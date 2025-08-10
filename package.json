@@ -1,0 +1,32 @@
+{
+  "name": "drome",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsc",
+    "ci": "pnpm run build"
+  },
+  "description": "A live coding DSL built with Typescript",
+  "keywords": [
+    "Live coding",
+    "typescript",
+    "Tidal Cycles"
+  ],
+  "homepage": "https://github.com/andy-stewart-design/drome",
+  "bugs": {
+    "url": "https://github.com/andy-stewart-design/drome/issues"
+  },
+  "author": "Andy Stewart <andy.stewart1170@gmail.com> (https://andystew.art)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andy-stewart-design/drome.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}
