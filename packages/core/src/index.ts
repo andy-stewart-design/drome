@@ -1,1 +1,1 @@
-export { add } from "./utils.js";
+export { default as DromeArray } from "./cycle/drome-array.js";
