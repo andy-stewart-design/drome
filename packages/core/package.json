@@ -1,0 +1,27 @@
+{
+  "name": "drome-live",
+  "version": "0.0.1",
+  "description": "A web-based language for live coding music",
+  "keywords": [
+    "drome",
+    "dromelive",
+    "tidalcycles",
+    "pattern",
+    "livecoding",
+    "algorave"
+  ],
+  "homepage": "https://github.com/andy-stewart-design/drome",
+  "bugs": {
+    "url": "https://github.com/andy-stewart-design/drome/issues"
+  },
+  "author": "Andy Stewart <andy.stewart1170@gmail.com> (https://andystew.art)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andy-stewart-design/drome"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "dist/index.js"
+}
