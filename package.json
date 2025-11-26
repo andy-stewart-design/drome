@@ -20,6 +20,7 @@
     "livecoding",
     "algorave"
   ],
+  "packageManager": "pnpm@10.3.0",
   "author": "",
   "license": "ISC",
   "devDependencies": {
