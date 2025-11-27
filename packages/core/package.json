@@ -16,7 +16,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "pnpm run clean && tsc"
+    "build": "pnpm run clean && tsc && tsc-alias"
   },
   "author": "Andy Stewart <andy.stewart1170@gmail.com> (https://andystew.art)",
   "repository": {

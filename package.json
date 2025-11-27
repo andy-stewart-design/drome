@@ -25,6 +25,7 @@
   "license": "ISC",
   "devDependencies": {
     "prettier": "^3.6.2",
+    "tsc-alias": "^1.8.16",
     "turbo": "^2.6.1",
     "typescript": "^5.9.3"
   }
