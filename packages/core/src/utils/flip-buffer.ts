@@ -1,3 +1,5 @@
+import { isNumber } from "./validators.js";
+
 function flipBuffer(ctx: AudioContext, buffer: AudioBuffer) {
   // Create a new AudioBuffer to store the reversed data
   const reversedBuffer = ctx.createBuffer(
@@ -13,8 +15,9 @@ function flipBuffer(ctx: AudioContext, buffer: AudioBuffer) {
 
     // Copy and reverse the data
     for (let j = 0; j < originalChannelData.length; j++) {
-      reversedChannelData[j] =
-        originalChannelData[originalChannelData.length - 1 - j];
+      let reversed = reversedChannelData[j];
+      const original = originalChannelData[originalChannelData.length - 1 - j];
+      if (isNumber(reversed) && isNumber(original)) reversed = original;
     }
   }
 
