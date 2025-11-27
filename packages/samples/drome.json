@@ -1,0 +1,1478 @@
+{
+  "9000": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "Linn9000/linn9000-bd/BAssdrum.wav"
+      ],
+      "cb": [
+        "Linn9000/linn9000-cb/Cowbell-01.wav",
+        "Linn9000/linn9000-cb/Cowbell-02.wav"
+      ],
+      "cr": [
+        "Linn9000/linn9000-cr/Crash-01.wav",
+        "Linn9000/linn9000-cr/Crash-02.wav"
+      ],
+      "hh": [
+        "Linn9000/linn9000-hh/Hat Closed.wav"
+      ],
+      "ht": [
+        "Linn9000/linn9000-ht/Tom-01.wav",
+        "Linn9000/linn9000-ht/Tom-02.wav"
+      ],
+      "lt": [
+        "Linn9000/linn9000-lt/Tom-04.wav",
+        "Linn9000/linn9000-lt/Tom-05.wav"
+      ],
+      "mt": [
+        "Linn9000/linn9000-mt/Tom-03.wav"
+      ],
+      "oh": [
+        "Linn9000/linn9000-oh/Hat Open.wav"
+      ],
+      "perc": [
+        "Linn9000/linn9000-perc/Conga H.wav",
+        "Linn9000/linn9000-perc/Conga L.wav",
+        "Linn9000/linn9000-perc/Conga M.wav"
+      ],
+      "rd": [
+        "Linn9000/linn9000-rd/Crash-03.wav",
+        "Linn9000/linn9000-rd/Ping.wav"
+      ],
+      "rim": [
+        "Linn9000/linn9000-rim/Rim Shot.wav"
+      ],
+      "sd": [
+        "Linn9000/linn9000-sd/0Snaredrum.wav"
+      ],
+      "tb": [
+        "Linn9000/linn9000-tb/Tambourine.wav"
+      ]
+    }
+  },
+  "ace": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "RhythmAce/rhythmace-bd/Bassdrum-01.wav",
+        "RhythmAce/rhythmace-bd/Bassdrum-02.wav",
+        "RhythmAce/rhythmace-bd/Bassdrum-03.wav"
+      ],
+      "hh": [
+        "RhythmAce/rhythmace-hh/Hat Closed.wav"
+      ],
+      "ht": [
+        "RhythmAce/rhythmace-ht/Tom H.wav"
+      ],
+      "lt": [
+        "RhythmAce/rhythmace-lt/Tom L.wav"
+      ],
+      "oh": [
+        "RhythmAce/rhythmace-oh/Hat Open.wav"
+      ],
+      "perc": [
+        "RhythmAce/rhythmace-perc/Clave.wav",
+        "RhythmAce/rhythmace-perc/Click.wav",
+        "RhythmAce/rhythmace-perc/Percussion-01.wav",
+        "RhythmAce/rhythmace-perc/Percussion-02.wav",
+        "RhythmAce/rhythmace-perc/Percussion-03.wav",
+        "RhythmAce/rhythmace-perc/Percussion-04.wav"
+      ],
+      "sd": [
+        "RhythmAce/rhythmace-sd/Snaredrum-01.wav",
+        "RhythmAce/rhythmace-sd/Snaredrum-02.wav",
+        "RhythmAce/rhythmace-sd/Snaredrum-03.wav"
+      ]
+    }
+  },
+  "cr78": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "RolandCompurhythm78/rolandcompurhythm78-bd/Bassdrum.wav"
+      ],
+      "cb": [
+        "RolandCompurhythm78/rolandcompurhythm78-cb/Cowbell.wav"
+      ],
+      "hh": [
+        "RolandCompurhythm78/rolandcompurhythm78-hh/Hat Closed-01.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-hh/Hat Closed-02.wav"
+      ],
+      "misc": [
+        "RolandCompurhythm78/rolandcompurhythm78-misc/Quid-01.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-misc/Quid-02.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-misc/Quid-03.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-misc/Quid-04.wav"
+      ],
+      "oh": [
+        "RolandCompurhythm78/rolandcompurhythm78-oh/Hat Open-01.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-oh/Hat Open-02.wav"
+      ],
+      "perc": [
+        "RolandCompurhythm78/rolandcompurhythm78-perc/Conga H.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-perc/Conga L.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-perc/Conga M.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-perc/Hit.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-perc/Woodblock-01.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-perc/Woodblock-02.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-perc/Woodblock-03.wav",
+        "RolandCompurhythm78/rolandcompurhythm78-perc/Woodblock-04.wav"
+      ],
+      "sd": [
+        "RolandCompurhythm78/rolandcompurhythm78-sd/Snaredrum.wav"
+      ],
+      "tb": [
+        "RolandCompurhythm78/rolandcompurhythm78-tb/Tambourine.wav"
+      ]
+    }
+  },
+  "d70": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "RolandD70/rolandd70-bd/Bassdrum-01.wav",
+        "RolandD70/rolandd70-bd/Bassdrum-02.wav",
+        "RolandD70/rolandd70-bd/Bassdrum-03.wav",
+        "RolandD70/rolandd70-bd/Bassdrum-04.wav"
+      ],
+      "cb": [
+        "RolandD70/rolandd70-cb/Cowbell.wav"
+      ],
+      "cp": [
+        "RolandD70/rolandd70-cp/Clap.wav"
+      ],
+      "cr": [
+        "RolandD70/rolandd70-cr/Crash.wav"
+      ],
+      "hh": [
+        "RolandD70/rolandd70-hh/Hat Closed.wav"
+      ],
+      "lt": [
+        "RolandD70/rolandd70-lt/Tom-02.wav"
+      ],
+      "mt": [
+        "RolandD70/rolandd70-mt/Tom.-01.wav"
+      ],
+      "oh": [
+        "RolandD70/rolandd70-oh/Hat Open.wav"
+      ],
+      "perc": [
+        "RolandD70/rolandd70-perc/Sticks.wav"
+      ],
+      "rd": [
+        "RolandD70/rolandd70-rd/Ride.wav"
+      ],
+      "rim": [
+        "RolandD70/rolandd70-rim/Rim Shot.wav"
+      ],
+      "sd": [
+        "RolandD70/rolandd70-sd/Snaredrum-01.wav",
+        "RolandD70/rolandd70-sd/Snaredrum-02.wav",
+        "RolandD70/rolandd70-sd/Snaredrum-03.wav",
+        "RolandD70/rolandd70-sd/Snaredrum-04.wav",
+        "RolandD70/rolandd70-sd/Snaredrum-05.wav"
+      ],
+      "sh": [
+        "RolandD70/rolandd70-sh/Cabasa.wav"
+      ]
+    }
+  },
+  "dmx": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "misc": [
+        "OberheimDMX/oberheimdmx--perc/Timbale H.wav",
+        "OberheimDMX/oberheimdmx--perc/Timbale L.wav",
+        "OberheimDMX/oberheimdmx--perc/Timbale M.wav"
+      ],
+      "bd": [
+        "OberheimDMX/oberheimdmx-bd/Bassdrum-01.wav",
+        "OberheimDMX/oberheimdmx-bd/Bassdrum-02.wav",
+        "OberheimDMX/oberheimdmx-bd/Bassdrum-03.wav"
+      ],
+      "cp": [
+        "OberheimDMX/oberheimdmx-cp/Clap.wav"
+      ],
+      "cr": [
+        "OberheimDMX/oberheimdmx-cr/Crash.wav"
+      ],
+      "hh": [
+        "OberheimDMX/oberheimdmx-hh/Hat Closed.wav"
+      ],
+      "ht": [
+        "OberheimDMX/oberheimdmx-ht/Tom H.wav"
+      ],
+      "lt": [
+        "OberheimDMX/oberheimdmx-lt/Tom L.wav"
+      ],
+      "mt": [
+        "OberheimDMX/oberheimdmx-mt/Tom M.wav"
+      ],
+      "oh": [
+        "OberheimDMX/oberheimdmx-oh/Hat Open.wav"
+      ],
+      "rd": [
+        "OberheimDMX/oberheimdmx-rd/Ride.wav"
+      ],
+      "rim": [
+        "OberheimDMX/oberheimdmx-rim/Rim Shot.wav"
+      ],
+      "sd": [
+        "OberheimDMX/oberheimdmx-sd/Snaredrum-01.wav",
+        "OberheimDMX/oberheimdmx-sd/Snaredrum-02.wav",
+        "OberheimDMX/oberheimdmx-sd/Snaredrum-03.wav"
+      ],
+      "sh": [
+        "OberheimDMX/oberheimdmx-sh/Cabasa.wav"
+      ],
+      "tb": [
+        "OberheimDMX/oberheimdmx-tb/Tamborine.wav"
+      ]
+    }
+  },
+  "dr550": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "BossDR550/bossdr550-bd/Bassdrum-01.wav",
+        "BossDR550/bossdr550-bd/Bassdrum-02.wav",
+        "BossDR550/bossdr550-bd/Bassdrum-03.wav",
+        "BossDR550/bossdr550-bd/Bassdrum-04.wav",
+        "BossDR550/bossdr550-bd/Bassdrum-05.wav"
+      ],
+      "cb": [
+        "BossDR550/bossdr550-cb/Cowbell-01.wav",
+        "BossDR550/bossdr550-cb/Cowbell-02.wav"
+      ],
+      "cp": [
+        "BossDR550/bossdr550-cp/Clap.wav"
+      ],
+      "cr": [
+        "BossDR550/bossdr550-cr/Crash.wav"
+      ],
+      "hh": [
+        "BossDR550/bossdr550-hh/Hat Closed-01.wav",
+        "BossDR550/bossdr550-hh/Hat Closed-02.wav"
+      ],
+      "ht": [
+        "BossDR550/bossdr550-ht/Tom H-01.wav",
+        "BossDR550/bossdr550-ht/Tom H-02.wav",
+        "BossDR550/bossdr550-ht/Tom H-03.wav"
+      ],
+      "lt": [
+        "BossDR550/bossdr550-lt/Tom L-01.wav",
+        "BossDR550/bossdr550-lt/Tom L-02.wav",
+        "BossDR550/bossdr550-lt/Tom L-03.wav"
+      ],
+      "misc": [
+        "BossDR550/bossdr550-misc/Hi Q.wav",
+        "BossDR550/bossdr550-misc/Srcatch-01.wav",
+        "BossDR550/bossdr550-misc/Srcatch-02.wav"
+      ],
+      "mt": [
+        "BossDR550/bossdr550-mt/Tom M-01.wav",
+        "BossDR550/bossdr550-mt/Tom M-02.wav"
+      ],
+      "oh": [
+        "BossDR550/bossdr550-oh/Hat Open-01.wav",
+        "BossDR550/bossdr550-oh/Hat Open-02.wav"
+      ],
+      "perc": [
+        "BossDR550/bossdr550-perc/Agogo H.wav",
+        "BossDR550/bossdr550-perc/Agogo L.wav",
+        "BossDR550/bossdr550-perc/Bongo H.wav",
+        "BossDR550/bossdr550-perc/Bongo L.wav",
+        "BossDR550/bossdr550-perc/Claves.wav",
+        "BossDR550/bossdr550-perc/Conga H.wav",
+        "BossDR550/bossdr550-perc/Conga L.wav",
+        "BossDR550/bossdr550-perc/Conga S.wav",
+        "BossDR550/bossdr550-perc/Timbale H.wav",
+        "BossDR550/bossdr550-perc/Timbale L.wav",
+        "BossDR550/bossdr550-perc/Whistle.wav"
+      ],
+      "rd": [
+        "BossDR550/bossdr550-rd/Ride-01.wav",
+        "BossDR550/bossdr550-rd/Ride-02.wav"
+      ],
+      "rim": [
+        "BossDR550/bossdr550-rim/Rim Shot.wav"
+      ],
+      "sd": [
+        "BossDR550/bossdr550-sd/Snaredrum-01.wav",
+        "BossDR550/bossdr550-sd/Snaredrum-02.wav",
+        "BossDR550/bossdr550-sd/Snaredrum-03.wav",
+        "BossDR550/bossdr550-sd/Snaredrum-04.wav",
+        "BossDR550/bossdr550-sd/Snaredrum-05.wav",
+        "BossDR550/bossdr550-sd/Snaredrum-06.wav"
+      ],
+      "sh": [
+        "BossDR550/bossdr550-sh/Cabasa-01.wav",
+        "BossDR550/bossdr550-sh/Cabasa-02.wav"
+      ]
+    }
+  },
+  "fx": {
+    "basePath": "https://raw.githubusercontent.com/andy-stewart-design/samples-fx/main/",
+    "slugs": {
+      "echo": [
+        "reverb/echo-2.wav",
+        "reverb/echo-thief-1.wav",
+        "reverb/echo-thief-2.wav",
+        "reverb/echo.wav"
+      ],
+      "muffler": [
+        "reverb/muffler.wav"
+      ],
+      "spring": [
+        "reverb/spring.wav",
+        "reverb/spring-2.wav"
+      ],
+      "telephone": [
+        "reverb/telephone.wav"
+      ],
+      "rmx16": [
+        "reverb/rmx16-1.wav",
+        "reverb/rmx16-2.wav"
+      ]
+    }
+  },
+  "hr16": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "AlesisHR16/alesishr16-bd/Bassdrum.wav"
+      ],
+      "cp": [
+        "AlesisHR16/alesishr16-cp/Clap.wav"
+      ],
+      "hh": [
+        "AlesisHR16/alesishr16-hh/Closed Hat.wav"
+      ],
+      "ht": [
+        "AlesisHR16/alesishr16-ht/Tom-2.wav"
+      ],
+      "lt": [
+        "AlesisHR16/alesishr16-lt/Tom-1.wav"
+      ],
+      "oh": [
+        "AlesisHR16/alesishr16-oh/Open Hat.wav"
+      ],
+      "perc": [
+        "AlesisHR16/alesishr16-perc/Agogo Bell.wav",
+        "AlesisHR16/alesishr16-perc/Claves.wav",
+        "AlesisHR16/alesishr16-perc/Conga H.wav",
+        "AlesisHR16/alesishr16-perc/Conga L.wav",
+        "AlesisHR16/alesishr16-perc/Timbale.wav",
+        "AlesisHR16/alesishr16-perc/Triangle.wav",
+        "AlesisHR16/alesishr16-perc/Wood Block H.wav",
+        "AlesisHR16/alesishr16-perc/Wood Block L.wav"
+      ],
+      "rim": [
+        "AlesisHR16/alesishr16-rim/Rim.wav"
+      ],
+      "sd": [
+        "AlesisHR16/alesishr16-sd/Snaredrum.wav"
+      ],
+      "sh": [
+        "AlesisHR16/alesishr16-sh/Cabasa.wav",
+        "AlesisHR16/alesishr16-sh/Maracas.wav",
+        "AlesisHR16/alesishr16-sh/Shaker.wav"
+      ]
+    }
+  },
+  "loops": {
+    "basePath": "https://raw.githubusercontent.com/andy-stewart-design/samples-loops/main/",
+    "slugs": {
+      "break": [
+        "breaks/10_break.wav",
+        "breaks/11_break.wav",
+        "breaks/12_break.wav",
+        "breaks/13_break.wav",
+        "breaks/14_break.wav"
+      ],
+      "rhodes": [
+        "rhodes/rhodes-01.mp3"
+      ]
+    }
+  },
+  "ms404": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "DoepferMS404/doepferms404-bd/0Bassdrum.wav",
+        "DoepferMS404/doepferms404-bd/Bassdrum Reverse.wav"
+      ],
+      "hh": [
+        "DoepferMS404/doepferms404-hh/Hat Closed.wav"
+      ],
+      "lt": [
+        "DoepferMS404/doepferms404-lt/Tom.wav"
+      ],
+      "oh": [
+        "DoepferMS404/doepferms404-oh/Hat Open.wav"
+      ],
+      "sd": [
+        "DoepferMS404/doepferms404-sd/Snaredrum.wav"
+      ]
+    }
+  },
+  "rm50": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "YamahaRM50/yamaharm50-bd/BD-001.wav",
+        "YamahaRM50/yamaharm50-bd/BD-002.wav",
+        "YamahaRM50/yamaharm50-bd/BD-003.wav",
+        "YamahaRM50/yamaharm50-bd/BD-004.wav",
+        "YamahaRM50/yamaharm50-bd/BD-005.wav",
+        "YamahaRM50/yamaharm50-bd/BD-006.wav",
+        "YamahaRM50/yamaharm50-bd/BD-007.wav",
+        "YamahaRM50/yamaharm50-bd/BD-008.wav",
+        "YamahaRM50/yamaharm50-bd/BD-009.wav",
+        "YamahaRM50/yamaharm50-bd/BD-010.wav",
+        "YamahaRM50/yamaharm50-bd/BD-011..wav",
+        "YamahaRM50/yamaharm50-bd/BD-012.wav",
+        "YamahaRM50/yamaharm50-bd/BD-013.wav",
+        "YamahaRM50/yamaharm50-bd/BD-014.wav",
+        "YamahaRM50/yamaharm50-bd/BD-015.wav",
+        "YamahaRM50/yamaharm50-bd/BD-016.wav",
+        "YamahaRM50/yamaharm50-bd/BD-017.wav",
+        "YamahaRM50/yamaharm50-bd/BD-018.wav",
+        "YamahaRM50/yamaharm50-bd/BD-019.wav",
+        "YamahaRM50/yamaharm50-bd/BD-020.wav",
+        "YamahaRM50/yamaharm50-bd/BD-021.wav",
+        "YamahaRM50/yamaharm50-bd/BD-022.wav",
+        "YamahaRM50/yamaharm50-bd/BD-023.wav",
+        "YamahaRM50/yamaharm50-bd/BD-024.wav",
+        "YamahaRM50/yamaharm50-bd/BD-025.wav",
+        "YamahaRM50/yamaharm50-bd/BD-026.wav",
+        "YamahaRM50/yamaharm50-bd/BD-027.wav",
+        "YamahaRM50/yamaharm50-bd/BD-028.wav",
+        "YamahaRM50/yamaharm50-bd/BD-029.wav",
+        "YamahaRM50/yamaharm50-bd/BD-030.wav",
+        "YamahaRM50/yamaharm50-bd/BD-031.wav",
+        "YamahaRM50/yamaharm50-bd/BD-032.wav",
+        "YamahaRM50/yamaharm50-bd/BD-033.wav",
+        "YamahaRM50/yamaharm50-bd/BD-034.wav",
+        "YamahaRM50/yamaharm50-bd/BD-035.wav",
+        "YamahaRM50/yamaharm50-bd/BD-036.wav",
+        "YamahaRM50/yamaharm50-bd/BD-037.wav",
+        "YamahaRM50/yamaharm50-bd/BD-038.wav",
+        "YamahaRM50/yamaharm50-bd/BD-039.wav",
+        "YamahaRM50/yamaharm50-bd/BD-040.wav",
+        "YamahaRM50/yamaharm50-bd/BD-041.wav",
+        "YamahaRM50/yamaharm50-bd/BD-042.wav",
+        "YamahaRM50/yamaharm50-bd/BD-043.wav",
+        "YamahaRM50/yamaharm50-bd/BD-044.wav",
+        "YamahaRM50/yamaharm50-bd/BD-045.wav",
+        "YamahaRM50/yamaharm50-bd/BD-046.wav",
+        "YamahaRM50/yamaharm50-bd/BD-047.wav",
+        "YamahaRM50/yamaharm50-bd/BD-048.wav",
+        "YamahaRM50/yamaharm50-bd/BD-049.wav",
+        "YamahaRM50/yamaharm50-bd/BD-050.wav",
+        "YamahaRM50/yamaharm50-bd/BD-051.wav",
+        "YamahaRM50/yamaharm50-bd/BD-052.wav",
+        "YamahaRM50/yamaharm50-bd/BD-053.wav",
+        "YamahaRM50/yamaharm50-bd/BD-054.wav",
+        "YamahaRM50/yamaharm50-bd/BD-055.wav",
+        "YamahaRM50/yamaharm50-bd/BD-056.wav",
+        "YamahaRM50/yamaharm50-bd/BD-057.wav",
+        "YamahaRM50/yamaharm50-bd/BD-058.wav",
+        "YamahaRM50/yamaharm50-bd/BD-059.wav",
+        "YamahaRM50/yamaharm50-bd/BD-060.wav",
+        "YamahaRM50/yamaharm50-bd/BD-061.wav",
+        "YamahaRM50/yamaharm50-bd/BD-062.wav",
+        "YamahaRM50/yamaharm50-bd/BD-063.wav",
+        "YamahaRM50/yamaharm50-bd/BD-064.wav",
+        "YamahaRM50/yamaharm50-bd/BD-065.wav",
+        "YamahaRM50/yamaharm50-bd/BD-066.wav",
+        "YamahaRM50/yamaharm50-bd/BD-067.wav",
+        "YamahaRM50/yamaharm50-bd/BD-068.wav",
+        "YamahaRM50/yamaharm50-bd/BD-069.wav",
+        "YamahaRM50/yamaharm50-bd/BD-070.wav",
+        "YamahaRM50/yamaharm50-bd/BD-071.wav",
+        "YamahaRM50/yamaharm50-bd/BD-072.wav",
+        "YamahaRM50/yamaharm50-bd/BD-073.wav",
+        "YamahaRM50/yamaharm50-bd/BD-074.wav",
+        "YamahaRM50/yamaharm50-bd/BD-075.wav",
+        "YamahaRM50/yamaharm50-bd/BD-076.wav",
+        "YamahaRM50/yamaharm50-bd/BD-077.wav",
+        "YamahaRM50/yamaharm50-bd/BD-078.wav",
+        "YamahaRM50/yamaharm50-bd/BD-079.wav",
+        "YamahaRM50/yamaharm50-bd/BD-080.wav",
+        "YamahaRM50/yamaharm50-bd/BD-081.wav",
+        "YamahaRM50/yamaharm50-bd/BD-082.wav",
+        "YamahaRM50/yamaharm50-bd/BD-083.wav",
+        "YamahaRM50/yamaharm50-bd/BD-084.wav",
+        "YamahaRM50/yamaharm50-bd/BD-085.wav",
+        "YamahaRM50/yamaharm50-bd/BD-086.wav",
+        "YamahaRM50/yamaharm50-bd/BD-087.wav",
+        "YamahaRM50/yamaharm50-bd/BD-088.wav",
+        "YamahaRM50/yamaharm50-bd/BD-089.wav",
+        "YamahaRM50/yamaharm50-bd/BD-090.wav",
+        "YamahaRM50/yamaharm50-bd/BD-091.wav",
+        "YamahaRM50/yamaharm50-bd/BD-092.wav",
+        "YamahaRM50/yamaharm50-bd/BD-093.wav",
+        "YamahaRM50/yamaharm50-bd/BD-094.wav",
+        "YamahaRM50/yamaharm50-bd/BD-095.wav",
+        "YamahaRM50/yamaharm50-bd/BD-096.wav",
+        "YamahaRM50/yamaharm50-bd/BD-097.wav",
+        "YamahaRM50/yamaharm50-bd/BD-098.wav",
+        "YamahaRM50/yamaharm50-bd/BD-099.wav",
+        "YamahaRM50/yamaharm50-bd/BD-100.wav",
+        "YamahaRM50/yamaharm50-bd/BD-101.wav",
+        "YamahaRM50/yamaharm50-bd/BD-102.wav",
+        "YamahaRM50/yamaharm50-bd/BD-103.wav"
+      ],
+      "cb": [
+        "YamahaRM50/yamaharm50-cb/FX_001.wav",
+        "YamahaRM50/yamaharm50-cb/FX_002.wav",
+        "YamahaRM50/yamaharm50-cb/FX_025.wav",
+        "YamahaRM50/yamaharm50-cb/FX_026.wav",
+        "YamahaRM50/yamaharm50-cb/FX_027.wav",
+        "YamahaRM50/yamaharm50-cb/FX_061.wav"
+      ],
+      "cp": [
+        "YamahaRM50/yamaharm50-cp/FX_059.wav",
+        "YamahaRM50/yamaharm50-cp/FX_060.wav"
+      ],
+      "cr": [
+        "YamahaRM50/yamaharm50-cr/CYMBAL_043.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_044.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_045.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_046.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_047.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_048.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_049.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_050.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_051.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_052.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_053.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_054.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_055.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_056.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_057.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_058.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_059.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_060.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_061.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_063.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_064.wav",
+        "YamahaRM50/yamaharm50-cr/CYMBAL_065.wav"
+      ],
+      "hh": [
+        "YamahaRM50/yamaharm50-hh/CYMBAL_001.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_002.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_005.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_006.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_008.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_009.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_010.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_013.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_014.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_016.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_017.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_019.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_020.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_021.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_024.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_025.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_026.wav",
+        "YamahaRM50/yamaharm50-hh/CYMBAL_028.wav"
+      ],
+      "ht": [
+        "YamahaRM50/yamaharm50-ht/TOMS_001.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_005.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_009.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_010.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_013.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_017.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_021.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_022.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_025.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_026.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_029.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_035.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_039.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_043.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_047.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_049.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_052.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_056.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_064.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_068.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_072.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_077.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_085.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_089.wav",
+        "YamahaRM50/yamaharm50-ht/TOMS_101.wav"
+      ],
+      "lt": [
+        "YamahaRM50/yamaharm50-lt/TOMS_004.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_008.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_012.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_015.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_016.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_019.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_020.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_024.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_028.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_032.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_033.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_034.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_038.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_041.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_042.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_046.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_048.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_050.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_051.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_053.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_054.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_055.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_058.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_059.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_061.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_062.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_063.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_066.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_067.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_071.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_075.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_079.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_082.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_083.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_084.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_087.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_088.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_092.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_094.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_095.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_096.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_099.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_100.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_103.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_104.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_105.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_106.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_107.wav",
+        "YamahaRM50/yamaharm50-lt/TOMS_108.wav"
+      ],
+      "misc": [
+        "YamahaRM50/yamaharm50-misc/CYMBAL_062.wav",
+        "YamahaRM50/yamaharm50-misc/FX_071.wav",
+        "YamahaRM50/yamaharm50-misc/FX_072.wav",
+        "YamahaRM50/yamaharm50-misc/FX_074.wav",
+        "YamahaRM50/yamaharm50-misc/FX_075.wav",
+        "YamahaRM50/yamaharm50-misc/FX_076.wav",
+        "YamahaRM50/yamaharm50-misc/FX_079.wav",
+        "YamahaRM50/yamaharm50-misc/FX_082.wav",
+        "YamahaRM50/yamaharm50-misc/FX_083.wav",
+        "YamahaRM50/yamaharm50-misc/FX_085.wav",
+        "YamahaRM50/yamaharm50-misc/FX_086.wav",
+        "YamahaRM50/yamaharm50-misc/FX_087.wav",
+        "YamahaRM50/yamaharm50-misc/FX_088.wav",
+        "YamahaRM50/yamaharm50-misc/FX_089.wav",
+        "YamahaRM50/yamaharm50-misc/FX_090.wav",
+        "YamahaRM50/yamaharm50-misc/FX_091.wav",
+        "YamahaRM50/yamaharm50-misc/FX_092.wav",
+        "YamahaRM50/yamaharm50-misc/FX_093.wav",
+        "YamahaRM50/yamaharm50-misc/FX_094.wav",
+        "YamahaRM50/yamaharm50-misc/FX_095.wav",
+        "YamahaRM50/yamaharm50-misc/FX_098.wav",
+        "YamahaRM50/yamaharm50-misc/FX_122.wav",
+        "YamahaRM50/yamaharm50-misc/FX_126.wav",
+        "YamahaRM50/yamaharm50-misc/FX_127.wav",
+        "YamahaRM50/yamaharm50-misc/FX_128.wav",
+        "YamahaRM50/yamaharm50-misc/FX_129.wav",
+        "YamahaRM50/yamaharm50-misc/FX_135.wav",
+        "YamahaRM50/yamaharm50-misc/FX_139.wav"
+      ],
+      "mt": [
+        "YamahaRM50/yamaharm50-mt/TOMS_002.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_003.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_006.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_007.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_011.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_014.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_018.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_023.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_027.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_030.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_031.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_036.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_037.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_040.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_044.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_045.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_057.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_060.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_065.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_069.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_070.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_073.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_074.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_076.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_078.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_080.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_081.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_086.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_090.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_091.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_093.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_097.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_098.wav",
+        "YamahaRM50/yamaharm50-mt/TOMS_102.wav"
+      ],
+      "oh": [
+        "YamahaRM50/yamaharm50-oh/CYMBAL_003.wav",
+        "YamahaRM50/yamaharm50-oh/CYMBAL_004.wav",
+        "YamahaRM50/yamaharm50-oh/CYMBAL_007.wav",
+        "YamahaRM50/yamaharm50-oh/CYMBAL_011.wav",
+        "YamahaRM50/yamaharm50-oh/CYMBAL_012.wav",
+        "YamahaRM50/yamaharm50-oh/CYMBAL_015.wav",
+        "YamahaRM50/yamaharm50-oh/CYMBAL_018.wav",
+        "YamahaRM50/yamaharm50-oh/CYMBAL_022.wav",
+        "YamahaRM50/yamaharm50-oh/CYMBAL_023.wav",
+        "YamahaRM50/yamaharm50-oh/CYMBAL_027.wav",
+        "YamahaRM50/yamaharm50-oh/CYMBAL_029.wav",
+        "YamahaRM50/yamaharm50-oh/FX_064.wav"
+      ],
+      "perc": [
+        "YamahaRM50/yamaharm50-perc/FX_003.wav",
+        "YamahaRM50/yamaharm50-perc/FX_004.wav",
+        "YamahaRM50/yamaharm50-perc/FX_012.wav",
+        "YamahaRM50/yamaharm50-perc/FX_013.wav",
+        "YamahaRM50/yamaharm50-perc/FX_014.wav",
+        "YamahaRM50/yamaharm50-perc/FX_015.wav",
+        "YamahaRM50/yamaharm50-perc/FX_016.wav",
+        "YamahaRM50/yamaharm50-perc/FX_017.wav",
+        "YamahaRM50/yamaharm50-perc/FX_018.wav",
+        "YamahaRM50/yamaharm50-perc/FX_019.wav",
+        "YamahaRM50/yamaharm50-perc/FX_020.wav",
+        "YamahaRM50/yamaharm50-perc/FX_021.wav",
+        "YamahaRM50/yamaharm50-perc/FX_022.wav",
+        "YamahaRM50/yamaharm50-perc/FX_023.wav",
+        "YamahaRM50/yamaharm50-perc/FX_024.wav",
+        "YamahaRM50/yamaharm50-perc/FX_033.wav",
+        "YamahaRM50/yamaharm50-perc/FX_034.wav",
+        "YamahaRM50/yamaharm50-perc/FX_035.wav",
+        "YamahaRM50/yamaharm50-perc/FX_036.wav",
+        "YamahaRM50/yamaharm50-perc/FX_037.wav",
+        "YamahaRM50/yamaharm50-perc/FX_038.wav",
+        "YamahaRM50/yamaharm50-perc/FX_039.wav",
+        "YamahaRM50/yamaharm50-perc/FX_040.wav",
+        "YamahaRM50/yamaharm50-perc/FX_041.wav",
+        "YamahaRM50/yamaharm50-perc/FX_042.wav",
+        "YamahaRM50/yamaharm50-perc/FX_043.wav",
+        "YamahaRM50/yamaharm50-perc/FX_044.wav",
+        "YamahaRM50/yamaharm50-perc/FX_045.wav",
+        "YamahaRM50/yamaharm50-perc/FX_046.wav",
+        "YamahaRM50/yamaharm50-perc/FX_047.wav",
+        "YamahaRM50/yamaharm50-perc/FX_048.wav",
+        "YamahaRM50/yamaharm50-perc/FX_049.wav",
+        "YamahaRM50/yamaharm50-perc/FX_050.wav",
+        "YamahaRM50/yamaharm50-perc/FX_051.wav",
+        "YamahaRM50/yamaharm50-perc/FX_052.wav",
+        "YamahaRM50/yamaharm50-perc/FX_053.wav",
+        "YamahaRM50/yamaharm50-perc/FX_054.wav",
+        "YamahaRM50/yamaharm50-perc/FX_055.wav",
+        "YamahaRM50/yamaharm50-perc/FX_056.wav",
+        "YamahaRM50/yamaharm50-perc/FX_057.wav",
+        "YamahaRM50/yamaharm50-perc/FX_058.wav",
+        "YamahaRM50/yamaharm50-perc/FX_062.wav",
+        "YamahaRM50/yamaharm50-perc/FX_063.wav",
+        "YamahaRM50/yamaharm50-perc/FX_065.wav",
+        "YamahaRM50/yamaharm50-perc/FX_066.wav",
+        "YamahaRM50/yamaharm50-perc/FX_067.wav",
+        "YamahaRM50/yamaharm50-perc/FX_068.wav",
+        "YamahaRM50/yamaharm50-perc/FX_069.wav",
+        "YamahaRM50/yamaharm50-perc/FX_070.wav",
+        "YamahaRM50/yamaharm50-perc/FX_073.wav",
+        "YamahaRM50/yamaharm50-perc/FX_116.wav",
+        "YamahaRM50/yamaharm50-perc/FX_119.wav",
+        "YamahaRM50/yamaharm50-perc/FX_120.wav",
+        "YamahaRM50/yamaharm50-perc/FX_121.wav",
+        "YamahaRM50/yamaharm50-perc/FX_125.wav",
+        "YamahaRM50/yamaharm50-perc/FX_132.wav"
+      ],
+      "rd": [
+        "YamahaRM50/yamaharm50-rd/CYMBAL_030.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_031.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_032.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_033.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_034.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_035.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_036.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_037.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_038.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_039.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_040.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_041.wav",
+        "YamahaRM50/yamaharm50-rd/CYMBAL_042.wav"
+      ],
+      "sd": [
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_001.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_002.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_003.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_004.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_005.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_006.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_007.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_008.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_009.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_010.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_011.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_012.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_013.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_014.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_015.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_016.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_017.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_018.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_019.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_020.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_021.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_022.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_023.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_024.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_025.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_026.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_027.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_028.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_029.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_030.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_031.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_032.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_033.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_034.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_035.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_036.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_037.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_038.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_039.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_040.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_041.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_042.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_043.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_044.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_045.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_046.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_047.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_048.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_049.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_050.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_051.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_052.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_053.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_054.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_055.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_056.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_057.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_058.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_059.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_060.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_061.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_062.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_063.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_064.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_065.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_066.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_067.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_068.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_069.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_070.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_071.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_072.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_073.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_074.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_075.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_076.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_077.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_078.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_079.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_080.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_081.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_082.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_083.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_084.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_085.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_086.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_087.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_088.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_089.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_090.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_091.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_092.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_093.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_094.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_095.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_096.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_097.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_098.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_099.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_100.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_101.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_102.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_103.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_104.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_105.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_106.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_107.wav",
+        "YamahaRM50/yamaharm50-sd/SNAREDRUM_108.wav"
+      ],
+      "sh": [
+        "YamahaRM50/yamaharm50-sh/FX_010.wav",
+        "YamahaRM50/yamaharm50-sh/FX_011.wav",
+        "YamahaRM50/yamaharm50-sh/FX_028.wav",
+        "YamahaRM50/yamaharm50-sh/FX_029.wav",
+        "YamahaRM50/yamaharm50-sh/FX_130.wav",
+        "YamahaRM50/yamaharm50-sh/FX_131.wav"
+      ],
+      "tb": [
+        "YamahaRM50/yamaharm50-tb/FX_030.wav",
+        "YamahaRM50/yamaharm50-tb/FX_031.wav",
+        "YamahaRM50/yamaharm50-tb/FX_032.wav"
+      ]
+    }
+  },
+  "sonicpi": {
+    "basePath": "https://raw.githubusercontent.com/andy-stewart-design/samples-sonic-pi/main/",
+    "slugs": {
+      "ambi": [
+        "ambient/ambi_choir.wav",
+        "ambient/ambi_drone.wav",
+        "ambient/ambi_haunted_hum.wav"
+      ],
+      "bass": [
+        "/bass/00_bass_thick_c.wav",
+        "/bass/01_bass_trance_c.wav",
+        "/bass/02_bass_dnb_f.wav",
+        "/bass/03_bass_drop_c.wav"
+      ]
+    }
+  },
+  "tr505": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "RolandTR505/rolandtr505-bd/Bassdrum.wav"
+      ],
+      "cb": [
+        "RolandTR505/rolandtr505-cb/Cowbell H.wav",
+        "RolandTR505/rolandtr505-cb/Cowbell L.wav"
+      ],
+      "cp": [
+        "RolandTR505/rolandtr505-cp/Clap.wav"
+      ],
+      "cr": [
+        "RolandTR505/rolandtr505-cr/Crash.wav"
+      ],
+      "hh": [
+        "RolandTR505/rolandtr505-hh/Hat Closed.wav"
+      ],
+      "ht": [
+        "RolandTR505/rolandtr505-ht/Tom H.wav"
+      ],
+      "lt": [
+        "RolandTR505/rolandtr505-lt/Tom L.wav"
+      ],
+      "mt": [
+        "RolandTR505/rolandtr505-mt/Tom M.wav"
+      ],
+      "oh": [
+        "RolandTR505/rolandtr505-oh/Hat Open.wav"
+      ],
+      "perc": [
+        "RolandTR505/rolandtr505-perc/Conga H.wav",
+        "RolandTR505/rolandtr505-perc/Conga L.wav",
+        "RolandTR505/rolandtr505-perc/Timbale.wav"
+      ],
+      "rd": [
+        "RolandTR505/rolandtr505-rd/Ride.wav"
+      ],
+      "rim": [
+        "RolandTR505/rolandtr505-rim/Rimshot.wav"
+      ],
+      "sd": [
+        "RolandTR505/rolandtr505-sd/Snaredrum.wav"
+      ]
+    }
+  },
+  "tr606": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "RolandTR606/rolandtr606-bd/Bassdrum.wav"
+      ],
+      "cr": [
+        "RolandTR606/rolandtr606-cr/Cymbal.wav"
+      ],
+      "hh": [
+        "RolandTR606/rolandtr606-hh/Hat Closed.wav"
+      ],
+      "ht": [
+        "RolandTR606/rolandtr606-ht/Tom H.wav"
+      ],
+      "lt": [
+        "RolandTR606/rolandtr606-lt/Tom L.wav"
+      ],
+      "oh": [
+        "RolandTR606/rolandtr606-oh/Hat Open.wav"
+      ],
+      "sd": [
+        "RolandTR606/rolandtr606-sd/Snaredrum.wav"
+      ]
+    }
+  },
+  "tr626": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "RolandTR626/rolandtr626-bd/Bassdrum-01.wav",
+        "RolandTR626/rolandtr626-bd/Bassdrum-02.wav"
+      ],
+      "cb": [
+        "RolandTR626/rolandtr626-cb/Cowbell.wav"
+      ],
+      "cp": [
+        "RolandTR626/rolandtr626-cp/Clap.wav"
+      ],
+      "cr": [
+        "RolandTR626/rolandtr626-cr/Crash.wav",
+        "RolandTR626/rolandtr626-cr/zChina.wav"
+      ],
+      "hh": [
+        "RolandTR626/rolandtr626-hh/Hat Closed.wav"
+      ],
+      "ht": [
+        "RolandTR626/rolandtr626-ht/Tom H-01.wav",
+        "RolandTR626/rolandtr626-ht/Tom H-02.wav"
+      ],
+      "lt": [
+        "RolandTR626/rolandtr626-lt/Tom L-01.wav",
+        "RolandTR626/rolandtr626-lt/Tom L-02.wav"
+      ],
+      "mt": [
+        "RolandTR626/rolandtr626-mt/Tom M-01.wav",
+        "RolandTR626/rolandtr626-mt/Tom M-02.wav"
+      ],
+      "oh": [
+        "RolandTR626/rolandtr626-oh/Hat Open.wav"
+      ],
+      "perc": [
+        "RolandTR626/rolandtr626-perc/Agogo H.wav",
+        "RolandTR626/rolandtr626-perc/Agogo L.wav",
+        "RolandTR626/rolandtr626-perc/Clave.wav",
+        "RolandTR626/rolandtr626-perc/Conga H.wav",
+        "RolandTR626/rolandtr626-perc/Conga L.wav",
+        "RolandTR626/rolandtr626-perc/Conga M.wav",
+        "RolandTR626/rolandtr626-perc/Timbale H.wav",
+        "RolandTR626/rolandtr626-perc/Timbale L.wav"
+      ],
+      "rd": [
+        "RolandTR626/rolandtr626-rd/Ride-01.wav",
+        "RolandTR626/rolandtr626-rd/Ride-02.wav"
+      ],
+      "rim": [
+        "RolandTR626/rolandtr626-rim/Rimshot.wav"
+      ],
+      "sd": [
+        "RolandTR626/rolandtr626-sd/Snaredrum-01.wav",
+        "RolandTR626/rolandtr626-sd/Snaredrum-02.wav",
+        "RolandTR626/rolandtr626-sd/Snaredrum-03.wav"
+      ],
+      "sh": [
+        "RolandTR626/rolandtr626-sh/Shaker.wav"
+      ],
+      "tb": [
+        "RolandTR626/rolandtr626-tb/Tambourine.wav"
+      ]
+    }
+  },
+  "tr707": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "RolandTR707/rolandtr707-bd/Bassdrum-01.wav",
+        "RolandTR707/rolandtr707-bd/Bassdrum-02.wav"
+      ],
+      "cb": [
+        "RolandTR707/rolandtr707-cb/Cowbell.wav"
+      ],
+      "cp": [
+        "RolandTR707/rolandtr707-cp/Clap.wav"
+      ],
+      "cr": [
+        "RolandTR707/rolandtr707-cr/Crash.wav"
+      ],
+      "hh": [
+        "RolandTR707/rolandtr707-hh/Hat Closed.wav"
+      ],
+      "ht": [
+        "RolandTR707/rolandtr707-ht/Tom H.wav"
+      ],
+      "lt": [
+        "RolandTR707/rolandtr707-lt/Tom L.wav"
+      ],
+      "mt": [
+        "RolandTR707/rolandtr707-mt/Tom M.wav"
+      ],
+      "oh": [
+        "RolandTR707/rolandtr707-oh/Hat Open.wav"
+      ],
+      "rim": [
+        "RolandTR707/rolandtr707-rim/Rimshot.wav"
+      ],
+      "sd": [
+        "RolandTR707/rolandtr707-sd/Snaredrum-01.wav",
+        "RolandTR707/rolandtr707-sd/Snaredrum-02.wav"
+      ]
+    }
+  },
+  "tr808": {
+    "basePath": "https://raw.githubusercontent.com/andy-stewart-design/samples-tr808/main/",
+    "slugs": {
+      "bd": [
+        "kick/rolandtr808-kick-01.wav",
+        "kick/rolandtr808-kick-02.wav",
+        "kick/rolandtr808-kick-03.wav",
+        "kick/rolandtr808-kick-04.wav",
+        "kick/rolandtr808-kick-05.wav",
+        "kick/rolandtr808-kick-06.wav",
+        "kick/rolandtr808-kick-07.wav",
+        "kick/rolandtr808-kick-08.wav",
+        "kick/rolandtr808-kick-09.wav",
+        "kick/rolandtr808-kick-10.wav",
+        "kick/rolandtr808-kick-11.wav",
+        "kick/rolandtr808-kick-12.wav",
+        "kick/rolandtr808-kick-18.wav",
+        "kick/rolandtr808-kick-19.wav",
+        "kick/rolandtr808-kick-20.wav",
+        "kick/rolandtr808-kick-21.wav"
+      ],
+      "cb": [
+        "cowbell/rolandtr808-cowbell-01.wav",
+        "cowbell/rolandtr808-cowbell-02.wav",
+        "cowbell/rolandtr808-cowbell-03.wav",
+        "cowbell/rolandtr808-cowbell-04.wav",
+        "cowbell/rolandtr808-cowbell-05.wav"
+      ],
+      "cp": [
+        "clap/rolandtr808-clap-01.wav",
+        "clap/rolandtr808-clap-02.wav",
+        "clap/rolandtr808-clap-03.wav",
+        "clap/rolandtr808-clap-04.wav",
+        "clap/rolandtr808-clap-05.wav",
+        "clap/rolandtr808-clap-06.wav",
+        "clap/rolandtr808-clap-07.wav",
+        "clap/rolandtr808-clap-08.wav"
+      ],
+      "cr": [
+        "crash/rolandtr808-crash-01.wav",
+        "crash/rolandtr808-crash-02.wav",
+        "crash/rolandtr808-crash-03.wav",
+        "crash/rolandtr808-crash-04.wav",
+        "crash/rolandtr808-crash-05.wav",
+        "crash/rolandtr808-crash-06.wav",
+        "crash/rolandtr808-crash-07.wav",
+        "crash/rolandtr808-crash-08.wav"
+      ],
+      "hh": [
+        "hat-closed/rolandtr808-closedhat-01.wav",
+        "hat-closed/rolandtr808-closedhat-02.wav",
+        "hat-closed/rolandtr808-closedhat-03.wav",
+        "hat-closed/rolandtr808-closedhat-04.wav",
+        "hat-closed/rolandtr808-closedhat-05.wav",
+        "hat-closed/rolandtr808-closedhat-06.wav",
+        "hat-closed/rolandtr808-closedhat-07.wav",
+        "hat-closed/rolandtr808-closedhat-08.wav",
+        "hat-closed/rolandtr808-closedhat-09.wav",
+        "hat-closed/rolandtr808-closedhat-10.wav",
+        "hat-closed/rolandtr808-closedhat-11.wav",
+        "hat-closed/rolandtr808-closedhat-12.wav"
+      ],
+      "ht": [
+        "tom-high/rolandtr808-hightom-01.wav",
+        "tom-high/rolandtr808-hightom-02.wav",
+        "tom-high/rolandtr808-hightom-03.wav",
+        "tom-high/rolandtr808-hightom-04.wav",
+        "tom-high/rolandtr808-hightom-05.wav",
+        "tom-high/rolandtr808-hightom-06.wav",
+        "tom-high/rolandtr808-hightom-07.wav",
+        "tom-high/rolandtr808-hightom-08.wav",
+        "tom-high/rolandtr808-hightom-09.wav",
+        "tom-high/rolandtr808-hightom-10.wav",
+        "tom-high/rolandtr808-hightom-11.wav",
+        "tom-high/rolandtr808-hightom-12.wav"
+      ],
+      "lt": [
+        "tom-low/rolandtr808-lowtom-01a.wav",
+        "tom-low/rolandtr808-lowtom-01b.wav",
+        "tom-low/rolandtr808-lowtom-01c.wav",
+        "tom-low/rolandtr808-lowtom-02a.wav",
+        "tom-low/rolandtr808-lowtom-02b.wav",
+        "tom-low/rolandtr808-lowtom-02c.wav",
+        "tom-low/rolandtr808-lowtom-03a.wav",
+        "tom-low/rolandtr808-lowtom-03b.wav",
+        "tom-low/rolandtr808-lowtom-03c.wav",
+        "tom-low/rolandtr808-lowtom-04a.wav",
+        "tom-low/rolandtr808-lowtom-04b.wav",
+        "tom-low/rolandtr808-lowtom-04c.wav",
+        "tom-low/rolandtr808-lowtom-05a.wav",
+        "tom-low/rolandtr808-lowtom-05b.wav",
+        "tom-low/rolandtr808-lowtom-05c.wav"
+      ],
+      "mt": [
+        "tom-mid/rolandtr808-midtom-01.wav",
+        "tom-mid/rolandtr808-midtom-02.wav",
+        "tom-mid/rolandtr808-midtom-03.wav",
+        "tom-mid/rolandtr808-midtom-04.wav",
+        "tom-mid/rolandtr808-midtom-05.wav",
+        "tom-mid/rolandtr808-midtom-06.wav",
+        "tom-mid/rolandtr808-midtom-07.wav",
+        "tom-mid/rolandtr808-midtom-08.wav",
+        "tom-mid/rolandtr808-midtom-09.wav",
+        "tom-mid/rolandtr808-midtom-10.wav",
+        "tom-mid/rolandtr808-midtom-11.wav",
+        "tom-mid/rolandtr808-midtom-12.wav"
+      ],
+      "oh": [
+        "hat-open/rolandtr808-openhat-01.wav",
+        "hat-open/rolandtr808-openhat-02.wav",
+        "hat-open/rolandtr808-openhat-03.wav",
+        "hat-open/rolandtr808-openhat-04.wav",
+        "hat-open/rolandtr808-openhat-05.wav",
+        "hat-open/rolandtr808-openhat-06.wav",
+        "hat-open/rolandtr808-openhat-07.wav"
+      ],
+      "perc": [
+        "perc/rolandtr808-perc-01.wav",
+        "perc/rolandtr808-perc-02.wav",
+        "perc/rolandtr808-perc-03.wav",
+        "perc/rolandtr808-perc-04.wav",
+        "perc/rolandtr808-perc-05.wav",
+        "perc/rolandtr808-perc-06.wav",
+        "perc/rolandtr808-perc-07.wav",
+        "perc/rolandtr808-perc-08.wav",
+        "perc/rolandtr808-perc-09.wav",
+        "perc/rolandtr808-perc-10.wav",
+        "perc/rolandtr808-perc-11.wav",
+        "perc/rolandtr808-perc-12.wav",
+        "perc/rolandtr808-perc-13.wav",
+        "perc/rolandtr808-perc-14.wav",
+        "perc/rolandtr808-perc-15.wav",
+        "perc/rolandtr808-perc-16.wav",
+        "perc/rolandtr808-perc-17.wav",
+        "perc/rolandtr808-perc-18.wav"
+      ],
+      "rim": [
+        "rim/rolandtr808-rim-01.wav",
+        "rim/rolandtr808-rim-02.wav",
+        "rim/rolandtr808-rim-03.wav",
+        "rim/rolandtr808-rim-04.wav"
+      ],
+      "sd": [
+        "snare/rolandtr808-snare-01a.wav",
+        "snare/rolandtr808-snare-01b.wav",
+        "snare/rolandtr808-snare-01c.wav",
+        "snare/rolandtr808-snare-02a.wav",
+        "snare/rolandtr808-snare-02b.wav",
+        "snare/rolandtr808-snare-02c.wav",
+        "snare/rolandtr808-snare-03a.wav",
+        "snare/rolandtr808-snare-03b.wav",
+        "snare/rolandtr808-snare-03c.wav",
+        "snare/rolandtr808-snare-04a.wav",
+        "snare/rolandtr808-snare-04b.wav",
+        "snare/rolandtr808-snare-04c.wav",
+        "snare/rolandtr808-snare-05a.wav",
+        "snare/rolandtr808-snare-05b.wav",
+        "snare/rolandtr808-snare-05c.wav",
+        "snare/rolandtr808-snare-06a.wav",
+        "snare/rolandtr808-snare-06b.wav",
+        "snare/rolandtr808-snare-06c.wav",
+        "snare/rolandtr808-snare-07a.wav",
+        "snare/rolandtr808-snare-07b.wav",
+        "snare/rolandtr808-snare-07c.wav",
+        "snare/rolandtr808-snare-08a.wav",
+        "snare/rolandtr808-snare-08b.wav",
+        "snare/rolandtr808-snare-08c.wav",
+        "snare/rolandtr808-snare-09a.wav",
+        "snare/rolandtr808-snare-09b.wav",
+        "snare/rolandtr808-snare-09c.wav",
+        "snare/rolandtr808-snare-10a.wav",
+        "snare/rolandtr808-snare-10b.wav",
+        "snare/rolandtr808-snare-10c.wav",
+        "snare/rolandtr808-snare-11a.wav",
+        "snare/rolandtr808-snare-11b.wav",
+        "snare/rolandtr808-snare-11c.wav",
+        "snare/rolandtr808-snare-12a.wav",
+        "snare/rolandtr808-snare-12b.wav",
+        "snare/rolandtr808-snare-12c.wav",
+        "snare/rolandtr808-snare-13a.wav",
+        "snare/rolandtr808-snare-13b.wav",
+        "snare/rolandtr808-snare-13c.wav",
+        "snare/rolandtr808-snare-14a.wav",
+        "snare/rolandtr808-snare-14b.wav",
+        "snare/rolandtr808-snare-14c.wav",
+        "snare/rolandtr808-snare-15a.wav",
+        "snare/rolandtr808-snare-15b.wav",
+        "snare/rolandtr808-snare-15c.wav",
+        "snare/rolandtr808-snare-16a.wav",
+        "snare/rolandtr808-snare-16b.wav",
+        "snare/rolandtr808-snare-16c.wav",
+        "snare/rolandtr808-snare-17a.wav",
+        "snare/rolandtr808-snare-17b.wav",
+        "snare/rolandtr808-snare-17c.wav",
+        "snare/rolandtr808-snare-18a.wav",
+        "snare/rolandtr808-snare-18b.wav",
+        "snare/rolandtr808-snare-18c.wav",
+        "snare/rolandtr808-snare-19a.wav",
+        "snare/rolandtr808-snare-19b.wav",
+        "snare/rolandtr808-snare-19c.wav",
+        "snare/rolandtr808-snare-20a.wav",
+        "snare/rolandtr808-snare-20b.wav",
+        "snare/rolandtr808-snare-20c.wav",
+        "snare/rolandtr808-snare-21a.wav",
+        "snare/rolandtr808-snare-21b.wav",
+        "snare/rolandtr808-snare-21c.wav",
+        "snare/rolandtr808-snare-22a.wav",
+        "snare/rolandtr808-snare-22b.wav",
+        "snare/rolandtr808-snare-22c.wav",
+        "snare/rolandtr808-snare-23a.wav",
+        "snare/rolandtr808-snare-23b.wav",
+        "snare/rolandtr808-snare-23c.wav",
+        "snare/rolandtr808-snare-24a.wav",
+        "snare/rolandtr808-snare-24b.wav",
+        "snare/rolandtr808-snare-24c.wav",
+        "snare/rolandtr808-snare-25a.wav",
+        "snare/rolandtr808-snare-25b.wav",
+        "snare/rolandtr808-snare-25c.wav",
+        "snare/rolandtr808-snare-26a.wav",
+        "snare/rolandtr808-snare-26b.wav",
+        "snare/rolandtr808-snare-26c.wav",
+        "snare/rolandtr808-snare-27a.wav",
+        "snare/rolandtr808-snare-27b.wav",
+        "snare/rolandtr808-snare-27c.wav",
+        "snare/rolandtr808-snare-28a.wav",
+        "snare/rolandtr808-snare-28b.wav",
+        "snare/rolandtr808-snare-28c.wav",
+        "snare/rolandtr808-snare-29a.wav",
+        "snare/rolandtr808-snare-29b.wav",
+        "snare/rolandtr808-snare-29c.wav",
+        "snare/rolandtr808-snare-30a.wav",
+        "snare/rolandtr808-snare-30b.wav",
+        "snare/rolandtr808-snare-30c.wav"
+      ],
+      "sh": [
+        "shaker/rolandtr808-shaker-01.wav",
+        "shaker/rolandtr808-shaker-02.WAV",
+        "shaker/rolandtr808-shaker-03.wav",
+        "shaker/rolandtr808-shaker-04.wav",
+        "shaker/rolandtr808-shaker-05.wav",
+        "shaker/rolandtr808-shaker-06.wav"
+      ]
+    }
+  },
+  "tr909": {
+    "basePath": "https://raw.githubusercontent.com/ritchse/tidal-drum-machines/main/machines/",
+    "slugs": {
+      "bd": [
+        "RolandTR909/rolandtr909-bd/Bassdrum-01.wav",
+        "RolandTR909/rolandtr909-bd/Bassdrum-02.wav",
+        "RolandTR909/rolandtr909-bd/Bassdrum-03.wav",
+        "RolandTR909/rolandtr909-bd/Bassdrum-04.wav"
+      ],
+      "cp": [
+        "RolandTR909/rolandtr909-cp/Clap.wav",
+        "RolandTR909/rolandtr909-cp/cp01.wav",
+        "RolandTR909/rolandtr909-cp/cp02.wav",
+        "RolandTR909/rolandtr909-cp/cp03.wav",
+        "RolandTR909/rolandtr909-cp/cp04.wav"
+      ],
+      "cr": [
+        "RolandTR909/rolandtr909-cr/Crash.wav",
+        "RolandTR909/rolandtr909-cr/cr01.wav",
+        "RolandTR909/rolandtr909-cr/cr02.wav",
+        "RolandTR909/rolandtr909-cr/cr03.wav",
+        "RolandTR909/rolandtr909-cr/cr04.wav"
+      ],
+      "hh": [
+        "RolandTR909/rolandtr909-hh/hh01.wav",
+        "RolandTR909/rolandtr909-hh/hh02.wav",
+        "RolandTR909/rolandtr909-hh/hh03.wav",
+        "RolandTR909/rolandtr909-hh/hh04.wav"
+      ],
+      "ht": [
+        "RolandTR909/rolandtr909-ht/Tom H.wav",
+        "RolandTR909/rolandtr909-ht/ht01.wav",
+        "RolandTR909/rolandtr909-ht/ht02.wav",
+        "RolandTR909/rolandtr909-ht/ht03.wav",
+        "RolandTR909/rolandtr909-ht/ht04.wav",
+        "RolandTR909/rolandtr909-ht/ht05.wav",
+        "RolandTR909/rolandtr909-ht/ht06.wav",
+        "RolandTR909/rolandtr909-ht/ht07.wav",
+        "RolandTR909/rolandtr909-ht/ht08.wav"
+      ],
+      "lt": [
+        "RolandTR909/rolandtr909-lt/Tom L.wav",
+        "RolandTR909/rolandtr909-lt/lt01.wav",
+        "RolandTR909/rolandtr909-lt/lt02.wav",
+        "RolandTR909/rolandtr909-lt/lt03.wav",
+        "RolandTR909/rolandtr909-lt/lt04.wav",
+        "RolandTR909/rolandtr909-lt/lt05.wav",
+        "RolandTR909/rolandtr909-lt/lt06.wav",
+        "RolandTR909/rolandtr909-lt/lt07.wav",
+        "RolandTR909/rolandtr909-lt/lt08.wav"
+      ],
+      "mt": [
+        "RolandTR909/rolandtr909-mt/Tom M.wav",
+        "RolandTR909/rolandtr909-mt/mt01.wav",
+        "RolandTR909/rolandtr909-mt/mt02.wav",
+        "RolandTR909/rolandtr909-mt/mt03.wav",
+        "RolandTR909/rolandtr909-mt/mt04.wav",
+        "RolandTR909/rolandtr909-mt/mt05.wav",
+        "RolandTR909/rolandtr909-mt/mt06.wav",
+        "RolandTR909/rolandtr909-mt/mt07.wav",
+        "RolandTR909/rolandtr909-mt/mt08.wav"
+      ],
+      "oh": [
+        "RolandTR909/rolandtr909-oh/Hat Open.wav",
+        "RolandTR909/rolandtr909-oh/oh01.wav",
+        "RolandTR909/rolandtr909-oh/oh02.wav",
+        "RolandTR909/rolandtr909-oh/oh03.wav",
+        "RolandTR909/rolandtr909-oh/oh04.wav"
+      ],
+      "rd": [
+        "RolandTR909/rolandtr909-rd/Ride.wav",
+        "RolandTR909/rolandtr909-rd/rd01.wav",
+        "RolandTR909/rolandtr909-rd/rd02.wav",
+        "RolandTR909/rolandtr909-rd/rd03.wav",
+        "RolandTR909/rolandtr909-rd/rd04.wav"
+      ],
+      "rim": [
+        "RolandTR909/rolandtr909-rim/Rimhot.wav",
+        "RolandTR909/rolandtr909-rim/rs01.wav",
+        "RolandTR909/rolandtr909-rim/rs02.wav"
+      ],
+      "sd": [
+        "RolandTR909/rolandtr909-sd/naredrum.wav",
+        "RolandTR909/rolandtr909-sd/sd01.wav",
+        "RolandTR909/rolandtr909-sd/sd02.wav",
+        "RolandTR909/rolandtr909-sd/sd03.wav",
+        "RolandTR909/rolandtr909-sd/sd04.wav",
+        "RolandTR909/rolandtr909-sd/sd05.wav",
+        "RolandTR909/rolandtr909-sd/sd06.wav",
+        "RolandTR909/rolandtr909-sd/sd07.wav",
+        "RolandTR909/rolandtr909-sd/sd08.wav",
+        "RolandTR909/rolandtr909-sd/sd09.wav",
+        "RolandTR909/rolandtr909-sd/sd10.wav",
+        "RolandTR909/rolandtr909-sd/sd11.wav",
+        "RolandTR909/rolandtr909-sd/sd12.wav",
+        "RolandTR909/rolandtr909-sd/sd13.wav",
+        "RolandTR909/rolandtr909-sd/sd14.wav",
+        "RolandTR909/rolandtr909-sd/sd15.wav"
+      ]
+    }
+  }
+}

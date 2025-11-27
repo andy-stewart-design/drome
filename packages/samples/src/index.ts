@@ -3,7 +3,7 @@ import { dirname, join, basename } from "path";
 import { fileURLToPath } from "url";
 
 const inDir = join(dirname(fileURLToPath(import.meta.url)), "samples");
-const outDir = join(dirname(fileURLToPath(import.meta.url)), "..", "dist");
+const outDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outFile = join(outDir, "drome.json");
 console.log(outDir);
 
@@ -29,7 +29,7 @@ async function combineJSONFiles() {
     }
   }
 
-  await mkdir(outDir);
+  // await mkdir(outDir);
   await writeFile(outFile, JSON.stringify(result, null, 2), "utf8");
   console.log(`✅ Combined JSON written to ${outFile}`);
 }
