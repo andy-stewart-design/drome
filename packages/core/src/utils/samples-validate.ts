@@ -65,4 +65,4 @@ function parseSampleBanks(data: unknown) {
   return data;
 }
 
-export { parseSampleBanks, type SampleBankData };
+export { parseSampleBanks, type SampleBankData, type SampleBankSchema };
