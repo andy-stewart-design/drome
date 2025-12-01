@@ -15,8 +15,9 @@
     "url": "https://github.com/andy-stewart-design/drome/issues"
   },
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "pnpm run clean && tsc && tsc-alias"
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit"
   },
   "author": "Andy Stewart <andy.stewart1170@gmail.com> (https://andystew.art)",
   "repository": {
@@ -27,9 +28,16 @@
     "dist"
   ],
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "esbuild": "^0.27.0",
+    "tsdown": "0.17.0-beta.4"
   },
   "type": "module",
-  "main": "dist/index.js",
-  "license": "MIT"
+  "main": "./dist/index.mjs",
+  "license": "MIT",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  }
 }

@@ -1,3 +1,5 @@
+import { BITCRUSH_ID } from "@/constants.js";
+
 class BitcrushProcessor extends AudioWorkletProcessor {
   private phase: number;
   private lastSample: number;
@@ -59,4 +61,4 @@ class BitcrushProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor("bitcrush-processor", BitcrushProcessor);
+registerProcessor(BITCRUSH_ID, BitcrushProcessor);
