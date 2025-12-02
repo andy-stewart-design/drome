@@ -17,11 +17,11 @@ function importRaw() {
     async load(id: string) {
       if (id.endsWith("?raw")) {
         const filePath = id.replace("?raw", "");
-        console.log("FILEPATH", filePath);
 
-        const built = await build({ entry: filePath, outDir, minify: true });
+        const built = await build({ entry: filePath, outDir, dts: false });
         const output = built[0].chunks.es?.[0];
         const code = output?.type === "chunk" && output.code;
+        console.log(filePath, code);
         if (!code) return null;
 
         return `export default \`${code.replace(/`/g, "\\`")}\``;
@@ -31,9 +31,9 @@ function importRaw() {
     async closeBundle() {
       try {
         await rm(outDir, { recursive: true, force: true });
-        console.log("[worklet-bundle] cleaned .tsdown-temp");
+        console.log("[RAW IMPORT] cleaned .tsdown-temp");
       } catch (err) {
-        console.warn("[worklet-bundle] cleanup failed:", err);
+        console.warn("[RAW IMPORT] cleanup failed:", err);
       }
     },
   };

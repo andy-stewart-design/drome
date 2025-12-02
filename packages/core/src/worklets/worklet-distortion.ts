@@ -65,3 +65,5 @@ class DistortionProcessor extends AudioWorkletProcessor {
 }
 
 registerProcessor(DISTORTION_ID, DistortionProcessor);
+
+export { DistortionProcessor };

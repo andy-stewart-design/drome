@@ -62,3 +62,5 @@ class BitcrushProcessor extends AudioWorkletProcessor {
 }
 
 registerProcessor(BITCRUSH_ID, BitcrushProcessor);
+
+export { BitcrushProcessor };
