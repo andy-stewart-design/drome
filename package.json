@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "turbo run dev",
+    "dev:repl": "turbo run dev --filter=repl-web",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
