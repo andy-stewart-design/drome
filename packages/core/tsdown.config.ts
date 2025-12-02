@@ -6,6 +6,7 @@ export default defineConfig({
   exports: true,
   // minify: true,
   plugins: [importRaw()],
+  dts: true,
 });
 
 function importRaw() {
@@ -16,6 +17,7 @@ function importRaw() {
     async load(id: string) {
       if (id.endsWith("?raw")) {
         const filePath = id.replace("?raw", "");
+        console.log("FILEPATH", filePath);
 
         const built = await build({ entry: filePath, outDir, minify: true });
         const output = built[0].chunks.es?.[0];

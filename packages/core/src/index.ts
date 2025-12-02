@@ -11,18 +11,18 @@ async function init() {
 
 init();
 
-// export { default as DromeArray } from "@/cycle/drome-array.js";
+export { default as DromeArray } from "@/cycle/drome-array";
 
-// import AudioClock from "@/clock/audio-clock.js";
-// import Envelope from "@/automation/envelope.js";
-// import LFO from "@/automation/lfo.js";
-// // import Sample from "./sample";
-// // import Synth from "./synth";
-// // import bitcrusherUrl from "./worklet-bitcrusher?url";
-// // import distortionUrl from "./worklet-distortion?url";
-// import { getSamplePath } from "@/utils/samples.js";
-// import { loadSample } from "@/utils/load-sample.js";
-// import { bufferId } from "@/utils/cache-id.js";
+// import AudioClock from "@/clock/audio-clock";
+// import Envelope from "@/automation/envelope";
+// import LFO from "@/automation/lfo";
+// import Sample from "@/instruments/sample";
+// import Synth from "@/instruments/synth";
+// import { getSampleBanks, getSamplePath } from "@/utils/samples";
+// import { loadSample } from "@/utils/load-sample";
+// import { bufferId } from "@/utils/cache-id";
+// import { addWorklets } from "./utils/worklets";
+// import type { SampleBankSchema } from "./utils/samples-validate";
 
 // const BASE_GAIN = 0.8;
 // const NUM_CHANNELS = 8;
@@ -33,19 +33,17 @@ init();
 //   readonly audioChannels: GainNode[];
 //   readonly bufferCache: Map<string, AudioBuffer[]> = new Map();
 //   readonly reverbCache: Map<string, AudioBuffer> = new Map();
+//   private sampleBanks: SampleBankSchema | null = null;
 //   readonly userSamples: Map<string, Map<string, string[]>> = new Map();
 
 //   static async init(bpm?: number) {
 //     const drome = new Drome(bpm);
 
-//     // try {
-//     //   await Promise.all([
-//     //     drome.ctx.audioWorklet.addModule(bitcrusherUrl),
-//     //     drome.ctx.audioWorklet.addModule(distortionUrl),
-//     //   ]);
-//     // } catch (error) {
-//     //   console.warn(error);
-//     // }
+//     try {
+//       await Promise.all([drome.loadSampleBanks(), drome.addWorklets()]);
+//     } catch (error) {
+//       console.warn(error);
+//     }
 
 //     return drome;
 //   }
@@ -66,19 +64,29 @@ init();
 //     );
 //   }
 
-// //   private async preloadSamples() {
-// //     const samplePromises = [...this.instruments].flatMap((inst) => {
-// //       if (inst instanceof Synth) return [];
-// //       return inst.preloadSamples();
-// //     });
-// //     await Promise.all(samplePromises);
-// //   }
+//   private async preloadSamples() {
+//     const samplePromises = [...this.instruments].flatMap((inst) => {
+//       if (inst instanceof Synth) return [];
+//       return inst.preloadSamples();
+//     });
+//     await Promise.all(samplePromises);
+//   }
 
-// //   private getSamplePath(bank: string, name: string, index: number) {
-// //     const paths = this.userSamples.get(bank)?.get(name);
-// //     if (paths) return paths[index % paths.length];
-// //     else return getSamplePath(bank, name, index);
-// //   }
+//   private getSamplePath(bank: string, name: string, index: number) {
+//     const paths = this.userSamples.get(bank)?.get(name);
+//     if (paths) return paths[index % paths.length];
+//     else return getSamplePath(this.sampleBanks, bank, name, index);
+//   }
+
+//   async addWorklets() {
+//     await addWorklets(this.ctx);
+//   }
+
+//   async loadSampleBanks() {
+//     const response = await getSampleBanks();
+
+//     if (response.data) this.sampleBanks = response.data;
+//   }
 
 //   addSamples(record: Record<string, string | string[]>, bank = "user") {
 //     const samples = Object.entries(record).map(([k, v]) => {
@@ -134,9 +142,11 @@ init();
 //   }
 
 //   synth(...types: OscillatorType[]) {
+//     const destination = this.audioChannels[0];
+//     if (!destination) throw new Error("Cannot find audio channel");
 //     const synth = new Synth(this, {
 //       type: types,
-//       destination: this.audioChannels[0],
+//       destination,
 //       defaultCycle: [[[60]]],
 //     });
 //     this.instruments.push(synth);
@@ -144,8 +154,10 @@ init();
 //   }
 
 //   sample(...sampleIds: string[]) {
+//     const destination = this.audioChannels[1];
+//     if (!destination) throw new Error("Cannot find audio channel");
 //     const sample = new Sample(this, {
-//       destination: this.audioChannels[1],
+//       destination,
 //       sampleIds: sampleIds,
 //       defaultCycle: [[0]],
 //     });

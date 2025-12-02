@@ -8,6 +8,9 @@ type Metronome = { beat: number; bar: number };
 type DromeEventType = "start" | "pause" | "stop" | "beat" | "bar";
 type DromeEventCallback = (m: Metronome, time: number) => void;
 
+// INSTRUMENTS
+type InstrumentType = "synth" | "sample";
+
 // CYCLE
 type Note<T> = { value: T; start: number; duration: number } | null;
 type Nullable<T> = T | null | undefined;
@@ -43,6 +46,7 @@ export type {
   DromeEventType,
   FilterType,
   FilterOptions,
+  InstrumentType,
   Metronome,
   Note,
   Nullable,
