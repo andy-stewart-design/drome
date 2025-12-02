@@ -21,7 +21,6 @@ function importRaw() {
         const built = await build({ entry: filePath, outDir, dts: false });
         const output = built[0].chunks.es?.[0];
         const code = output?.type === "chunk" && output.code;
-        console.log(filePath, code);
         if (!code) return null;
 
         return `export default \`${code.replace(/`/g, "\\`")}\``;
