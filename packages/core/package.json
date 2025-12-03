@@ -1,0 +1,44 @@
+{
+  "name": "drome-live",
+  "version": "0.0.1",
+  "description": "A web-based language for live coding music",
+  "keywords": [
+    "drome",
+    "dromelive",
+    "tidalcycles",
+    "pattern",
+    "livecoding",
+    "algorave"
+  ],
+  "homepage": "https://github.com/andy-stewart-design/drome",
+  "bugs": {
+    "url": "https://github.com/andy-stewart-design/drome/issues"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "author": "Andy Stewart <andy.stewart1170@gmail.com> (https://andystew.art)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andy-stewart-design/drome"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "esbuild": "^0.27.0",
+    "tsdown": "0.17.0-beta.4"
+  },
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "license": "MIT",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.mts"
+}

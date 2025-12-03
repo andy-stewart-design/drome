@@ -1,32 +1,35 @@
 {
-  "name": "drome-js",
+  "name": "drome",
+  "private": false,
   "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "ci": "pnpm run build"
+    "dev": "turbo run dev",
+    "dev:repl": "turbo run dev --filter=repl-web",
+    "build": "turbo run build",
+    "build:core": "turbo run build --filter=drome-live",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
   },
-  "description": "A live coding DSL built with Typescript",
   "keywords": [
-    "Live coding",
-    "typescript",
-    "Tidal Cycles"
+    "drome",
+    "dromelive",
+    "tidalcycles",
+    "pattern",
+    "livecoding",
+    "algorave"
   ],
-  "homepage": "https://github.com/andy-stewart-design/drome",
-  "bugs": {
-    "url": "https://github.com/andy-stewart-design/drome/issues"
-  },
-  "author": "Andy Stewart <andy.stewart1170@gmail.com> (https://andystew.art)",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/andy-stewart-design/drome.git"
-  },
-  "files": [
-    "dist"
-  ],
-  "type": "module",
-  "main": "dist/index.js",
-  "license": "MIT",
+  "packageManager": "pnpm@10.3.0",
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "typescript": "^5.9.2"
+    "@types/node": "^24.10.1",
+    "prettier": "^3.6.2",
+    "tsc-alias": "^1.8.16",
+    "turbo": "^2.6.1",
+    "typescript": "^5.9.3"
   }
 }

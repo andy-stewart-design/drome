@@ -1,0 +1,85 @@
+import DromeArray from "@/cycle/drome-array.js";
+import DromeAudioNode from "@/abstracts/drome-audio-node.js";
+import Envelope from "@/automation/envelope.js";
+import LFO from "@/automation/lfo.js";
+import { isNullish } from "@/utils/validators.js";
+import { applySteppedRamp } from "@/utils/stepped-ramp.js";
+import type { Automatable, Note } from "@/types.js";
+
+abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
+  protected abstract override _input: GainNode;
+  protected abstract _effect: T;
+  protected abstract _target: AudioParam | undefined;
+  protected _defaultValue: number;
+  protected _cycles: DromeArray<number>;
+  protected _lfo: LFO | undefined;
+  protected _env: Envelope | undefined;
+
+  constructor(input: Automatable, defaultValue = 1) {
+    super();
+
+    if (input instanceof LFO) {
+      this._defaultValue = input.value;
+      this._cycles = new DromeArray([[this._defaultValue]]);
+      this._lfo = input;
+    } else if (input instanceof Envelope) {
+      this._defaultValue = input.startValue;
+      this._cycles = new DromeArray([[this._defaultValue]]);
+      this._env = input;
+    } else {
+      this._cycles = new DromeArray([[0]]).note(...input);
+      this._defaultValue = this._cycles.at(0, 0) ?? defaultValue;
+    }
+  }
+
+  apply(
+    notes: Note<unknown>[],
+    currentBar: number,
+    startTime: number,
+    duration: number
+  ) {
+    if (!this._target) return;
+
+    if (this._lfo && !this._lfo.paused) this._lfo.stop(startTime);
+
+    if (this._lfo) {
+      this._lfo.create().connect(this._target).start(startTime);
+    } else if (this._env) {
+      for (let i = 0; i < notes.length; i++) {
+        const note = notes[i];
+        if (isNullish(note)) continue;
+        this._env.apply(this._target, note.start, note.duration - 0.001);
+      }
+    } else {
+      const cycleIndex = currentBar % this._cycles.length;
+      const steps = this._cycles.at(cycleIndex) ?? [];
+      applySteppedRamp({ target: this._target, startTime, duration, steps });
+    }
+  }
+
+  connect(dest: AudioNode) {
+    this._input.connect(this._effect).connect(dest);
+  }
+
+  disconnect() {
+    this._input.disconnect();
+  }
+
+  get effect() {
+    return this._effect;
+  }
+
+  get env() {
+    return this._env;
+  }
+
+  get input() {
+    return this._input;
+  }
+
+  get lfo() {
+    return this._lfo;
+  }
+}
+
+export default AutomatableEffect;

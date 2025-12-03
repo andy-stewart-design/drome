@@ -1,0 +1,54 @@
+import AutomatableEffect from "@/abstracts/effect-automatable.js";
+import type { Automatable, DistortionAlgorithm } from "@/types.js";
+
+interface DistortionEffectOptions {
+  distortion: Automatable;
+  postgain?: number;
+  type?: DistortionAlgorithm;
+}
+
+class DistortionEffect extends AutomatableEffect<AudioWorkletNode> {
+  protected _input: GainNode;
+  protected _effect: AudioWorkletNode;
+  protected _target: AudioParam;
+
+  constructor(
+    ctx: AudioContext,
+    { distortion, postgain = 1, type }: DistortionEffectOptions
+  ) {
+    super(distortion);
+
+    this._input = new GainNode(ctx);
+    this._effect = new AudioWorkletNode(ctx, "distortion-processor", {
+      processorOptions: { algorithm: type },
+    } as AudioWorkletNodeOptions);
+    this._target = this.distortionParam;
+
+    this.distort(this._defaultValue);
+    this.postgain(postgain);
+  }
+
+  distort(v: number) {
+    this.distortionParam.value = v;
+  }
+
+  postgain(v: number) {
+    this.postgainParam.value = v;
+  }
+
+  get distortionParam() {
+    const param = this._effect.parameters.get("distortion");
+    if (!param)
+      throw new Error("[DistortionEffect] couldn't get 'distortion' param");
+    return param;
+  }
+
+  get postgainParam() {
+    const param = this._effect.parameters.get("postgain");
+    if (!param)
+      throw new Error("[DistortionEffect] couldn't get 'postgain' param");
+    return param;
+  }
+}
+
+export default DistortionEffect;
