@@ -29,7 +29,7 @@ const NUM_CHANNELS = 8;
 
 class Drome {
   readonly clock: AudioClock;
-  readonly instruments: (Synth | Sample)[] = [];
+  readonly instruments: Set<Synth | Sample> = new Set();
   readonly audioChannels: GainNode[];
   readonly bufferCache: Map<string, AudioBuffer[]> = new Map();
   readonly reverbCache: Map<string, AudioBuffer> = new Map();
@@ -141,6 +141,11 @@ class Drome {
     });
   }
 
+  public clear() {
+    this.instruments.clear();
+    // this.clearReplListeners();
+  }
+
   synth(...types: OscillatorType[]) {
     const destination = this.audioChannels[0];
     if (!destination) throw new Error("Cannot find audio channel");
@@ -149,7 +154,7 @@ class Drome {
       destination,
       defaultCycle: [[[60]]],
     });
-    this.instruments.push(synth);
+    this.instruments.add(synth);
     return synth;
   }
 
@@ -161,7 +166,7 @@ class Drome {
       sampleIds: sampleIds,
       defaultCycle: [[0]],
     });
-    this.instruments.push(sample);
+    this.instruments.add(sample);
     return sample;
   }
 
@@ -186,6 +191,10 @@ class Drome {
 
   get currentTime() {
     return this.ctx.currentTime;
+  }
+
+  get paused() {
+    return this.clock.paused;
   }
 
   get barStartTime() {

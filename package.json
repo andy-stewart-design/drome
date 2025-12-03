@@ -8,6 +8,7 @@
     "dev": "turbo run dev",
     "dev:repl": "turbo run dev --filter=repl-web",
     "build": "turbo run build",
+    "build:core": "turbo run build --filter=drome-live",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
