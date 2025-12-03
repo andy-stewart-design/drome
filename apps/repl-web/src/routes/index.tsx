@@ -12,12 +12,9 @@ function App() {
   }, [])
 
   function onkeyDown(e: KeyboardEvent) {
-    console.log(e.key)
-
     if (!(e.target instanceof HTMLTextAreaElement) || !drome) return
     if (e.altKey && e.key === 'Enter') {
       e.preventDefault()
-      console.log(e.target.value)
       runCode(drome, e.target.value)
       if (drome.paused) {
         drome.start()

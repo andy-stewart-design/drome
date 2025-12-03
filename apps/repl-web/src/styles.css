@@ -27,6 +27,7 @@ textarea {
   border: none;
   outline: none;
   resize: none;
+  padding: 2rem;
 
   &:focus {
     outline: none;
