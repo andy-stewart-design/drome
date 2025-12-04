@@ -9,11 +9,16 @@ html {
   color: white;
   color-scheme: dark;
 
-  --color-neon-pink: color(display-p3 1 0 1);
+  --color-neon-pink: oklch(0.7 0.35 328);
   --color-neon-cyan: color(display-p3 0 0.75 1);
-  --color-purple: color(display-p3 0.5 0.5 1);
+  --color-neon-yellow: oklch(0.95 0.25 115);
+  --color-purple: oklch(0.76 0.13 270);
   --color-white: rgb(255, 255, 255);
   --color-neutral-50: rgb(248, 249, 250);
+  --color-neutral-100: rgb(191, 206, 222);
+  --color-neutral-200: rgb(163, 184, 208);
+  --color-neutral-300: rgb(137, 163, 192);
+  --color-neutral-400: rgb(113, 142, 174);
   /* --color-neutral-600: rgb(78, 84, 92); */
   --color-neutral-600: rgb(75, 100, 128);
   --color-neutral-800: rgb(36, 58, 81);
