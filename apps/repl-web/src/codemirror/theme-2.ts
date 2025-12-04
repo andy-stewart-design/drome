@@ -17,44 +17,39 @@ import {
 } from './theme-utils'
 
 // Base colors - Ocean depths
-const colorNeutral000 = 'var(--color-neutral-000)' // - Pure white for maximum contrast
-const colorNeutral950 = 'var(--color-neutral-950)' // - Background (deep ocean blue)
+const colorWhite = 'var(--color-white)' // - Pure white for maximum contrast
+const colorNeutral50 = 'var(--color-neutral-50)' // - Foreground (lighter blue for enhanced readability)
+const colorNeutral600 = 'var(--color-neutral-600)' // - Selection (more vibrant blue for better visibility)
 const colorNeutral800 = 'var(--color-neutral-800)' // - Selection (more vibrant blue for better visibility)
+const colorNeutral950 = 'var(--color-neutral-950)' // - Background (deep ocean blue)
 const colorNeonPink = 'var(--color-neon-pink)' // - Constants (softer pink)
 const colorNeonCyan = 'var(--color-neon-cyan)' // - Keywords (brighter cyan blue)
 const colorPurple = 'var(--color-purple)' // - Functions (softer purple)
 
-const base01 = '#f8f9fa' // - Foreground (lighter blue for enhanced readability)
-const base03 = '#b4a2f7' // - Gutter background (darker for contrast)
-const base04 = '#e6d4a3' // - Cursor (warmer gold for better visibility)
-const base05 = '#0066ff20' // - Active line (subtle blue tint)
 const base08 = '#5caeff' // - Variables (softer azure blue)
 const base09 = '#4b6480' // - Comments (brighter blue-gray)
 const base0D = '#ffd47b' // - Classes (warmer gold)
-const base0E = '#f8f9fa' // - Headings (brighter sky blue)
 const base0F = '#59d6ff' // - Tags (brighter cyan)
-const base10 = '#ff50c8' // - Links (brighter magenta)
-const base11 = '#66ecd4', // - URLs (brighter teal)
-  // UI elements
-  invalid = '#ff5370',
-  darkBackground = '#16191c', // Darker background for better contrast
-  highlightBackground = '#ffffff15',
-  tooltipBackground = '#05101d', // Darker tooltip for better contrast
-  cursor = base04,
-  selection = colorNeutral800,
-  activeBracketBg = '#0a5999b0',
-  activeBracketBorder = 'transparent',
-  // Diff/merge specific colors
-  addedBackground = '#0e4e1d50', // Dark green with transparency for insertions
-  removedBackground = '#78112240', // Dark red with transparency for deletions
-  addedText = '#4ce660', // Bright green for added text (matching string color)
-  removedText = '#ff6b7d' // Bright red for removed text
+// UI elements
+const invalid = '#ff5370'
+const darkBackground = '#16191c' // Darker background for better contrast
+const highlightBackground = '#ffffff15'
+const tooltipBackground = '#05101d' // Darker tooltip for better contrast
+const cursor = colorNeonCyan
+const selection = colorNeutral800
+const activeBracketBg = '#0a5999b0'
+const activeBracketBorder = 'transparent'
+// Diff/merge specific colors
+const addedBackground = '#0e4e1d50' // Dark green with transparency for insertions
+const removedBackground = '#78112240' // Dark red with transparency for deletions
+const addedText = '#4ce660' // Bright green for added text (matching string color)
+const removedText = '#ff6b7d' // Bright red for removed text
 
 const abyssTheme = EditorView.theme(
   {
     // Base editor styles
     '&': {
-      color: base01,
+      color: colorNeutral50,
       backgroundColor: colorNeutral950,
       fontSize: generalContent.fontSize,
       fontFamily: generalContent.fontFamily,
@@ -92,20 +87,20 @@ const abyssTheme = EditorView.theme(
       borderRadius: generalSearchField.borderRadius,
 
       '& span': {
-        color: colorNeutral000,
+        color: colorWhite,
       },
     },
     '.cm-searchMatch.cm-searchMatch-selected': {
       backgroundColor: '#2a6ac080',
-      color: colorNeutral000,
+      color: colorWhite,
       padding: generalSearchField.padding,
 
       '& span': {
-        color: colorNeutral000,
+        color: colorWhite,
       },
     },
     '.cm-search.cm-panel.cm-textfield': {
-      color: base01,
+      color: colorNeutral50,
       borderRadius: generalSearchField.borderRadius,
       padding: generalSearchField.padding,
     },
@@ -113,7 +108,7 @@ const abyssTheme = EditorView.theme(
     // Panels
     '.cm-panels': {
       backgroundColor: darkBackground,
-      color: base01,
+      color: colorNeutral50,
     },
     '.cm-panels.cm-panels-top': {
       borderBottom: '2px solid #0a3555',
@@ -123,7 +118,7 @@ const abyssTheme = EditorView.theme(
     },
     '.cm-panel button': {
       backgroundColor: darkBackground,
-      color: base01,
+      color: colorNeutral50,
       border: generalPanel.border,
       borderRadius: generalPanel.borderRadius,
       padding: generalPanel.padding,
@@ -141,13 +136,13 @@ const abyssTheme = EditorView.theme(
     // Gutters
     '.cm-gutters': {
       backgroundColor: colorNeutral950,
-      color: 'var(--color-neutral-600)',
+      color: colorNeutral600,
       border: generalGutter.border,
       paddingRight: generalGutter.paddingRight,
     },
     '.cm-activeLineGutter': {
       backgroundColor: highlightBackground,
-      color: base01,
+      color: colorNeutral50,
       fontWeight: generalGutter.fontWeight,
     },
     '.cm-lineNumbers': {
@@ -161,7 +156,7 @@ const abyssTheme = EditorView.theme(
       cursor: 'pointer',
     },
     '.cm-foldGutter .cm-gutterElement:hover': {
-      color: base01,
+      color: colorNeutral50,
     },
 
     // Diff/Merge View Styles
@@ -293,7 +288,6 @@ const abyssTheme = EditorView.theme(
     // Focus outline
     '&.cm-focused': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${base05}, 0 0 0 4px ${colorNeutral950}`,
     },
 
     // Scrollbars
@@ -333,19 +327,18 @@ const abyssHighlightStyle = HighlightStyle.define([
 
   // Names and variables
   { tag: [t.name, t.deleted, t.character, t.macroName], color: base08 },
-  { tag: [t.variableName], color: base0E },
-  { tag: [t.propertyName], color: base0E, fontStyle: 'normal' },
+  { tag: [t.variableName], color: colorNeutral50 },
+  { tag: [t.propertyName], color: colorNeutral50, fontStyle: 'normal' },
 
   // Classes and types
-  { tag: [t.typeName], color: base03 },
   { tag: [t.className], color: base0D, fontStyle: 'italic' },
   { tag: [t.namespace], color: colorNeonPink, fontStyle: 'italic' },
 
   // Operators and punctuation - clearer blues
-  { tag: [t.operator, t.operatorKeyword], color: base0E },
-  { tag: [t.bracket], color: base01 },
-  { tag: [t.brace], color: base01 },
-  { tag: [t.punctuation], color: base01 },
+  { tag: [t.operator, t.operatorKeyword], color: colorNeutral50 },
+  { tag: [t.bracket], color: colorNeutral50 },
+  { tag: [t.brace], color: colorNeutral50 },
+  { tag: [t.punctuation], color: colorNeutral50 },
 
   // Functions and parameters
   { tag: [t.function(t.variableName), t.labelName], color: colorPurple },
@@ -369,7 +362,7 @@ const abyssHighlightStyle = HighlightStyle.define([
 
   // Punctuation and structure
   { tag: t.definition(t.typeName), color: colorPurple, fontWeight: 'bold' },
-  { tag: [t.operator, t.operatorKeyword], color: base08 },
+  { tag: [t.operator, t.operatorKeyword], color: colorNeonCyan },
   { tag: [t.bracket], color: '#8da0bf' },
   { tag: [t.brace], color: '#8da0bf' },
   { tag: [t.punctuation], color: '#8da0bf' },
@@ -380,22 +373,22 @@ const abyssHighlightStyle = HighlightStyle.define([
   { tag: t.docComment, fontStyle: 'italic', color: base09 },
 
   // HTML/XML elements
-  { tag: [t.tagName], color: base0F },
-  { tag: [t.attributeName], color: '#ffd580' },
+  //   { tag: [t.tagName], color: base0F },
+  //   { tag: [t.attributeName], color: '#ffd580' },
 
   // Markdown and text formatting
-  { tag: [t.heading], fontWeight: 'bold', color: base0E },
+  { tag: [t.heading], fontWeight: 'bold', color: colorNeutral50 },
   { tag: [t.strong], fontWeight: 'bold' },
   { tag: [t.emphasis], fontStyle: 'italic' },
 
   // Links and URLs
-  { tag: [t.link], color: base10, fontWeight: '500' },
-  {
-    tag: [t.url],
-    color: base11,
-    textDecoration: 'underline',
-    textUnderlineOffset: '2px',
-  },
+  //   { tag: [t.link], color: base10, fontWeight: '500' },
+  //   {
+  //     tag: [t.url],
+  //     color: base11,
+  //     textDecoration: 'underline',
+  //     textUnderlineOffset: '2px',
+  //   },
 
   // Special states
   { tag: [t.invalid], color: invalid, textDecoration: 'underline wavy' },
