@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { basicSetup, EditorView } from 'codemirror'
-import { theme } from '@/codemirror/theme'
+import { theme } from '@/codemirror/theme-2'
+import { javascript } from '@/codemirror/language'
+import { flash, flashField } from '@/codemirror/flash'
 import Drome from 'drome-live'
 
 export const Route = createFileRoute('/')({ component: App })
@@ -17,7 +19,7 @@ function App() {
 
     const editor = new EditorView({
       doc: 'd.sample("bd:3").bank("tr909").euclid([3, 5], 8)',
-      extensions: [basicSetup, theme],
+      extensions: [basicSetup, theme, javascript(), flashField],
       parent: editorContainer.current,
     })
 
@@ -44,6 +46,7 @@ function App() {
       e.preventDefault()
 
       runCode(drome, editor.state.doc.toString())
+      flash(editor)
       if (drome.paused) {
         drome.start()
       }

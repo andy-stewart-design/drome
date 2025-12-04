@@ -12,8 +12,11 @@
     "check": "prettier --write . && eslint --fix"
   },
   "dependencies": {
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.8",
-    "@tailwindcss/vite": "^4.0.6",
+    "@lezer/highlight": "^1.2.3",
+    "@lezer/javascript": "^1.5.4",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-router": "^1.132.0",
     "@tanstack/react-router-devtools": "^1.132.0",

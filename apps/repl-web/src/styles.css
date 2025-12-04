@@ -8,6 +8,15 @@ html {
   background: black;
   color: white;
   color-scheme: dark;
+
+  --color-neon-pink: color(display-p3 1 0 1);
+  --color-neon-cyan: color(display-p3 0 0.75 1);
+  --color-purple: color(display-p3 0.5 0.5 1);
+  --color-neutral-000: rgb(255, 255, 255);
+  --color-neutral-600: rgb(78, 84, 92);
+  --color-neutral-800: rgb(36, 58, 81);
+  --color-neutral-950: rgb(0, 4, 8);
+  --color-neutral-999: rgb(0, 0, 0);
 }
 
 body {
@@ -17,32 +26,4 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
-}
-
-.cm-editor {
-  width: 100vw;
-  display: block;
-  height: 100vh;
-  background: black;
-  border: none;
-  outline: none;
-  resize: none;
-  /* padding: 2rem; */
-
-  &:focus {
-    outline: none;
-  }
-
-  /* .cm-gutters {
-    background: none;
-    border: none;
-
-    .cm-lineNumbers {
-      min-width: 5ch;
-    }
-
-    .cm-activeLineGutter {
-      background: #cceeff28;
-    }
-  } */
 }
