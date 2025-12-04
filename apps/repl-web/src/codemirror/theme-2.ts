@@ -5,12 +5,10 @@ import { tags as t } from '@lezer/highlight'
 import {
   generalContent,
   generalCursor,
-  generalDiff,
   generalGutter,
   generalLine,
   generalMatching,
   generalPanel,
-  generalPlaceholder,
   generalScroller,
   generalSearchField,
   generalTooltip,
@@ -28,18 +26,23 @@ const colorNeutral = {
   800: 'var(--color-neutral-800)',
   950: 'var(--color-neutral-950)',
 }
+const colorCyan = {
+  100: 'var(--color-cyan-100)',
+  200: 'var(--color-cyan-200)',
+  500: 'var(--color-cyan-500)',
+  700: 'var(--color-cyan-700)',
+}
 const colorNeonPink = 'var(--color-neon-pink)'
-const colorNeonCyan = 'var(--color-neon-cyan)'
 const colorPurple = 'var(--color-purple)'
 const colorNeonYellow = 'var(--color-neon-yellow)'
 
 // Semantic
 const foregroundPrimary = colorNeutral[50]
-const declarationKeyword = colorNeonCyan // const, let, etc
-const moduleKeyword = colorNeonCyan
+const declarationKeyword = colorCyan[200] // const, let, etc
+const moduleKeyword = colorCyan[200]
 const classIdentifier = colorNeonYellow
 const selection = colorNeutral[800]
-const cursor = colorNeonCyan
+const cursor = colorCyan[200]
 const variableDeclaration = colorPurple
 const variableReference = foregroundPrimary
 const bracket = colorNeutral[400]
@@ -50,14 +53,14 @@ const invalid = '#ff5370'
 const darkBackground = '#16191c' // Darker background for better contrast
 const highlightBackground = '#ffffff15'
 const tooltipBackground = '#05101d' // Darker tooltip for better contrast
-const activeBracketBg = '#0a5999b0'
-const activeBracketBorder = 'transparent'
+// const activeBracketBg = '#0a5999b0'
+// const activeBracketBorder = 'transparent'
 
-// Diff/merge specific colors
-const addedBackground = '#0e4e1d50' // Dark green with transparency for insertions
-const removedBackground = '#78112240' // Dark red with transparency for deletions
-const addedText = '#4ce660' // Bright green for added text (matching string color)
-const removedText = '#ff6b7d' // Bright red for removed text
+// // Diff/merge specific colors
+// const addedBackground = '#0e4e1d50' // Dark green with transparency for insertions
+// const removedBackground = '#78112240' // Dark red with transparency for deletions
+// const addedText = '#4ce660' // Bright green for added text (matching string color)
+// const removedText = '#ff6b7d' // Bright red for removed text
 
 const abyssTheme = EditorView.theme(
   {
@@ -96,7 +99,7 @@ const abyssTheme = EditorView.theme(
 
     // Search functionality
     '.cm-searchMatch': {
-      backgroundColor: '#155ab380',
+      backgroundColor: colorCyan[700],
       outline: `1px solid transparent`,
       borderRadius: generalSearchField.borderRadius,
 
@@ -105,7 +108,7 @@ const abyssTheme = EditorView.theme(
       },
     },
     '.cm-searchMatch.cm-searchMatch-selected': {
-      backgroundColor: '#2a6ac080',
+      backgroundColor: colorCyan[500],
       color: colorWhite,
       padding: generalSearchField.padding,
 
@@ -375,7 +378,7 @@ const abyssHighlightStyle = HighlightStyle.define([
 
   // Punctuation and structure
   { tag: t.definition(t.typeName), color: colorPurple, fontWeight: 'bold' },
-  { tag: [t.operator, t.operatorKeyword], color: colorNeonCyan },
+  { tag: [t.operator, t.operatorKeyword], color: colorCyan[200] },
   { tag: [t.bracket], color: bracket },
   { tag: [t.brace], color: bracket },
   { tag: [t.punctuation], color: bracket },
@@ -409,7 +412,7 @@ const abyssHighlightStyle = HighlightStyle.define([
 
   // Enhanced syntax highlighting
   { tag: t.constant(t.name), color: colorNeonPink },
-  { tag: t.controlKeyword, color: colorNeonCyan, fontWeight: 'bold' },
+  { tag: t.controlKeyword, color: colorCyan[200], fontWeight: 'bold' },
   // { tag: t.deleted, color: base08 },
   { tag: t.labelName, color: colorPurple },
   { tag: t.string, color: colorNeonPink },

@@ -9,11 +9,6 @@ html {
   color: white;
   color-scheme: dark;
 
-  --color-neon-pink: oklch(0.7 0.35 328);
-  --color-neon-cyan: color(display-p3 0 0.75 1);
-  --color-neon-yellow: oklch(0.95 0.25 115);
-  --color-purple: oklch(0.76 0.13 270);
-  --color-white: rgb(255, 255, 255);
   --color-neutral-50: rgb(248, 249, 250);
   --color-neutral-100: rgb(191, 206, 222);
   --color-neutral-200: rgb(163, 184, 208);
@@ -23,6 +18,17 @@ html {
   --color-neutral-600: rgb(75, 100, 128);
   --color-neutral-800: rgb(36, 58, 81);
   --color-neutral-950: rgb(0, 4, 8);
+
+  --color-cyan-100: oklch(0.84 0.1 235);
+  --color-cyan-200: oklch(0.75 0.1625 235);
+  --color-cyan-500: oklch(0.57 0.154 233);
+  --color-cyan-700: oklch(0.41 0.11 233);
+
+  --color-neon-pink: oklch(0.7 0.35 328);
+  --color-neon-cyan: oklch(0.75 0.1625 235);
+  --color-neon-yellow: oklch(0.95 0.25 115);
+  --color-purple: oklch(0.76 0.13 270);
+  --color-white: rgb(255, 255, 255);
   --color-black: rgb(0, 0, 0);
 }
 
