@@ -19,17 +19,30 @@ body {
   margin: 0;
 }
 
-textarea {
-  display: block;
+.cm-editor {
   width: 100vw;
+  display: block;
   height: 100vh;
   background: black;
   border: none;
   outline: none;
   resize: none;
-  padding: 2rem;
+  /* padding: 2rem; */
 
   &:focus {
     outline: none;
   }
+
+  /* .cm-gutters {
+    background: none;
+    border: none;
+
+    .cm-lineNumbers {
+      min-width: 5ch;
+    }
+
+    .cm-activeLineGutter {
+      background: #cceeff28;
+    }
+  } */
 }
