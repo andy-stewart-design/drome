@@ -49,47 +49,65 @@
     --cm-declaration-keyword: var(--cm-color-fg-primary);
   }
 
-  .cm-panel label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    user-select: none;
-    padding-inline-start: 0.25rem;
+  .cm-panel.cm-search {
+    padding: 1rem 1rem 0.5rem;
+    line-height: 2.25;
 
-    &:has(input[type='checkbox']) {
-      padding-block-start: 1rem;
+    & > * {
+      display: inline-block;
+      vertical-align: top;
+      height: 20px !important;
+      margin: 0 !important;
+      margin-inline-end: 1rem !important;
     }
-  }
 
-  .cm-panel label input[type='checkbox'] {
-    position: relative;
-    appearance: none; /* Standard property */
-    -webkit-appearance: none; /* For Webkit browsers */
-    width: 1rem;
-    height: 1rem;
-    margin: 0 !important;
-    border: none;
-    border-radius: 3px;
-    padding: 0;
-    vertical-align: middle;
-  }
+    & > button {
+      margin-inline-end: 0.5rem !important;
+    }
 
-  .cm-panel label input[type='checkbox']:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    border: 1px solid rgb(255 255 255 / 0.15); /* Border color */
-    border-radius: 3px;
-    background-color: transparent;
-    vertical-align: middle;
-    margin-right: 8px;
-  }
+    & > button + label {
+      margin-inline-start: 0.5rem !important;
+    }
 
-  .cm-panel label input[type='checkbox']:checked:after {
-    background-color: var(--color-cyan-200);
+    label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      user-select: none;
+      height: 1rem;
+      /* padding-inline-start: 0.25rem; */
+
+      input[type='checkbox'] {
+        position: relative;
+        appearance: none;
+        -webkit-appearance: none;
+        width: 1rem;
+        height: 1rem;
+        margin: 0 !important;
+        border: none;
+        border-radius: 3px;
+        padding: 0;
+        vertical-align: middle;
+      }
+
+      input[type='checkbox']:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 1px solid rgb(255 255 255 / 0.15);
+        border-radius: 3px;
+        background-color: transparent;
+        vertical-align: middle;
+        margin-right: 8px;
+      }
+
+      input[type='checkbox']:checked:after {
+        background-color: var(--color-cyan-200);
+      }
+    }
   }
 }
