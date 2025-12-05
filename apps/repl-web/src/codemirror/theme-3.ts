@@ -110,32 +110,43 @@ const abyssTheme = EditorView.theme(
         color: 'var(--cm-search-match-selected-color-fg)',
       },
     },
-    '.cm-search.cm-panel.cm-textfield': {
-      color: foregroundPrimary,
-      borderRadius: generalSearchField.borderRadius,
-      padding: generalSearchField.padding,
-    },
 
     // Panels
     '.cm-panels': {
-      backgroundColor: darkBackground,
-      color: foregroundPrimary,
+      backgroundColor: 'var(--cm-panel-color-bg)',
+      color: 'var(--cm-panel-color-fg)',
     },
     '.cm-panels.cm-panels-top': {
-      borderBottom: '2px solid #0a3555',
+      borderBottom: 'var(--cm-top-panel-border-bottom)',
     },
     '.cm-panels.cm-panels-bottom': {
-      borderTop: '2px solid #0a3555',
+      borderTop: 'var(--cm-bottom-panel-border-top)',
     },
     '.cm-panel button': {
-      backgroundColor: darkBackground,
-      color: foregroundPrimary,
-      border: generalPanel.border,
-      borderRadius: generalPanel.borderRadius,
-      padding: generalPanel.padding,
+      backgroundColor: 'var(--cm-panel-button-color-bg)',
+      backgroundImage: 'none',
+      color: 'var(--cm-panel-button-color-fg)',
+      border: 'var(--cm-panel-button-border)',
+      borderRadius: 'var(--cm-panel-button-border-radius)',
+      padding: 'var(--cm-panel-button-padding)',
     },
     '.cm-panel button:hover': {
-      backgroundColor: '#0a3555',
+      backgroundColor: 'var(--cm-panel-button-hover-color-bg)',
+      color: 'var(--cm-panel-button-hover-color-fg)',
+    },
+    '.cm-panel .cm-textfield': {
+      backgroundColor: 'var(--cm-panel-input-color-bg)',
+      color: 'var(--cm-panel-input-color-fg)',
+      border: 'var(--cm-panel-input-border)',
+      borderRadius: 'var(--cm-panel-input-border-radius)',
+      padding: 'var(--cm-panel-input-padding)',
+    },
+    '.cm-panel label input': {
+      backgroundColor: 'var(--cm-panel-input-color-bg)',
+      color: 'var(--cm-panel-input-color-fg)',
+      border: 'var(--cm-panel-input-border)',
+      borderRadius: 'var(--cm-panel-input-border-radius)',
+      padding: 'var(--cm-panel-input-padding)',
     },
 
     // Line highlighting

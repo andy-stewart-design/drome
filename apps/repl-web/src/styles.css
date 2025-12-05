@@ -16,6 +16,7 @@ html {
   --color-neutral-400: rgb(113, 142, 174);
   --color-neutral-600: rgb(75, 100, 128);
   --color-neutral-800: rgb(36, 58, 81);
+  --color-neutral-900: rgb(23, 34, 49);
   --color-neutral-950: rgb(0, 4, 8);
 
   --color-cyan-50: oklch(0.92 0.049 235);
