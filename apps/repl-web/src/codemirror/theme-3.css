@@ -1,0 +1,34 @@
+.cm-editor {
+  --cm-color-fg-primary: var(--color-neutral-50);
+  --cm-color-bg-primary: var(--color-neutral-950);
+
+  --cm-editor-color-bg: var(--cm-color-bg-primary);
+  --cm-editor-color-fg: var(--cm-color-fg-primary);
+  --cm-editor-font-size: 14px;
+  --cm-editor-font-family: MDIO, Consolas, monospace;
+  --cm-editor-line-height: 1.6;
+
+  --cm-cursor-fg: var(--color-cyan-200);
+  --cm-cursor-width: 1.2px;
+
+  --cm-selection-color-bg: var(--color-cyan-700);
+  --cm-selection-color-fg: var(--color-cyan-100);
+  --cm-selection-border-radius: 3px;
+
+  --cm-flash-color-bg: var(--color-neon-pink);
+
+  --cm-search-match-color-bg: var(--color-cyan-700);
+  --cm-search-match-color-fg: var(--color-cyan-100);
+  --cm-search-match-border-radius: 3px;
+  --cm-search-match-border-outline: 1px solid transparent;
+  --cm-search-match-selected-color-bg: var(--color-cyan-200);
+  --cm-search-match-selected-color-fg: var(--color-neutral-950);
+  --cm-search-match-selected-color-padding: 2px 4px;
+
+  --cm-declaration-keyword: var(--color-cyan-200);
+
+  &[data-flash='true'] {
+    --cm-editor-color-fg: var(--cm-color-fg-primary);
+    --cm-declaration-keyword: var(--cm-color-fg-primary);
+  }
+}

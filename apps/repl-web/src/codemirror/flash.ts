@@ -14,7 +14,9 @@ export const flashField = StateField.define({
         if (e.is(setFlash)) {
           if (e.value && tr.newDoc.length > 0) {
             const mark = Decoration.mark({
-              attributes: { style: `background-color: #243a51;` },
+              attributes: {
+                style: `background-color: var(--cm-flash-color-bg);`,
+              },
             })
             flash = Decoration.set([mark.range(0, tr.newDoc.length)])
           } else {
@@ -34,9 +36,11 @@ export const flashField = StateField.define({
 export const flash = (view: EditorView, ms = 200) => {
   if (timeoutId) clearTimeout(timeoutId)
   view.dispatch({ effects: setFlash.of(true) })
+  view.dom.dataset.flash = 'true'
   timeoutId = setTimeout(() => {
     view.dispatch({ effects: setFlash.of(false) })
     timeoutId = null
+    delete view.dom.dataset.flash
   }, ms)
 }
 

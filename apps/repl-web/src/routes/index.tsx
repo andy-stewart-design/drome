@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { basicSetup, EditorView } from 'codemirror'
-import { theme } from '@/codemirror/theme-2'
+import { theme } from '@/codemirror/theme-3'
 import { javascript } from '@/codemirror/language'
 import { flash, flashField } from '@/codemirror/flash'
 import Drome from 'drome-live'
+import '@/codemirror/theme-3.css'
 
 export const Route = createFileRoute('/')({ component: App })
 

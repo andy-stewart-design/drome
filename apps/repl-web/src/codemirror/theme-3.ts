@@ -3,8 +3,6 @@ import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags as t } from '@lezer/highlight'
 
 import {
-  generalContent,
-  generalCursor,
   generalGutter,
   generalLine,
   generalMatching,
@@ -41,15 +39,12 @@ const foregroundPrimary = colorNeutral[50]
 // const declarationKeyword = colorCyan[200] // const, let, etc
 const moduleKeyword = colorCyan[200]
 const classIdentifier = colorNeonYellow
-const selection = colorNeutral[800]
-const cursor = colorCyan[200]
 const variableDeclaration = colorPurple
 const variableReference = foregroundPrimary
 const bracket = colorNeutral[400]
 const boolean = colorNeonYellow
 
 // UI elements
-const invalid = '#ff5370'
 const darkBackground = '#16191c' // Darker background for better contrast
 const highlightBackground = '#ffffff15'
 const tooltipBackground = '#05101d' // Darker tooltip for better contrast
@@ -66,10 +61,10 @@ const abyssTheme = EditorView.theme(
   {
     // Base editor styles
     '&': {
-      color: foregroundPrimary,
-      backgroundColor: colorNeutral[950],
-      fontSize: generalContent.fontSize,
-      fontFamily: generalContent.fontFamily,
+      color: 'var(--cm-editor-color-fg)',
+      backgroundColor: 'var(--cm-editor-color-bg)',
+      fontSize: 'var(--cm-editor-font-size)',
+      fontFamily: 'var(--cm-editor-font-family)',
       width: '100vw',
       height: '100vh',
       border: 'none',
@@ -79,41 +74,40 @@ const abyssTheme = EditorView.theme(
 
     // Content and cursor
     '.cm-content': {
-      caretColor: cursor,
-      lineHeight: 'inherit',
+      caretColor: 'var(--cm-cursor-fg)',
+      lineHeight: 'var(--cm-editor-line-height)',
     },
     '.cm-cursor, .cm-dropCursor': {
-      borderLeftColor: cursor,
-      borderLeftWidth: generalCursor.borderLeftWidth,
-    },
-    '.cm-fat-cursor': {
-      backgroundColor: `${cursor}99`,
-      color: colorNeutral[950],
+      borderLeftColor: 'var(--cm-cursor-fg)',
+      borderLeftWidth: 'var(--cm-cursor-width)',
     },
 
     // Selection
     '&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection':
       {
-        backgroundColor: selection,
+        backgroundColor: 'var(--cm-selection-color-bg)',
+        color: 'var(--cm-selection-color-fg)',
+        borderRadius: 'var(--cm-selection-border-radius)',
       },
 
     // Search functionality
     '.cm-searchMatch': {
-      backgroundColor: colorCyan[700],
-      outline: `1px solid transparent`,
-      borderRadius: generalSearchField.borderRadius,
+      backgroundColor: 'var(--cm-search-match-color-bg)',
+      color: 'var(--cm-search-match-color-fg)',
+      outline: 'var(--cm-search-match-outline)',
+      borderRadius: 'var(--cm-search-match-border-radius)',
 
       '& span': {
-        color: colorWhite,
+        color: 'var(--cm-search-match-color-fg)',
       },
     },
     '.cm-searchMatch.cm-searchMatch-selected': {
-      backgroundColor: colorCyan[500],
-      color: colorWhite,
-      padding: generalSearchField.padding,
+      backgroundColor: 'var(--cm-search-match-selected-color-bg)',
+      color: 'var(--cm-search-match-selected-color-fg)',
+      padding: 'var(--cm-search-match-selected-color-padding)',
 
       '& span': {
-        color: colorWhite,
+        color: 'var(--cm-search-match-selected-color-fg)',
       },
     },
     '.cm-search.cm-panel.cm-textfield': {
@@ -411,8 +405,8 @@ const abyssHighlightStyle = HighlightStyle.define([
   //   },
 
   // Special states
-  { tag: [t.invalid], color: invalid, textDecoration: 'underline wavy' },
-  { tag: [t.strikethrough], color: invalid, textDecoration: 'line-through' },
+  //   { tag: [t.invalid], color: invalid, textDecoration: 'underline wavy' },
+  //   { tag: [t.strikethrough], color: invalid, textDecoration: 'line-through' },
 
   // Enhanced syntax highlighting
   { tag: t.constant(t.name), color: colorNeonPink },
