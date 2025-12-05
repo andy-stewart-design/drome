@@ -15,7 +15,17 @@
   --cm-selection-color-fg: var(--color-cyan-100);
   --cm-selection-border-radius: 3px;
 
+  --cm-active-line-color-bg: rgb(255 255 255 / 0.0375);
+  --cm-active-line-border-radius: 0;
+  --cm-active-line-outline: 1px solid rgb(255 255 255 / 0.125);
+
   --cm-flash-color-bg: var(--color-neon-pink);
+
+  --cm-gutters-color-bg: var(--cm-color-bg-primary);
+  --cm-gutters-color-fg: var(--color-neutral-600);
+  --cm-gutters-active-line-color-bg: rgb(255 255 255 / 0.125);
+  --cm-gutters-active-line-color-fg: var(--cm-color-fg-primary);
+  --cm-gutters-font-size: 12.5px;
 
   --cm-search-match-color-bg: var(--color-cyan-700);
   --cm-search-match-color-fg: var(--color-cyan-100);

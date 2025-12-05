@@ -151,34 +151,31 @@ const abyssTheme = EditorView.theme(
 
     // Line highlighting
     '.cm-activeLine': {
-      backgroundColor: highlightBackground,
-      borderRadius: generalLine.borderRadius,
+      backgroundColor: 'var(--cm-active-line-color-bg)',
+      borderRadius: 'var(--cm-active-line-border-radius)',
+      outline: 'var(--cm-active-line-outline)',
     },
 
     // Gutters
     '.cm-gutters': {
-      backgroundColor: colorNeutral[950],
-      color: colorNeutral[600],
-      border: generalGutter.border,
-      paddingRight: generalGutter.paddingRight,
+      backgroundColor: 'var(--cm-gutters-color-bg)',
+      color: 'var(--cm-gutters-color-fg)',
+    },
+    '.cm-gutters .cm-gutterElement': {
+      display: 'flex',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
     },
     '.cm-activeLineGutter': {
-      backgroundColor: highlightBackground,
-      color: foregroundPrimary,
-      fontWeight: generalGutter.fontWeight,
+      backgroundColor: 'var(--cm-gutters-active-line-color-bg)',
+      color: 'var(--cm-gutters-active-line-color-fg)',
+      outline: 'var(--cm-active-line-outline)',
     },
     '.cm-lineNumbers': {
-      fontSize: generalGutter.fontSize,
+      fontSize: 'var(--cm-gutters-font-size)',
     },
     '.cm-foldGutter': {
-      fontSize: generalGutter.fontSize,
-    },
-    '.cm-foldGutter .cm-gutterElement': {
-      color: '#5f7e97',
-      cursor: 'pointer',
-    },
-    '.cm-foldGutter .cm-gutterElement:hover': {
-      color: foregroundPrimary,
+      fontSize: 'var(--cm-gutters-font-size)',
     },
 
     // Diff/Merge View Styles
