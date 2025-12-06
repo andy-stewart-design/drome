@@ -14,7 +14,9 @@ html {
   --color-neutral-200: rgb(163, 184, 208);
   --color-neutral-300: rgb(137, 163, 192);
   --color-neutral-400: rgb(113, 142, 174);
+  --color-neutral-500: rgb(92, 118, 154);
   --color-neutral-600: rgb(75, 100, 128);
+  --color-neutral-700: rgb(57, 77, 105);
   --color-neutral-800: rgb(36, 58, 81);
   --color-neutral-900: rgb(23, 34, 49);
   --color-neutral-950: rgb(0, 4, 8);

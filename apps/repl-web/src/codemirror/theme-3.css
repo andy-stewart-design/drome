@@ -2,6 +2,8 @@
   --cm-color-fg-primary: var(--color-neutral-50);
   --cm-color-bg-primary: var(--color-neutral-950);
 
+  --cm-editor-width: 100vw;
+  --cm-editor-height: 100vh;
   --cm-editor-color-bg: var(--cm-color-bg-primary);
   --cm-editor-color-fg: var(--cm-color-fg-primary);
   --cm-editor-font-size: 14px;
@@ -11,15 +13,26 @@
   --cm-cursor-fg: var(--color-cyan-200);
   --cm-cursor-width: 1.2px;
 
+  --cm-scrollbar-width: 8px;
+  --cm-scrollbar-height: 8px;
+  --cm-scrollbar-color-bg: var(--color-neutral-900);
+  --cm-scrollbar-thumb-color-bg: var(--color-neutral-800);
+  --cm-scrollbar-thumb-hover-color-bg: var(--color-neutral-700);
+  --cm-scrollbar-thumb-border: none;
+  --cm-scrollbar-thumb-border-radius: 100vmax;
+  --cm-scrollbar-corner-color-bg: var(--color-neutral-900);
+  --cm-scrollbar-corner-border: none;
+
   --cm-selection-color-bg: var(--color-cyan-700);
   --cm-selection-color-fg: var(--color-cyan-100);
   --cm-selection-border-radius: 3px;
+  --cm-selection-match-color-bg: var(--color-neutral-700);
+  --cm-selection-match-outline: none;
+  --cm-selection-match-border-radius: 3px;
 
   --cm-active-line-color-bg: rgb(255 255 255 / 0.0375);
   --cm-active-line-border-radius: 0;
   --cm-active-line-outline: 1px solid rgb(255 255 255 / 0.125);
-
-  --cm-flash-color-bg: var(--color-neon-pink);
 
   --cm-gutters-color-bg: var(--cm-color-bg-primary);
   --cm-gutters-color-fg: var(--color-neutral-600);
@@ -35,7 +48,21 @@
   --cm-search-match-selected-color-fg: var(--color-neutral-950);
   --cm-search-match-selected-color-padding: 2px 4px;
 
-  --cm-declaration-keyword: var(--color-cyan-200);
+  /* ie: let, const, var  */
+  --cm-declaration-keyword-color-fg: var(--color-cyan-200);
+  /* ie: export , import  */
+  --cm-module-keyword-color-fg: var(--color-cyan-200);
+  /* ie: return  */
+  --cm-control-keyword-color-fg: var(--color-neutral-400);
+  --cm-variable-declaration-color-fg: var(--color-purple);
+  --cm-variable-reference-color-fg: var(--cm-color-fg-primary);
+  --cm-property-object-key-color-fg: var(--color-neutral-200);
+  --cm-property-name-color-fg: var(--cm-color-fg-primary);
+  --cm-function-declaration-color-fg: var(--color-neon-pink);
+  --cm-function-reference-color-fg: var(--color-neon-pink);
+  --cm-class-identifier-color-fg: var(--color-neon-yellow);
+  --cm-number-color-fg: var(--color-neon-pink);
+  --cm-boolean-color-fg: var(--color-neon-yellow);
 
   --cm-panel-color-bg: var(--color-neutral-900);
   --cm-panel-color-fg: var(--cm-color-fg-primary);
@@ -53,6 +80,8 @@
   --cm-panel-input-border: 1px solid rgb(255 255 255 / 0.15);
   --cm-panel-input-border-radius: 3px;
   --cm-panel-input-padding: 2px 10px;
+
+  --cm-flash-color-bg: var(--color-neon-pink);
 
   &[data-flash='true'] {
     --cm-editor-color-fg: var(--cm-color-fg-primary);

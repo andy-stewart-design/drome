@@ -1,19 +1,9 @@
 import { EditorView } from '@codemirror/view'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags as t } from '@lezer/highlight'
-
-import {
-  generalGutter,
-  generalLine,
-  generalMatching,
-  generalPanel,
-  generalScroller,
-  generalSearchField,
-  generalTooltip,
-} from './theme-utils'
+import { generalTooltip } from './theme-utils'
 
 // Pritive
-const colorWhite = 'var(--color-white)'
 const colorNeutral = {
   50: 'var(--color-neutral-50)',
   100: 'var(--color-neutral-100)',
@@ -37,25 +27,10 @@ const colorNeonYellow = 'var(--color-neon-yellow)'
 // Semantic
 const foregroundPrimary = colorNeutral[50]
 // const declarationKeyword = colorCyan[200] // const, let, etc
-const moduleKeyword = colorCyan[200]
-const classIdentifier = colorNeonYellow
-const variableDeclaration = colorPurple
-const variableReference = foregroundPrimary
 const bracket = colorNeutral[400]
-const boolean = colorNeonYellow
 
 // UI elements
-const darkBackground = '#16191c' // Darker background for better contrast
-const highlightBackground = '#ffffff15'
 const tooltipBackground = '#05101d' // Darker tooltip for better contrast
-// const activeBracketBg = '#0a5999b0'
-// const activeBracketBorder = 'transparent'
-
-// // Diff/merge specific colors
-// const addedBackground = '#0e4e1d50' // Dark green with transparency for insertions
-// const removedBackground = '#78112240' // Dark red with transparency for deletions
-// const addedText = '#4ce660' // Bright green for added text (matching string color)
-// const removedText = '#ff6b7d' // Bright red for removed text
 
 const abyssTheme = EditorView.theme(
   {
@@ -65,8 +40,8 @@ const abyssTheme = EditorView.theme(
       backgroundColor: 'var(--cm-editor-color-bg)',
       fontSize: 'var(--cm-editor-font-size)',
       fontFamily: 'var(--cm-editor-font-family)',
-      width: '100vw',
-      height: '100vh',
+      width: 'var(--cm-editor-width)',
+      height: 'var(--cm-editor-height)',
       border: 'none',
       outline: 'none',
       resize: 'none',
@@ -89,6 +64,13 @@ const abyssTheme = EditorView.theme(
         color: 'var(--cm-selection-color-fg)',
         borderRadius: 'var(--cm-selection-border-radius)',
       },
+
+    // Selection matches
+    '.cm-selectionMatch': {
+      backgroundColor: 'var(--cm-selection-match-color-bg)',
+      outline: `var(--cm-selection-match-outline)`,
+      borderRadius: 'var(--cm-selection-match-border-radius)',
+    },
 
     // Search functionality
     '.cm-searchMatch': {
@@ -178,47 +160,6 @@ const abyssTheme = EditorView.theme(
       fontSize: 'var(--cm-gutters-font-size)',
     },
 
-    // Diff/Merge View Styles
-    // Inserted/Added Content
-    // '.cm-insertedLine': {
-    //   textDecoration: generalDiff.insertedTextDecoration,
-    //   backgroundColor: addedBackground,
-    //   color: addedText,
-    //   padding: generalDiff.insertedLinePadding,
-    //   borderRadius: generalDiff.borderRadious,
-    // },
-    // 'ins.cm-insertedLine, ins.cm-insertedLine:not(:has(.cm-changedText))': {
-    //   textDecoration: generalDiff.insertedTextDecoration,
-    //   backgroundColor: `${addedBackground} !important`,
-    //   color: addedText,
-    //   padding: generalDiff.insertedLinePadding,
-    //   borderRadius: generalDiff.borderRadious,
-    //   border: `1px solid ${addedText}40`,
-    // },
-    // 'ins.cm-insertedLine .cm-changedText': {
-    //   background: 'transparent !important',
-    // },
-
-    // Deleted/Removed Content
-    // '.cm-deletedLine': {
-    //   textDecoration: generalDiff.deletedTextDecoration,
-    //   backgroundColor: removedBackground,
-    //   color: removedText,
-    //   padding: generalDiff.insertedLinePadding,
-    //   borderRadius: generalDiff.borderRadious,
-    // },
-    // 'del.cm-deletedLine, del, del:not(:has(.cm-deletedText))': {
-    //   textDecoration: generalDiff.deletedTextDecoration,
-    //   backgroundColor: `${removedBackground} !important`,
-    //   color: removedText,
-    //   padding: generalDiff.insertedLinePadding,
-    //   borderRadius: generalDiff.borderRadious,
-    //   border: `1px solid ${removedText}40`,
-    // },
-    // 'del .cm-deletedText, del .cm-changedText': {
-    //   background: 'transparent !important',
-    // },
-
     // Tooltips and autocomplete
     '.cm-tooltip': {
       backgroundColor: tooltipBackground,
@@ -286,13 +227,6 @@ const abyssTheme = EditorView.theme(
     //   borderRadius: generalMatching.borderRadius,
     // },
 
-    // Selection matches
-    '.cm-selectionMatch': {
-      backgroundColor: colorNeutral[800],
-      outline: `1px solid transparent`,
-      borderRadius: generalMatching.borderRadius,
-    },
-
     // Fold placeholder
     // '.cm-foldPlaceholder': {
     //   backgroundColor: 'transparent',
@@ -311,25 +245,23 @@ const abyssTheme = EditorView.theme(
 
     // Scrollbars
     '& .cm-scroller::-webkit-scrollbar': {
-      width: generalScroller.width,
-      height: generalScroller.height,
+      width: 'var(--cm-scrollbar-width)',
+      height: 'var(--cm-scrollbar-height)',
     },
     '& .cm-scroller::-webkit-scrollbar-track': {
-      background: darkBackground,
+      background: 'var(--cm-scrollbar-color-bg)',
     },
     '& .cm-scroller::-webkit-scrollbar-thumb': {
-      backgroundColor: colorNeutral[600],
-      borderRadius: generalScroller.borderRadius,
-      border: `3px solid ${darkBackground}`,
+      backgroundColor: 'var(--cm-scrollbar-thumb-color-bg)',
+      border: 'var(--cm-scrollbar-thumb-border)',
+      borderRadius: 'var(--cm-scrollbar-thumb-border-radius)',
     },
     '& .cm-scroller::-webkit-scrollbar-thumb:hover': {
-      backgroundColor: colorNeutral[400],
+      backgroundColor: 'var(--cm-scrollbar-thumb-hover-color-bg)',
     },
-
-    // Ghost text
-    '.cm-ghostText': {
-      opacity: '0.5',
-      color: colorWhite,
+    '& .cm-scroller::-webkit-scrollbar-corner': {
+      backgroundColor: 'var(--cm-scrollbar-corner-color-bg)',
+      border: 'var(--cm-scrollbar-corner-border)',
     },
   },
   { dark: true },
@@ -338,36 +270,61 @@ const abyssTheme = EditorView.theme(
 /**
  * Enhanced syntax highlighting for the Abyss theme
  */
-const abyssHighlightStyle = HighlightStyle.define([
+const highlightStyle = HighlightStyle.define([
   // Keywords and control flow
   {
     tag: t.keyword,
-    color: 'var(--cm-declaration-keyword)',
+    color: 'var(--cm-declaration-keyword-color-fg)',
     fontWeight: 'regular',
   },
-  { tag: t.moduleKeyword, color: moduleKeyword, fontWeight: 'regular' },
+  {
+    tag: t.moduleKeyword,
+    color: 'var(--cm-module-keyword-color-fg)',
+    fontWeight: 'regular',
+  },
 
   // Names and variables
-  // { tag: [t.name, t.deleted, t.character, t.macroName], color: base08 },
-  { tag: [t.variableName], color: variableReference },
-  { tag: [t.propertyName], color: foregroundPrimary, fontStyle: 'normal' },
+  {
+    tag: [t.definition(t.variableName)],
+    color: 'var(--cm-variable-declaration-color-fg)',
+  },
+  { tag: [t.variableName], color: 'var(--cm-variable-reference-color-fg)' },
+  {
+    tag: [t.propertyName],
+    color: 'var(--cm-property-name-color-fg)',
+    fontStyle: 'normal',
+  },
+  {
+    tag: [t.definition(t.propertyName)],
+    color: 'var(--cm-property-object-key-color-fg)',
+    fontStyle: 'normal',
+  },
+  {
+    tag: [t.function(t.definition(t.variableName))],
+    color: 'var(--cm-function-declaration-color-fg)',
+  },
+  {
+    tag: [t.function(t.variableName), t.labelName],
+    color: 'var(--cm-function-reference-color-fg)',
+  },
 
   // Classes and types
-  { tag: [t.className], color: classIdentifier, fontStyle: 'italic' },
-  { tag: [t.namespace], color: colorNeonPink, fontStyle: 'italic' },
+  {
+    tag: [t.className],
+    color: 'var(--cm-class-identifier-color-fg)',
+    fontStyle: 'italic',
+  },
+  //   { tag: [t.namespace], color: colorNeonPink, fontStyle: 'italic' },
 
   // Operators and punctuation - clearer blues
-  { tag: [t.operator, t.operatorKeyword], color: foregroundPrimary },
-  { tag: [t.bracket], color: foregroundPrimary },
-  { tag: [t.brace], color: foregroundPrimary },
-  { tag: [t.punctuation], color: foregroundPrimary },
-
-  // Functions and parameters
-  // { tag: [t.function(t.variableName), t.labelName], color: colorPurple },
-  { tag: [t.definition(t.variableName)], color: variableDeclaration },
+  //   { tag: [t.operator, t.operatorKeyword], color: 'red' },
+  //   { tag: [t.bracket], color: 'red' },
+  //   { tag: [t.brace], color: 'red' },
+  //   { tag: [t.punctuation], color: 'red' },
 
   // Constants and literals
-  { tag: t.number, color: colorNeonPink },
+  { tag: t.number, color: 'var(--cm-number-color-fg)' },
+  { tag: t.bool, color: 'var(--cm-boolean-color-fg)' },
   { tag: t.changed, color: colorNeonPink },
   { tag: t.annotation, color: colorNeonPink, fontStyle: 'italic' },
   { tag: t.modifier, color: colorNeonPink, fontStyle: 'italic' },
@@ -376,7 +333,7 @@ const abyssHighlightStyle = HighlightStyle.define([
     tag: [t.color, t.constant(t.name), t.standard(t.name)],
     color: colorNeonPink,
   },
-  { tag: [t.atom, t.bool, t.special(t.variableName)], color: boolean },
+  { tag: [t.atom, t.special(t.variableName)], color: colorNeonYellow },
 
   // Strings and regex
   { tag: [t.processingInstruction, t.inserted], color: colorNeonPink },
@@ -418,7 +375,11 @@ const abyssHighlightStyle = HighlightStyle.define([
 
   // Enhanced syntax highlighting
   { tag: t.constant(t.name), color: colorNeonPink },
-  { tag: t.controlKeyword, color: colorCyan[200], fontWeight: 'bold' },
+  {
+    tag: t.controlKeyword,
+    color: 'var(--cm-control-keyword-color-fg)',
+    fontWeight: 'bold',
+  },
   // { tag: t.deleted, color: base08 },
   { tag: t.labelName, color: colorPurple },
   { tag: t.string, color: colorNeonPink },
@@ -427,6 +388,6 @@ const abyssHighlightStyle = HighlightStyle.define([
 /**
  * Combined Abyss theme extension
  */
-const theme = [abyssTheme, syntaxHighlighting(abyssHighlightStyle)]
+const theme = [abyssTheme, syntaxHighlighting(highlightStyle)]
 
 export { theme }
