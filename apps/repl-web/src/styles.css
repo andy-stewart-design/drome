@@ -8,6 +8,31 @@ html {
   background: black;
   color: white;
   color-scheme: dark;
+
+  --color-neutral-50: rgb(248, 249, 250);
+  --color-neutral-100: rgb(191, 206, 222);
+  --color-neutral-200: rgb(163, 184, 208);
+  --color-neutral-300: rgb(137, 163, 192);
+  --color-neutral-400: rgb(113, 142, 174);
+  --color-neutral-500: rgb(92, 118, 154);
+  --color-neutral-600: rgb(75, 100, 128);
+  --color-neutral-700: rgb(57, 77, 105);
+  --color-neutral-800: rgb(36, 58, 81);
+  --color-neutral-900: rgb(23, 34, 49);
+  --color-neutral-950: rgb(0, 4, 8);
+
+  --color-cyan-50: oklch(0.92 0.049 235);
+  --color-cyan-100: oklch(0.84 0.1 235);
+  --color-cyan-200: oklch(0.75 0.1625 235);
+  --color-cyan-500: oklch(0.57 0.154 233);
+  --color-cyan-700: oklch(0.41 0.11 233);
+
+  --color-neon-pink: oklch(0.7 0.35 328);
+  --color-neon-cyan: oklch(0.75 0.1625 235);
+  --color-neon-yellow: oklch(0.95 0.25 115);
+  --color-purple: oklch(0.69 0.17 266);
+  --color-white: rgb(255, 255, 255);
+  --color-black: rgb(0, 0, 0);
 }
 
 body {
@@ -17,19 +42,4 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
-}
-
-textarea {
-  display: block;
-  width: 100vw;
-  height: 100vh;
-  background: black;
-  border: none;
-  outline: none;
-  resize: none;
-  padding: 2rem;
-
-  &:focus {
-    outline: none;
-  }
 }
