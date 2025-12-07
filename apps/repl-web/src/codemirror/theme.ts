@@ -201,78 +201,85 @@ const highlightStyle = HighlightStyle.define([
   // Keywords and control flow
   {
     tag: t.keyword,
-    color: 'var(--cm-declaration-keyword-color-fg)',
+    color: 'var(--cm-syntax-declaration-keyword-color-fg)',
     fontWeight: 'regular',
   },
   {
     tag: t.moduleKeyword,
-    color: 'var(--cm-module-keyword-color-fg)',
+    color: 'var(--cm-syntax-module-keyword-color-fg)',
     fontWeight: 'regular',
   },
 
   // Names and variables
   {
     tag: [t.definition(t.variableName)],
-    color: 'var(--cm-variable-declaration-color-fg)',
+    color: 'var(--cm-syntax-variable-declaration-color-fg)',
   },
-  { tag: [t.variableName], color: 'var(--cm-variable-reference-color-fg)' },
+  {
+    tag: [t.variableName],
+    color: 'var(--cm-syntax-variable-reference-color-fg)',
+  },
   {
     tag: [t.propertyName],
-    color: 'var(--cm-property-name-color-fg)',
+    color: 'var(--cm-syntax-property-name-color-fg)',
     fontStyle: 'normal',
   },
   {
     tag: [t.definition(t.propertyName)],
-    color: 'var(--cm-property-object-key-color-fg)',
+    color: 'var(--cm-syntax-property-object-key-color-fg)',
     fontStyle: 'normal',
   },
   {
     tag: [t.function(t.definition(t.variableName))],
-    color: 'var(--cm-function-declaration-color-fg)',
+    color: 'var(--cm-syntax-function-declaration-color-fg)',
   },
   {
     tag: [t.function(t.variableName), t.labelName],
-    color: 'var(--cm-function-reference-color-fg)',
+    color: 'var(--cm-syntax-function-reference-color-fg)',
   },
 
   // Classes and types
   {
     tag: [t.className],
-    color: 'var(--cm-class-identifier-color-fg)',
+    color: 'var(--cm-syntax-class-identifier-color-fg)',
     fontStyle: 'italic',
   },
 
   // Constants and literals
-  { tag: t.number, color: 'var(--cm-number-color-fg)' },
-  { tag: t.bool, color: 'var(--cm-boolean-color-fg)' },
-  { tag: t.self, color: 'var(--cm-self-color-fg)' },
+  { tag: t.number, color: 'var(--cm-syntax-number-color-fg)' },
+  { tag: t.bool, color: 'var(--cm-syntax-boolean-color-fg)' },
+  { tag: t.self, color: 'var(--cm-syntax-self-color-fg)' },
 
   // Strings and regex
-  { tag: t.string, color: 'var(--cm-string-color-fg)' },
-  { tag: t.regexp, color: 'var(--cm-regex-color-fg)' },
+  { tag: t.string, color: 'var(--cm-syntax-string-color-fg)' },
+  { tag: t.regexp, color: 'var(--cm-syntax-regex-color-fg)' },
 
   // Punctuation and structure
   {
     tag: [t.operator, t.operatorKeyword],
-    color: 'var(--cm-operator-color-fg)',
+    color: 'var(--cm-syntax-operator-color-fg)',
   },
-  { tag: [t.bracket], color: 'var(--cm-bracket-color-fg)' },
-  { tag: [t.brace], color: 'var(--cm-bracket-color-fg)' },
-  { tag: [t.punctuation], color: 'var(--cm-bracket-color-fg)' },
+  { tag: [t.bracket], color: 'var(--cm-syntax-bracket-color-fg)' },
+  { tag: [t.brace], color: 'var(--cm-syntax-bracket-color-fg)' },
+  { tag: [t.punctuation], color: 'var(--cm-syntax-bracket-color-fg)' },
 
   // Comments and documentation
-  { tag: t.meta, color: 'var(--cm-comment-color-fg)' },
-  { tag: t.comment, fontStyle: 'italic', color: 'var(--cm-comment-color-fg)' },
+  { tag: t.meta, color: 'var(--cm-syntax-comment-color-fg)' },
+  {
+    tag: t.comment,
+    fontStyle: 'italic',
+    color: 'var(--cm-syntax-comment-color-fg)',
+  },
   {
     tag: t.docComment,
     fontStyle: 'italic',
-    color: 'var(--cm-comment-color-fg)',
+    color: 'var(--cm-syntax-comment-color-fg)',
   },
 
   // Enhanced syntax highlighting
   {
     tag: t.controlKeyword,
-    color: 'var(--cm-control-keyword-color-fg)',
+    color: 'var(--cm-syntax-control-keyword-color-fg)',
     fontWeight: 'bold',
   },
 ])

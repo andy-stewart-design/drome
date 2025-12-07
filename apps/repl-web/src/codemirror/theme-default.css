@@ -49,27 +49,27 @@
   --cm-search-match-selected-color-padding: 2px 4px;
 
   /* ie: let, const, var  */
-  --cm-declaration-keyword-color-fg: var(--color-cyan-200);
+  --cm-syntax-declaration-keyword-color-fg: var(--color-cyan-200);
   /* ie: export , import  */
-  --cm-module-keyword-color-fg: var(--color-cyan-200);
+  --cm-syntax-module-keyword-color-fg: var(--color-cyan-200);
   /* ie: return  */
-  --cm-control-keyword-color-fg: var(--color-neutral-400);
+  --cm-syntax-control-keyword-color-fg: var(--color-neutral-400);
   /* ie: this  */
-  --cm-self-color-fg: var(--color-neon-yellow);
-  --cm-variable-declaration-color-fg: var(--color-purple);
-  --cm-variable-reference-color-fg: var(--cm-color-fg-primary);
-  --cm-function-declaration-color-fg: var(--color-neon-pink);
-  --cm-function-reference-color-fg: var(--color-neon-pink);
-  --cm-property-object-key-color-fg: var(--color-neutral-200);
-  --cm-string-color-fg: var(--color-neon-pink);
-  --cm-number-color-fg: var(--color-neon-pink);
-  --cm-boolean-color-fg: var(--color-neon-yellow);
-  --cm-regex-color-fg: var(--color-neon-yellow);
-  --cm-operator-color-fg: var(--color-cyan-200);
-  --cm-property-name-color-fg: var(--cm-color-fg-primary);
-  --cm-class-identifier-color-fg: var(--color-neon-yellow);
-  --cm-bracket-color-fg: var(--color-neutral-400);
-  --cm-comment-color-fg: var(--color-neutral-600);
+  --cm-syntax-self-color-fg: var(--color-neon-yellow);
+  --cm-syntax-variable-declaration-color-fg: var(--color-purple);
+  --cm-syntax-variable-reference-color-fg: var(--cm-color-fg-primary);
+  --cm-syntax-function-declaration-color-fg: var(--color-neon-pink);
+  --cm-syntax-function-reference-color-fg: var(--color-neon-pink);
+  --cm-syntax-property-object-key-color-fg: var(--color-neutral-200);
+  --cm-syntax-string-color-fg: var(--color-neon-pink);
+  --cm-syntax-number-color-fg: var(--color-neon-pink);
+  --cm-syntax-boolean-color-fg: var(--color-neon-yellow);
+  --cm-syntax-regex-color-fg: var(--color-neon-yellow);
+  --cm-syntax-operator-color-fg: var(--color-cyan-200);
+  --cm-syntax-property-name-color-fg: var(--cm-color-fg-primary);
+  --cm-syntax-class-identifier-color-fg: var(--color-neon-yellow);
+  --cm-syntax-bracket-color-fg: var(--color-neutral-400);
+  --cm-syntax-comment-color-fg: var(--color-neutral-600);
 
   --cm-panel-color-bg: var(--color-neutral-900);
   --cm-panel-color-fg: var(--cm-color-fg-primary);
@@ -92,7 +92,24 @@
 
   &[data-flash='true'] {
     --cm-editor-color-fg: var(--cm-color-fg-primary);
-    --cm-declaration-keyword: var(--cm-color-fg-primary);
+    --cm-syntax-declaration-keyword-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-module-keyword-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-control-keyword-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-self-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-variable-declaration-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-variable-reference-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-function-declaration-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-function-reference-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-property-object-key-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-string-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-number-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-boolean-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-regex-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-operator-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-property-name-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-class-identifier-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-bracket-color-fg: var(--cm-color-fg-primary);
+    --cm-syntax-comment-color-fg: var(--cm-color-fg-primary);
   }
 
   .cm-panel.cm-search {
