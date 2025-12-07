@@ -54,15 +54,22 @@
   --cm-module-keyword-color-fg: var(--color-cyan-200);
   /* ie: return  */
   --cm-control-keyword-color-fg: var(--color-neutral-400);
+  /* ie: this  */
+  --cm-self-color-fg: var(--color-neon-yellow);
   --cm-variable-declaration-color-fg: var(--color-purple);
   --cm-variable-reference-color-fg: var(--cm-color-fg-primary);
-  --cm-property-object-key-color-fg: var(--color-neutral-200);
-  --cm-property-name-color-fg: var(--cm-color-fg-primary);
   --cm-function-declaration-color-fg: var(--color-neon-pink);
   --cm-function-reference-color-fg: var(--color-neon-pink);
-  --cm-class-identifier-color-fg: var(--color-neon-yellow);
+  --cm-property-object-key-color-fg: var(--color-neutral-200);
+  --cm-string-color-fg: var(--color-neon-pink);
   --cm-number-color-fg: var(--color-neon-pink);
   --cm-boolean-color-fg: var(--color-neon-yellow);
+  --cm-regex-color-fg: var(--color-neon-yellow);
+  --cm-operator-color-fg: var(--color-cyan-200);
+  --cm-property-name-color-fg: var(--cm-color-fg-primary);
+  --cm-class-identifier-color-fg: var(--color-neon-yellow);
+  --cm-bracket-color-fg: var(--color-neutral-400);
+  --cm-comment-color-fg: var(--color-neutral-600);
 
   --cm-panel-color-bg: var(--color-neutral-900);
   --cm-panel-color-fg: var(--cm-color-fg-primary);

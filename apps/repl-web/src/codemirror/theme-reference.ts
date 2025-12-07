@@ -1,33 +1,14 @@
 import { EditorView } from '@codemirror/view'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags as t } from '@lezer/highlight'
-import { generalTooltip } from './theme-utils'
 
-// Pritive
-const colorNeutral = {
-  50: 'var(--color-neutral-50)',
-  100: 'var(--color-neutral-100)',
-  200: 'var(--color-neutral-200)',
-  300: 'var(--color-neutral-300)',
-  400: 'var(--color-neutral-400)',
-  600: 'var(--color-neutral-600)',
-  800: 'var(--color-neutral-800)',
-  950: 'var(--color-neutral-950)',
+const generalTooltip = {
+  borderRadius: '4px',
+  borderRadiusSelected: '3px',
+  lineHeight: '1.3',
+  padding: '4px 8px',
+  paddingRight: '8px',
 }
-const colorCyan = {
-  100: 'var(--color-cyan-100)',
-  200: 'var(--color-cyan-200)',
-  500: 'var(--color-cyan-500)',
-  700: 'var(--color-cyan-700)',
-}
-const colorNeonPink = 'var(--color-neon-pink)'
-const colorPurple = 'var(--color-purple)'
-const colorNeonYellow = 'var(--color-neon-yellow)'
-
-// Semantic
-const foregroundPrimary = colorNeutral[50]
-// const declarationKeyword = colorCyan[200] // const, let, etc
-const bracket = colorNeutral[400]
 
 // UI elements
 const tooltipBackground = '#05101d' // Darker tooltip for better contrast
@@ -325,40 +306,47 @@ const highlightStyle = HighlightStyle.define([
   // Constants and literals
   { tag: t.number, color: 'var(--cm-number-color-fg)' },
   { tag: t.bool, color: 'var(--cm-boolean-color-fg)' },
-  { tag: t.changed, color: colorNeonPink },
-  { tag: t.annotation, color: colorNeonPink, fontStyle: 'italic' },
-  { tag: t.modifier, color: colorNeonPink, fontStyle: 'italic' },
-  { tag: t.self, color: colorNeonPink },
-  {
-    tag: [t.color, t.constant(t.name), t.standard(t.name)],
-    color: colorNeonPink,
-  },
-  { tag: [t.atom, t.special(t.variableName)], color: colorNeonYellow },
+  //   { tag: t.changed, color: 'red' },
+  //   { tag: t.annotation, color: 'red', fontStyle: 'italic' },
+  //   { tag: t.modifier, color: 'red', fontStyle: 'italic' },
+  { tag: t.self, color: 'var(--cm-self-color-fg)' },
+  //   {
+  //     tag: [t.color, t.constant(t.name), t.standard(t.name)],
+  //     color: 'green',
+  //   },
+  //   { tag: [t.atom, t.special(t.variableName)], color: 'green' },
 
   // Strings and regex
-  { tag: [t.processingInstruction, t.inserted], color: colorNeonPink },
-  { tag: [t.special(t.string), t.regexp], color: colorNeonPink },
+  //   { tag: [t.processingInstruction, t.inserted], color: 'green' },
+  { tag: t.regexp, color: 'var(--cm-regex-color-fg)' },
 
   // Punctuation and structure
-  { tag: t.definition(t.typeName), color: colorPurple, fontWeight: 'bold' },
-  { tag: [t.operator, t.operatorKeyword], color: colorCyan[200] },
-  { tag: [t.bracket], color: bracket },
-  { tag: [t.brace], color: bracket },
-  { tag: [t.punctuation], color: bracket },
+  //   { tag: t.definition(t.typeName), color: colorPurple, fontWeight: 'bold' },
+  {
+    tag: [t.operator, t.operatorKeyword],
+    color: 'var(--cm-operator-color-fg)',
+  },
+  { tag: [t.bracket], color: 'var(--cm-bracket-color-fg)' },
+  { tag: [t.brace], color: 'var(--cm-bracket-color-fg)' },
+  { tag: [t.punctuation], color: 'var(--cm-bracket-color-fg)' },
 
   // Comments and documentation
-  { tag: t.meta, color: colorNeutral[600] },
-  { tag: t.comment, fontStyle: 'italic', color: colorNeutral[600] },
-  { tag: t.docComment, fontStyle: 'italic', color: colorNeutral[600] },
+  { tag: t.meta, color: 'var(--cm-comment-color-fg)' },
+  { tag: t.comment, fontStyle: 'italic', color: 'var(--cm-comment-color-fg)' },
+  {
+    tag: t.docComment,
+    fontStyle: 'italic',
+    color: 'var(--cm-comment-color-fg)',
+  },
 
   // HTML/XML elements
   //   { tag: [t.tagName], color: base0F },
   //   { tag: [t.attributeName], color: '#ffd580' },
 
   // Markdown and text formatting
-  { tag: [t.heading], fontWeight: 'bold', color: colorNeutral[50] },
-  { tag: [t.strong], fontWeight: 'bold' },
-  { tag: [t.emphasis], fontStyle: 'italic' },
+  //   { tag: [t.heading], fontWeight: 'bold', color: colorNeutral[50] },
+  //   { tag: [t.strong], fontWeight: 'bold' },
+  //   { tag: [t.emphasis], fontStyle: 'italic' },
 
   // Links and URLs
   //   { tag: [t.link], color: base10, fontWeight: '500' },
@@ -374,20 +362,17 @@ const highlightStyle = HighlightStyle.define([
   //   { tag: [t.strikethrough], color: invalid, textDecoration: 'line-through' },
 
   // Enhanced syntax highlighting
-  { tag: t.constant(t.name), color: colorNeonPink },
+  //   { tag: t.constant(t.name), color: colorNeonPink },
   {
     tag: t.controlKeyword,
     color: 'var(--cm-control-keyword-color-fg)',
     fontWeight: 'bold',
   },
   // { tag: t.deleted, color: base08 },
-  { tag: t.labelName, color: colorPurple },
-  { tag: t.string, color: colorNeonPink },
+  //   { tag: t.labelName, color: 'green' },
+  { tag: t.string, color: 'var(--cm-string-color-fg)' },
 ])
 
-/**
- * Combined Abyss theme extension
- */
 const theme = [abyssTheme, syntaxHighlighting(highlightStyle)]
 
 export { theme }
