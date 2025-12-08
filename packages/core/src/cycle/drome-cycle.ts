@@ -29,6 +29,19 @@ class DromeCycle<T> extends DromeArray<Nullable<T>> {
     return nextCycles;
   }
 
+  arrange(...input: [number, Nullable<T>[]][]) {
+    let nextCycles: Nullable<T>[][] = [];
+
+    for (const [numLoops, pattern] of input) {
+      for (let i = 0; i < numLoops; i++) {
+        nextCycles.push(pattern);
+      }
+    }
+
+    this._value = nextCycles;
+    return this;
+  }
+
   euclid(
     pulses: number | number[],
     steps: number,

@@ -60,6 +60,7 @@ abstract class Instrument<T> {
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
   rev: () => this;
+  seq: (steps: number, ...pulses: StepPattern) => this;
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
@@ -77,6 +78,7 @@ abstract class Instrument<T> {
     this.env = this.adsr.bind(this);
     this.envMode = this.adsrMode.bind(this);
     this.rev = this.reverse.bind(this);
+    this.seq = this.sequence.bind(this);
   }
 
   protected createGain(
@@ -134,6 +136,11 @@ abstract class Instrument<T> {
 
   note(...input: (Nullable<T> | Nullable<T>[])[]) {
     this._cycles.note(...input);
+    return this;
+  }
+
+  arrange(...input: [number, Nullable<T>[]][]) {
+    this._cycles.arrange(...input);
     return this;
   }
 
