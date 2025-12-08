@@ -38,9 +38,6 @@ function App() {
   }, [drome, editor])
 
   function onkeyDown(e: KeyboardEvent) {
-    console.log('keydown', e.key)
-    console.log()
-
     if (!drome || !editor) return
 
     if (e.altKey && e.key === 'Enter') {
@@ -61,25 +58,19 @@ function App() {
   return (
     <main>
       <div ref={editorContainer} />
-      {/* <textarea
-        name="code"
-        defaultValue='d.sample("bd:3").bank("tr909").euclid([3, 5], 8)'
-        spellCheck={false}
-        disabled={!drome}
-      /> */}
     </main>
   )
 }
 
 function runCode(drome: Drome, code: string) {
-  const msg = drome.paused ? `◑ Evaluating code...` : `◑ Queuing update...`
-  console.log(msg, 'input')
+  // const msg = drome.paused ? `◑ Evaluating code...` : `◑ Queuing update...`
+  // console.log(msg, 'input')
 
   try {
     drome.clear()
     const result = new Function('drome, d', `${code}`)(drome, drome)
 
-    console.log(`✓ Code executed successfully`, 'output')
+    // console.log(`✓ Code executed successfully`, 'output')
     if (result !== undefined) {
       console.log(`← ${result}`, 'output')
     }

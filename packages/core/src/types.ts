@@ -12,8 +12,8 @@ type DromeEventCallback = (m: Metronome, time: number) => void;
 type InstrumentType = "synth" | "sample";
 
 // CYCLE
-type Note<T> = { value: T; start: number; duration: number } | null;
 type Nullable<T> = T | null | undefined;
+type Note<T> = { value: T; start: number; duration: number } | null;
 type DromeCycleValue<T> = Nullable<T>[][];
 type StepPatternInput = number | string;
 type StepPattern = (number | number[])[];

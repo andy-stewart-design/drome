@@ -1,6 +1,7 @@
 import DromeArray from "@/cycle/drome-array.js";
 import type { DromeCycleValue, Nullable } from "@/types.js";
 import { euclid } from "@/utils/euclid.js";
+import { hex } from "@/utils/hex";
 
 class DromeCycle<T> extends DromeArray<Nullable<T>> {
   constructor(defaultValue: DromeCycleValue<T>) {
@@ -28,8 +29,17 @@ class DromeCycle<T> extends DromeArray<Nullable<T>> {
     return nextCycles;
   }
 
-  euclid(pulses: number | number[], steps: number, rotation = 0) {
+  euclid(
+    pulses: number | number[],
+    steps: number,
+    rotation: number | number[]
+  ) {
     this._value = this.applyPattern(euclid(pulses, steps, rotation));
+    return this;
+  }
+
+  hex(...hexes: (string | number)[]) {
+    this._value = this.applyPattern(hexes.map(hex));
     return this;
   }
 }

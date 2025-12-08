@@ -136,8 +136,17 @@ abstract class Instrument<T> {
     return this;
   }
 
-  euclid(pulses: number | number[], steps: number, rotation = 0) {
+  euclid(
+    pulses: number | number[],
+    steps: number,
+    rotation: number | number[]
+  ) {
     this._cycles.euclid(pulses, steps, rotation);
+    return this;
+  }
+
+  hex(...hexes: (string | number)[]) {
+    this._cycles.hex(...hexes);
     return this;
   }
 
