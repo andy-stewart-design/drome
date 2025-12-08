@@ -150,6 +150,11 @@ abstract class Instrument<T> {
     return this;
   }
 
+  xox(...input: StepPattern) {
+    this._cycles.xox(...input);
+    return this;
+  }
+
   reverse() {
     this._cycles.reverse();
     return this;
