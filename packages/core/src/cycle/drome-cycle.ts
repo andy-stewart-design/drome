@@ -45,10 +45,16 @@ class DromeCycle<T> extends DromeArray<Nullable<T>> {
     return this;
   }
 
-  xox(...input: StepPattern) {
-    const pattern = input.map((cycle) =>
-      Array.isArray(cycle) ? cycle.map((n) => (n ? 1 : 0)) : cycle ? [1] : [0]
-    );
+  xox(...input: StepPattern | string[]) {
+    const pattern = input.map((c) => {
+      if (typeof c === "string") {
+        return c.split("").reduce<number[]>((acc, s) => {
+          if (s.trim()) acc.push(s.trim() === "x" ? 1 : 0);
+          return acc;
+        }, []);
+      }
+      return Array.isArray(c) ? c.map((n) => (n ? 1 : 0)) : c ? [1] : [0];
+    });
     this._value = this.applyPattern(pattern);
     return this;
   }

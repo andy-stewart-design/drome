@@ -31,6 +31,7 @@ import type {
   Note,
   Nullable,
   RestInput,
+  StepPattern,
   StepPatternInput,
 } from "../types.js";
 
