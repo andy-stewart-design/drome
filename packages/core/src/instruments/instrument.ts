@@ -184,6 +184,11 @@ abstract class Instrument<T> {
     return this;
   }
 
+  stretch(multiplier: number) {
+    this._cycles.stretch(multiplier);
+    return this;
+  }
+
   amplitude(...v: RestInput) {
     if (isLfoTuple(v)) {
       this._gain.cycles.note(v[0].value);

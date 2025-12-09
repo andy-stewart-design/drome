@@ -18,14 +18,6 @@ class DromeArray<T> {
     return this;
   }
 
-  reverse() {
-    this._value = this._value
-      .slice()
-      .reverse()
-      .map((arr) => arr?.slice().reverse());
-    return this;
-  }
-
   set defaultValue(value: T[][]) {
     this._defaultValue = value;
   }
@@ -37,20 +29,24 @@ class DromeArray<T> {
   /* ----------------------------------------------------------------
   /* PATTERN MODIFIERS
   ---------------------------------------------------------------- */
-  fast(multiplier: number) {
-    if (multiplier === 1) return this;
-    else if (multiplier < 1) {
-      this.slow(1 / multiplier);
+  clear() {
+    this._value = [];
+  }
+
+  fast(n: number) {
+    if (n === 1) return this;
+    else if (n < 1) {
+      this.slow(1 / n);
       return this;
     }
 
-    const length = Math.ceil(this._value.length / multiplier);
-    const numLoops = multiplier * length;
-    const nextCyles: typeof this._value = Array.from({ length }, () => []);
+    const length = Math.ceil(this._value.length / n);
+    const numLoops = n * length;
+    const nextCyles: T[][] = Array.from({ length }, () => []);
 
     for (let i = 0; i < numLoops; i++) {
       const v = this._value[i % this._value.length];
-      if (v) nextCyles[Math.floor(i / multiplier)]?.push(...v);
+      if (v) nextCyles[Math.floor(i / n)]?.push(...v);
     }
 
     this._value = nextCyles;
@@ -85,6 +81,31 @@ class DromeArray<T> {
     }
 
     this._value = nextCycles;
+    return this;
+  }
+
+  stretch(n: number) {
+    const foo = this._value.map((cycle) => {
+      const length = Math.ceil(n * cycle.length) / cycle.length;
+      const nextCyles: T[][] = Array.from({ length }, () => []);
+
+      for (let i = 0; i < cycle.length * length; i++) {
+        const beat = cycle[Math.floor(i / n)];
+        if (beat) nextCyles[Math.floor(i / cycle.length)]?.push(beat);
+      }
+
+      return nextCyles;
+    });
+
+    this._value = foo.flat();
+    return this;
+  }
+
+  reverse() {
+    this._value = this._value
+      .slice()
+      .reverse()
+      .map((arr) => arr?.slice().reverse());
     return this;
   }
 
