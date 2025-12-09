@@ -4,8 +4,8 @@ import { hex } from "@/utils/hex";
 import type { DromeCycleValue, Nullable, StepPattern } from "@/types.js";
 
 class DromeCycle<T> extends DromeArray<Nullable<T>> {
-  constructor(defaultValue: DromeCycleValue<T>) {
-    super(defaultValue);
+  constructor(defaultValue: DromeCycleValue<T>, nullValue: T) {
+    super(defaultValue, nullValue);
   }
 
   /* ----------------------------------------------------------------
@@ -47,8 +47,6 @@ class DromeCycle<T> extends DromeArray<Nullable<T>> {
     steps: number,
     rotation: number | number[]
   ) {
-    console.log(euclid(pulses, steps, rotation));
-
     this._value = this.applyPattern(euclid(pulses, steps, rotation));
     return this;
   }

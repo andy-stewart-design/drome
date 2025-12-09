@@ -1,9 +1,11 @@
 class DromeArray<T> {
   protected _value: T[][] = [];
   protected _defaultValue: T[][];
+  protected _nullValue: T;
 
-  constructor(defaultValue: T[][]) {
+  constructor(defaultValue: T[][], nullValue: T) {
     this._defaultValue = defaultValue;
+    this._nullValue = nullValue;
   }
 
   /* ----------------------------------------------------------------
@@ -36,7 +38,12 @@ class DromeArray<T> {
   /* PATTERN MODIFIERS
   ---------------------------------------------------------------- */
   fast(multiplier: number) {
-    if (multiplier <= 1) return this;
+    if (multiplier === 1) return this;
+    else if (multiplier < 1) {
+      this.slow(1 / multiplier);
+      return this;
+    }
+
     const length = Math.ceil(this._value.length / multiplier);
     const numLoops = multiplier * length;
     const nextCyles: typeof this._value = Array.from({ length }, () => []);
@@ -47,6 +54,37 @@ class DromeArray<T> {
     }
 
     this._value = nextCyles;
+    return this;
+  }
+
+  slow(n: number) {
+    if (n === 1) return this;
+    else if (n < 1) {
+      this.fast(1 / n);
+      return this;
+    }
+
+    const nextCycles: T[][] = [];
+
+    for (const cycle of this._value) {
+      const chunkSize = Math.ceil((cycle.length * n) / n);
+
+      for (let k = 0; k < n; k++) {
+        const chunk: T[] = [];
+        const startPos = k * chunkSize;
+        const endPos = Math.min((k + 1) * chunkSize, cycle.length * n);
+
+        for (let pos = startPos; pos < endPos; pos++) {
+          const v = cycle[pos / n];
+          if (v && pos % n === 0) chunk.push(v);
+          else chunk.push(this._nullValue);
+        }
+
+        nextCycles.push(chunk);
+      }
+    }
+
+    this._value = nextCycles;
     return this;
   }
 

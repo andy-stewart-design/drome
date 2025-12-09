@@ -20,14 +20,14 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
 
     if (input instanceof LFO) {
       this._defaultValue = input.value;
-      this._cycles = new DromeArray([[this._defaultValue]]);
+      this._cycles = new DromeArray([[this._defaultValue]], this._defaultValue);
       this._lfo = input;
     } else if (input instanceof Envelope) {
       this._defaultValue = input.startValue;
-      this._cycles = new DromeArray([[this._defaultValue]]);
+      this._cycles = new DromeArray([[this._defaultValue]], this._defaultValue);
       this._env = input;
     } else {
-      this._cycles = new DromeArray([[0]]).note(...input);
+      this._cycles = new DromeArray([[0]], 0).note(...input);
       this._defaultValue = this._cycles.at(0, 0) ?? defaultValue;
     }
   }

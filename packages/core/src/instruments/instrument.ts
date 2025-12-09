@@ -37,7 +37,8 @@ import type {
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
-  defaultCycle?: Nullable<T>[][];
+  defaultCycle: Nullable<T>[][];
+  nullValue: T;
   baseGain?: number;
   adsr?: AdsrEnvelope;
 }
@@ -65,7 +66,7 @@ abstract class Instrument<T> {
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
     this._destination = opts.destination;
-    this._cycles = new DromeCycle(opts.defaultCycle ?? []);
+    this._cycles = new DromeCycle(opts.defaultCycle, opts.nullValue);
     this._sourceNode = new GainNode(drome.ctx);
     this._audioNodes = new Set();
     this._gainNodes = new Set();
@@ -175,6 +176,11 @@ abstract class Instrument<T> {
 
   fast(multiplier: number) {
     this._cycles.fast(multiplier);
+    return this;
+  }
+
+  slow(multiplier: number) {
+    this._cycles.slow(multiplier);
     return this;
   }
 
