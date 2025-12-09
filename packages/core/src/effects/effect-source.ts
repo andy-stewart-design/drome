@@ -59,7 +59,7 @@ class GainSourceEffect extends SourceEffect {
   constructor(drome: Drome, baseGain?: number, adsr?: AdsrEnvelope) {
     super(drome);
     this._cycles = new DromeArray([[1]]);
-    const { a, d, s, r } = adsr ?? { a: 0.005, d: 0, s: 1, r: 0.01 };
+    const { a, d, s, r } = adsr ?? { a: 0.01, d: 0, s: 1, r: 0.1 };
     this._env = new Envelope(0, baseGain || 1).adsr(a, d, s, r);
   }
 

@@ -173,6 +173,11 @@ abstract class Instrument<T> {
     return this;
   }
 
+  fast(multiplier: number) {
+    this._cycles.fast(multiplier);
+    return this;
+  }
+
   amplitude(...v: RestInput) {
     if (isLfoTuple(v)) {
       this._gain.cycles.note(v[0].value);

@@ -33,6 +33,24 @@ class DromeArray<T> {
   }
 
   /* ----------------------------------------------------------------
+  /* PATTERN MODIFIERS
+  ---------------------------------------------------------------- */
+  fast(multiplier: number) {
+    if (multiplier <= 1) return this;
+    const length = Math.ceil(this._value.length / multiplier);
+    const numLoops = multiplier * length;
+    const nextCyles: typeof this._value = Array.from({ length }, () => []);
+
+    for (let i = 0; i < numLoops; i++) {
+      const v = this._value[i % this._value.length];
+      if (v) nextCyles[Math.floor(i / multiplier)]?.push(...v);
+    }
+
+    this._value = nextCyles;
+    return this;
+  }
+
+  /* ----------------------------------------------------------------
   /* GETTERS
   ---------------------------------------------------------------- */
   at(i: number): T[] | null;
