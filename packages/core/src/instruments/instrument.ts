@@ -31,12 +31,14 @@ import type {
   Note,
   Nullable,
   RestInput,
+  StepPattern,
   StepPatternInput,
 } from "../types.js";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
-  defaultCycle?: Nullable<T>[][];
+  defaultCycle: Nullable<T>[][];
+  nullValue: T;
   baseGain?: number;
   adsr?: AdsrEnvelope;
 }
@@ -59,11 +61,12 @@ abstract class Instrument<T> {
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
   rev: () => this;
+  seq: (steps: number, ...pulses: StepPattern) => this;
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
     this._destination = opts.destination;
-    this._cycles = new DromeCycle(opts.defaultCycle ?? []);
+    this._cycles = new DromeCycle(opts.defaultCycle, opts.nullValue);
     this._sourceNode = new GainNode(drome.ctx);
     this._audioNodes = new Set();
     this._gainNodes = new Set();
@@ -76,6 +79,7 @@ abstract class Instrument<T> {
     this.env = this.adsr.bind(this);
     this.envMode = this.adsrMode.bind(this);
     this.rev = this.reverse.bind(this);
+    this.seq = this.sequence.bind(this);
   }
 
   protected createGain(
@@ -136,13 +140,52 @@ abstract class Instrument<T> {
     return this;
   }
 
-  euclid(pulses: number | number[], steps: number, rotation = 0) {
+  arrange(...input: [number, Nullable<T>[]][]) {
+    this._cycles.arrange(...input);
+    return this;
+  }
+
+  euclid(
+    pulses: number | number[],
+    steps: number,
+    rotation: number | number[]
+  ) {
     this._cycles.euclid(pulses, steps, rotation);
+    return this;
+  }
+
+  hex(...hexes: (string | number)[]) {
+    this._cycles.hex(...hexes);
     return this;
   }
 
   reverse() {
     this._cycles.reverse();
+    return this;
+  }
+
+  sequence(steps: number, ...pulses: StepPattern) {
+    this._cycles.sequence(steps, ...pulses);
+    return this;
+  }
+
+  xox(...input: StepPattern) {
+    this._cycles.xox(...input);
+    return this;
+  }
+
+  fast(multiplier: number) {
+    this._cycles.fast(multiplier);
+    return this;
+  }
+
+  slow(multiplier: number) {
+    this._cycles.slow(multiplier);
+    return this;
+  }
+
+  stretch(multiplier: number) {
+    this._cycles.stretch(multiplier);
     return this;
   }
 

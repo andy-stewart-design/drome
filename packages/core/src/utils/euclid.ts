@@ -1,8 +1,20 @@
-function euclid(pulses: number | number[], steps: number, rotation = 0) {
-  if (Array.isArray(pulses)) {
-    return pulses.map((p) => _euclid(p, steps, rotation));
+function euclid(
+  pulses: number | number[],
+  steps: number,
+  rotation: number | number[] = 0
+) {
+  const numPulses = Array.isArray(pulses) ? pulses.length : 1;
+  const numRotation = Array.isArray(rotation) ? rotation.length : 1;
+  const numCycles = Math.max(numPulses, numRotation);
+  const cycles: number[][] = [];
+
+  for (let i = 0; i < numCycles; i++) {
+    const p = getValue(pulses, i, 1);
+    const r = getValue(rotation, i, 0);
+    cycles.push(_euclid(p, steps, r));
   }
-  return [_euclid(pulses, steps, rotation)];
+
+  return cycles;
 }
 
 export { euclid };
@@ -10,6 +22,10 @@ export { euclid };
 // ————————————————————————————————————————————————————————————————
 // INTERNAL
 // ————————————————————————————————————————————————————————————————
+function getValue<T>(v: T | T[], i: number, fb: T) {
+  return Array.isArray(v) ? (v[i % v.length] ?? fb) : v;
+}
+
 function _euclid(pulse: number, steps: number, rotation: number) {
   if (pulse < 0 || steps < 0 || steps < pulse) return [];
 

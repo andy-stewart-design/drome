@@ -1,10 +1,11 @@
 import DromeArray from "@/cycle/drome-array.js";
-import type { DromeCycleValue, Nullable } from "@/types.js";
 import { euclid } from "@/utils/euclid.js";
+import { hex } from "@/utils/hex";
+import type { DromeCycleValue, Nullable, StepPattern } from "@/types.js";
 
 class DromeCycle<T> extends DromeArray<Nullable<T>> {
-  constructor(defaultValue: DromeCycleValue<T>) {
-    super(defaultValue);
+  constructor(defaultValue: DromeCycleValue<T>, nullValue: T) {
+    super(defaultValue, nullValue);
   }
 
   /* ----------------------------------------------------------------
@@ -28,8 +29,54 @@ class DromeCycle<T> extends DromeArray<Nullable<T>> {
     return nextCycles;
   }
 
-  euclid(pulses: number | number[], steps: number, rotation = 0) {
+  arrange(...input: [number, Nullable<T>[]][]) {
+    let nextCycles: Nullable<T>[][] = [];
+
+    for (const [numLoops, pattern] of input) {
+      for (let i = 0; i < numLoops; i++) {
+        nextCycles.push(pattern);
+      }
+    }
+
+    this._value = nextCycles;
+    return this;
+  }
+
+  euclid(
+    pulses: number | number[],
+    steps: number,
+    rotation: number | number[]
+  ) {
     this._value = this.applyPattern(euclid(pulses, steps, rotation));
+    return this;
+  }
+
+  hex(...input: (string | number)[]) {
+    this._value = this.applyPattern(input.map(hex));
+    return this;
+  }
+
+  sequence(steps: number, ...pulses: StepPattern) {
+    const pattern = pulses.map((p) =>
+      Array.from({ length: steps }, (_, i) => {
+        return [p].flat().includes(i) ? 1 : 0;
+      })
+    );
+    this._value = this.applyPattern(pattern);
+    return this;
+  }
+
+  xox(...input: StepPattern | string[]) {
+    const pattern = input.map((c) => {
+      if (typeof c === "string") {
+        return c.split("").reduce<number[]>((acc, s) => {
+          if (s.trim()) acc.push(s.trim() === "x" ? 1 : 0);
+          return acc;
+        }, []);
+      }
+      return Array.isArray(c) ? c.map((n) => (n ? 1 : 0)) : c ? [1] : [0];
+    });
+    this._value = this.applyPattern(pattern);
     return this;
   }
 }

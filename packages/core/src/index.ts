@@ -153,6 +153,7 @@ class Drome {
       type: types,
       destination,
       defaultCycle: [[[60]]],
+      nullValue: 0,
     });
     this.instruments.add(synth);
     return synth;
@@ -165,6 +166,7 @@ class Drome {
       destination,
       sampleIds: sampleIds,
       defaultCycle: [[0]],
+      nullValue: 0,
     });
     this.instruments.add(sample);
     return sample;

@@ -3,6 +3,11 @@ import "./style.css";
 
 const d = await Drome.init(120);
 
+d.synth("triangle").arrange(
+  [2, [60, , , 64, , 67, 71, ,]],
+  [2, [67, 64, 60, 71]]
+);
+
 // d.synth("sawtooth")
 //   .note([72, 76, 79, 83], [69, 72, 76, 79])
 //   .euclid(16, 32)
@@ -25,14 +30,14 @@ const d = await Drome.init(120);
 //   .pan(lfo2)
 //   .gain(d.env(0, 1).adsr(0.05, 1, 0.25));
 
-d.sample("bass")
-  .bank("sonicpi")
-  .fit(2)
-  .begin(0, 0.45)
-  .lpf(200)
-  .rel(0.1)
-  .lpf(d.env(200, 1000).adsr(0.1, 0.25, 0.25))
-  .cut();
+// d.sample("bass")
+//   .bank("sonicpi")
+//   .fit(2)
+//   .begin(0, 0.45)
+//   .lpf(200)
+//   .rel(0.1)
+//   .lpf(d.env(200, 1000).adsr(0.1, 0.25, 0.25))
+//   .cut();
 
 document
   .querySelector<HTMLButtonElement>("#start")
