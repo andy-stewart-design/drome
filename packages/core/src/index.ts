@@ -1,18 +1,3 @@
-// import { addWorklets } from "./utils/worklets.js";
-// import { DISTORTION_ID } from "./constants.js";
-
-// async function init() {
-//   const ctx = new AudioContext();
-//   await addWorklets(ctx);
-//   const bcProcessor = new AudioWorkletNode(ctx, DISTORTION_ID);
-
-//   console.log(bcProcessor.parameters.get("distortion"));
-// }
-
-// init();
-
-// export { default as DromeArray } from "@/cycle/drome-array";
-
 import AudioClock from "@/clock/audio-clock";
 import Envelope from "@/automation/envelope";
 import LFO from "@/automation/lfo";

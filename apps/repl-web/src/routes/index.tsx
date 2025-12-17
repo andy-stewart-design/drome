@@ -9,6 +9,8 @@ import '@/codemirror/theme-default.css'
 
 export const Route = createFileRoute('/')({ component: App })
 
+const LS_KEY = 'drome_sketch'
+
 function App() {
   const editorContainer = useRef<HTMLDivElement>(null)
   const [drome, setDrome] = useState<Drome | null>(null)
@@ -18,8 +20,10 @@ function App() {
     if (!editorContainer.current) return
     Drome.init(120).then((d) => setDrome(d))
 
+    const doc = localStorage.getItem(LS_KEY)
+
     const editor = new EditorView({
-      doc: 'd.sample("bd:3").bank("tr909").euclid([3, 5], 8)',
+      doc: doc ?? 'd.sample("bd:3").bank("tr909").euclid([3, 5], 8)',
       extensions: [basicSetup, theme, javascript(), flashField],
       parent: editorContainer.current,
     })
@@ -44,6 +48,7 @@ function App() {
       e.preventDefault()
 
       runCode(drome, editor.state.doc.toString())
+      localStorage.setItem(LS_KEY, editor.state.doc.toString())
       flash(editor)
       if (drome.paused) {
         drome.start()

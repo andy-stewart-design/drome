@@ -15,7 +15,7 @@ function getAdsrTimes({ a, d, r, duration, mode }: getAdsrTimesArgs) {
     const nD = adsrSum > 1 ? d / adsrSum : d;
     const nR = adsrSum > 1 ? r / adsrSum : r;
 
-    const att = nA * duration;
+    const att = Math.max(nA * duration, 0.005);
     const dec = att + nD * duration;
     const rStart = duration - nR * duration;
     const rEnd = duration;
@@ -26,10 +26,12 @@ function getAdsrTimes({ a, d, r, duration, mode }: getAdsrTimesArgs) {
     const nA = adsrSum > 1 ? a / adsrSum : a;
     const nD = adsrSum > 1 ? d / adsrSum : d;
 
-    const att = nA * (duration - 0.001);
-    const dec = att + nD * (duration - 0.001);
+    // const att = Math.max(nA * (duration - 0.001), 0.005);
+    // const dec = att + nD * (duration - 0.001);
+    const att = Math.max(nA * duration, 0.005);
+    const dec = att + nD * duration;
     const rStart = duration;
-    const rEnd = duration + r * duration;
+    const rEnd = duration + Math.max(r * duration, 0.01);
 
     return { a: att, d: dec, r: { start: rStart, end: rEnd } };
   } else {
