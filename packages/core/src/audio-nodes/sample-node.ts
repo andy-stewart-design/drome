@@ -1,0 +1,174 @@
+// TODO: Move loop, loopStart, loopEnd to be properties (not AudioParams)
+
+// import AudioEndedEvent from "./audio-event";
+import type { FilterType } from "@/worklets/worklet-filter";
+// import type {
+//   SampleParameterData,
+//   SampleProcessorMessage,
+//   SampleProcessorOptions,
+// } from "../worklets/sample-processor";
+
+type SampleNodeMessage =
+  | {
+      type: "loop";
+      loop: boolean;
+    }
+  | {
+      type: "start" | "stop";
+      time: number;
+      offset?: number;
+    }
+  | {
+      type: "buffer";
+      buffer: Float32Array<ArrayBuffer>;
+    }
+  | {
+      type: "loopStart" | "loopEnd";
+      offset: number;
+    }
+  | {
+      type: "filterType";
+      filterType: FilterType;
+    };
+
+// class SampleNode extends AudioWorkletNode {
+//   private _duration: number;
+//   private _loop: boolean;
+//   private _loopStart: number;
+//   private _loopEnd: number;
+//   private _filterType: FilterType;
+//   readonly playbackRate: AudioParam;
+//   readonly detune: AudioParam;
+//   readonly gain: AudioParam;
+//   readonly filterFrequency: AudioParam;
+//   readonly filterQ: AudioParam;
+//   onended: ((e: AudioEndedEvent) => void) | null = null;
+
+//   constructor(
+//     ctx: AudioContext,
+//     buffer: AudioBuffer,
+//     {
+//       filterType = "none",
+//       loop = false,
+//       loopStart = 0,
+//       loopEnd = 1,
+//       ...params
+//     }: Partial<SampleParameterData & SampleProcessorOptions> = {}
+//   ) {
+//     super(ctx, "buffer-source-processor", {
+//       numberOfOutputs: 1,
+//       outputChannelCount: [2],
+//       parameterData: params,
+//       processorOptions: { filterType, loop, loopStart, loopEnd },
+//     });
+
+//     this._duration = buffer.duration;
+
+//     this.playbackRate = getParam(this, "playbackRate");
+//     this.detune = getParam(this, "detune");
+//     this.gain = getParam(this, "gain");
+//     this._loop = loop;
+//     this._loopStart = loopStart;
+//     this._loopEnd = loopEnd;
+//     this._filterType = filterType;
+//     this.filterFrequency = getParam(this, "filterFrequency");
+//     this.filterQ = getParam(this, "filterQ");
+
+//     this.postMessage({ type: "buffer", buffer: buffer.getChannelData(0) });
+
+//     // Listen for messages from the processor
+//     this.port.onmessage = (event: MessageEvent<SampleProcessorMessage>) => {
+//       if (event.data.type === "ended") {
+//         const audioEvent = new AudioEndedEvent(event.data.time);
+//         this.onended?.(audioEvent);
+//         this.dispatchEvent(audioEvent);
+//       }
+//     };
+//   }
+
+//   private postMessage(msg: SampleNodeMessage) {
+//     this.port.postMessage(msg);
+//   }
+
+//   start(when = 0, offset = 0) {
+//     const clampedOffset = Math.max(
+//       0,
+//       Math.min(offset * this._duration, this._duration)
+//     );
+
+//     this.postMessage({
+//       type: "start",
+//       time: when || this.context.currentTime,
+//       offset: clampedOffset * this.context.sampleRate,
+//     });
+//   }
+
+//   stop(when = 0) {
+//     this.postMessage({ type: "stop", time: when || this.context.currentTime });
+//   }
+
+//   setLoop(loop: boolean) {
+//     this._loop = loop;
+//     this.postMessage({ type: "loop", loop });
+//   }
+
+//   setLoopStart(loopStart: number) {
+//     this._loopStart = loopStart;
+//     this.postMessage({ type: "loopStart", offset: loopStart });
+//   }
+
+//   setLoopEnd(loopEnd: number) {
+//     this._loopEnd = loopEnd;
+//     this.postMessage({ type: "loopEnd", offset: loopEnd });
+//   }
+
+//   setFilterType(filterType: FilterType) {
+//     this._filterType = filterType;
+//     this.postMessage({ type: "filterType", filterType });
+//   }
+
+//   get loop() {
+//     return this._loop;
+//   }
+
+//   set loop(loop: boolean) {
+//     this._loop = loop;
+//     this.postMessage({ type: "loop", loop });
+//   }
+
+//   get loopStart() {
+//     return this._loopStart;
+//   }
+
+//   set loopStart(loopStart: number) {
+//     this._loopStart = loopStart;
+//     this.postMessage({ type: "loopStart", offset: loopStart });
+//   }
+
+//   get loopEnd() {
+//     return this._loopEnd;
+//   }
+
+//   set loopEnd(loopEnd: number) {
+//     this._loopEnd = loopEnd;
+//     this.postMessage({ type: "loopEnd", offset: loopEnd });
+//   }
+
+//   get filterType() {
+//     return this._filterType;
+//   }
+
+//   set filterType(filterType: FilterType) {
+//     this._filterType = filterType;
+//     this.postMessage({ type: "filterType", filterType });
+//   }
+// }
+
+// function getParam(node: AudioWorkletNode, name: string) {
+//   const param = node.parameters.get(name);
+//   if (!param) throw new Error(`Missing AudioParam "${name}"`);
+//   return param;
+// }
+
+// export default SampleNode;
+export type { SampleNodeMessage };
