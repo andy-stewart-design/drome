@@ -8,6 +8,7 @@ import { loadSample } from "@/utils/load-sample";
 import { bufferId } from "@/utils/cache-id";
 import { addWorklets } from "./utils/worklets";
 import type { SampleBankSchema } from "./utils/samples-validate";
+import SampleNode from "./audio-nodes/sample-node";
 
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
