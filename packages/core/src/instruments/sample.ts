@@ -1,6 +1,7 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
 import { flipBuffer } from "../utils/flip-buffer";
 import type Drome from "@/index";
+import SampleNode from "@/audio-nodes/sample-node";
 
 type Nullable<T> = T | null | undefined;
 
@@ -104,12 +105,14 @@ export default class Sample extends Instrument<number> {
         const chopStartTime = note.value * buffer.duration;
         const chopDuration = buffer.duration - chopStartTime;
 
-        const src = new AudioBufferSourceNode(this.ctx, {
-          buffer:
-            this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
-          playbackRate: playbackRate,
-          loop: this._loop,
-        });
+        const src = new SampleNode(
+          this.ctx,
+          this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
+          {
+            playbackRate: playbackRate,
+            loop: this._loop,
+          }
+        );
         this.applyDetune(src, note.start, note.duration, noteIndex);
         this._audioNodes.add(src);
 

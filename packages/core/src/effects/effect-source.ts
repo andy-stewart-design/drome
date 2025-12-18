@@ -3,9 +3,11 @@ import Envelope from "@/automation/envelope";
 import LFO from "@/automation/lfo";
 import type Drome from "@/index";
 import type { AdsrEnvelope } from "@/types";
+import type SynthesizerNode from "@/audio-nodes/synthesizer-node";
+import type SampleNode from "@/audio-nodes/sample-node";
 
 interface SourceEffectApplyArgs {
-  node: OscillatorNode | AudioBufferSourceNode;
+  node: OscillatorNode | AudioBufferSourceNode | SynthesizerNode | SampleNode;
   start: number;
   duration: number;
   cycleIndex: number;

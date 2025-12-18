@@ -1,6 +1,7 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
 import { midiToFrequency } from "@/utils/midi-to-frequency";
 import type Drome from "@/index";
+import SynthesizerNode from "@/audio-nodes/synthesizer-node";
 
 interface SynthOptions extends InstrumentOptions<number | number[]> {
   type?: OscillatorType[];
@@ -22,9 +23,9 @@ export default class Synth extends Instrument<number | number[]> {
         if (!note) return;
         [note?.value].flat().forEach((midiNote) => {
           // if (!midiNote) return;
-          const osc = new OscillatorNode(this.ctx, {
+          const osc = new SynthesizerNode(this.ctx, {
             frequency: midiToFrequency(midiNote),
-            type,
+            type: type === "custom" ? "sine" : type,
           });
           this._audioNodes.add(osc);
 
@@ -37,15 +38,15 @@ export default class Synth extends Instrument<number | number[]> {
           );
 
           osc.start(note.start);
-          osc.stop(note.start + noteEnd);
+          osc.stop(note.start + note.duration);
 
           const cleanup = () => {
             osc.disconnect();
             this._audioNodes.delete(osc);
-            gainNodes.forEach((node) => {
-              node.disconnect();
-              this._gainNodes.delete(node);
-            });
+            // gainNodes.forEach((node) => {
+            //   node.disconnect();
+            //   this._gainNodes.delete(node);
+            // });
             osc.removeEventListener("ended", cleanup);
           };
 

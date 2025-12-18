@@ -34,6 +34,8 @@ import type {
   StepPattern,
   StepPatternInput,
 } from "../types.js";
+import type SynthesizerNode from "@/audio-nodes/synthesizer-node.js";
+import type SampleNode from "@/audio-nodes/sample-node.js";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
@@ -53,7 +55,9 @@ abstract class Instrument<T> {
   private _destination: AudioNode;
   protected _startTime: number | undefined;
   private _isConnected = false;
-  protected readonly _audioNodes: Set<OscillatorNode | AudioBufferSourceNode>;
+  protected readonly _audioNodes: Set<
+    OscillatorNode | AudioBufferSourceNode | SynthesizerNode | SampleNode
+  >;
   protected readonly _gainNodes: Set<GainNode>;
 
   // Method Aliases
@@ -83,7 +87,7 @@ abstract class Instrument<T> {
   }
 
   protected createGain(
-    node: OscillatorNode | AudioBufferSourceNode,
+    node: OscillatorNode | AudioBufferSourceNode | SynthesizerNode | SampleNode,
     start: number,
     duration: number,
     chordIndex: number
@@ -99,13 +103,14 @@ abstract class Instrument<T> {
 
     this._gainNodes.add(envGain);
     this._gainNodes.add(effectGain);
-    node.connect(effectGain).connect(envGain).connect(this._sourceNode);
+    // node.connect(effectGain).connect(envGain).connect(this._sourceNode);
+    node.connect(this._sourceNode);
 
     return { gainNodes: [envGain, effectGain], noteEnd };
   }
 
   protected applyDetune(
-    node: OscillatorNode | AudioBufferSourceNode,
+    node: OscillatorNode | AudioBufferSourceNode | SynthesizerNode | SampleNode,
     start: number,
     duration: number,
     chordIndex: number
