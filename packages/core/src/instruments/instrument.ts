@@ -37,6 +37,7 @@ import type {
 import type SynthesizerNode from "@/audio-nodes/synthesizer-node";
 import type SampleNode from "@/audio-nodes/sample-node";
 import Envelope from "@/automation/envelope";
+import Pattern from "@/automation/pattern";
 import type { FilterType } from "@/worklets/worklet-filter";
 
 interface InstrumentOptions<T> {
@@ -45,6 +46,12 @@ interface InstrumentOptions<T> {
   nullValue: T;
   baseGain?: number;
   adsr?: AdsrEnvelope;
+}
+
+interface FrequencyParams {
+  type: FilterType;
+  frequency?: Pattern | Envelope;
+  q?: Pattern | Envelope;
 }
 
 abstract class Instrument<T> {
@@ -63,10 +70,7 @@ abstract class Instrument<T> {
   protected readonly _gainNodes: Set<GainNode>;
 
   protected _gain2: Envelope;
-  protected _filter: { type: FilterType; frequency: number } = {
-    type: "none",
-    frequency: 1000,
-  };
+  protected _filter: FrequencyParams = { type: "none" };
 
   // Method Aliases
   amp: (...v: RestInput) => this;
@@ -86,6 +90,8 @@ abstract class Instrument<T> {
     const { baseGain, adsr } = opts;
     this._gain = new GainSourceEffect(drome, baseGain, adsr);
     this._detune = new DetuneSourceEffect(drome);
+
+    console.log(baseGain);
 
     this._gain2 = new Envelope(0, baseGain ?? 0.35);
 
@@ -116,6 +122,26 @@ abstract class Instrument<T> {
     node.connect(effectGain).connect(envGain).connect(this._sourceNode);
 
     return { gainNodes: [envGain, effectGain], noteEnd };
+  }
+
+  protected applyFilter(
+    node: SynthesizerNode | SampleNode | BiquadFilterNode,
+    start: number,
+    duration: number,
+    chordIndex: number
+  ) {
+    const cycleIndex = this._drome.metronome.bar % this._cycles.length;
+    const target =
+      node instanceof BiquadFilterNode ? node.frequency : node.filterFrequency;
+
+    if (this._filter.frequency && !(node instanceof BiquadFilterNode))
+      node.setFilterType(this._filter.type);
+
+    if (this._filter.frequency instanceof Pattern) {
+      this._filter.frequency.apply(target, cycleIndex, chordIndex);
+    } else if (this._filter.frequency instanceof Envelope) {
+      this._filter.frequency.apply(target, start, duration);
+    }
   }
 
   protected applyDetune(
@@ -255,9 +281,12 @@ abstract class Instrument<T> {
     return this;
   }
 
-  filter(type: FilterType, frequency: number) {
+  filter(type: FilterType, ...frequency: (number | number[])[] | [Envelope]) {
     this._filter.type = type;
-    this._filter.frequency = frequency;
+    this._filter.frequency = isEnvTuple(frequency)
+      ? frequency[0]
+      : new Pattern(...frequency);
+    return this;
   }
 
   gain(...input: RestInput) {

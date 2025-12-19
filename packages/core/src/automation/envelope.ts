@@ -56,6 +56,8 @@ class Envelope {
       mode: this._mode,
     });
 
+    console.log("maxValue", this.maxValue, this._adsr.s);
+
     applyAdsr({
       target,
       startTime,
