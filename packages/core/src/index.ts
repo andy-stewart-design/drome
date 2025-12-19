@@ -115,6 +115,7 @@ class Drome {
   async start() {
     if (!this.clock.paused) return;
     await this.preloadSamples();
+    await new Promise((r) => setTimeout(r, 100));
     this.clock.start();
   }
 
@@ -126,6 +127,7 @@ class Drome {
       chan.gain.cancelScheduledValues(this.ctx.currentTime);
       chan.gain.value = BASE_GAIN;
     });
+    // this.ctx.suspend();
   }
 
   public clear() {

@@ -36,6 +36,8 @@ import type {
 } from "../types.js";
 import type SynthesizerNode from "@/audio-nodes/synthesizer-node.js";
 import type SampleNode from "@/audio-nodes/sample-node.js";
+import Envelope from "@/automation/envelope.js";
+import type { FilterType } from "@/worklets/worklet-filter.js";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
@@ -50,15 +52,21 @@ abstract class Instrument<T> {
   protected _cycles: DromeCycle<T>;
   private _gain: GainSourceEffect;
   private _detune: DetuneSourceEffect;
-  private _sourceNode: GainNode;
+  protected _sourceNode: GainNode;
   private _signalChain: Set<DromeAudioNode>;
   private _destination: AudioNode;
   protected _startTime: number | undefined;
   private _isConnected = false;
   protected readonly _audioNodes: Set<
-    OscillatorNode | AudioBufferSourceNode | SynthesizerNode | SampleNode
+    AudioBufferSourceNode | SynthesizerNode | SampleNode
   >;
   protected readonly _gainNodes: Set<GainNode>;
+
+  protected _gain2: Envelope;
+  protected _filter: { type: FilterType; frequency: number } = {
+    type: "none",
+    frequency: 1000,
+  };
 
   // Method Aliases
   amp: (...v: RestInput) => this;
@@ -78,6 +86,8 @@ abstract class Instrument<T> {
     const { baseGain, adsr } = opts;
     this._gain = new GainSourceEffect(drome, baseGain, adsr);
     this._detune = new DetuneSourceEffect(drome);
+
+    this._gain2 = new Envelope(0, baseGain ?? 0.35);
 
     this.amp = this.amplitude.bind(this);
     this.env = this.adsr.bind(this);
@@ -211,6 +221,11 @@ abstract class Instrument<T> {
     if (typeof s === "number") this._gain.env.sus(s);
     if (typeof r === "number") this._gain.env.rel(r);
 
+    this._gain2.att(a);
+    if (typeof d === "number") this._gain2.dec(d);
+    if (typeof s === "number") this._gain2.sus(s);
+    if (typeof r === "number") this._gain2.rel(r);
+
     return this;
   }
 
@@ -238,6 +253,11 @@ abstract class Instrument<T> {
     this._gain.env.mode(mode);
     this._detune.env?.mode(mode);
     return this;
+  }
+
+  filter(type: FilterType, frequency: number) {
+    this._filter.type = type;
+    this._filter.frequency = frequency;
   }
 
   gain(...input: RestInput) {
@@ -414,7 +434,7 @@ abstract class Instrument<T> {
     const startTime = this._startTime ?? this.ctx.currentTime;
     const relTime = 0.25;
 
-    if (startTime > this.ctx.currentTime) {
+    if (startTime > stopTime) {
       this._audioNodes.forEach((node) => node.stop());
       this.cleanup();
     } else {

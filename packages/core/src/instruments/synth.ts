@@ -26,27 +26,32 @@ export default class Synth extends Instrument<number | number[]> {
           const osc = new SynthesizerNode(this.ctx, {
             frequency: midiToFrequency(midiNote),
             type: type === "custom" ? "sine" : type,
+            filterType: this._filter.type,
+            filterFrequency: this._filter.frequency,
           });
           this._audioNodes.add(osc);
 
           this.applyDetune(osc, note.start, note.duration, chordIndex);
-          const { gainNodes, noteEnd } = this.createGain(
-            osc,
-            note.start,
-            note.duration,
-            chordIndex
-          );
+          const end = this._gain2.apply(osc.gain, note.start, note.duration);
 
+          // osc.filterFrequency.setValueAtTime(0, note.start);
+          // osc.filterFrequency.linearRampToValueAtTime(
+          //   this._filter.frequency,
+          //   note.start + end
+          // );
+          // osc.filterFrequency.setValueAtTime(
+          //   1200,
+          //   note.start + end - 0.5 * end
+          // );
+          // osc.filterFrequency.linearRampToValueAtTime(0, note.start + end);
+
+          osc.connect(this._sourceNode);
           osc.start(note.start);
-          osc.stop(note.start + note.duration);
+          osc.stop(note.start + end);
 
           const cleanup = () => {
             osc.disconnect();
             this._audioNodes.delete(osc);
-            gainNodes.forEach((node) => {
-              node.disconnect();
-              this._gainNodes.delete(node);
-            });
             osc.removeEventListener("ended", cleanup);
           };
 
