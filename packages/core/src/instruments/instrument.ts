@@ -103,8 +103,7 @@ abstract class Instrument<T> {
 
     this._gainNodes.add(envGain);
     this._gainNodes.add(effectGain);
-    // node.connect(effectGain).connect(envGain).connect(this._sourceNode);
-    node.connect(this._sourceNode);
+    node.connect(effectGain).connect(envGain).connect(this._sourceNode);
 
     return { gainNodes: [envGain, effectGain], noteEnd };
   }

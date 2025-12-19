@@ -17,7 +17,7 @@ function App() {
   const [editor, setEditor] = useState<EditorView | null>(null)
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !editorContainer.current) return
+    if (!editorContainer.current) return
     Drome.init(120).then((d) => setDrome(d))
 
     const doc = localStorage.getItem(LS_KEY)

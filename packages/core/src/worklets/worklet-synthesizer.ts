@@ -180,6 +180,7 @@ class SynthesizerProcessor extends FilterProcessor {
         this.isRunning = false;
         this.scheduledStopTime = null;
         this.postEndedMessage(currentTime);
+        return false;
       }
 
       if (!this.isRunning) {

@@ -153,6 +153,7 @@ class SampleProcessor extends FilterProcessor {
         this.isRunning = false;
         this.scheduledStopTime = null;
         this.postEndedMessage(currentTime);
+        return false;
       }
 
       if (!this.isRunning) {
@@ -206,6 +207,7 @@ class SampleProcessor extends FilterProcessor {
       } else if (this.readIndex >= buffer.length) {
         this.isRunning = false;
         this.postEndedMessage(currentTime);
+        return false;
         break;
       }
     }

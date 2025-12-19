@@ -43,10 +43,10 @@ export default class Synth extends Instrument<number | number[]> {
           const cleanup = () => {
             osc.disconnect();
             this._audioNodes.delete(osc);
-            // gainNodes.forEach((node) => {
-            //   node.disconnect();
-            //   this._gainNodes.delete(node);
-            // });
+            gainNodes.forEach((node) => {
+              node.disconnect();
+              this._gainNodes.delete(node);
+            });
             osc.removeEventListener("ended", cleanup);
           };
 
