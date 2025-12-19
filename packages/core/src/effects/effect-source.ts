@@ -1,4 +1,4 @@
-import DromeArray from "@/cycle/drome-array";
+import DromeArray from "@/array/drome-array";
 import Envelope from "@/automation/envelope";
 import LFO from "@/automation/lfo";
 import type Drome from "@/index";

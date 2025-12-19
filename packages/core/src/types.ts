@@ -1,4 +1,4 @@
-import type DromeArray from "@/cycle/drome-array.js";
+import type DromeArray from "@/array/drome-array.js";
 import type Envelope from "@/automation/envelope.js";
 import type LFO from "@/automation/lfo.js";
 import type * as algos from "@/utils/distortion-algorithms.js";

@@ -3,7 +3,7 @@ import BitcrusherEffect from "@/effects/effect-bitcrusher";
 import DelayEffect from "@/effects/effect-delay";
 import DistortionEffect from "@/effects/effect-distortion";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
-import DromeCycle from "@/cycle/drome-cycle";
+import DromeArrayNullable from "@/array/drome-array-nullable";
 import DromeFilter from "@/effects/effect-filter";
 import GainEffect from "@/effects/effect-gain";
 import PanEffect from "@/effects/effect-pan";
@@ -14,14 +14,14 @@ import {
   parseAutomatableInput,
   parsePatternString,
   parseRestInput,
-} from "../utils/parse-pattern.js";
+} from "../utils/parse-pattern";
 import {
   isEnvTuple,
   isLfoTuple,
   isNullish,
   isStringTuple,
-} from "../utils/validators.js";
-import type Drome from "../index.js";
+} from "../utils/validators";
+import type Drome from "../index";
 import type {
   AdsrMode,
   AdsrEnvelope,
@@ -33,11 +33,11 @@ import type {
   RestInput,
   StepPattern,
   StepPatternInput,
-} from "../types.js";
-import type SynthesizerNode from "@/audio-nodes/synthesizer-node.js";
-import type SampleNode from "@/audio-nodes/sample-node.js";
-import Envelope from "@/automation/envelope.js";
-import type { FilterType } from "@/worklets/worklet-filter.js";
+} from "../types";
+import type SynthesizerNode from "@/audio-nodes/synthesizer-node";
+import type SampleNode from "@/audio-nodes/sample-node";
+import Envelope from "@/automation/envelope";
+import type { FilterType } from "@/worklets/worklet-filter";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
@@ -49,7 +49,7 @@ interface InstrumentOptions<T> {
 
 abstract class Instrument<T> {
   protected _drome: Drome;
-  protected _cycles: DromeCycle<T>;
+  protected _cycles: DromeArrayNullable<T>;
   private _gain: GainSourceEffect;
   private _detune: DetuneSourceEffect;
   protected _sourceNode: GainNode;
@@ -78,7 +78,7 @@ abstract class Instrument<T> {
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
     this._destination = opts.destination;
-    this._cycles = new DromeCycle(opts.defaultCycle, opts.nullValue);
+    this._cycles = new DromeArrayNullable(opts.defaultCycle, opts.nullValue);
     this._sourceNode = new GainNode(drome.ctx);
     this._audioNodes = new Set();
     this._gainNodes = new Set();

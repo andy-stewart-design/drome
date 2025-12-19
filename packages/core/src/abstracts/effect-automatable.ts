@@ -1,4 +1,4 @@
-import DromeArray from "@/cycle/drome-array.js";
+import DromeArray from "@/array/drome-array.js";
 import DromeAudioNode from "@/abstracts/drome-audio-node.js";
 import Envelope from "@/automation/envelope.js";
 import LFO from "@/automation/lfo.js";
