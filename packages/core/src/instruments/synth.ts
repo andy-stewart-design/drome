@@ -27,10 +27,9 @@ export default class Synth extends Instrument<number | number[]> {
             frequency: midiToFrequency(midiNote),
             type: type === "custom" ? "sine" : type,
             filterType: this._filter.type,
+            gain: 0,
           });
           this._audioNodes.add(osc);
-
-          // console.log({ chordIndex, noteIndex });
 
           const end = this._gain2.apply(osc.gain, note.start, note.duration);
           this.applyFilter(osc, note.start, note.start + end, chordIndex);
