@@ -28,7 +28,7 @@ function getAdsrTimes({ a, d, r, duration, mode }: getAdsrTimesArgs) {
 
     // const att = Math.max(nA * (duration - 0.001), 0.005);
     // const dec = att + nD * (duration - 0.001);
-    const att = Math.max(nA * duration, 0.005);
+    const att = Math.max(nA * duration, 0.01);
     const dec = att + nD * duration;
     const rStart = duration;
     const rEnd = duration + Math.max(r * duration, 0.01);

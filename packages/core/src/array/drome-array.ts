@@ -112,14 +112,14 @@ class DromeArray<T> {
   /* ----------------------------------------------------------------
   /* GETTERS
   ---------------------------------------------------------------- */
-  at(i: number): T[] | null;
-  at(i: number, j: number): NonNullable<T> | null;
+  at(i: number): T[];
+  at(i: number, j: number): NonNullable<T>;
   at(i: number, j?: number) {
     const currentValue = this.value[i % this.value.length];
     if (typeof j === "number") {
-      return currentValue?.[j % currentValue.length] ?? null;
+      return currentValue?.[j % currentValue.length] ?? this._nullValue;
     }
-    return currentValue ?? null;
+    return currentValue ?? this._nullValue;
   }
 
   get length() {

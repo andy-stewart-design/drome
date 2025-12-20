@@ -31,24 +31,19 @@ export default class Synth extends Instrument<number | number[]> {
           });
           this._audioNodes.add(osc);
 
-          const end = this._gain2.apply(osc.gain, note.start, note.duration);
-          this.applyFilter(osc, note.start, note.start + end, chordIndex);
-          this.applyDetune(osc, note.start, note.start + end, chordIndex);
+          const duration = this.applyGain(
+            osc,
+            note.start,
+            note.duration,
+            chordIndex
+          );
 
-          // osc.filterFrequency.setValueAtTime(0, note.start);
-          // osc.filterFrequency.linearRampToValueAtTime(
-          //   this._filter.frequency,
-          //   note.start + end
-          // );
-          // osc.filterFrequency.setValueAtTime(
-          //   1200,
-          //   note.start + end - 0.5 * end
-          // );
-          // osc.filterFrequency.linearRampToValueAtTime(0, note.start + end);
+          this.applyFilter(osc, note.start, duration, chordIndex);
+          this.applyDetune(osc, note.start, duration, chordIndex);
 
           osc.connect(this._sourceNode);
           osc.start(note.start);
-          osc.stop(note.start + end);
+          osc.stop(note.start + duration);
 
           const cleanup = () => {
             osc.disconnect();

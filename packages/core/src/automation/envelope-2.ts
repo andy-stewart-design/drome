@@ -1,16 +1,17 @@
-import type { AdsrEnvelope, AdsrMode } from "@/types.js";
+import DromeArray from "@/array/drome-array";
 import { applyAdsr, getAdsrTimes } from "@/utils/adsr.js";
+import type { AdsrEnvelope, AdsrMode } from "@/types.js";
 
-class Envelope {
+class Envelope2 {
   private _startValue: number;
-  private _maxValue: number;
+  private _maxValue: DromeArray<number>;
   private _endValue: number;
   private _adsr: AdsrEnvelope = { a: 0.01, d: 0, s: 1, r: 0.01 };
   private _mode: AdsrMode = "fit";
 
   constructor(startValue: number, maxValue: number, endValue?: number) {
     this._startValue = startValue;
-    this._maxValue = maxValue;
+    this._maxValue = new DromeArray([[maxValue]], maxValue);
     this._endValue = endValue ?? startValue;
   }
 
@@ -47,7 +48,17 @@ class Envelope {
     return this;
   }
 
-  apply(target: AudioParam, startTime: number, duration: number) {
+  maxValue(...v: (number | number[])[]) {
+    return this._maxValue.note(...v);
+  }
+
+  apply(
+    target: AudioParam,
+    startTime: number,
+    duration: number,
+    cycleIndex: number,
+    chordIndex: number
+  ) {
     const envTimes = getAdsrTimes({
       a: this._adsr.a,
       d: this._adsr.d,
@@ -56,13 +67,15 @@ class Envelope {
       mode: this._mode,
     });
 
+    const maxValue = this._maxValue.at(cycleIndex, chordIndex);
+
     applyAdsr({
       target,
       startTime,
       startValue: this._startValue,
       envTimes,
-      maxValue: this._maxValue,
-      sustainValue: this._maxValue * this._adsr.s,
+      maxValue,
+      sustainValue: maxValue * this._adsr.s,
       endValue: this._endValue,
     });
 
@@ -71,14 +84,6 @@ class Envelope {
 
   get startValue() {
     return this._startValue;
-  }
-
-  get maxValue() {
-    return this._maxValue;
-  }
-
-  set maxValue(v: number) {
-    this._maxValue = v;
   }
 
   set endValue(v: number) {
@@ -102,4 +107,4 @@ class Envelope {
   }
 }
 
-export default Envelope;
+export default Envelope2;

@@ -34,9 +34,10 @@ import type {
   StepPattern,
   StepPatternInput,
 } from "../types";
-import type SynthesizerNode from "@/audio-nodes/synthesizer-node";
-import type SampleNode from "@/audio-nodes/sample-node";
+import SynthesizerNode from "@/audio-nodes/synthesizer-node";
+import SampleNode from "@/audio-nodes/sample-node";
 import Envelope from "@/automation/envelope";
+import Envelope2 from "@/automation/envelope-2";
 import Pattern from "@/automation/pattern";
 import type { FilterType } from "@/worklets/worklet-filter";
 
@@ -69,15 +70,17 @@ abstract class Instrument<T> {
   >;
   protected readonly _gainNodes: Set<GainNode>;
 
-  protected _gain2: Envelope;
+  protected _gain2: Envelope2;
   protected _filter: FrequencyParams = { type: "none" };
 
   // Method Aliases
-  amp: (...v: RestInput) => this;
+  amp: (...v: (number | number[])[] | [Envelope2] | [string]) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
   rev: () => this;
   seq: (steps: number, ...pulses: StepPattern) => this;
+  fil: (type: FilterType, ...v: (number | number[])[] | [Envelope]) => this;
+  filq: (...v: (number | number[])[] | [Envelope]) => this;
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
@@ -91,15 +94,15 @@ abstract class Instrument<T> {
     this._gain = new GainSourceEffect(drome, baseGain, adsr);
     this._detune = new DetuneSourceEffect(drome);
 
-    console.log(baseGain);
-
-    this._gain2 = new Envelope(0, baseGain ?? 0.35);
+    this._gain2 = new Envelope2(0, baseGain ?? 0.35);
 
     this.amp = this.amplitude.bind(this);
     this.env = this.adsr.bind(this);
     this.envMode = this.adsrMode.bind(this);
     this.rev = this.reverse.bind(this);
     this.seq = this.sequence.bind(this);
+    this.fil = this.filter.bind(this);
+    this.filq = this.filterq.bind(this);
   }
 
   protected createGain(
@@ -124,23 +127,46 @@ abstract class Instrument<T> {
     return { gainNodes: [envGain, effectGain], noteEnd };
   }
 
-  protected applyFilter(
-    node: SynthesizerNode | SampleNode | BiquadFilterNode,
+  protected applyGain(
+    node: SynthesizerNode | SampleNode,
     start: number,
     duration: number,
     chordIndex: number
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
-    const target =
-      node instanceof BiquadFilterNode ? node.frequency : node.filterFrequency;
+    return this._gain2.apply(
+      node.gain,
+      start,
+      duration,
+      cycleIndex,
+      chordIndex
+    );
+  }
 
-    if (this._filter.frequency && !(node instanceof BiquadFilterNode))
-      node.setFilterType(this._filter.type);
+  protected applyFilter(
+    node: SynthesizerNode | SampleNode,
+    start: number,
+    duration: number,
+    chordIndex: number
+  ) {
+    const cycleIndex = this._drome.metronome.bar % this._cycles.length;
+
+    if (this._filter.frequency) node.setFilterType(this._filter.type);
 
     if (this._filter.frequency instanceof Pattern) {
-      this._filter.frequency.apply(target, cycleIndex, chordIndex);
+      this._filter.frequency.apply(
+        node.filterFrequency,
+        cycleIndex,
+        chordIndex
+      );
     } else if (this._filter.frequency instanceof Envelope) {
-      this._filter.frequency.apply(target, start, duration);
+      this._filter.frequency.apply(node.filterFrequency, start, duration);
+    }
+
+    if (this._filter.q instanceof Pattern) {
+      this._filter.q.apply(node.filterQ, cycleIndex, chordIndex);
+    } else if (this._filter.q instanceof Envelope) {
+      this._filter.q.apply(node.filterQ, start, duration);
     }
   }
 
@@ -229,15 +255,22 @@ abstract class Instrument<T> {
     return this;
   }
 
-  amplitude(...v: RestInput) {
-    if (isLfoTuple(v)) {
-      this._gain.cycles.note(v[0].value);
-      this._gain.lfo = v[0];
-    } else if (isStringTuple(v)) {
-      this._gain.cycles.note(...parsePatternString(v[0]));
-    } else if (!isEnvTuple(v)) {
-      this._gain.cycles.note(...v);
-    }
+  // amplitude2(...v: RestInput) {
+  //   if (isLfoTuple(v)) {
+  //     this._gain.cycles.note(v[0].value);
+  //     this._gain.lfo = v[0];
+  //   } else if (isStringTuple(v)) {
+  //     this._gain.cycles.note(...parsePatternString(v[0]));
+  //   } else if (!isEnvTuple(v)) {
+  //     this._gain.cycles.note(...v);
+  //   }
+  //   return this;
+  // }
+
+  amplitude(...v: (number | number[])[] | [Envelope2] | [string]) {
+    if (isStringTuple(v)) this._gain2.maxValue(...parsePatternString(v[0]));
+    else if (isEnvTuple(v)) this._gain2 = v[0];
+    else this._gain2.maxValue(...v);
     return this;
   }
 
@@ -281,11 +314,21 @@ abstract class Instrument<T> {
     return this;
   }
 
-  filter(type: FilterType, ...frequency: (number | number[])[] | [Envelope]) {
+  filter(type: FilterType, ...v: (number | number[])[] | [Envelope]) {
     this._filter.type = type;
-    this._filter.frequency = isEnvTuple(frequency)
-      ? frequency[0]
-      : new Pattern(...frequency);
+
+    if (isEnvTuple(v)) {
+      this._filter.frequency = v[0];
+      this._filter.frequency.endValue = 30;
+    } else {
+      this._filter.frequency = new Pattern(...v);
+    }
+
+    return this;
+  }
+
+  filterq(...v: (number | number[])[] | [Envelope]) {
+    this._filter.q = isEnvTuple(v) ? v[0] : new Pattern(...v);
     return this;
   }
 
@@ -471,6 +514,14 @@ abstract class Instrument<T> {
         node.gain.cancelScheduledValues(stopTime);
         node.gain.setValueAtTime(node.gain.value, stopTime);
         node.gain.linearRampToValueAtTime(0, stopTime + relTime);
+      });
+
+      this._audioNodes.forEach((node) => {
+        if (node instanceof SynthesizerNode || node instanceof SampleNode) {
+          node.gain.cancelScheduledValues(stopTime);
+          node.gain.setValueAtTime(node.gain.value, stopTime);
+          node.gain.linearRampToValueAtTime(0, stopTime + relTime);
+        }
       });
 
       const handleEnded = (e: Event) => {
