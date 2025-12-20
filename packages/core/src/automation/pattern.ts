@@ -7,7 +7,7 @@ class Pattern {
 
   constructor(...input: (number | number[])[]) {
     const defaultValue = Array.isArray(input[0]) ? input[0][0] : input[0];
-    if (defaultValue === undefined) throw new Error("Invalid pattern Input");
+    if (defaultValue === undefined) throw new Error("Invalid pattern input");
 
     this._value = new DromeArray([[defaultValue]], defaultValue);
     this._value.note(...input);

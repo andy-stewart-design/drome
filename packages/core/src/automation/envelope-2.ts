@@ -1,18 +1,20 @@
-import DromeArray from "@/array/drome-array";
+import DromeArray2 from "@/array/drome-array-2";
 import { applyAdsr, getAdsrTimes } from "@/utils/adsr.js";
+import { parsePatternString } from "@/utils/parse-pattern";
 import type { AdsrEnvelope, AdsrMode } from "@/types.js";
 
 class Envelope2 {
   private _startValue: number;
-  private _maxValue: DromeArray<number>;
+  private _maxValue: DromeArray2<number>;
   private _endValue: number;
   private _adsr: AdsrEnvelope = { a: 0.01, d: 0, s: 1, r: 0.01 };
   private _mode: AdsrMode = "fit";
 
-  constructor(startValue: number, maxValue: number, endValue?: number) {
-    this._startValue = startValue;
-    this._maxValue = new DromeArray([[maxValue]], maxValue);
-    this._endValue = endValue ?? startValue;
+  constructor(start: number, max: number | string, end?: number) {
+    this._startValue = start;
+    const mv = typeof max === "number" ? [max] : parsePatternString(max);
+    this._maxValue = new DromeArray2(...mv);
+    this._endValue = end ?? start;
   }
 
   mode(mode: AdsrMode) {

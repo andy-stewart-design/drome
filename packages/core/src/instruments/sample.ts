@@ -113,26 +113,26 @@ export default class Sample extends Instrument<number> {
             loop: this._loop,
           }
         );
-        this.applyDetune(src, note.start, note.duration, noteIndex);
         this._audioNodes.add(src);
 
-        const { gainNodes } = this.createGain(
+        const duration = this.applyGain(
           src,
           note.start,
-          this._cut ? note.duration : chopDuration,
+          note.duration,
           noteIndex
         );
 
+        const d = this._cut ? duration : chopDuration;
+        this.applyFilter(src, note.start, d, noteIndex);
+        this.applyDetune(src, note.start, d, noteIndex);
+
+        src.connect(this._sourceNode);
         src.start(note.start, chopStartTime);
         // src.stop(noteStart + endTime + 0.1);
 
         const cleanup = () => {
           src.disconnect();
           this._audioNodes.delete(src);
-          gainNodes.forEach((node) => {
-            node.disconnect();
-            this._gainNodes.delete(node);
-          });
           src.removeEventListener("ended", cleanup);
         };
 
