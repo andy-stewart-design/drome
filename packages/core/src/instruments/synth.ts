@@ -11,7 +11,7 @@ export default class Synth extends Instrument<number | number[]> {
   private _types: OscillatorType[];
 
   constructor(drome: Drome, opts: SynthOptions) {
-    super(drome, { ...opts, baseGain: 0.25 });
+    super(drome, { ...opts, baseGain: 0.125 });
     this._types = opts.type?.length ? opts.type : ["sine"];
   }
 
@@ -41,7 +41,7 @@ export default class Synth extends Instrument<number | number[]> {
           this.applyFilter(osc, note.start, duration, chordIndex);
           this.applyDetune(osc, note.start, duration, chordIndex);
 
-          osc.connect(this._sourceNode);
+          osc.connect(this._connectorNode);
           osc.start(note.start);
           osc.stop(note.start + duration);
 
