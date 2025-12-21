@@ -141,7 +141,7 @@ class Drome {
     const synth = new Synth(this, {
       type: types,
       destination,
-      defaultCycle: [[[60]]],
+      defaultCycle: 60,
       nullValue: 0,
     });
     this.instruments.add(synth);
@@ -154,7 +154,7 @@ class Drome {
     const sample = new Sample(this, {
       destination,
       sampleIds: sampleIds,
-      defaultCycle: [[0]],
+      defaultCycle: 0,
       nullValue: 0,
     });
     this.instruments.add(sample);

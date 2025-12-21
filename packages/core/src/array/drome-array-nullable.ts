@@ -1,11 +1,11 @@
-import DromeArray from "@/array/drome-array.js";
-import { euclid } from "@/utils/euclid.js";
+import DromeArray from "@/array/drome-array";
+import { euclid } from "@/utils/euclid";
 import { hex } from "@/utils/hex";
-import type { DromeCycleValue, Nullable, StepPattern } from "@/types.js";
+import type { DromeCycleValue, Nullable, StepPattern } from "@/types";
 
 class DromeArrayNullable<T> extends DromeArray<Nullable<T>> {
-  constructor(defaultValue: DromeCycleValue<T>, nullValue: T) {
-    super(defaultValue, nullValue);
+  constructor(...input: (T | T[])[]) {
+    super(...input);
   }
 
   /* ----------------------------------------------------------------

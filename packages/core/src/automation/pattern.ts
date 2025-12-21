@@ -1,5 +1,5 @@
 import DromeArray from "@/array/drome-array";
-import type { Nullable } from "@/types";
+// import type { Nullable } from "@/types";
 
 class Pattern {
   private _value: DromeArray<number>;
@@ -9,7 +9,7 @@ class Pattern {
     const defaultValue = Array.isArray(input[0]) ? input[0][0] : input[0];
     if (defaultValue === undefined) throw new Error("Invalid pattern input");
 
-    this._value = new DromeArray([[defaultValue]], defaultValue);
+    this._value = new DromeArray(defaultValue);
     this._value.note(...input);
     this._defaultValue = defaultValue;
   }

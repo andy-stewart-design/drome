@@ -3,9 +3,12 @@ class DromeArray<T> {
   protected _defaultValue: T[][];
   protected _nullValue: T;
 
-  constructor(defaultValue: T[][], nullValue: T) {
-    this._defaultValue = defaultValue;
-    this._nullValue = nullValue;
+  constructor(...input: (T | T[])[]) {
+    const dv = Array.isArray(input[0]) ? input[0][0] : input[0];
+    if (dv === undefined) throw new Error("Invalid drome array input");
+
+    this._defaultValue = input.map((c) => (Array.isArray(c) ? c : [c]));
+    this._nullValue = dv;
   }
 
   /* ----------------------------------------------------------------

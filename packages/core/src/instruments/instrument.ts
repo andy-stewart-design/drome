@@ -1,4 +1,3 @@
-// TODO: Fully migrate to DromeArray2
 // TODO: Do I need to/can I calculate envTimes when I calculate note data (in beforePlay method)?
 
 import AutomatableEffect from "@/abstracts/effect-automatable";
@@ -44,7 +43,7 @@ import type { FilterType } from "@/worklets/worklet-filter";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
-  defaultCycle: Nullable<T>[][];
+  defaultCycle: T;
   nullValue: T;
   baseGain?: number;
   adsr?: AdsrEnvelope;
@@ -59,18 +58,16 @@ interface FrequencyParams {
 abstract class Instrument<T> {
   protected _drome: Drome;
   protected _cycles: DromeArrayNullable<T>;
+  private _destination: AudioNode;
+  protected _connectorNode: GainNode;
+  protected readonly _audioNodes: Set<SynthesizerNode | SampleNode>;
+  private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
   protected _gain: Envelope;
-  protected _filter: FrequencyParams = { type: "none" };
   private _detune: Pattern | Envelope;
-  protected _connectorNode: GainNode;
-  private _signalChain: Set<DromeAudioNode>;
-  private _destination: AudioNode;
+  protected _filter: FrequencyParams = { type: "none" };
   protected _startTime: number | undefined;
   private _connected = false;
-  protected readonly _audioNodes: Set<
-    AudioBufferSourceNode | SynthesizerNode | SampleNode
-  >;
 
   // Method Aliases
   amp: (...v: (number | number[])[] | [Envelope] | [string]) => this;
@@ -83,12 +80,12 @@ abstract class Instrument<T> {
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
+    this._cycles = new DromeArrayNullable(opts.defaultCycle);
+
     this._destination = opts.destination;
-    this._cycles = new DromeArrayNullable(opts.defaultCycle, opts.nullValue);
     this._connectorNode = new GainNode(drome.ctx);
     this._audioNodes = new Set();
     this._signalChain = new Set();
-    // this._detune = new DetuneSourceEffect(drome);
 
     this._baseGain = opts.baseGain ?? 0.35;
     this._gain = new Envelope(0, this._baseGain);
