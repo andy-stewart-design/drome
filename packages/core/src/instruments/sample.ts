@@ -111,6 +111,7 @@ export default class Sample extends Instrument<number> {
           {
             playbackRate: playbackRate,
             loop: this._loop,
+            gain: 0,
           }
         );
         this._audioNodes.add(src);

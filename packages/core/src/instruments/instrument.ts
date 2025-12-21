@@ -1,5 +1,5 @@
-// TODO: Temporarily remove LFOs
-// TODO: Fully migrate to Envelope2 and DromeArray2
+// TODO: Fully migrate to DromeArray2
+// TODO: Do I need to/can I calculate envTimes when I calculate note data (in beforePlay method)?
 
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import BitcrusherEffect from "@/effects/effect-bitcrusher";
@@ -14,7 +14,6 @@ import ReverbEffect from "@/effects/effect-reverb";
 import SynthesizerNode from "@/audio-nodes/synthesizer-node";
 import SampleNode from "@/audio-nodes/sample-node";
 import Envelope from "@/automation/envelope";
-import Envelope2 from "@/automation/envelope-2";
 import Pattern from "@/automation/pattern";
 import {
   parseStepPatternInput,
@@ -61,7 +60,7 @@ abstract class Instrument<T> {
   protected _drome: Drome;
   protected _cycles: DromeArrayNullable<T>;
   private _baseGain: number;
-  protected _gain: Envelope2;
+  protected _gain: Envelope;
   protected _filter: FrequencyParams = { type: "none" };
   private _detune: Pattern | Envelope;
   protected _connectorNode: GainNode;
@@ -74,7 +73,7 @@ abstract class Instrument<T> {
   >;
 
   // Method Aliases
-  amp: (...v: (number | number[])[] | [Envelope2] | [string]) => this;
+  amp: (...v: (number | number[])[] | [Envelope] | [string]) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
   rev: () => this;
@@ -92,7 +91,7 @@ abstract class Instrument<T> {
     // this._detune = new DetuneSourceEffect(drome);
 
     this._baseGain = opts.baseGain ?? 0.35;
-    this._gain = new Envelope2(0, this._baseGain);
+    this._gain = new Envelope(0, this._baseGain);
     this._detune = new Pattern(0);
 
     this.amp = this.amplitude.bind(this);
@@ -131,13 +130,25 @@ abstract class Instrument<T> {
         chordIndex
       );
     } else if (this._filter.frequency instanceof Envelope) {
-      this._filter.frequency.apply(node.filterFrequency, start, duration);
+      this._filter.frequency.apply(
+        node.filterFrequency,
+        start,
+        duration,
+        cycleIndex,
+        chordIndex
+      );
     }
 
     if (this._filter.q instanceof Pattern) {
       this._filter.q.apply(node.filterQ, cycleIndex, chordIndex);
     } else if (this._filter.q instanceof Envelope) {
-      this._filter.q.apply(node.filterQ, start, duration);
+      this._filter.q.apply(
+        node.filterQ,
+        start,
+        duration,
+        cycleIndex,
+        chordIndex
+      );
     }
   }
 
@@ -152,7 +163,7 @@ abstract class Instrument<T> {
     if (this._detune instanceof Pattern) {
       this._detune.apply(node.detune, cycleIndex, chordIndex);
     } else if (this._detune instanceof Envelope) {
-      this._detune.apply(node.detune, start, duration);
+      this._detune.apply(node.detune, start, duration, cycleIndex, chordIndex);
     }
   }
 
@@ -235,7 +246,7 @@ abstract class Instrument<T> {
     return this;
   }
 
-  amplitude(...v: (number | number[])[] | [Envelope2] | [string]) {
+  amplitude(...v: (number | number[])[] | [Envelope] | [string]) {
     if (isEnvTuple(v)) {
       this._gain = v[0];
     } else {

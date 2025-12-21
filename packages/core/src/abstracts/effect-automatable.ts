@@ -1,10 +1,10 @@
-import DromeArray from "@/array/drome-array.js";
-import DromeAudioNode from "@/abstracts/drome-audio-node.js";
-import Envelope from "@/automation/envelope.js";
-// import LFO from "@/automation/lfo.js";
-import { isNullish } from "@/utils/validators.js";
-import { applySteppedRamp } from "@/utils/stepped-ramp.js";
-import type { Automatable, Note } from "@/types.js";
+import DromeArray from "@/array/drome-array";
+import DromeAudioNode from "@/abstracts/drome-audio-node";
+import Envelope from "@/automation/envelope";
+// import LFO from "@/automation/lfo";
+import { isNullish } from "@/utils/validators";
+import { applySteppedRamp } from "@/utils/stepped-ramp";
+import type { Automatable, Note } from "@/types";
 
 abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   protected abstract override _input: GainNode;
@@ -46,14 +46,20 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
     // if (this._lfo) {
     //   this._lfo.create().connect(this._target).start(startTime);
     // } else
+    const cycleIndex = currentBar % this._cycles.length;
     if (this._env) {
       for (let i = 0; i < notes.length; i++) {
         const note = notes[i];
         if (isNullish(note)) continue;
-        this._env.apply(this._target, note.start, note.duration - 0.001);
+        this._env.apply(
+          this._target,
+          note.start,
+          note.duration - 0.001,
+          cycleIndex,
+          i
+        );
       }
     } else {
-      const cycleIndex = currentBar % this._cycles.length;
       const steps = this._cycles.at(cycleIndex) ?? [];
       applySteppedRamp({ target: this._target, startTime, duration, steps });
     }
