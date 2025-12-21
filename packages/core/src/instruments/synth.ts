@@ -1,7 +1,7 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
+import SynthesizerNode from "@/audio-nodes/synthesizer-node";
 import { midiToFrequency } from "@/utils/midi-to-frequency";
 import type Drome from "@/index";
-import SynthesizerNode from "@/audio-nodes/synthesizer-node";
 
 interface SynthOptions extends InstrumentOptions<number | number[]> {
   type?: OscillatorType[];

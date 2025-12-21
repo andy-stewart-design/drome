@@ -1,7 +1,7 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
+import SampleNode from "@/audio-nodes/sample-node";
 import { flipBuffer } from "../utils/flip-buffer";
 import type Drome from "@/index";
-import SampleNode from "@/audio-nodes/sample-node";
 
 type Nullable<T> = T | null | undefined;
 

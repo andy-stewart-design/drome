@@ -2,7 +2,7 @@
 
 import AudioClock from "@/clock/audio-clock";
 import Envelope from "@/automation/envelope";
-import LFO from "@/automation/lfo";
+// import LFO from "@/automation/lfo";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
 import { getSampleBanks, getSamplePath } from "@/utils/samples";
@@ -165,12 +165,12 @@ class Drome {
     return new Envelope(maxValue, startValue, endValue);
   }
 
-  lfo(minValue: number, maxValue: number, speed: number) {
-    const value = (maxValue + minValue) / 2;
-    const depth = maxValue - value;
-    const bpm = this.beatsPerMin;
-    return new LFO(this.ctx, { value, depth, speed, bpm });
-  }
+  // lfo(minValue: number, maxValue: number, speed: number) {
+  //   const value = (maxValue + minValue) / 2;
+  //   const depth = maxValue - value;
+  //   const bpm = this.beatsPerMin;
+  //   return new LFO(this.ctx, { value, depth, speed, bpm });
+  // }
 
   get ctx() {
     return this.clock.ctx;

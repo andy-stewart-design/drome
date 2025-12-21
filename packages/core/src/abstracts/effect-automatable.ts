@@ -1,7 +1,7 @@
 import DromeArray from "@/array/drome-array.js";
 import DromeAudioNode from "@/abstracts/drome-audio-node.js";
 import Envelope from "@/automation/envelope.js";
-import LFO from "@/automation/lfo.js";
+// import LFO from "@/automation/lfo.js";
 import { isNullish } from "@/utils/validators.js";
 import { applySteppedRamp } from "@/utils/stepped-ramp.js";
 import type { Automatable, Note } from "@/types.js";
@@ -12,17 +12,18 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   protected abstract _target: AudioParam | undefined;
   protected _defaultValue: number;
   protected _cycles: DromeArray<number>;
-  protected _lfo: LFO | undefined;
+  // protected _lfo: LFO | undefined;
   protected _env: Envelope | undefined;
 
   constructor(input: Automatable, defaultValue = 1) {
     super();
 
-    if (input instanceof LFO) {
-      this._defaultValue = input.value;
-      this._cycles = new DromeArray([[this._defaultValue]], this._defaultValue);
-      this._lfo = input;
-    } else if (input instanceof Envelope) {
+    // if (input instanceof LFO) {
+    //   this._defaultValue = input.value;
+    //   this._cycles = new DromeArray([[this._defaultValue]], this._defaultValue);
+    //   this._lfo = input;
+    // } else
+    if (input instanceof Envelope) {
       this._defaultValue = input.startValue;
       this._cycles = new DromeArray([[this._defaultValue]], this._defaultValue);
       this._env = input;
@@ -40,11 +41,12 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   ) {
     if (!this._target) return;
 
-    if (this._lfo && !this._lfo.paused) this._lfo.stop(startTime);
+    // if (this._lfo && !this._lfo.paused) this._lfo.stop(startTime);
 
-    if (this._lfo) {
-      this._lfo.create().connect(this._target).start(startTime);
-    } else if (this._env) {
+    // if (this._lfo) {
+    //   this._lfo.create().connect(this._target).start(startTime);
+    // } else
+    if (this._env) {
       for (let i = 0; i < notes.length; i++) {
         const note = notes[i];
         if (isNullish(note)) continue;
@@ -77,9 +79,9 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
     return this._input;
   }
 
-  get lfo() {
-    return this._lfo;
-  }
+  // get lfo() {
+  //   return this._lfo;
+  // }
 }
 
 export default AutomatableEffect;

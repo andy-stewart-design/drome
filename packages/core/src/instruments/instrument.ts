@@ -1,3 +1,6 @@
+// TODO: Temporarily remove LFOs
+// TODO: Fully migrate to Envelope2 and DromeArray2
+
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import BitcrusherEffect from "@/effects/effect-bitcrusher";
 import DelayEffect from "@/effects/effect-delay";
@@ -13,7 +16,6 @@ import SampleNode from "@/audio-nodes/sample-node";
 import Envelope from "@/automation/envelope";
 import Envelope2 from "@/automation/envelope-2";
 import Pattern from "@/automation/pattern";
-// import { DetuneSourceEffect, GainSourceEffect } from "@/effects/effect-source";
 import {
   parseStepPatternInput,
   parseAutomatableInput,

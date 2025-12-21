@@ -1,5 +1,5 @@
 import Envelope from "@/automation/envelope";
-import LFO from "@/automation/lfo";
+// import LFO from "@/automation/lfo";
 import { isEnvTuple, isLfoTuple, isStringTuple } from "./validators";
 import type {
   AutomatableInput,
@@ -14,13 +14,15 @@ function parseStepPatternInput(input: StepPatternInput): StepPattern {
 }
 
 function parseRestInput(input: RestInput) {
-  if (isEnvTuple(input) || isLfoTuple(input)) return input[0];
+  // if (isEnvTuple(input) || isLfoTuple(input)) return input[0];
+  if (isEnvTuple(input)) return input[0];
   else if (isStringTuple(input)) return parsePatternString(input[0]);
   else return input;
 }
 
 function parseAutomatableInput(input: AutomatableInput) {
-  if (input instanceof Envelope || input instanceof LFO) return input;
+  // if (input instanceof Envelope || input instanceof LFO) return input;
+  if (input instanceof Envelope) return input;
   else return parseStepPatternInput(input);
 }
 

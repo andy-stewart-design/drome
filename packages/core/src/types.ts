@@ -1,6 +1,6 @@
 import type DromeArray from "@/array/drome-array.js";
 import type Envelope from "@/automation/envelope.js";
-import type LFO from "@/automation/lfo.js";
+// import type LFO from "@/automation/lfo.js";
 import type * as algos from "@/utils/distortion-algorithms.js";
 
 // AUDIO CLOCK
@@ -17,9 +17,12 @@ type Note<T> = { value: T; start: number; duration: number } | null;
 type DromeCycleValue<T> = Nullable<T>[][];
 type StepPatternInput = number | string;
 type StepPattern = (number | number[])[];
-type AutomatableInput = StepPatternInput | LFO | Envelope;
-type Automatable = StepPattern | LFO | Envelope;
-type RestInput = StepPattern | [string] | [LFO] | [Envelope];
+// type AutomatableInput = StepPatternInput | LFO | Envelope;
+// type Automatable = StepPattern | LFO | Envelope;
+// type RestInput = StepPattern | [string] | [LFO] | [Envelope];
+type AutomatableInput = StepPatternInput | Envelope;
+type Automatable = StepPattern | Envelope;
+type RestInput = StepPattern | [string] | [Envelope];
 
 // AUTOMATION
 type AdsrMode = "fit" | "clip" | "free";
