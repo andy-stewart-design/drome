@@ -75,8 +75,12 @@ abstract class Instrument<T> {
   envMode: (mode: AdsrMode) => this;
   rev: () => this;
   seq: (steps: number, ...pulses: StepPattern) => this;
-  fil: (type: FilterType, ...v: (number | number[])[] | [Envelope]) => this;
-  filq: (...v: (number | number[])[] | [Envelope]) => this;
+  fil: (
+    type: FilterType,
+    f: number | Envelope | string,
+    q: number | Envelope | string
+  ) => this;
+  // filq: (...v: (number | number[])[] | [Envelope]) => this;
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
@@ -97,7 +101,7 @@ abstract class Instrument<T> {
     this.rev = this.reverse.bind(this);
     this.seq = this.sequence.bind(this);
     this.fil = this.filter.bind(this);
-    this.filq = this.filterq.bind(this);
+    // this.filq = this.filterq.bind(this);
   }
 
   protected applyGain(
@@ -218,7 +222,7 @@ abstract class Instrument<T> {
     return this;
   }
 
-  sequence(steps: number, ...pulses: StepPattern) {
+  sequence(steps: number, ...pulses: (number | number[])[]) {
     this._cycles.sequence(steps, ...pulses);
     return this;
   }
@@ -304,24 +308,26 @@ abstract class Instrument<T> {
 
   filter(
     type: FilterType,
-    ...v: (number | number[])[] | [Envelope] | [string]
+    f: number | string | Envelope,
+    q: number | string | Envelope
   ) {
     this._filter.type = type;
 
-    if (isEnvTuple(v)) {
-      this._filter.frequency = v[0];
+    if (f instanceof Envelope) {
+      this._filter.frequency = f;
       this._filter.frequency.endValue = 30;
     } else {
-      const pattern = isStringTuple(v) ? parsePatternString(v[0]) : v;
+      const pattern = typeof f === "string" ? parsePatternString(f) : [f];
       this._filter.frequency = new Pattern(...pattern);
     }
 
-    return this;
-  }
+    if (q instanceof Envelope) {
+      this._filter.q = q;
+    } else {
+      const pattern = typeof q === "string" ? parsePatternString(q) : [q];
+      this._filter.q = new Pattern(...pattern);
+    }
 
-  // TODO: ADD PATTERN STRING AS INPUT OPTION
-  filterq(...v: (number | number[])[] | [Envelope]) {
-    this._filter.q = isEnvTuple(v) ? v[0] : new Pattern(...v);
     return this;
   }
 
@@ -509,11 +515,9 @@ abstract class Instrument<T> {
   }
 
   cleanup() {
-    setTimeout(() => {
-      this._audioNodes.forEach((node) => node.disconnect());
-      this._audioNodes.clear();
-      this._connected = false;
-    }, 100);
+    this._audioNodes.forEach((node) => node.disconnect());
+    this._audioNodes.clear();
+    this._connected = false;
   }
 
   get ctx() {

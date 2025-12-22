@@ -22,6 +22,7 @@ class Drome {
   readonly reverbCache: Map<string, AudioBuffer> = new Map();
   private sampleBanks: SampleBankSchema | null = null;
   readonly userSamples: Map<string, Map<string, string[]>> = new Map();
+  private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
 
   static async init(bpm?: number) {
     const drome = new Drome(bpm);
@@ -38,7 +39,7 @@ class Drome {
   constructor(bpm?: number) {
     this.clock = new AudioClock(bpm);
     this.audioChannels = Array.from({ length: NUM_CHANNELS }, () => {
-      const gain = new GainNode(this.ctx, { gain: 0.75 });
+      const gain = new GainNode(this.ctx, { gain: BASE_GAIN });
       gain.connect(this.ctx.destination);
       return gain;
     });
@@ -113,6 +114,7 @@ class Drome {
   }
 
   async start() {
+    if (this.suspendTimeoutId) clearTimeout(this.suspendTimeoutId);
     if (!this.clock.paused) return;
     await this.preloadSamples();
     await new Promise((r) => setTimeout(r, 100));
@@ -127,7 +129,10 @@ class Drome {
       chan.gain.cancelScheduledValues(this.ctx.currentTime);
       chan.gain.value = BASE_GAIN;
     });
-    // this.ctx.suspend();
+    this.suspendTimeoutId = setTimeout(() => {
+      this.ctx.suspend();
+      this.suspendTimeoutId = null;
+    }, 1000); // Timeout duration is arbitrary, just needs to be longer than instrument fade out
   }
 
   public clear() {

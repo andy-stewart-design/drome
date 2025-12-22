@@ -37,7 +37,6 @@ export default class Synth extends Instrument<number | number[]> {
             note.duration,
             chordIndex
           );
-
           this.applyFilter(osc, note.start, duration, chordIndex);
           this.applyDetune(osc, note.start, duration, chordIndex);
 
@@ -47,8 +46,8 @@ export default class Synth extends Instrument<number | number[]> {
 
           const cleanup = () => {
             osc.disconnect();
-            this._audioNodes.delete(osc);
             osc.removeEventListener("ended", cleanup);
+            this._audioNodes.delete(osc);
           };
 
           osc.addEventListener("ended", cleanup);

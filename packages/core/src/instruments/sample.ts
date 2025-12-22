@@ -122,8 +122,7 @@ export default class Sample extends Instrument<number> {
           note.duration,
           noteIndex
         );
-
-        const d = this._cut ? duration : 1 - note.value;
+        const d = this._cut ? duration : 1 - note.value; // TODO: Is this right? Why is it `1 - note.value`?
         this.applyFilter(src, note.start, d, noteIndex);
         this.applyDetune(src, note.start, d, noteIndex);
 
@@ -133,8 +132,8 @@ export default class Sample extends Instrument<number> {
 
         const cleanup = () => {
           src.disconnect();
-          this._audioNodes.delete(src);
           src.removeEventListener("ended", cleanup);
+          this._audioNodes.delete(src);
         };
 
         src.addEventListener("ended", cleanup);
