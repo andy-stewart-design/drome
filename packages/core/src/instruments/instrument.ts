@@ -66,6 +66,7 @@ abstract class Instrument<T> {
   dt: (input: number | Envelope | string) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
+  fx: (...nodes: DromeAudioNode[]) => this;
   rev: () => this;
   seq: (steps: number, ...pulses: (number | number[])[]) => this;
   fil: (
@@ -90,6 +91,7 @@ abstract class Instrument<T> {
     this.amp = this.amplitude.bind(this);
     this.dt = this.detune.bind(this);
     this.env = this.adsr.bind(this);
+    this.fx = this.effects.bind(this);
     this.envMode = this.adsrMode.bind(this);
     this.rev = this.reverse.bind(this);
     this.seq = this.sequence.bind(this);
@@ -316,6 +318,11 @@ abstract class Instrument<T> {
       this._filter.q = new Pattern(...pattern);
     }
 
+    return this;
+  }
+
+  effects(...nodes: DromeAudioNode[]) {
+    nodes.forEach((node) => this._signalChain.add(node));
     return this;
   }
 

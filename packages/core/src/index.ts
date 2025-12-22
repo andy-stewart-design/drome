@@ -8,8 +8,12 @@ import Synth from "@/instruments/synth";
 import { getSampleBanks, getSamplePath } from "@/utils/samples";
 import { loadSample } from "@/utils/load-sample";
 import { bufferId } from "@/utils/cache-id";
-import { addWorklets } from "./utils/worklets";
-import type { SampleBankSchema } from "./utils/samples-validate";
+import { addWorklets } from "@/utils/worklets";
+import DromeFilter from "@/effects/effect-filter";
+import { parseParamInput } from "@/utils/parse-pattern";
+import type { SampleBankSchema } from "@/utils/samples-validate";
+import type { NSE } from "@/types";
+import { filterTypeMap, type FilterTypeAlias } from "./constants/index";
 
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
@@ -23,6 +27,8 @@ class Drome {
   private sampleBanks: SampleBankSchema | null = null;
   readonly userSamples: Map<string, Map<string, string[]>> = new Map();
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
+
+  fil: (type: FilterTypeAlias, frequency: NSE, q?: number) => DromeFilter;
 
   static async init(bpm?: number) {
     const drome = new Drome(bpm);
@@ -44,6 +50,8 @@ class Drome {
       return gain;
     });
     this.clock.on("bar", this.handleTick.bind(this));
+
+    this.fil = this.filter.bind(this);
   }
 
   private handleTick() {
@@ -168,6 +176,14 @@ class Drome {
 
   env(maxValue: number, startValue = 0, endValue?: number) {
     return new Envelope(maxValue, startValue, endValue);
+  }
+
+  filter(type: FilterTypeAlias, frequency: NSE, q?: number) {
+    return new DromeFilter(this.ctx, {
+      type: filterTypeMap[type],
+      frequency: parseParamInput(frequency),
+      q,
+    });
   }
 
   // lfo(minValue: number, maxValue: number, speed: number) {
