@@ -1,30 +1,7 @@
 import Envelope from "@/automation/envelope";
 // import LFO from "@/automation/lfo";
-import { isEnvTuple, isLfoTuple, isStringTuple } from "./validators";
-import type {
-  AutomatableInput,
-  RestInput,
-  StepPattern,
-  StepPatternInput,
-} from "../types";
-
-function parseStepPatternInput(input: StepPatternInput): StepPattern {
-  if (typeof input === "string") return parsePatternString(input);
-  return [input];
-}
-
-function parseRestInput(input: RestInput) {
-  // if (isEnvTuple(input) || isLfoTuple(input)) return input[0];
-  if (isEnvTuple(input)) return input[0];
-  else if (isStringTuple(input)) return parsePatternString(input[0]);
-  else return input;
-}
-
-function parseAutomatableInput(input: AutomatableInput) {
-  // if (input instanceof Envelope || input instanceof LFO) return input;
-  if (input instanceof Envelope) return input;
-  else return parseStepPatternInput(input);
-}
+import { isEnv } from "./validators";
+import type { Pattern, PatternInput } from "../types";
 
 function parsePatternString(input: string) {
   const err = `[DROME] could not parse pattern string: ${input}`;
@@ -38,7 +15,18 @@ function parsePatternString(input: string) {
   }
 }
 
-function isStepPattern(input: unknown): input is StepPattern {
+function parsePatternInput(input: PatternInput): Pattern {
+  if (typeof input === "string") return parsePatternString(input);
+  return [input];
+}
+
+function parseParamInput(input: number | string | Envelope) {
+  // if (input instanceof Envelope || input instanceof LFO) return input;
+  if (isEnv(input)) return input;
+  else return parsePatternInput(input);
+}
+
+function isStepPattern(input: unknown): input is Pattern {
   return (
     Array.isArray(input) &&
     input.reduce<boolean>((_, x) => {
@@ -49,10 +37,4 @@ function isStepPattern(input: unknown): input is StepPattern {
   );
 }
 
-export {
-  isStepPattern,
-  parseAutomatableInput,
-  parsePatternString,
-  parseRestInput,
-  parseStepPatternInput,
-};
+export { parseParamInput, parsePatternString, parsePatternInput };

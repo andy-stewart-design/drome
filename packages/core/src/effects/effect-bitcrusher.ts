@@ -1,8 +1,8 @@
 import AutomatableEffect from "@/abstracts/effect-automatable.js";
-import type { Automatable } from "@/types.js";
+import type { Automation } from "@/types.js";
 
 interface BitcrusherEffectOptions {
-  bitDepth: Automatable;
+  bitDepth: Automation;
   rateReduction?: number;
 }
 

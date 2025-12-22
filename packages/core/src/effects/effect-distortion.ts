@@ -1,8 +1,8 @@
 import AutomatableEffect from "@/abstracts/effect-automatable.js";
-import type { Automatable, DistortionAlgorithm } from "@/types.js";
+import type { Automation, DistortionAlgorithm } from "@/types.js";
 
 interface DistortionEffectOptions {
-  distortion: Automatable;
+  distortion: Automation;
   postgain?: number;
   type?: DistortionAlgorithm;
 }

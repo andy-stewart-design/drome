@@ -2,7 +2,7 @@ import AutomatableEffect from "@/abstracts/effect-automatable";
 import { createImpulseResponse, renderFilter } from "@/utils/reverb";
 import { loadSample } from "@/utils/load-sample";
 import type Drome from "@/index";
-import type { Automatable } from "../types";
+import type { Automation } from "../types";
 
 interface LocalSampleSource {
   registered: true;
@@ -18,7 +18,7 @@ interface RemoteSampleSource {
 type SampleSource = RemoteSampleSource | LocalSampleSource;
 
 interface ReverbOptions {
-  mix?: Automatable;
+  mix?: Automation;
   src?: SampleSource;
   decay?: number; // IR decay time in seconds
   lpfStart?: number;

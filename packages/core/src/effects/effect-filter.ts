@@ -1,10 +1,10 @@
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import Envelope from "@/automation/envelope";
-import type { Automatable, FilterType } from "@/types";
+import type { Automation, FilterType } from "@/types";
 
 interface DromeFilterOptions {
   type: FilterType;
-  frequency: Automatable;
+  frequency: Automation;
   q?: number;
 }
 
