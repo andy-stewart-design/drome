@@ -1,4 +1,5 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
+import SampleNode from "@/audio-nodes/sample-node";
 import { flipBuffer } from "../utils/flip-buffer";
 import type Drome from "@/index";
 
@@ -20,7 +21,7 @@ export default class Sample extends Instrument<number> {
   private _cut = false;
 
   constructor(drome: Drome, opts: SampleOptions) {
-    super(drome, opts);
+    super(drome, { ...opts, baseGain: 0.75 });
     this._sampleIds = opts.sampleIds?.length ? opts.sampleIds : ["bd"];
     this._sampleBank = opts.sampleBank || "tr909";
     this._playbackRate = opts.playbackRate || 1;
@@ -101,36 +102,38 @@ export default class Sample extends Instrument<number> {
         const playbackRate = this._fitValue
           ? buffer.duration / barDuration / this._fitValue
           : Math.abs(this._playbackRate);
-        const chopStartTime = note.value * buffer.duration;
-        const chopDuration = buffer.duration - chopStartTime;
+        // const chopStartTime = note.value * buffer.duration;
+        // const chopDuration = buffer.duration - chopStartTime;
 
-        const src = new AudioBufferSourceNode(this.ctx, {
-          buffer:
-            this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
-          playbackRate: playbackRate,
-          loop: this._loop,
-        });
-        this.applyDetune(src, note.start, note.duration, noteIndex);
+        const src = new SampleNode(
+          this.ctx,
+          this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
+          {
+            playbackRate: playbackRate,
+            loop: this._loop,
+            gain: 0,
+          }
+        );
         this._audioNodes.add(src);
 
-        const { gainNodes } = this.createGain(
+        const duration = this.applyGain(
           src,
           note.start,
-          this._cut ? note.duration : chopDuration,
+          note.duration,
           noteIndex
         );
+        const d = this._cut ? duration : 1 - note.value; // TODO: Is this right? Why is it `1 - note.value`?
+        this.applyFilter(src, note.start, d, noteIndex);
+        this.applyDetune(src, note.start, d, noteIndex);
 
-        src.start(note.start, chopStartTime);
+        src.connect(this._connectorNode);
+        src.start(note.start, note.value);
         // src.stop(noteStart + endTime + 0.1);
 
         const cleanup = () => {
           src.disconnect();
-          this._audioNodes.delete(src);
-          gainNodes.forEach((node) => {
-            node.disconnect();
-            this._gainNodes.delete(node);
-          });
           src.removeEventListener("ended", cleanup);
+          this._audioNodes.delete(src);
         };
 
         src.addEventListener("ended", cleanup);

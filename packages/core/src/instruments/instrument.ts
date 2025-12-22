@@ -1,27 +1,32 @@
+// TODO: Do I need to/can I calculate envTimes when I calculate note data (in beforePlay method)?
+
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import BitcrusherEffect from "@/effects/effect-bitcrusher";
 import DelayEffect from "@/effects/effect-delay";
 import DistortionEffect from "@/effects/effect-distortion";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
-import DromeCycle from "@/cycle/drome-cycle";
+import DromeArrayNullable from "@/array/drome-array-nullable";
 import DromeFilter from "@/effects/effect-filter";
 import GainEffect from "@/effects/effect-gain";
 import PanEffect from "@/effects/effect-pan";
 import ReverbEffect from "@/effects/effect-reverb";
-import { DetuneSourceEffect, GainSourceEffect } from "@/effects/effect-source";
+import SynthesizerNode from "@/audio-nodes/synthesizer-node";
+import SampleNode from "@/audio-nodes/sample-node";
+import Envelope from "@/automation/envelope";
+import Pattern from "@/automation/pattern";
 import {
   parseStepPatternInput,
   parseAutomatableInput,
   parsePatternString,
   parseRestInput,
-} from "../utils/parse-pattern.js";
+} from "../utils/parse-pattern";
 import {
   isEnvTuple,
-  isLfoTuple,
+  // isLfoTuple,
   isNullish,
   isStringTuple,
-} from "../utils/validators.js";
-import type Drome from "../index.js";
+} from "../utils/validators";
+import type Drome from "../index";
 import type {
   AdsrMode,
   AdsrEnvelope,
@@ -33,85 +38,134 @@ import type {
   RestInput,
   StepPattern,
   StepPatternInput,
-} from "../types.js";
+} from "../types";
+import type { FilterType } from "@/worklets/worklet-filter";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
-  defaultCycle: Nullable<T>[][];
+  defaultCycle: T;
   nullValue: T;
   baseGain?: number;
   adsr?: AdsrEnvelope;
 }
 
+interface FrequencyParams {
+  type: FilterType;
+  frequency?: Pattern | Envelope;
+  q?: Pattern | Envelope;
+}
+
 abstract class Instrument<T> {
   protected _drome: Drome;
-  protected _cycles: DromeCycle<T>;
-  private _gain: GainSourceEffect;
-  private _detune: DetuneSourceEffect;
-  private _sourceNode: GainNode;
-  private _signalChain: Set<DromeAudioNode>;
+  protected _cycles: DromeArrayNullable<T>;
   private _destination: AudioNode;
+  protected _connectorNode: GainNode;
+  protected readonly _audioNodes: Set<SynthesizerNode | SampleNode>;
+  private _signalChain: Set<DromeAudioNode>;
+  private _baseGain: number;
+  protected _gain: Envelope;
+  private _detune: Pattern | Envelope;
+  protected _filter: FrequencyParams = { type: "none" };
   protected _startTime: number | undefined;
-  private _isConnected = false;
-  protected readonly _audioNodes: Set<OscillatorNode | AudioBufferSourceNode>;
-  protected readonly _gainNodes: Set<GainNode>;
+  private _connected = false;
 
   // Method Aliases
-  amp: (...v: RestInput) => this;
+  amp: (...v: (number | number[])[] | [Envelope] | [string]) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
   rev: () => this;
   seq: (steps: number, ...pulses: StepPattern) => this;
+  fil: (
+    type: FilterType,
+    f: number | Envelope | string,
+    q: number | Envelope | string
+  ) => this;
+  // filq: (...v: (number | number[])[] | [Envelope]) => this;
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
+    this._cycles = new DromeArrayNullable(opts.defaultCycle);
+
     this._destination = opts.destination;
-    this._cycles = new DromeCycle(opts.defaultCycle, opts.nullValue);
-    this._sourceNode = new GainNode(drome.ctx);
+    this._connectorNode = new GainNode(drome.ctx);
     this._audioNodes = new Set();
-    this._gainNodes = new Set();
     this._signalChain = new Set();
-    const { baseGain, adsr } = opts;
-    this._gain = new GainSourceEffect(drome, baseGain, adsr);
-    this._detune = new DetuneSourceEffect(drome);
+
+    this._baseGain = opts.baseGain ?? 0.35;
+    this._gain = new Envelope(0, this._baseGain);
+    this._detune = new Pattern(0);
 
     this.amp = this.amplitude.bind(this);
     this.env = this.adsr.bind(this);
     this.envMode = this.adsrMode.bind(this);
     this.rev = this.reverse.bind(this);
     this.seq = this.sequence.bind(this);
+    this.fil = this.filter.bind(this);
+    // this.filq = this.filterq.bind(this);
   }
 
-  protected createGain(
-    node: OscillatorNode | AudioBufferSourceNode,
+  protected applyGain(
+    node: SynthesizerNode | SampleNode,
     start: number,
     duration: number,
     chordIndex: number
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
-    const { envGain, effectGain, noteEnd } = this._gain.apply({
-      node,
-      start,
-      duration,
-      cycleIndex,
-      chordIndex,
-    });
+    return this._gain.apply(node.gain, start, duration, cycleIndex, chordIndex);
+  }
 
-    this._gainNodes.add(envGain);
-    this._gainNodes.add(effectGain);
-    node.connect(effectGain).connect(envGain).connect(this._sourceNode);
+  protected applyFilter(
+    node: SynthesizerNode | SampleNode,
+    start: number,
+    duration: number,
+    chordIndex: number
+  ) {
+    const cycleIndex = this._drome.metronome.bar % this._cycles.length;
 
-    return { gainNodes: [envGain, effectGain], noteEnd };
+    if (this._filter.frequency) node.setFilterType(this._filter.type);
+
+    if (this._filter.frequency instanceof Pattern) {
+      this._filter.frequency.apply(
+        node.filterFrequency,
+        cycleIndex,
+        chordIndex
+      );
+    } else if (this._filter.frequency instanceof Envelope) {
+      this._filter.frequency.apply(
+        node.filterFrequency,
+        start,
+        duration,
+        cycleIndex,
+        chordIndex
+      );
+    }
+
+    if (this._filter.q instanceof Pattern) {
+      this._filter.q.apply(node.filterQ, cycleIndex, chordIndex);
+    } else if (this._filter.q instanceof Envelope) {
+      this._filter.q.apply(
+        node.filterQ,
+        start,
+        duration,
+        cycleIndex,
+        chordIndex
+      );
+    }
   }
 
   protected applyDetune(
-    node: OscillatorNode | AudioBufferSourceNode,
+    node: SynthesizerNode | SampleNode,
     start: number,
     duration: number,
     chordIndex: number
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
-    this._detune.apply({ node, start, duration, cycleIndex, chordIndex });
+
+    if (this._detune instanceof Pattern) {
+      this._detune.apply(node.detune, cycleIndex, chordIndex);
+    } else if (this._detune instanceof Envelope) {
+      this._detune.apply(node.detune, start, duration, cycleIndex, chordIndex);
+    }
   }
 
   private connectChain(
@@ -119,20 +173,24 @@ abstract class Instrument<T> {
     barStart: number,
     barDuration: number
   ) {
-    const chain = [this._sourceNode, ...this._signalChain, this._destination];
+    const chain = [
+      this._connectorNode,
+      ...this._signalChain,
+      this._destination,
+    ];
 
     chain.forEach((node, i) => {
       if (node instanceof AutomatableEffect)
         node.apply(notes, this._drome.metronome.bar, barStart, barDuration);
 
-      if (this._isConnected) return;
+      if (this._connected) return;
 
       const nextNode = chain[i + 1];
       if (nextNode instanceof DromeAudioNode) node.connect(nextNode.input);
       else if (nextNode) node.connect(nextNode);
     });
 
-    this._isConnected = true;
+    this._connected = true;
   }
 
   note(...input: (Nullable<T> | Nullable<T>[])[]) {
@@ -164,7 +222,7 @@ abstract class Instrument<T> {
     return this;
   }
 
-  sequence(steps: number, ...pulses: StepPattern) {
+  sequence(steps: number, ...pulses: (number | number[])[]) {
     this._cycles.sequence(steps, ...pulses);
     return this;
   }
@@ -189,50 +247,87 @@ abstract class Instrument<T> {
     return this;
   }
 
-  amplitude(...v: RestInput) {
-    if (isLfoTuple(v)) {
-      this._gain.cycles.note(v[0].value);
-      this._gain.lfo = v[0];
-    } else if (isStringTuple(v)) {
-      this._gain.cycles.note(...parsePatternString(v[0]));
-    } else if (!isEnvTuple(v)) {
-      this._gain.cycles.note(...v);
+  amplitude(...v: (number | number[])[] | [Envelope] | [string]) {
+    if (isEnvTuple(v)) {
+      this._gain = v[0];
+    } else {
+      const pattern = isStringTuple(v) ? parsePatternString(v[0]) : v;
+      const normalizedPattern = pattern.map((x) =>
+        Array.isArray(x) ? x.map((y) => y * this._baseGain) : x * this._baseGain
+      );
+      this._gain.maxValue(...normalizedPattern);
     }
     return this;
   }
 
   adsr(a: number, d?: number, s?: number, r?: number) {
-    this._gain.env.att(a);
-    if (typeof d === "number") this._gain.env.dec(d);
-    if (typeof s === "number") this._gain.env.sus(s);
-    if (typeof r === "number") this._gain.env.rel(r);
+    this._gain.att(a);
+    if (typeof d === "number") this._gain.dec(d);
+    if (typeof s === "number") this._gain.sus(s);
+    if (typeof r === "number") this._gain.rel(r);
 
     return this;
   }
 
   att(v: number) {
-    this._gain.env.att(v);
+    this._gain.att(v);
     return this;
   }
 
   dec(v: number) {
-    this._gain.env.dec(v);
+    this._gain.dec(v);
     return this;
   }
 
   sus(v: number) {
-    this._gain.env.sus(v);
+    this._gain.sus(v);
     return this;
   }
 
   rel(v: number) {
-    this._gain.env.rel(v);
+    this._gain.rel(v);
     return this;
   }
 
   adsrMode(mode: AdsrMode) {
-    this._gain.env.mode(mode);
-    this._detune.env?.mode(mode);
+    this._gain.mode(mode);
+    if (this._detune instanceof Envelope) this._detune.mode(mode);
+    return this;
+  }
+
+  detune(...v: (number | number[])[] | [Envelope] | [string]) {
+    if (isEnvTuple(v)) {
+      this._detune = v[0];
+    } else {
+      const pattern = isStringTuple(v) ? parsePatternString(v[0]) : v;
+      this._detune = new Pattern(...pattern);
+    }
+
+    return this;
+  }
+
+  filter(
+    type: FilterType,
+    f: number | string | Envelope,
+    q: number | string | Envelope
+  ) {
+    this._filter.type = type;
+
+    if (f instanceof Envelope) {
+      this._filter.frequency = f;
+      this._filter.frequency.endValue = 30;
+    } else {
+      const pattern = typeof f === "string" ? parsePatternString(f) : [f];
+      this._filter.frequency = new Pattern(...pattern);
+    }
+
+    if (q instanceof Envelope) {
+      this._filter.q = q;
+    } else {
+      const pattern = typeof q === "string" ? parsePatternString(q) : [q];
+      this._filter.q = new Pattern(...pattern);
+    }
+
     return this;
   }
 
@@ -301,21 +396,6 @@ abstract class Instrument<T> {
         e.effect.Q.setValueAtTime(v, this.ctx.currentTime);
       }
     });
-    return this;
-  }
-
-  detune(...v: RestInput) {
-    if (isLfoTuple(v)) {
-      this._detune.cycles.note(v[0].value);
-      this._detune.lfo = v[0];
-    } else if (isEnvTuple(v)) {
-      this._detune.env = v[0];
-    } else if (isStringTuple(v)) {
-      this._detune.cycles.note(...parsePatternString(v[0]));
-    } else {
-      this._detune.cycles.note(...v);
-    }
-
     return this;
   }
 
@@ -410,14 +490,16 @@ abstract class Instrument<T> {
     const startTime = this._startTime ?? this.ctx.currentTime;
     const relTime = 0.25;
 
-    if (startTime > this.ctx.currentTime) {
+    if (startTime > stopTime) {
       this._audioNodes.forEach((node) => node.stop());
       this.cleanup();
     } else {
-      this._gainNodes.forEach((node) => {
-        node.gain.cancelScheduledValues(stopTime);
-        node.gain.setValueAtTime(node.gain.value, stopTime);
-        node.gain.linearRampToValueAtTime(0, stopTime + relTime);
+      this._audioNodes.forEach((node) => {
+        if (node instanceof SynthesizerNode || node instanceof SampleNode) {
+          node.gain.cancelScheduledValues(stopTime);
+          node.gain.setValueAtTime(node.gain.value, stopTime);
+          node.gain.linearRampToValueAtTime(0, stopTime + relTime);
+        }
       });
 
       const handleEnded = (e: Event) => {
@@ -433,13 +515,9 @@ abstract class Instrument<T> {
   }
 
   cleanup() {
-    setTimeout(() => {
-      this._gainNodes.forEach((node) => node.disconnect());
-      this._gainNodes.clear();
-      this._audioNodes.forEach((node) => node.disconnect());
-      this._audioNodes.clear();
-      this._isConnected = false;
-    }, 100);
+    this._audioNodes.forEach((node) => node.disconnect());
+    this._audioNodes.clear();
+    this._connected = false;
   }
 
   get ctx() {

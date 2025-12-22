@@ -1,6 +1,6 @@
-import AutomatableEffect from "@/abstracts/effect-automatable.js";
-import Envelope from "@/automation/envelope.js";
-import type { Automatable, FilterType } from "@/types.js";
+import AutomatableEffect from "@/abstracts/effect-automatable";
+import Envelope from "@/automation/envelope";
+import type { Automatable, FilterType } from "@/types";
 
 interface DromeFilterOptions {
   type: FilterType;

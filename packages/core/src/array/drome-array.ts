@@ -3,9 +3,12 @@ class DromeArray<T> {
   protected _defaultValue: T[][];
   protected _nullValue: T;
 
-  constructor(defaultValue: T[][], nullValue: T) {
-    this._defaultValue = defaultValue;
-    this._nullValue = nullValue;
+  constructor(...input: (T | T[])[]) {
+    const dv = Array.isArray(input[0]) ? input[0][0] : input[0];
+    if (dv === undefined) throw new Error("Invalid drome array input");
+
+    this._defaultValue = input.map((c) => (Array.isArray(c) ? c : [c]));
+    this._nullValue = dv;
   }
 
   /* ----------------------------------------------------------------
@@ -112,14 +115,14 @@ class DromeArray<T> {
   /* ----------------------------------------------------------------
   /* GETTERS
   ---------------------------------------------------------------- */
-  at(i: number): T[] | null;
-  at(i: number, j: number): NonNullable<T> | null;
+  at(i: number): T[];
+  at(i: number, j: number): NonNullable<T>;
   at(i: number, j?: number) {
     const currentValue = this.value[i % this.value.length];
     if (typeof j === "number") {
-      return currentValue?.[j % currentValue.length] ?? null;
+      return currentValue?.[j % currentValue.length] ?? this._nullValue;
     }
-    return currentValue ?? null;
+    return currentValue ?? this._nullValue;
   }
 
   get length() {

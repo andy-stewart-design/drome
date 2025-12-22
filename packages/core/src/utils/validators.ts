@@ -1,5 +1,6 @@
-import LFO from "@/automation/lfo.js";
-import Envelope from "@/automation/envelope.js";
+import LFO from "@/automation/lfo";
+// import Envelope from "@/automation/envelope";
+import Envelope from "@/automation/envelope";
 
 function isNullish(v: unknown) {
   return v === null || v === undefined;
@@ -12,6 +13,10 @@ function isNumber(v: unknown) {
 function isLfoTuple(n: unknown[]): n is [LFO] {
   return n[0] instanceof LFO;
 }
+
+// function isEnvTuple(n: unknown[]): n is [Envelope | Envelope2] {
+//   return n[0] instanceof Envelope || n[0] instanceof Envelope2;
+// }
 
 function isEnvTuple(n: unknown[]): n is [Envelope] {
   return n[0] instanceof Envelope;

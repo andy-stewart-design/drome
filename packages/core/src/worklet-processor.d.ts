@@ -1,5 +1,6 @@
 declare class AudioWorkletProcessor extends EventTarget {
   constructor(options?: AudioWorkletNodeOptions);
+  readonly port: MessagePort;
   abstract process(
     inputs: Float32Array[][],
     outputs: Float32Array[][],
@@ -11,3 +12,6 @@ declare function registerProcessor(
   name: string,
   processorCtor: typeof AudioWorkletProcessor
 ): void;
+
+declare const sampleRate: number;
+declare const currentTime: number;
