@@ -22,8 +22,12 @@ function isEnvTuple(n: unknown[]): n is [Envelope] {
   return n[0] instanceof Envelope;
 }
 
+function isString(input: unknown): input is string {
+  return typeof input === "string";
+}
+
 function isStringTuple(n: unknown[]): n is [string] {
   return typeof n[0] === "string";
 }
 
-export { isNullish, isNumber, isEnvTuple, isLfoTuple, isStringTuple };
+export { isNullish, isNumber, isEnvTuple, isLfoTuple, isString, isStringTuple };

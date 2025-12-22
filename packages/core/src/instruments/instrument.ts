@@ -24,6 +24,7 @@ import {
   isEnvTuple,
   // isLfoTuple,
   isNullish,
+  isString,
   isStringTuple,
 } from "../utils/validators";
 import type Drome from "../index";
@@ -54,6 +55,8 @@ interface FrequencyParams {
   frequency?: Pattern | Envelope;
   q?: Pattern | Envelope;
 }
+
+type NSE = number | string | Envelope;
 
 abstract class Instrument<T> {
   protected _drome: Drome;
@@ -306,96 +309,68 @@ abstract class Instrument<T> {
     return this;
   }
 
-  filter(
-    type: FilterType,
-    f: number | string | Envelope,
-    q: number | string | Envelope
-  ) {
+  filter(type: FilterType, f: NSE, q: NSE) {
     this._filter.type = type;
 
     if (f instanceof Envelope) {
       this._filter.frequency = f;
       this._filter.frequency.endValue = 30;
     } else {
-      const pattern = typeof f === "string" ? parsePatternString(f) : [f];
+      const pattern = isString(f) ? parsePatternString(f) : [f];
       this._filter.frequency = new Pattern(...pattern);
     }
 
     if (q instanceof Envelope) {
       this._filter.q = q;
     } else {
-      const pattern = typeof q === "string" ? parsePatternString(q) : [q];
+      const pattern = isString(q) ? parsePatternString(q) : [q];
       this._filter.q = new Pattern(...pattern);
     }
 
     return this;
   }
 
-  gain(...input: RestInput) {
-    const effect = new GainEffect(this.ctx, { gain: parseRestInput(input) });
-
-    this._signalChain.add(effect);
-
-    return this;
-  }
-
-  bpf(...input: RestInput) {
-    const f = new DromeFilter(this.ctx, {
-      type: "bandpass",
-      frequency: parseRestInput(input),
-    });
-
-    this._signalChain.add(f);
+  gain(input: NSE) {
+    this._signalChain.add(
+      new GainEffect(this.ctx, { gain: parseAutomatableInput(input) })
+    );
 
     return this;
   }
 
-  bpq(v: number) {
-    Array.from(this._signalChain).forEach((e) => {
-      if (e instanceof DromeFilter && e.type === "bandpass") {
-        e.effect.Q.setValueAtTime(v, this.ctx.currentTime);
-      }
-    });
-    return this;
-  }
-
-  hpf(...input: RestInput) {
-    const f = new DromeFilter(this.ctx, {
-      type: "highpass",
-      frequency: parseRestInput(input),
-    });
-
-    this._signalChain.add(f);
+  bpf(input: NSE, q?: number) {
+    this._signalChain.add(
+      new DromeFilter(this.ctx, {
+        type: "bandpass",
+        frequency: parseAutomatableInput(input),
+        q,
+      })
+    );
 
     return this;
   }
 
-  hpq(v: number) {
-    Array.from(this._signalChain).forEach((e) => {
-      if (e instanceof DromeFilter && e.type === "highpass") {
-        e.effect.Q.setValueAtTime(v, this.ctx.currentTime);
-      }
-    });
-    return this;
-  }
-
-  lpf(...input: RestInput) {
-    const f = new DromeFilter(this.ctx, {
-      type: "lowpass",
-      frequency: parseRestInput(input),
-    });
-
-    this._signalChain.add(f);
+  hpf(input: NSE, q?: number) {
+    this._signalChain.add(
+      new DromeFilter(this.ctx, {
+        type: "highpass",
+        frequency: parseAutomatableInput(input),
+        q,
+      })
+    );
 
     return this;
   }
 
-  lpq(v: number) {
-    Array.from(this._signalChain).forEach((e) => {
-      if (e instanceof DromeFilter && e.type === "lowpass") {
-        e.effect.Q.setValueAtTime(v, this.ctx.currentTime);
-      }
-    });
+  lpf(input: NSE, q?: number) {
+    this._signalChain.add(
+      new DromeFilter(this.ctx, {
+        type: "lowpass",
+        frequency: parseAutomatableInput(input),
+        q,
+      })
+    );
+
     return this;
   }
 
@@ -410,9 +385,19 @@ abstract class Instrument<T> {
   // b either represents decay/room size or a url/sample name
   // c either represents the lpf start value or a sample bank name
   // d is the lpf end value
-  reverb(a: AutomatableInput, b?: number, c?: number, d?: number): this;
-  reverb(a: AutomatableInput, b?: string, c?: string): this;
-  reverb(mix: AutomatableInput, b: unknown = 1, c: unknown = 1600, d?: number) {
+  reverb(
+    a: number | string | Envelope,
+    b?: number,
+    c?: number,
+    d?: number
+  ): this;
+  reverb(a: number | string | Envelope, b?: string, c?: string): this;
+  reverb(
+    mix: number | string | Envelope,
+    b: unknown = 1,
+    c: unknown = 1600,
+    d?: number
+  ) {
     let effect: ReverbEffect;
     const parsedMix = parseAutomatableInput(mix);
 
@@ -421,8 +406,8 @@ abstract class Instrument<T> {
       const opts = { mix: parsedMix, decay: b, lpfStart: c, lpfEnd };
       effect = new ReverbEffect(this._drome, opts);
     } else {
-      const name = typeof b === "string" ? b : "echo";
-      const bank = typeof c === "string" ? c : "fx";
+      const name = isString(b) ? b : "echo";
+      const bank = isString(c) ? c : "fx";
       const src = name.startsWith("https")
         ? ({ registered: false, url: name } as const)
         : ({ registered: true, name, bank } as const);
@@ -442,11 +427,7 @@ abstract class Instrument<T> {
     return this;
   }
 
-  distort(
-    amount: AutomatableInput,
-    postgain?: number,
-    type?: DistortionAlgorithm
-  ) {
+  distort(amount: NSE, postgain?: number, type?: DistortionAlgorithm) {
     const distortion = parseAutomatableInput(amount);
     const effect = new DistortionEffect(this.ctx, {
       distortion,
@@ -457,7 +438,7 @@ abstract class Instrument<T> {
     return this;
   }
 
-  crush(bd: AutomatableInput, rateReduction = 1) {
+  crush(bd: NSE, rateReduction = 1) {
     const bitDepth = parseAutomatableInput(bd);
     const effect = new BitcrusherEffect(this.ctx, {
       bitDepth,
