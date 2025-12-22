@@ -6,6 +6,8 @@ class Pattern {
   private _defaultValue: number;
 
   constructor(...input: (number | number[])[]) {
+    console.log(input);
+
     const defaultValue = Array.isArray(input[0]) ? input[0][0] : input[0];
     if (defaultValue === undefined) throw new Error("Invalid pattern input");
 

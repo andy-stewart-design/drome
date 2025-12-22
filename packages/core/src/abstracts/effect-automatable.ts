@@ -4,7 +4,7 @@ import Envelope from "@/automation/envelope";
 // import LFO from "@/automation/lfo";
 import { isNullish } from "@/utils/validators";
 import { applySteppedRamp } from "@/utils/stepped-ramp";
-import type { Automatable, Note } from "@/types";
+import type { Automation, Note } from "@/types";
 
 abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   protected abstract override _input: GainNode;
@@ -15,7 +15,7 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   // protected _lfo: LFO | undefined;
   protected _env: Envelope | undefined;
 
-  constructor(input: Automatable, defaultValue = 1) {
+  constructor(input: Automation, defaultValue = 1) {
     super();
 
     // if (input instanceof LFO) {

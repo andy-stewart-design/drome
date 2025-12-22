@@ -1,7 +1,7 @@
 import DromeArray from "@/array/drome-array";
 import { euclid } from "@/utils/euclid";
 import { hex } from "@/utils/hex";
-import type { DromeCycleValue, Nullable, StepPattern } from "@/types";
+import type { DromeCycleValue, Nullable, Pattern } from "@/types";
 
 class DromeArrayNullable<T> extends DromeArray<Nullable<T>> {
   constructor(...input: (T | T[])[]) {
@@ -56,7 +56,7 @@ class DromeArrayNullable<T> extends DromeArray<Nullable<T>> {
     return this;
   }
 
-  sequence(steps: number, ...pulses: StepPattern) {
+  sequence(steps: number, ...pulses: Pattern) {
     const pattern = pulses.map((p) =>
       Array.from({ length: steps }, (_, i) => {
         return [p].flat().includes(i) ? 1 : 0;
@@ -66,7 +66,7 @@ class DromeArrayNullable<T> extends DromeArray<Nullable<T>> {
     return this;
   }
 
-  xox(...input: StepPattern | string[]) {
+  xox(...input: Pattern | string[]) {
     const pattern = input.map((c) => {
       if (typeof c === "string") {
         return c.split("").reduce<number[]>((acc, s) => {

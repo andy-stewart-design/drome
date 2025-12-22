@@ -1,10 +1,11 @@
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import Envelope from "@/automation/envelope";
-import type { Automatable, FilterType } from "@/types";
+import type { Automation, FilterType } from "@/types";
 
 interface DromeFilterOptions {
   type: FilterType;
-  frequency: Automatable;
+  frequency: Automation;
+  q?: number;
 }
 
 class DromeFilter extends AutomatableEffect<BiquadFilterNode> {
@@ -13,13 +14,14 @@ class DromeFilter extends AutomatableEffect<BiquadFilterNode> {
   protected _target: AudioParam;
 
   constructor(ctx: AudioContext, opts: DromeFilterOptions) {
-    const { type, frequency } = opts;
+    const { type, frequency, q } = opts;
     super(frequency);
 
     this._input = new GainNode(ctx);
     this._effect = new BiquadFilterNode(ctx, {
       type,
       frequency: this._defaultValue,
+      Q: q,
     });
     this._target = this._effect.frequency;
   }

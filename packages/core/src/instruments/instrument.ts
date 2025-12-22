@@ -15,31 +15,23 @@ import SampleNode from "@/audio-nodes/sample-node";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
 import {
-  parseStepPatternInput,
-  parseAutomatableInput,
+  parsePatternInput,
+  parseParamInput,
   parsePatternString,
-  parseRestInput,
 } from "../utils/parse-pattern";
-import {
-  isEnvTuple,
-  // isLfoTuple,
-  isNullish,
-  isStringTuple,
-} from "../utils/validators";
+import { isNullish, isNumber, isString } from "../utils/validators";
 import type Drome from "../index";
 import type {
   AdsrMode,
   AdsrEnvelope,
-  AutomatableInput,
   DistortionAlgorithm,
   InstrumentType,
   Note,
+  NSE,
   Nullable,
-  RestInput,
-  StepPattern,
-  StepPatternInput,
 } from "../types";
 import type { FilterType } from "@/worklets/worklet-filter";
+import { filterTypeMap, type FilterTypeAlias } from "../constants/index";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
@@ -70,17 +62,17 @@ abstract class Instrument<T> {
   private _connected = false;
 
   // Method Aliases
-  amp: (...v: (number | number[])[] | [Envelope] | [string]) => this;
+  amp: (input: number | Envelope | string) => this;
+  dt: (input: number | Envelope | string) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
   rev: () => this;
-  seq: (steps: number, ...pulses: StepPattern) => this;
+  seq: (steps: number, ...pulses: (number | number[])[]) => this;
   fil: (
-    type: FilterType,
+    type: FilterTypeAlias,
     f: number | Envelope | string,
     q: number | Envelope | string
   ) => this;
-  // filq: (...v: (number | number[])[] | [Envelope]) => this;
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
@@ -96,12 +88,12 @@ abstract class Instrument<T> {
     this._detune = new Pattern(0);
 
     this.amp = this.amplitude.bind(this);
+    this.dt = this.detune.bind(this);
     this.env = this.adsr.bind(this);
     this.envMode = this.adsrMode.bind(this);
     this.rev = this.reverse.bind(this);
     this.seq = this.sequence.bind(this);
     this.fil = this.filter.bind(this);
-    // this.filq = this.filterq.bind(this);
   }
 
   protected applyGain(
@@ -227,7 +219,7 @@ abstract class Instrument<T> {
     return this;
   }
 
-  xox(...input: StepPattern) {
+  xox(...input: (number | number[])[]) {
     this._cycles.xox(...input);
     return this;
   }
@@ -247,11 +239,11 @@ abstract class Instrument<T> {
     return this;
   }
 
-  amplitude(...v: (number | number[])[] | [Envelope] | [string]) {
-    if (isEnvTuple(v)) {
-      this._gain = v[0];
+  amplitude(input: number | Envelope | string) {
+    if (input instanceof Envelope) {
+      this._gain = input;
     } else {
-      const pattern = isStringTuple(v) ? parsePatternString(v[0]) : v;
+      const pattern = isString(input) ? parsePatternString(input) : [input];
       const normalizedPattern = pattern.map((x) =>
         Array.isArray(x) ? x.map((y) => y * this._baseGain) : x * this._baseGain
       );
@@ -295,114 +287,88 @@ abstract class Instrument<T> {
     return this;
   }
 
-  detune(...v: (number | number[])[] | [Envelope] | [string]) {
-    if (isEnvTuple(v)) {
-      this._detune = v[0];
+  detune(input: number | Envelope | string) {
+    if (input instanceof Envelope) {
+      this._detune = input;
     } else {
-      const pattern = isStringTuple(v) ? parsePatternString(v[0]) : v;
+      const pattern = isString(input) ? parsePatternString(input) : [input];
       this._detune = new Pattern(...pattern);
     }
 
     return this;
   }
 
-  filter(
-    type: FilterType,
-    f: number | string | Envelope,
-    q: number | string | Envelope
-  ) {
-    this._filter.type = type;
+  filter(type: FilterTypeAlias, f: NSE, q?: NSE) {
+    this._filter.type = filterTypeMap[type];
 
     if (f instanceof Envelope) {
       this._filter.frequency = f;
       this._filter.frequency.endValue = 30;
     } else {
-      const pattern = typeof f === "string" ? parsePatternString(f) : [f];
+      const pattern = isString(f) ? parsePatternString(f) : [f];
       this._filter.frequency = new Pattern(...pattern);
     }
 
     if (q instanceof Envelope) {
       this._filter.q = q;
-    } else {
-      const pattern = typeof q === "string" ? parsePatternString(q) : [q];
+    } else if (isString(q) || isNumber(q)) {
+      const pattern = isString(q) ? parsePatternString(q) : [q];
       this._filter.q = new Pattern(...pattern);
     }
 
     return this;
   }
 
-  gain(...input: RestInput) {
-    const effect = new GainEffect(this.ctx, { gain: parseRestInput(input) });
-
-    this._signalChain.add(effect);
-
-    return this;
-  }
-
-  bpf(...input: RestInput) {
-    const f = new DromeFilter(this.ctx, {
-      type: "bandpass",
-      frequency: parseRestInput(input),
-    });
-
-    this._signalChain.add(f);
+  gain(input: NSE) {
+    this._signalChain.add(
+      new GainEffect(this.ctx, { gain: parseParamInput(input) })
+    );
 
     return this;
   }
 
-  bpq(v: number) {
-    Array.from(this._signalChain).forEach((e) => {
-      if (e instanceof DromeFilter && e.type === "bandpass") {
-        e.effect.Q.setValueAtTime(v, this.ctx.currentTime);
-      }
-    });
-    return this;
-  }
-
-  hpf(...input: RestInput) {
-    const f = new DromeFilter(this.ctx, {
-      type: "highpass",
-      frequency: parseRestInput(input),
-    });
-
-    this._signalChain.add(f);
+  bpf(input: NSE, q?: number) {
+    this._signalChain.add(
+      new DromeFilter(this.ctx, {
+        type: "bandpass",
+        frequency: parseParamInput(input),
+        q,
+      })
+    );
 
     return this;
   }
 
-  hpq(v: number) {
-    Array.from(this._signalChain).forEach((e) => {
-      if (e instanceof DromeFilter && e.type === "highpass") {
-        e.effect.Q.setValueAtTime(v, this.ctx.currentTime);
-      }
-    });
-    return this;
-  }
-
-  lpf(...input: RestInput) {
-    const f = new DromeFilter(this.ctx, {
-      type: "lowpass",
-      frequency: parseRestInput(input),
-    });
-
-    this._signalChain.add(f);
+  hpf(input: NSE, q?: number) {
+    this._signalChain.add(
+      new DromeFilter(this.ctx, {
+        type: "highpass",
+        frequency: parseParamInput(input),
+        q,
+      })
+    );
 
     return this;
   }
 
-  lpq(v: number) {
-    Array.from(this._signalChain).forEach((e) => {
-      if (e instanceof DromeFilter && e.type === "lowpass") {
-        e.effect.Q.setValueAtTime(v, this.ctx.currentTime);
-      }
-    });
+  lpf(input: NSE, q?: number) {
+    this._signalChain.add(
+      new DromeFilter(this.ctx, {
+        type: "lowpass",
+        frequency: parseParamInput(input),
+        q,
+      })
+    );
+
     return this;
   }
 
-  pan(...input: RestInput) {
-    const effect = new PanEffect(this.ctx, { pan: parseRestInput(input) });
-
-    this._signalChain.add(effect);
+  pan(input: NSE) {
+    this._signalChain.add(
+      new PanEffect(this.ctx, {
+        pan: parseParamInput(input),
+      })
+    );
 
     return this;
   }
@@ -410,19 +376,19 @@ abstract class Instrument<T> {
   // b either represents decay/room size or a url/sample name
   // c either represents the lpf start value or a sample bank name
   // d is the lpf end value
-  reverb(a: AutomatableInput, b?: number, c?: number, d?: number): this;
-  reverb(a: AutomatableInput, b?: string, c?: string): this;
-  reverb(mix: AutomatableInput, b: unknown = 1, c: unknown = 1600, d?: number) {
+  reverb(a: NSE, b?: number, c?: number, d?: number): this;
+  reverb(a: NSE, b?: string, c?: string): this;
+  reverb(mix: NSE, b: unknown = 1, c: unknown = 1600, d?: number) {
     let effect: ReverbEffect;
-    const parsedMix = parseAutomatableInput(mix);
+    const parsedMix = parseParamInput(mix);
 
     if (typeof b === "number" && typeof c === "number") {
       const lpfEnd = d || 1000;
       const opts = { mix: parsedMix, decay: b, lpfStart: c, lpfEnd };
       effect = new ReverbEffect(this._drome, opts);
     } else {
-      const name = typeof b === "string" ? b : "echo";
-      const bank = typeof c === "string" ? c : "fx";
+      const name = isString(b) ? b : "echo";
+      const bank = isString(c) ? c : "fx";
       const src = name.startsWith("https")
         ? ({ registered: false, url: name } as const)
         : ({ registered: true, name, bank } as const);
@@ -433,37 +399,35 @@ abstract class Instrument<T> {
     return this;
   }
 
-  delay(dt: StepPatternInput, feedback: number) {
-    const delayTime = parseStepPatternInput(dt);
-    const effect = new DelayEffect(this._drome, { delayTime, feedback });
-
-    this._signalChain.add(effect);
+  delay(_delayTime: number | string, feedback: number) {
+    this._signalChain.add(
+      new DelayEffect(this._drome, {
+        delayTime: parsePatternInput(_delayTime),
+        feedback,
+      })
+    );
 
     return this;
   }
 
-  distort(
-    amount: AutomatableInput,
-    postgain?: number,
-    type?: DistortionAlgorithm
-  ) {
-    const distortion = parseAutomatableInput(amount);
-    const effect = new DistortionEffect(this.ctx, {
-      distortion,
-      postgain,
-      type,
-    });
-    this._signalChain.add(effect);
+  distort(amount: NSE, postgain?: number, type?: DistortionAlgorithm) {
+    this._signalChain.add(
+      new DistortionEffect(this.ctx, {
+        distortion: parseParamInput(amount),
+        postgain,
+        type,
+      })
+    );
     return this;
   }
 
-  crush(bd: AutomatableInput, rateReduction = 1) {
-    const bitDepth = parseAutomatableInput(bd);
-    const effect = new BitcrusherEffect(this.ctx, {
-      bitDepth,
-      rateReduction,
-    });
-    this._signalChain.add(effect);
+  crush(_bitDepth: NSE, rateReduction = 1) {
+    this._signalChain.add(
+      new BitcrusherEffect(this.ctx, {
+        bitDepth: parseParamInput(_bitDepth),
+        rateReduction,
+      })
+    );
     return this;
   }
 

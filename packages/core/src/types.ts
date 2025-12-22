@@ -15,14 +15,10 @@ type InstrumentType = "synth" | "sample";
 type Nullable<T> = T | null | undefined;
 type Note<T> = { value: T; start: number; duration: number } | null;
 type DromeCycleValue<T> = Nullable<T>[][];
-type StepPatternInput = number | string;
-type StepPattern = (number | number[])[];
-// type AutomatableInput = StepPatternInput | LFO | Envelope;
-// type Automatable = StepPattern | LFO | Envelope;
-// type RestInput = StepPattern | [string] | [LFO] | [Envelope];
-type AutomatableInput = StepPatternInput | Envelope;
-type Automatable = StepPattern | Envelope;
-type RestInput = StepPattern | [string] | [Envelope];
+type Automation = Pattern | Envelope;
+type Pattern = (number | number[])[];
+type PatternInput = number | string;
+type NSE = PatternInput | Envelope;
 
 // AUTOMATION
 type AdsrMode = "fit" | "clip" | "free";
@@ -40,8 +36,7 @@ type DistortionFunction = (typeof algos)[DistortionAlgorithm];
 export type {
   AdsrEnvelope,
   AdsrMode,
-  Automatable,
-  AutomatableInput,
+  Automation,
   DistortionAlgorithm,
   DistortionFunction,
   DromeCycleValue,
@@ -52,8 +47,8 @@ export type {
   InstrumentType,
   Metronome,
   Note,
+  NSE,
   Nullable,
-  RestInput,
-  StepPattern,
-  StepPatternInput,
+  Pattern,
+  PatternInput,
 };

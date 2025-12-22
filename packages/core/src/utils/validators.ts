@@ -18,12 +18,28 @@ function isLfoTuple(n: unknown[]): n is [LFO] {
 //   return n[0] instanceof Envelope || n[0] instanceof Envelope2;
 // }
 
+function isEnv(n: unknown): n is Envelope {
+  return n instanceof Envelope;
+}
+
 function isEnvTuple(n: unknown[]): n is [Envelope] {
   return n[0] instanceof Envelope;
+}
+
+function isString(input: unknown): input is string {
+  return typeof input === "string";
 }
 
 function isStringTuple(n: unknown[]): n is [string] {
   return typeof n[0] === "string";
 }
 
-export { isNullish, isNumber, isEnvTuple, isLfoTuple, isStringTuple };
+export {
+  isNullish,
+  isNumber,
+  isEnv,
+  isEnvTuple,
+  isLfoTuple,
+  isString,
+  isStringTuple,
+};
