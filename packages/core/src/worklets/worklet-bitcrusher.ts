@@ -3,6 +3,7 @@ import { BITCRUSH_ID } from "@/constants.js";
 class BitcrushProcessor extends AudioWorkletProcessor {
   private phase: number;
   private lastSample: number;
+  private started: boolean;
 
   static get parameterDescriptors() {
     return [
@@ -15,6 +16,7 @@ class BitcrushProcessor extends AudioWorkletProcessor {
     super();
     this.phase = 0;
     this.lastSample = 0;
+    this.started = false;
   }
 
   process(
@@ -29,6 +31,11 @@ class BitcrushProcessor extends AudioWorkletProcessor {
     for (let inputNum = 0; inputNum < sourceLimit; inputNum++) {
       const input = inputs[inputNum];
       const output = outputs[inputNum];
+
+      const hasInput = !(input?.[0] === undefined);
+      if (this.started && !hasInput) return false;
+      this.started = hasInput;
+
       if (!input || !output) return true;
 
       const chanCount = Math.min(input.length, output.length);

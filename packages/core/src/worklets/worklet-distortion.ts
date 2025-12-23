@@ -11,6 +11,7 @@ interface DistortionOptions extends AudioWorkletNodeOptions {
 
 class DistortionProcessor extends AudioWorkletProcessor {
   private algorithm: DistortionFunction;
+  private started: boolean;
 
   static get parameterDescriptors() {
     return [
@@ -25,6 +26,7 @@ class DistortionProcessor extends AudioWorkletProcessor {
     const { algorithm = "sigmoid" } = processorOptions ?? {};
 
     this.algorithm = algos[algorithm];
+    this.started = false;
   }
 
   process(
@@ -39,6 +41,11 @@ class DistortionProcessor extends AudioWorkletProcessor {
     for (let inputNum = 0; inputNum < sourceLimit; inputNum++) {
       const input = inputs[inputNum];
       const output = outputs[inputNum];
+
+      const hasInput = !(input?.[0] === undefined);
+      if (this.started && !hasInput) return false;
+      this.started = hasInput;
+
       if (!input || !output) return true;
 
       const chanCount = Math.min(input.length, output.length);
