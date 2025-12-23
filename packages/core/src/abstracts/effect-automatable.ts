@@ -51,13 +51,7 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
       for (let i = 0; i < notes.length; i++) {
         const note = notes[i];
         if (isNullish(note)) continue;
-        this._env.apply(
-          this._target,
-          note.start,
-          note.duration - 0.001,
-          cycleIndex,
-          i
-        );
+        this._env.apply(this._target, note.start, note.duration, cycleIndex, i);
       }
     } else {
       const steps = this._cycles.at(cycleIndex) ?? [];

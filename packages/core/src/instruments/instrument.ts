@@ -1,5 +1,3 @@
-// TODO: Do I need to/can I calculate envTimes when I calculate note data (in beforePlay method)?
-
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
 import DromeArrayNullable from "@/array/drome-array-nullable";

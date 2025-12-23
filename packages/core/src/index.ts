@@ -61,6 +61,10 @@ class Drome {
     this.fil = this.filter.bind(this);
   }
 
+  bpm(n: number) {
+    this.clock.bpm(n);
+  }
+
   private handleTick() {
     this.instruments.forEach((inst) =>
       inst.play(this.barStartTime, this.barDuration)
