@@ -35,7 +35,7 @@ function getAdsrTimes({ a, d, r, duration, mode }: getAdsrTimesArgs) {
 
     return { a: att, d: dec, r: { start: rStart, end: rEnd } };
   } else {
-    return { a, d: a + d, r: { start: a + d, end: a + d + r } };
+    return { a, d: a + d, r: { start: a + d, end: a + d + r } }; // TODO: Test this logic. Should r.start be duration - something?
   }
 }
 

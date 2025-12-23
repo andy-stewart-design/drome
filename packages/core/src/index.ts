@@ -5,11 +5,22 @@ import Envelope from "@/automation/envelope";
 // import LFO from "@/automation/lfo";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
+import BitcrusherEffect from "./effects/effect-bitcrusher";
+import DelayEffect from "./effects/effect-delay";
+import DistortionEffect from "./effects/effect-distortion";
+import DromeFilter from "@/effects/effect-filter";
+import GainEffect from "@/effects/effect-gain";
+import PanEffect from "@/effects/effect-pan";
 import { getSampleBanks, getSamplePath } from "@/utils/samples";
 import { loadSample } from "@/utils/load-sample";
 import { bufferId } from "@/utils/cache-id";
-import { addWorklets } from "./utils/worklets";
-import type { SampleBankSchema } from "./utils/samples-validate";
+import { addWorklets } from "@/utils/worklets";
+import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
+import type { SampleBankSchema } from "@/utils/samples-validate";
+import type { DistortionAlgorithm, NSE } from "@/types";
+import { filterTypeMap, type FilterTypeAlias } from "./constants/index";
+import ReverbEffect from "./effects/effect-reverb";
+import { isString } from "./utils/validators";
 
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
@@ -23,6 +34,8 @@ class Drome {
   private sampleBanks: SampleBankSchema | null = null;
   readonly userSamples: Map<string, Map<string, string[]>> = new Map();
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
+
+  fil: (type: FilterTypeAlias, frequency: NSE, q?: number) => DromeFilter;
 
   static async init(bpm?: number) {
     const drome = new Drome(bpm);
@@ -44,6 +57,12 @@ class Drome {
       return gain;
     });
     this.clock.on("bar", this.handleTick.bind(this));
+
+    this.fil = this.filter.bind(this);
+  }
+
+  bpm(n: number) {
+    this.clock.bpm(n);
   }
 
   private handleTick() {
@@ -168,6 +187,66 @@ class Drome {
 
   env(maxValue: number, startValue = 0, endValue?: number) {
     return new Envelope(maxValue, startValue, endValue);
+  }
+
+  crush(_bitDepth: NSE, rateReduction = 1) {
+    return new BitcrusherEffect(this.ctx, {
+      bitDepth: parseParamInput(_bitDepth),
+      rateReduction,
+    });
+  }
+
+  delay(_delayTime: number | string, feedback: number) {
+    return new DelayEffect(this, {
+      delayTime: parsePatternInput(_delayTime),
+      feedback,
+    });
+  }
+
+  distort(amount: NSE, postgain?: number, type?: DistortionAlgorithm) {
+    return new DistortionEffect(this.ctx, {
+      distortion: parseParamInput(amount),
+      postgain,
+      type,
+    });
+  }
+
+  filter(type: FilterTypeAlias, frequency: NSE, q?: number) {
+    return new DromeFilter(this.ctx, {
+      type: filterTypeMap[type],
+      frequency: parseParamInput(frequency),
+      q,
+    });
+  }
+
+  gain(input: NSE) {
+    return new GainEffect(this.ctx, { gain: parseParamInput(input) });
+  }
+
+  pan(input: NSE) {
+    return new PanEffect(this.ctx, { pan: parseParamInput(input) });
+  }
+
+  reverb(a: NSE, b?: number, c?: number, d?: number): ReverbEffect;
+  reverb(a: NSE, b?: string, c?: string): ReverbEffect;
+  reverb(mix: NSE, b: unknown = 1, c: unknown = 1600, d?: number) {
+    let effect: ReverbEffect;
+    const parsedMix = parseParamInput(mix);
+
+    if (typeof b === "number" && typeof c === "number") {
+      const lpfEnd = d || 1000;
+      const opts = { mix: parsedMix, decay: b, lpfStart: c, lpfEnd };
+      effect = new ReverbEffect(this, opts);
+    } else {
+      const name = isString(b) ? b : "echo";
+      const bank = isString(c) ? c : "fx";
+      const src = name.startsWith("https")
+        ? ({ registered: false, url: name } as const)
+        : ({ registered: true, name, bank } as const);
+      effect = new ReverbEffect(this, { mix: parsedMix, src });
+    }
+
+    return effect;
   }
 
   // lfo(minValue: number, maxValue: number, speed: number) {

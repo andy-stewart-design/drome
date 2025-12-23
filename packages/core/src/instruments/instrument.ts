@@ -1,30 +1,16 @@
-// TODO: Do I need to/can I calculate envTimes when I calculate note data (in beforePlay method)?
-
 import AutomatableEffect from "@/abstracts/effect-automatable";
-import BitcrusherEffect from "@/effects/effect-bitcrusher";
-import DelayEffect from "@/effects/effect-delay";
-import DistortionEffect from "@/effects/effect-distortion";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
 import DromeArrayNullable from "@/array/drome-array-nullable";
-import DromeFilter from "@/effects/effect-filter";
-import GainEffect from "@/effects/effect-gain";
-import PanEffect from "@/effects/effect-pan";
-import ReverbEffect from "@/effects/effect-reverb";
 import SynthesizerNode from "@/audio-nodes/synthesizer-node";
 import SampleNode from "@/audio-nodes/sample-node";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
-import {
-  parsePatternInput,
-  parseParamInput,
-  parsePatternString,
-} from "../utils/parse-pattern";
+import { parsePatternString } from "../utils/parse-pattern";
 import { isNullish, isNumber, isString } from "../utils/validators";
 import type Drome from "../index";
 import type {
   AdsrMode,
   AdsrEnvelope,
-  DistortionAlgorithm,
   InstrumentType,
   Note,
   NSE,
@@ -66,6 +52,7 @@ abstract class Instrument<T> {
   dt: (input: number | Envelope | string) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
+  fx: (...nodes: DromeAudioNode[]) => this;
   rev: () => this;
   seq: (steps: number, ...pulses: (number | number[])[]) => this;
   fil: (
@@ -90,6 +77,7 @@ abstract class Instrument<T> {
     this.amp = this.amplitude.bind(this);
     this.dt = this.detune.bind(this);
     this.env = this.adsr.bind(this);
+    this.fx = this.effects.bind(this);
     this.envMode = this.adsrMode.bind(this);
     this.rev = this.reverse.bind(this);
     this.seq = this.sequence.bind(this);
@@ -319,115 +307,8 @@ abstract class Instrument<T> {
     return this;
   }
 
-  gain(input: NSE) {
-    this._signalChain.add(
-      new GainEffect(this.ctx, { gain: parseParamInput(input) })
-    );
-
-    return this;
-  }
-
-  bpf(input: NSE, q?: number) {
-    this._signalChain.add(
-      new DromeFilter(this.ctx, {
-        type: "bandpass",
-        frequency: parseParamInput(input),
-        q,
-      })
-    );
-
-    return this;
-  }
-
-  hpf(input: NSE, q?: number) {
-    this._signalChain.add(
-      new DromeFilter(this.ctx, {
-        type: "highpass",
-        frequency: parseParamInput(input),
-        q,
-      })
-    );
-
-    return this;
-  }
-
-  lpf(input: NSE, q?: number) {
-    this._signalChain.add(
-      new DromeFilter(this.ctx, {
-        type: "lowpass",
-        frequency: parseParamInput(input),
-        q,
-      })
-    );
-
-    return this;
-  }
-
-  pan(input: NSE) {
-    this._signalChain.add(
-      new PanEffect(this.ctx, {
-        pan: parseParamInput(input),
-      })
-    );
-
-    return this;
-  }
-
-  // b either represents decay/room size or a url/sample name
-  // c either represents the lpf start value or a sample bank name
-  // d is the lpf end value
-  reverb(a: NSE, b?: number, c?: number, d?: number): this;
-  reverb(a: NSE, b?: string, c?: string): this;
-  reverb(mix: NSE, b: unknown = 1, c: unknown = 1600, d?: number) {
-    let effect: ReverbEffect;
-    const parsedMix = parseParamInput(mix);
-
-    if (typeof b === "number" && typeof c === "number") {
-      const lpfEnd = d || 1000;
-      const opts = { mix: parsedMix, decay: b, lpfStart: c, lpfEnd };
-      effect = new ReverbEffect(this._drome, opts);
-    } else {
-      const name = isString(b) ? b : "echo";
-      const bank = isString(c) ? c : "fx";
-      const src = name.startsWith("https")
-        ? ({ registered: false, url: name } as const)
-        : ({ registered: true, name, bank } as const);
-      effect = new ReverbEffect(this._drome, { mix: parsedMix, src });
-    }
-
-    this._signalChain.add(effect);
-    return this;
-  }
-
-  delay(_delayTime: number | string, feedback: number) {
-    this._signalChain.add(
-      new DelayEffect(this._drome, {
-        delayTime: parsePatternInput(_delayTime),
-        feedback,
-      })
-    );
-
-    return this;
-  }
-
-  distort(amount: NSE, postgain?: number, type?: DistortionAlgorithm) {
-    this._signalChain.add(
-      new DistortionEffect(this.ctx, {
-        distortion: parseParamInput(amount),
-        postgain,
-        type,
-      })
-    );
-    return this;
-  }
-
-  crush(_bitDepth: NSE, rateReduction = 1) {
-    this._signalChain.add(
-      new BitcrusherEffect(this.ctx, {
-        bitDepth: parseParamInput(_bitDepth),
-        rateReduction,
-      })
-    );
+  effects(...nodes: DromeAudioNode[]) {
+    nodes.forEach((node) => this._signalChain.add(node));
     return this;
   }
 
@@ -481,6 +362,9 @@ abstract class Instrument<T> {
   cleanup() {
     this._audioNodes.forEach((node) => node.disconnect());
     this._audioNodes.clear();
+    this._signalChain.forEach((node) => node.disconnect());
+    this._signalChain.clear();
+    this._connectorNode.disconnect();
     this._connected = false;
   }
 
