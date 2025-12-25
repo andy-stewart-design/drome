@@ -8,8 +8,86 @@
   </head>
   <body>
     <div id="app">
-      <button id="start">Start</button>
-      <button id="stop">Stop</button>
+      <div class="container">
+        <h1>LFO Worklet Demo</h1>
+        <p class="subtitle">Web Audio API AudioWorklet Implementation</p>
+
+        <div class="control-group">
+          <label>
+            BPM
+            <span class="value-display" id="bpmValue">120</span>
+          </label>
+          <input
+            type="number"
+            id="bpm"
+            value="120"
+            min="20"
+            max="300"
+            step="1"
+          />
+        </div>
+
+        <div class="control-group">
+          <label>
+            Rate (beats)
+            <span class="value-display" id="rateValue">1/4</span>
+          </label>
+          <input type="range" id="rate" value="2" min="0" max="7" step="1" />
+        </div>
+
+        <div class="control-group">
+          <label>
+            Phase Offset (degrees)
+            <span class="value-display" id="phaseValue">0</span>
+          </label>
+          <input
+            type="range"
+            id="phase"
+            value="0"
+            min="0"
+            max="1"
+            step="0.01"
+          />
+        </div>
+
+        <div class="control-group">
+          <label>
+            Base Value
+            <span class="value-display" id="baseValue">0.50</span>
+          </label>
+          <input
+            type="range"
+            id="base"
+            value="0.5"
+            min="0"
+            max="1"
+            step="0.01"
+          />
+        </div>
+
+        <div class="control-group">
+          <label>
+            Modulation Amount
+            <span class="value-display" id="amountValue">0.50</span>
+          </label>
+          <input
+            type="range"
+            id="amount"
+            value="0.5"
+            min="0"
+            max="1"
+            step="0.01"
+          />
+        </div>
+
+        <button id="startBtn">Start Audio</button>
+        <button id="stopBtn">Stop Audio</button>
+        <button id="resetBtn">Reset Phase</button>
+
+        <div class="status" id="status">
+          Click "Start Audio Context" to begin
+        </div>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

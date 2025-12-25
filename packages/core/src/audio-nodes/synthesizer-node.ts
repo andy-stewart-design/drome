@@ -22,11 +22,15 @@ type SynthesizerNodeMessage =
   | {
       type: "filterType";
       filterType: FilterType;
+    }
+  | {
+      type: "oscillatorType";
+      oscillatorType: SynthesizerWaveform;
     };
 
 class SynthesizerNode extends AudioWorkletNode {
   private _filterType: FilterType;
-  readonly type: AudioParam;
+  private _oscillatorType: SynthesizerWaveform;
   readonly frequency: AudioParam;
   readonly detune: AudioParam;
   readonly gain: AudioParam;
@@ -42,11 +46,11 @@ class SynthesizerNode extends AudioWorkletNode {
       numberOfOutputs: 1,
       outputChannelCount: [2],
       parameterData: { ...params, type: getOscillatorType(type) },
-      processorOptions: { filterType },
+      processorOptions: { filterType, type },
     });
 
+    this._oscillatorType = type;
     this._filterType = filterType;
-    this.type = getParam(this, "type");
     this.frequency = getParam(this, "frequency");
     this.detune = getParam(this, "detune");
     this.gain = getParam(this, "gain");
@@ -79,9 +83,9 @@ class SynthesizerNode extends AudioWorkletNode {
     this.postMessage({ type: "stop", time: stopTime });
   }
 
-  setOscillatorType(type: SynthesizerWaveform | number) {
-    const typeMap = { sine: 0, sawtooth: 1, triangle: 2, square: 3 };
-    this.type.value = getOscillatorType(type);
+  setOscillatorType(oscillatorType: SynthesizerWaveform) {
+    this._oscillatorType = oscillatorType;
+    this.postMessage({ type: "oscillatorType", oscillatorType });
   }
 
   setFilterType(filterType: FilterType) {
@@ -90,13 +94,12 @@ class SynthesizerNode extends AudioWorkletNode {
   }
 
   get oscillatorType() {
-    return this.type.value;
+    return this._oscillatorType;
   }
 
-  set oscillatorType(type: SynthesizerWaveform | number) {
-    const typeMap = { sine: 0, sawtooth: 1, triangle: 2, square: 3 };
-    this.type.value =
-      typeof type === "number" ? Math.min(Math.max(type, 0), 3) : typeMap[type];
+  set oscillatorType(oscillatorType: SynthesizerWaveform) {
+    this._oscillatorType = oscillatorType;
+    this.postMessage({ type: "oscillatorType", oscillatorType });
   }
 
   get filterType() {
