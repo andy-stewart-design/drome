@@ -82,7 +82,8 @@ input[type="range"]::-moz-range-thumb {
   border: none;
 }
 
-input[type="number"] {
+input[type="number"],
+select {
   width: 100%;
   padding: 10px;
   background: rgba(255, 255, 255, 0.05);

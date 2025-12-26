@@ -1,14 +1,18 @@
 // TODO: start/stop commands (return false), generally make more consistent with oscillator
-// TODO: more waveforms
 // TODO: wrapper audio node
 
-const isNumber = (v: unknown) => typeof v === "number";
+interface LfoProcessorOptions {
+  type: keyof typeof oscillators;
+}
+
+interface LfoOptions {
+  processorOptions: Partial<LfoProcessorOptions>;
+}
 
 const parameterDescriptors = [
   { name: "frequency", defaultValue: 2, minValue: 0.01, maxValue: 100 },
   { name: "phaseOffset", defaultValue: 0, minValue: 0, maxValue: 1 },
-  { name: "baseValue", defaultValue: 0.5, minValue: 0, maxValue: 1 },
-  { name: "amount", defaultValue: 0.5, minValue: 0, maxValue: 1 },
+  { name: "scale", defaultValue: 0, minValue: 0, maxValue: 20000 },
 ];
 
 const oscillators = {
@@ -19,17 +23,23 @@ const oscillators = {
 };
 
 class LFOProcessor extends AudioWorkletProcessor {
+  private type: keyof typeof oscillators;
   private phase: number;
 
   static get parameterDescriptors() {
     return parameterDescriptors;
   }
 
-  constructor() {
+  constructor({ processorOptions }: LfoOptions) {
     super();
     this.phase = 0;
+    this.type = processorOptions.type ?? "sine";
     this.port.onmessage = (e) => {
-      if (e.data.type === "reset") this.phase = 0;
+      if (e.data.type === "reset") {
+        this.phase = 0;
+      } else if (e.data.type === "oscillatorType") {
+        this.type = e.data.oscillatorType;
+      }
     };
   }
 
@@ -41,40 +51,28 @@ class LFOProcessor extends AudioWorkletProcessor {
     const output = outputs[0];
     const frequencyArray = parameters.frequency;
     const offsetArray = parameters.phaseOffset;
-    const baseValue = parameters.baseValue;
-    const amount = parameters.amount;
+    const scale = parameters.scale;
     const blocksize = output?.[0]?.length ?? 0;
 
-    if (!output || !frequencyArray || !offsetArray || !baseValue || !amount) {
+    if (!output || !frequencyArray || !offsetArray || !scale) {
       return true;
     }
 
     for (let i = 0; i < blocksize; i++) {
       const currentFreq = frequencyArray?.[i] ?? frequencyArray?.[0] ?? 440;
       const currentPhaseOffset = offsetArray?.[i] ?? offsetArray?.[0] ?? 0;
-      const currentBase = baseValue.length > 1 ? baseValue[i] : baseValue[0];
-      const currentAmount = amount.length > 1 ? amount[i] : amount[0];
-
-      if (
-        !isNumber(currentFreq) ||
-        !isNumber(currentPhaseOffset) ||
-        !isNumber(currentBase) ||
-        !isNumber(currentAmount)
-      ) {
-        return true;
-      }
+      const currentScale = scale?.[i] ?? scale?.[0] ?? 0;
 
       // Calculate sine wave with phase offset
-      const sineValue = oscillators["square"](
+      const sineValue = oscillators[this.type](
         (this.phase + currentPhaseOffset) % 1.0
       );
 
       for (const channel of output) {
-        channel[i] = currentBase + sineValue * currentAmount;
+        channel[i] = sineValue * currentScale;
       }
 
-      const baseFrequency = frequencyArray?.[i] ?? frequencyArray?.[0] ?? 440;
-      const phaseIncrement = baseFrequency / sampleRate;
+      const phaseIncrement = currentFreq / sampleRate;
 
       this.phase += phaseIncrement;
       if (this.phase >= 1.0) this.phase -= 1.0;
