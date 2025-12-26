@@ -1,6 +1,5 @@
-// TODO: wrapper audio node
-
 import { isNumber } from "@/utils/validators";
+import type { LfoNodeMessage } from "@/automation/lfo-node";
 
 interface LfoProcessorOptions {
   type: keyof typeof oscillators;
@@ -11,11 +10,15 @@ interface LfoOptions {
   processorOptions: Partial<LfoProcessorOptions>;
 }
 
+type LfoParameter = (typeof parameterDescriptors)[number]["name"];
+type LfoParameterData = Record<LfoParameter, number>;
+type LfoProcessorMessage = { type: "ended"; time: number };
+
 const parameterDescriptors = [
   { name: "frequency", defaultValue: 2, minValue: 0.01, maxValue: 100 },
   { name: "phaseOffset", defaultValue: 0, minValue: 0, maxValue: 1 },
   { name: "scale", defaultValue: 0, minValue: 0, maxValue: 20000 },
-];
+] as const;
 
 const oscillators = {
   sine: (p: number) => Math.sin(2.0 * Math.PI * p),
@@ -39,7 +42,7 @@ class LFOProcessor extends AudioWorkletProcessor {
     super();
     this.phase = processorOptions.phaseOffset ?? 0.0;
     this.type = processorOptions.type ?? "sine";
-    this.port.onmessage = ({ data }: MessageEvent) => {
+    this.port.onmessage = ({ data }: MessageEvent<LfoNodeMessage>) => {
       switch (data.type) {
         case "start":
           this.scheduledStartTime = data.time || currentTime;
@@ -49,7 +52,7 @@ class LFOProcessor extends AudioWorkletProcessor {
           this.scheduledStopTime = data.time || currentTime;
           break;
         case "reset":
-          this.phase = 0;
+          this.phase = 0.0;
           break;
         case "oscillatorType":
           this.type = data.oscillatorType;
@@ -124,3 +127,10 @@ class LFOProcessor extends AudioWorkletProcessor {
 }
 
 registerProcessor("lfo-processor", LFOProcessor);
+
+export type {
+  LfoParameter,
+  LfoParameterData,
+  LfoProcessorOptions,
+  LfoProcessorMessage,
+};

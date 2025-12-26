@@ -7,17 +7,13 @@ interface SynthesizerProcessorOptions {
   filterType: FilterType;
 }
 
-type SynthesizerParameter = (typeof parameterDescriptors)[number]["name"];
-type SynthesizerParameterData = Record<SynthesizerParameter, number>;
-
 interface SynthesizerOptions {
   processorOptions: Partial<SynthesizerProcessorOptions>;
 }
 
-type SynthesizerProcessorMessage = {
-  type: "ended";
-  time: number;
-};
+type SynthesizerParameter = (typeof parameterDescriptors)[number]["name"];
+type SynthesizerParameterData = Record<SynthesizerParameter, number>;
+type SynthesizerProcessorMessage = { type: "ended"; time: number };
 
 type Waveform = keyof typeof oscillators;
 

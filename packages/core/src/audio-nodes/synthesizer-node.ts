@@ -6,12 +6,10 @@ import type {
   SynthesizerProcessorMessage,
 } from "@/worklets/worklet-synthesizer";
 
-type SynthesizerWaveform = "sine" | "sawtooth" | "triangle" | "square";
-type SynthesizerParamSubset = Omit<SynthesizerParameterData, "type">;
+type Waveform = "sine" | "sawtooth" | "triangle" | "square";
 
 type SynthesizerOptions = Partial<
-  SynthesizerProcessorOptions &
-    SynthesizerParamSubset & { type: SynthesizerWaveform | number }
+  SynthesizerProcessorOptions & SynthesizerParameterData
 >;
 type SynthesizerNodeMessage =
   | {
@@ -25,12 +23,12 @@ type SynthesizerNodeMessage =
     }
   | {
       type: "oscillatorType";
-      oscillatorType: SynthesizerWaveform;
+      oscillatorType: Waveform;
     };
 
 class SynthesizerNode extends AudioWorkletNode {
   private _filterType: FilterType;
-  private _oscillatorType: SynthesizerWaveform;
+  private _oscillatorType: Waveform;
   readonly frequency: AudioParam;
   readonly detune: AudioParam;
   readonly gain: AudioParam;
@@ -83,7 +81,7 @@ class SynthesizerNode extends AudioWorkletNode {
     this.postMessage({ type: "stop", time: stopTime });
   }
 
-  setOscillatorType(oscillatorType: SynthesizerWaveform) {
+  setOscillatorType(oscillatorType: Waveform) {
     this._oscillatorType = oscillatorType;
     this.postMessage({ type: "oscillatorType", oscillatorType });
   }
@@ -97,7 +95,7 @@ class SynthesizerNode extends AudioWorkletNode {
     return this._oscillatorType;
   }
 
-  set oscillatorType(oscillatorType: SynthesizerWaveform) {
+  set oscillatorType(oscillatorType: Waveform) {
     this._oscillatorType = oscillatorType;
     this.postMessage({ type: "oscillatorType", oscillatorType });
   }
@@ -112,17 +110,17 @@ class SynthesizerNode extends AudioWorkletNode {
   }
 }
 
+export default SynthesizerNode;
+
+export type { SynthesizerNodeMessage };
+
 function getParam(node: AudioWorkletNode, name: string) {
   const param = node.parameters.get(name);
   if (!param) throw new Error(`Missing AudioParam "${name}"`);
   return param;
 }
 
-export default SynthesizerNode;
-
-export type { SynthesizerNodeMessage };
-
-function getOscillatorType(type: SynthesizerWaveform | number) {
+function getOscillatorType(type: Waveform | number) {
   const typeMap = { sine: 0, sawtooth: 1, triangle: 2, square: 3 };
   return typeof type === "number"
     ? Math.min(Math.max(type, 0), 3)

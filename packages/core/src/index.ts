@@ -21,6 +21,7 @@ import type { DistortionAlgorithm, NSE } from "@/types";
 import { filterTypeMap, type FilterTypeAlias } from "./constants/index";
 import ReverbEffect from "./effects/effect-reverb";
 import { isString } from "./utils/validators";
+import LfoNode from "./automation/lfo-node";
 
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
@@ -187,6 +188,10 @@ class Drome {
 
   env(maxValue: number, startValue = 0, endValue?: number) {
     return new Envelope(maxValue, startValue, endValue);
+  }
+
+  lfo(type: "sawtooth" | "sine" | "square" | "triangle") {
+    return new LfoNode(this.ctx, { type });
   }
 
   crush(_bitDepth: NSE, rateReduction = 1) {

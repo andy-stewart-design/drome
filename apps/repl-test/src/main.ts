@@ -3,8 +3,8 @@ import "./style.css";
 
 const d = await Drome.init(120);
 
-let lfoNode: AudioWorkletNode | undefined | null;
 let oscillator: OscillatorNode | undefined | null;
+let lfoNode: ReturnType<typeof d.lfo> | undefined | null;
 
 const rateValues = [4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125];
 const rateLabels = ["1/64", "1/32", "1/16", "1/8", "1/4", "1/2", "1", "2"];
@@ -30,11 +30,9 @@ const amountValue = document.getElementById("amountValue");
 async function initAudio() {
   if (!startBtn || !status) return;
   try {
-    // Create LFO node
-    const processorOptions = oscTypeSelect ? { type: oscTypeSelect.value } : {};
-    lfoNode = new AudioWorkletNode(d.ctx, "lfo-processor", {
-      processorOptions,
-    });
+    lfoNode = d.lfo(
+      oscTypeSelect?.value as "sawtooth" | "sine" | "square" | "triangle"
+    );
 
     // Create oscillator to modulate
     oscillator = d.ctx.createOscillator();
@@ -42,9 +40,9 @@ async function initAudio() {
 
     // Connect: LFO -> Oscillator Frequency
     lfoNode.connect(oscillator.frequency);
+    lfoNode.start();
     oscillator.connect(d.ctx.destination);
     oscillator.start();
-    lfoNode.port.postMessage({ type: "start" });
 
     // Update initial parameters
     updateFrequency();
@@ -67,7 +65,7 @@ function stopAudio() {
   oscillator?.stop();
   oscillator?.disconnect();
   oscillator = null;
-  lfoNode?.port.postMessage({ type: "stop" });
+  lfoNode?.stop();
   lfoNode?.disconnect();
   lfoNode = null;
   startBtn.textContent = "Start Audio";
@@ -81,26 +79,23 @@ function updateFrequency() {
   const beatDuration = 60 / bpm;
   const frequency = 1 / (beatDuration * rateValues[rateIndex]);
 
-  const frequencyParam = lfoNode.parameters.get("frequency");
-  if (frequencyParam) frequencyParam.value = frequency;
+  lfoNode.frequency.value = frequency;
 }
 
 function updatePhase() {
   if (!lfoNode || !phaseSlider) return;
-  const phaseParam = lfoNode.parameters.get("phaseOffset");
-  if (phaseParam) phaseParam.value = parseFloat(phaseSlider.value);
+  lfoNode.phaseOffset.value = parseFloat(phaseSlider.value);
 }
 
 function updateAmount() {
   if (!lfoNode || !amountSlider) return;
 
-  const amountParam = lfoNode.parameters.get("scale");
-  if (amountParam) amountParam.value = parseFloat(amountSlider.value);
+  lfoNode.scale.value = parseFloat(amountSlider.value);
 }
 
 function resetPhase() {
   if (!lfoNode) return;
-  lfoNode.port.postMessage({ type: "reset" });
+  lfoNode.reset();
 }
 
 // Event listeners
@@ -109,10 +104,9 @@ stopBtn?.addEventListener("click", stopAudio);
 resetBtn?.addEventListener("click", resetPhase);
 
 oscTypeSelect?.addEventListener("change", () => {
-  lfoNode?.port.postMessage({
-    type: "oscillatorType",
-    oscillatorType: oscTypeSelect.value,
-  });
+  lfoNode?.setOscillatorType(
+    oscTypeSelect.value as "sawtooth" | "sine" | "square" | "triangle"
+  );
 });
 
 bpmInput?.addEventListener("input", (e) => {
