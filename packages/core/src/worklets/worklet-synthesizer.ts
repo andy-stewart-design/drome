@@ -1,6 +1,6 @@
 import type { SynthesizerNodeMessage } from "@/audio-nodes/synthesizer-node";
 import FilterProcessor, { type FilterType } from "./worklet-filter";
-import { isNullish } from "@/utils/validators";
+import { isNumber } from "@/utils/validators";
 
 interface SynthesizerProcessorOptions {
   type: Waveform;
@@ -77,7 +77,7 @@ class SynthesizerProcessor extends FilterProcessor {
     return parameterDescriptors;
   }
 
-  constructor({ processorOptions }: SynthesizerOptions) {
+  constructor({ processorOptions = {} }: SynthesizerOptions) {
     super();
     this.updateFilterCoefficients(20000.0, 0.707);
     this.type = processorOptions.type ?? "sine";
@@ -123,11 +123,13 @@ class SynthesizerProcessor extends FilterProcessor {
     const filterFreq = filterFrequencyArray?.[0];
     const filterQ = filterQArray?.[0];
 
-    if (!output || isNullish(filterFreq) || isNullish(filterQ)) {
+    if (!output || !isNumber(filterFreq) || !isNumber(filterQ)) {
       return true;
     }
 
     const blocksize = output?.[0]?.length ?? 0;
+    const startTime = this.scheduledStartTime;
+    const stopTime = this.scheduledStopTime;
     const safeFreq = Math.max(20, Math.min(filterFreq, sampleRate * 0.45));
     const safeQ = Math.max(0.001, filterQ);
     this.updateFilterCoefficients(safeFreq, safeQ);
@@ -135,20 +137,12 @@ class SynthesizerProcessor extends FilterProcessor {
     for (let i = 0; i < blocksize; i++) {
       const sampleTime = currentTime + i / sampleRate;
 
-      if (
-        !isNullish(this.scheduledStartTime) &&
-        sampleTime >= this.scheduledStartTime &&
-        !this.started
-      ) {
+      if (isNumber(startTime) && sampleTime >= startTime && !this.started) {
         this.started = true;
         this.scheduledStartTime = null;
       }
 
-      if (
-        !isNullish(this.scheduledStopTime) &&
-        sampleTime >= this.scheduledStopTime &&
-        this.started
-      ) {
+      if (isNumber(stopTime) && sampleTime >= stopTime && this.started) {
         this.started = false;
         this.scheduledStopTime = null;
         this.postEndedMessage(currentTime);
@@ -156,16 +150,13 @@ class SynthesizerProcessor extends FilterProcessor {
       }
 
       if (!this.started) {
-        for (let channel = 0; channel < output.length; channel++) {
-          const target = output[channel];
-          if (target) target[i] = 0.0;
+        for (const [j, channel] of output.entries()) {
+          channel[i] = 0.0; // output silence
         }
         continue;
       }
 
       const gain = gainArray?.[i] ?? gainArray?.[0] ?? 1;
-
-      // Generate Sawtooth Waveform and apply gain
       const sample = oscillators[this.type](this.phase) * gain;
 
       for (const [j, channel] of output.entries()) {

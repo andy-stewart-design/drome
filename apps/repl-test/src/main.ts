@@ -44,6 +44,7 @@ async function initAudio() {
     lfoNode.connect(oscillator.frequency);
     oscillator.connect(d.ctx.destination);
     oscillator.start();
+    lfoNode.port.postMessage({ type: "start" });
 
     // Update initial parameters
     updateFrequency();
@@ -64,10 +65,11 @@ function stopAudio() {
   if (!startBtn || !oscillator) return;
 
   oscillator?.stop();
-  lfoNode?.disconnect();
   oscillator?.disconnect();
-  lfoNode = null;
   oscillator = null;
+  lfoNode?.port.postMessage({ type: "stop" });
+  lfoNode?.disconnect();
+  lfoNode = null;
   startBtn.textContent = "Start Audio";
   startBtn.disabled = false;
 }
