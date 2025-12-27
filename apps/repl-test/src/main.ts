@@ -6,7 +6,6 @@ const d = await Drome.init(120);
 let oscillator: OscillatorNode | undefined | null;
 let lfoNode: ReturnType<typeof d.lfo> | undefined | null;
 
-const rateValues = [4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125];
 const rateLabels = ["1/64", "1/32", "1/16", "1/8", "1/4", "1/2", "1", "2"];
 
 // UI Elements
@@ -78,9 +77,12 @@ function stopAudio() {
 function updateFrequency() {
   if (!lfoNode || !bpmInput || !rateSlider) return;
   const bpm = parseFloat(bpmInput.value);
-  const rateIndex = parseInt(rateSlider.value);
-  const beatDuration = 60 / bpm;
-  const frequency = 1 / (beatDuration * rateValues[rateIndex]);
+  const beatsPerBar = 4;
+  const beatsPerSecond = bpm / 60;
+  const rate = Math.max(parseInt(rateSlider.value), 0.1);
+  const cyclesPerBeat = rate / beatsPerBar;
+  // const beatDuration = 60 / bpm;
+  const frequency = beatsPerSecond * cyclesPerBeat;
 
   lfoNode.frequency.value = frequency;
 }
@@ -124,8 +126,7 @@ bpmInput?.addEventListener("input", (e) => {
 
 rateSlider?.addEventListener("input", (e) => {
   if (!rateValue || !(e.target instanceof HTMLInputElement)) return;
-  const index = parseInt(e.target.value);
-  rateValue.textContent = rateLabels[index];
+  rateValue.textContent = e.target.value;
   updateFrequency();
 });
 
@@ -140,8 +141,3 @@ amountSlider?.addEventListener("input", (e) => {
   amountValue.textContent = parseFloat(e.target.value).toFixed(2);
   updateAmount();
 });
-
-// Initialize displays
-if (rateValue && rateSlider) {
-  rateValue.textContent = rateLabels[parseInt(rateSlider.value)];
-}

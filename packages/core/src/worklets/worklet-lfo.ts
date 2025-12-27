@@ -62,7 +62,7 @@ class LFOProcessor extends AudioWorkletProcessor {
       switch (data.type) {
         case "start":
           this.scheduledStartTime = data.time || currentTime;
-          //   this.phase = 0.0;
+          this.phase = 0.0;
           break;
         case "stop":
           this.scheduledStopTime = data.time || currentTime;
