@@ -19,6 +19,9 @@ const parameterDescriptors = [
   { name: "frequency", defaultValue: 2, minValue: 0.01, maxValue: 100 },
   { name: "phaseOffset", defaultValue: 0, minValue: 0, maxValue: 1 },
   { name: "scale", defaultValue: 0, minValue: 0, maxValue: 20000 },
+  { name: "beatsPerMinute", defaultValue: 120, minValue: 20, maxValue: 20000 },
+  { name: "beatsPerBar", defaultValue: 4, minValue: 1, maxValue: 8 },
+  { name: "rate", defaultValue: 1, minValue: 0, maxValue: 20000 },
 ] as const;
 
 // const polyBlep = (p: number, dt: number) => {
@@ -91,13 +94,13 @@ class LFOProcessor extends AudioWorkletProcessor {
     parameters: Record<string, Float32Array>
   ) {
     const output = outputs[0];
-    const frequencyArray = parameters.frequency;
+    const bpmArray = parameters.beatsPerMinute;
+    const bpbArray = parameters.beatsPerBar;
+    const rateArray = parameters.rate;
     const offsetArray = parameters.phaseOffset;
     const scaleArray = parameters.scale;
 
-    if (!output || !frequencyArray || !offsetArray || !scaleArray) {
-      return true;
-    }
+    if (!output) return true;
 
     const blocksize = output?.[0]?.length ?? 0;
     const startTime = this.scheduledStartTime;
@@ -123,7 +126,10 @@ class LFOProcessor extends AudioWorkletProcessor {
         continue;
       }
 
-      const frequency = frequencyArray?.[i] ?? frequencyArray?.[0] ?? 440;
+      const bpm = bpmArray?.[i] ?? bpmArray?.[0] ?? 120;
+      const beatsPerBar = Math.round(bpbArray?.[i] ?? bpbArray?.[0] ?? 4);
+      const rate = Math.max(rateArray?.[i] ?? rateArray?.[0] ?? 1, 0.01);
+      const frequency = (bpm / 60) * (rate / beatsPerBar); // beatsPerSecond x cyclesPerBeat
       const phaseOffset = offsetArray?.[i] ?? offsetArray?.[0] ?? 0;
       const scale = scaleArray?.[i] ?? scaleArray?.[0] ?? 0;
 

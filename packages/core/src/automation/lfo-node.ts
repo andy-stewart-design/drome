@@ -8,6 +8,7 @@ import type {
 type Waveform = "sine" | "sawtooth" | "triangle" | "square";
 
 type LfoOptions = Partial<LfoProcessorOptions & LfoParameterData>;
+type LfoParams = keyof LfoParameterData;
 type LfoNodeMessage =
   | {
       type: "start" | "stop";
@@ -30,6 +31,9 @@ class LfoNode extends AudioWorkletNode {
   private _oscillatorType: Waveform;
   private _started = false;
   private _normalize: boolean;
+  readonly bpm: AudioParam;
+  readonly beatsPerBar: AudioParam;
+  readonly rate: AudioParam;
   readonly frequency: AudioParam;
   readonly scale: AudioParam;
   readonly phaseOffset: AudioParam;
@@ -48,9 +52,12 @@ class LfoNode extends AudioWorkletNode {
 
     this._oscillatorType = type;
     this._normalize = normalize;
-    this.frequency = getParam(this, "frequency");
-    this.phaseOffset = getParam(this, "phaseOffset");
-    this.scale = getParam(this, "scale");
+    this.bpm = getParam<LfoParams>(this, "beatsPerMinute");
+    this.beatsPerBar = getParam<LfoParams>(this, "beatsPerBar");
+    this.rate = getParam<LfoParams>(this, "rate");
+    this.frequency = getParam<LfoParams>(this, "frequency");
+    this.phaseOffset = getParam<LfoParams>(this, "phaseOffset");
+    this.scale = getParam<LfoParams>(this, "scale");
 
     // Listen for messages from the processor
     this.port.onmessage = (event: MessageEvent<LfoProcessorMessage>) => {
@@ -112,7 +119,7 @@ class LfoNode extends AudioWorkletNode {
 export default LfoNode;
 export { type LfoNodeMessage };
 
-function getParam(node: AudioWorkletNode, name: string) {
+function getParam<T extends string & {}>(node: AudioWorkletNode, name: T) {
   const param = node.parameters.get(name);
   if (!param) throw new Error(`Missing AudioParam "${name}"`);
   return param;

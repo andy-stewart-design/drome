@@ -6,8 +6,6 @@ const d = await Drome.init(120);
 let oscillator: OscillatorNode | undefined | null;
 let lfoNode: ReturnType<typeof d.lfo> | undefined | null;
 
-const rateLabels = ["1/64", "1/32", "1/16", "1/8", "1/4", "1/2", "1", "2"];
-
 // UI Elements
 const startBtn = document.querySelector<HTMLButtonElement>("#startBtn");
 const stopBtn = document.querySelector<HTMLButtonElement>("#stopBtn");
@@ -76,15 +74,8 @@ function stopAudio() {
 
 function updateFrequency() {
   if (!lfoNode || !bpmInput || !rateSlider) return;
-  const bpm = parseFloat(bpmInput.value);
-  const beatsPerBar = 4;
-  const beatsPerSecond = bpm / 60;
-  const rate = Math.max(parseInt(rateSlider.value), 0.1);
-  const cyclesPerBeat = rate / beatsPerBar;
-  // const beatDuration = 60 / bpm;
-  const frequency = beatsPerSecond * cyclesPerBeat;
-
-  lfoNode.frequency.value = frequency;
+  lfoNode.bpm.value = parseFloat(bpmInput.value);
+  lfoNode.rate.value = parseInt(rateSlider.value);
 }
 
 function updatePhase() {
