@@ -64,8 +64,10 @@ class LFOProcessor extends AudioWorkletProcessor {
     this.port.onmessage = ({ data }: MessageEvent<LfoNodeMessage>) => {
       switch (data.type) {
         case "start":
-          this.scheduledStartTime = data.time || currentTime;
-          this.phase = 0.0;
+          if (!this.started) {
+            this.scheduledStartTime = data.time || currentTime;
+            this.phase = 0.0;
+          }
           break;
         case "stop":
           this.scheduledStopTime = data.time || currentTime;

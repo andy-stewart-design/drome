@@ -31,13 +31,14 @@ class LfoNode extends AudioWorkletNode {
   private _oscillatorType: Waveform;
   private _started = false;
   private _normalize: boolean;
-  readonly bpm: AudioParam;
-  readonly beatsPerBar: AudioParam;
-  readonly rate: AudioParam;
-  readonly frequency: AudioParam;
-  readonly scale: AudioParam;
-  readonly phaseOffset: AudioParam;
+  readonly bpmParam: AudioParam;
+  readonly bpbParam: AudioParam;
+  readonly rateParam: AudioParam;
+  readonly frequencyParam: AudioParam;
+  readonly scaleParam: AudioParam;
+  readonly phaseOffsetParam: AudioParam;
   onended: ((e: AudioEndedEvent) => void) | null = null;
+  norm: (normalize: boolean) => this;
 
   constructor(
     ctx: AudioContext,
@@ -52,12 +53,13 @@ class LfoNode extends AudioWorkletNode {
 
     this._oscillatorType = type;
     this._normalize = normalize;
-    this.bpm = getParam<LfoParams>(this, "beatsPerMinute");
-    this.beatsPerBar = getParam<LfoParams>(this, "beatsPerBar");
-    this.rate = getParam<LfoParams>(this, "rate");
-    this.frequency = getParam<LfoParams>(this, "frequency");
-    this.phaseOffset = getParam<LfoParams>(this, "phaseOffset");
-    this.scale = getParam<LfoParams>(this, "scale");
+    this.bpmParam = getParam<LfoParams>(this, "beatsPerMinute");
+    this.bpbParam = getParam<LfoParams>(this, "beatsPerBar");
+    this.rateParam = getParam<LfoParams>(this, "rate");
+    this.frequencyParam = getParam<LfoParams>(this, "frequency");
+    this.phaseOffsetParam = getParam<LfoParams>(this, "phaseOffset");
+    this.scaleParam = getParam<LfoParams>(this, "scale");
+    this.norm = this.normalize.bind(this);
 
     // Listen for messages from the processor
     this.port.onmessage = (event: MessageEvent<LfoProcessorMessage>) => {
@@ -77,34 +79,54 @@ class LfoNode extends AudioWorkletNode {
     this._started = true;
     const time = when === 0 ? this.context.currentTime : when;
     this.postMessage({ type: "start", time });
+    return this;
   }
 
   stop(when: number = 0) {
     const time = when === 0 ? this.context.currentTime : when;
     this.postMessage({ type: "stop", time });
+    return this;
+  }
+
+  bpm(bpm: number) {
+    this.bpmParam.value = bpm;
+    return this;
+  }
+
+  rate(rate: number) {
+    this.rateParam.value = rate;
+    return this;
+  }
+
+  normalize(normalize: boolean = true) {
+    this.postMessage({ type: "normalize", normalize });
+    this._normalize = normalize;
+    return this;
+  }
+
+  offset(phaseOffset: number) {
+    this.phaseOffsetParam.value = phaseOffset;
+    return this;
   }
 
   reset() {
     this.postMessage({ type: "reset" });
+    return this;
   }
 
-  normalize(normalize: boolean) {
-    this.postMessage({ type: "normalize", normalize });
-    this._normalize = normalize;
+  scale(scale: number) {
+    this.scaleParam.value = scale;
+    return this;
   }
 
-  setOscillatorType(oscillatorType: Waveform) {
+  type(oscillatorType: Waveform) {
     this._oscillatorType = oscillatorType;
     this.postMessage({ type: "oscillatorType", oscillatorType });
+    return this;
   }
 
-  get type() {
+  get waveform() {
     return this._oscillatorType;
-  }
-
-  set type(oscillatorType: Waveform) {
-    this._oscillatorType = oscillatorType;
-    this.postMessage({ type: "oscillatorType", oscillatorType });
   }
 
   get started() {
