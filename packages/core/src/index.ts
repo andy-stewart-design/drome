@@ -190,8 +190,8 @@ class Drome {
     return new Envelope(maxValue, startValue, endValue);
   }
 
-  lfo(type: "sawtooth" | "sine" | "square" | "triangle") {
-    return new LfoNode(this.ctx, { type });
+  lfo(type: "sawtooth" | "sine" | "square" | "triangle", normalize = false) {
+    return new LfoNode(this.ctx, { type, normalize });
   }
 
   crush(_bitDepth: NSE, rateReduction = 1) {

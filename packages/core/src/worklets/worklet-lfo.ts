@@ -4,6 +4,7 @@ import type { LfoNodeMessage } from "@/automation/lfo-node";
 interface LfoProcessorOptions {
   type: keyof typeof oscillators;
   phaseOffset: number;
+  normalize: boolean;
 }
 
 interface LfoOptions {
@@ -20,19 +21,33 @@ const parameterDescriptors = [
   { name: "scale", defaultValue: 0, minValue: 0, maxValue: 20000 },
 ] as const;
 
+// const polyBlep = (p: number, dt: number) => {
+//   if (p < dt) {
+//     p /= dt;
+//     return p + p - p * p - 1.0;
+//   } else if (p > 1.0 - dt) {
+//     p = (p - 1.0) / dt;
+//     return p * p + p + p + 1.0;
+//   }
+//   return 0;
+// };
+
 const oscillators = {
   sine: (p: number) => Math.sin(2.0 * Math.PI * p),
-  sawtooth: (p: number) => 2.0 * p - 1.0,
+  sawtooth: (p: number, dt: number) => 2.0 * p - 1.0,
+  //   sawtooth: (p: number, dt: number) => 2.0 * p - 1.0 - polyBlep(p, dt),
   triangle: (p: number) => (p < 0.5 ? 4.0 * p - 1.0 : 3.0 - 4.0 * p),
+  //  square: (p: number) => Math.tanh(Math.sin(2.0 * Math.PI * p) * 15),
   square: (p: number) => (p < 0.5 ? 1.0 : -1.0),
 };
 
 class LFOProcessor extends AudioWorkletProcessor {
   private type: keyof typeof oscillators;
   private phase: number;
-  started = false;
-  scheduledStartTime: number | null = null;
-  scheduledStopTime: number | null = null;
+  private started = false;
+  private scheduledStartTime: number | null = null;
+  private scheduledStopTime: number | null = null;
+  private normalize: boolean;
 
   static get parameterDescriptors() {
     return parameterDescriptors;
@@ -40,13 +55,14 @@ class LFOProcessor extends AudioWorkletProcessor {
 
   constructor({ processorOptions = {} }: LfoOptions) {
     super();
-    this.phase = processorOptions.phaseOffset ?? 0.0;
+    this.phase = 0.0;
     this.type = processorOptions.type ?? "sine";
+    this.normalize = processorOptions.normalize ?? false;
     this.port.onmessage = ({ data }: MessageEvent<LfoNodeMessage>) => {
       switch (data.type) {
         case "start":
           this.scheduledStartTime = data.time || currentTime;
-          this.phase = 0.0;
+          //   this.phase = 0.0;
           break;
         case "stop":
           this.scheduledStopTime = data.time || currentTime;
@@ -56,6 +72,9 @@ class LFOProcessor extends AudioWorkletProcessor {
           break;
         case "oscillatorType":
           this.type = data.oscillatorType;
+          break;
+        case "normalize":
+          this.normalize = data.normalize;
           break;
       }
     };
@@ -100,9 +119,7 @@ class LFOProcessor extends AudioWorkletProcessor {
       }
 
       if (!this.started) {
-        for (const [j, channel] of output.entries()) {
-          channel[i] = 0.0; // output silence
-        }
+        for (const channel of output) channel[i] = 0.0; // output silence
         continue;
       }
 
@@ -111,10 +128,14 @@ class LFOProcessor extends AudioWorkletProcessor {
       const scale = scaleArray?.[i] ?? scaleArray?.[0] ?? 0;
 
       // Calculate sine wave with phase offset
-      const oscValue = oscillators[this.type]((this.phase + phaseOffset) % 1.0);
+      const dt = frequency / sampleRate;
+      const oscValue = oscillators[this.type](
+        (this.phase + phaseOffset) % 1.0,
+        dt
+      );
 
       for (const channel of output) {
-        channel[i] = oscValue * scale;
+        channel[i] = (this.normalize ? (oscValue + 1) / 2 : oscValue) * scale;
       }
 
       const phaseIncrement = frequency / sampleRate;

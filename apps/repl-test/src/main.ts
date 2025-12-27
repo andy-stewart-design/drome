@@ -14,6 +14,7 @@ const startBtn = document.querySelector<HTMLButtonElement>("#startBtn");
 const stopBtn = document.querySelector<HTMLButtonElement>("#stopBtn");
 const resetBtn = document.querySelector<HTMLButtonElement>("#resetBtn");
 const oscTypeSelect = document.querySelector<HTMLSelectElement>("#oscType");
+const normalizeInput = document.querySelector<HTMLInputElement>("#normalize");
 const bpmInput = document.querySelector<HTMLInputElement>("#bpm");
 const rateSlider = document.querySelector<HTMLInputElement>("#rate");
 const phaseSlider = document.querySelector<HTMLInputElement>("#phase");
@@ -30,9 +31,16 @@ const amountValue = document.getElementById("amountValue");
 async function initAudio() {
   if (!startBtn || !status) return;
   try {
+    console.log(normalizeInput?.checked);
+
     lfoNode = d.lfo(
-      oscTypeSelect?.value as "sawtooth" | "sine" | "square" | "triangle"
+      oscTypeSelect?.value as "sawtooth" | "sine" | "square" | "triangle",
+      normalizeInput?.checked
     );
+    // Update initial parameters
+    updateFrequency();
+    updatePhase();
+    updateAmount();
 
     // Create oscillator to modulate
     oscillator = d.ctx.createOscillator();
@@ -43,11 +51,6 @@ async function initAudio() {
     lfoNode.start();
     oscillator.connect(d.ctx.destination);
     oscillator.start();
-
-    // Update initial parameters
-    updateFrequency();
-    updatePhase();
-    updateAmount();
 
     startBtn.textContent = "Audio Running";
     startBtn.disabled = true;
@@ -107,6 +110,10 @@ oscTypeSelect?.addEventListener("change", () => {
   lfoNode?.setOscillatorType(
     oscTypeSelect.value as "sawtooth" | "sine" | "square" | "triangle"
   );
+});
+
+normalizeInput?.addEventListener("change", () => {
+  lfoNode?.normalize(normalizeInput.checked);
 });
 
 bpmInput?.addEventListener("input", (e) => {

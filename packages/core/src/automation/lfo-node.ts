@@ -20,11 +20,16 @@ type LfoNodeMessage =
     }
   | {
       type: "reset";
+    }
+  | {
+      type: "normalize";
+      normalize: boolean;
     };
 
 class LfoNode extends AudioWorkletNode {
   private _oscillatorType: Waveform;
   private _started = false;
+  private _normalize: boolean;
   readonly frequency: AudioParam;
   readonly scale: AudioParam;
   readonly phaseOffset: AudioParam;
@@ -32,16 +37,17 @@ class LfoNode extends AudioWorkletNode {
 
   constructor(
     ctx: AudioContext,
-    { type = "sine", ...parameterData }: LfoOptions = {}
+    { type = "sine", normalize = false, ...parameterData }: LfoOptions = {}
   ) {
     super(ctx, "lfo-processor", {
       numberOfOutputs: 1,
       outputChannelCount: [2],
       parameterData,
-      processorOptions: { type },
+      processorOptions: { type, normalize },
     });
 
     this._oscillatorType = type;
+    this._normalize = normalize;
     this.frequency = getParam(this, "frequency");
     this.phaseOffset = getParam(this, "phaseOffset");
     this.scale = getParam(this, "scale");
@@ -75,22 +81,31 @@ class LfoNode extends AudioWorkletNode {
     this.postMessage({ type: "reset" });
   }
 
+  normalize(normalize: boolean) {
+    this.postMessage({ type: "normalize", normalize });
+    this._normalize = normalize;
+  }
+
   setOscillatorType(oscillatorType: Waveform) {
     this._oscillatorType = oscillatorType;
     this.postMessage({ type: "oscillatorType", oscillatorType });
   }
 
-  get oscillatorType() {
+  get type() {
     return this._oscillatorType;
   }
 
-  set oscillatorType(oscillatorType: Waveform) {
+  set type(oscillatorType: Waveform) {
     this._oscillatorType = oscillatorType;
     this.postMessage({ type: "oscillatorType", oscillatorType });
   }
 
   get started() {
     return this._started;
+  }
+
+  get normalized() {
+    return this._normalize;
   }
 }
 
