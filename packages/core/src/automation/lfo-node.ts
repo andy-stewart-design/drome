@@ -11,16 +11,13 @@ type LfoOptions = Partial<LfoProcessorOptions & LfoParameterData>;
 type LfoParams = keyof LfoParameterData;
 type LfoNodeMessage =
   | {
-      type: "start" | "stop";
-      time: number;
+      type: "start" | "stop" | "reset";
+      time?: number;
       offset?: number;
     }
   | {
       type: "oscillatorType";
       oscillatorType: Waveform;
-    }
-  | {
-      type: "reset";
     }
   | {
       type: "normalize";
@@ -109,8 +106,9 @@ class LfoNode extends AudioWorkletNode {
     return this;
   }
 
-  reset() {
-    this.postMessage({ type: "reset" });
+  reset(when: number = 0) {
+    const time = when === 0 ? this.context.currentTime : when;
+    this.postMessage({ type: "reset", time });
     return this;
   }
 

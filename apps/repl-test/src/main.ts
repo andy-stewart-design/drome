@@ -30,10 +30,12 @@ async function initAudio() {
   try {
     // Create oscillator to modulate
     oscillator = new OscillatorNode(d.ctx, { frequency: 220 });
-    lfoNode = d.lfo(
-      oscTypeSelect?.value as "sawtooth" | "sine" | "square" | "triangle",
-      parseFloat(amountSlider?.value ?? "1")
-    );
+    lfoNode = d
+      .lfo(
+        oscTypeSelect?.value as "sawtooth" | "sine" | "square" | "triangle",
+        parseFloat(amountSlider?.value ?? "1")
+      )
+      .normalize(normalizeInput?.checked ?? false);
     // Update initial parameters
     updateFrequency();
     updatePhase();

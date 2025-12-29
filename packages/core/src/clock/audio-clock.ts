@@ -28,6 +28,7 @@ class AudioClock {
       if (this.metronome.beat === 0) {
         this.metronome.bar++;
         this._barStart = this._nextBeatStart;
+        // console.log(this.barStartTime);
         this.listeners.get("bar")?.forEach((cb) => {
           cb({ ...this.metronome }, this._barStart);
         });

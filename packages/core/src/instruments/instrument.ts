@@ -18,6 +18,7 @@ import type {
 } from "../types";
 import type { FilterType } from "@/worklets/worklet-filter";
 import { filterTypeMap, type FilterTypeAlias } from "../constants/index";
+import LfoNode from "@/automation/lfo-node";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
@@ -42,7 +43,7 @@ abstract class Instrument<T> {
   private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
   protected _gain: Envelope;
-  private _detune: Pattern | Envelope;
+  private _detune: Pattern | Envelope | LfoNode;
   protected _filter: FrequencyParams = { type: "none" };
   protected _startTime: number | undefined;
   private _connected = false;
@@ -145,6 +146,8 @@ abstract class Instrument<T> {
       this._detune.apply(node.detune, cycleIndex, chordIndex);
     } else if (this._detune instanceof Envelope) {
       this._detune.apply(node.detune, start, duration, cycleIndex, chordIndex);
+    } else {
+      this._detune.connect(node.detune);
     }
   }
 
@@ -275,8 +278,8 @@ abstract class Instrument<T> {
     return this;
   }
 
-  detune(input: number | Envelope | string) {
-    if (input instanceof Envelope) {
+  detune(input: number | Envelope | LfoNode | string) {
+    if (input instanceof Envelope || input instanceof LfoNode) {
       this._detune = input;
     } else {
       const pattern = isString(input) ? parsePatternString(input) : [input];
@@ -325,6 +328,8 @@ abstract class Instrument<T> {
           duration: barDuration / cycle.length,
         };
       }) ?? [];
+
+    console.log(notes);
 
     this.connectChain(notes, barStart, barDuration);
 

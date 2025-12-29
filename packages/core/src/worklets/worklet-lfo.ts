@@ -50,6 +50,7 @@ class LFOProcessor extends AudioWorkletProcessor {
   private started = false;
   private scheduledStartTime: number | null = null;
   private scheduledStopTime: number | null = null;
+  private scheduledResetTime: number | null = null;
   private normalize: boolean;
 
   static get parameterDescriptors() {
@@ -73,7 +74,7 @@ class LFOProcessor extends AudioWorkletProcessor {
           this.scheduledStopTime = data.time || currentTime;
           break;
         case "reset":
-          this.phase = 0.0;
+          this.scheduledResetTime = data.time || currentTime;
           break;
         case "oscillatorType":
           this.type = data.oscillatorType;
@@ -106,6 +107,7 @@ class LFOProcessor extends AudioWorkletProcessor {
 
     const blocksize = output?.[0]?.length ?? 0;
     const startTime = this.scheduledStartTime;
+    const resetTime = this.scheduledResetTime;
     const stopTime = this.scheduledStopTime;
 
     for (let i = 0; i < blocksize; i++) {
@@ -114,6 +116,11 @@ class LFOProcessor extends AudioWorkletProcessor {
       if (isNumber(startTime) && sampleTime >= startTime && !this.started) {
         this.started = true;
         this.scheduledStartTime = null;
+      }
+
+      if (isNumber(resetTime) && sampleTime >= resetTime && this.started) {
+        this.phase = 0.0;
+        this.scheduledResetTime = null;
       }
 
       if (isNumber(stopTime) && sampleTime >= stopTime && this.started) {

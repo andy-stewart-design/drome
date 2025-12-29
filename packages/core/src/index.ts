@@ -29,6 +29,7 @@ const NUM_CHANNELS = 8;
 class Drome {
   readonly clock: AudioClock;
   readonly instruments: Set<Synth | Sample> = new Set();
+  readonly lfos: Set<LfoNode> = new Set();
   readonly audioChannels: GainNode[];
   readonly bufferCache: Map<string, AudioBuffer[]> = new Map();
   readonly reverbCache: Map<string, AudioBuffer> = new Map();
@@ -67,9 +68,13 @@ class Drome {
   }
 
   private handleTick() {
-    this.instruments.forEach((inst) =>
-      inst.play(this.barStartTime, this.barDuration)
-    );
+    this.instruments.forEach((inst) => {
+      inst.play(this.barStartTime, this.barDuration);
+    });
+    this.lfos.forEach((lfo) => {
+      if (lfo.started) lfo.reset(this.barStartTime);
+      else lfo.start(this.barStartTime);
+    });
   }
 
   private async preloadSamples() {
@@ -137,13 +142,14 @@ class Drome {
     if (this.suspendTimeoutId) clearTimeout(this.suspendTimeoutId);
     if (!this.clock.paused) return;
     await this.preloadSamples();
-    await new Promise((r) => setTimeout(r, 100));
+    // await new Promise((r) => setTimeout(r, 100));
     this.clock.start();
   }
 
   stop() {
     this.clock.stop();
     this.instruments.forEach((inst) => inst.stop(this.ctx.currentTime));
+    this.lfos.forEach((lfo) => lfo.stop(this.ctx.currentTime));
     // this.clearReplListeners();
     this.audioChannels.forEach((chan) => {
       chan.gain.cancelScheduledValues(this.ctx.currentTime);
@@ -157,6 +163,17 @@ class Drome {
 
   public clear() {
     this.instruments.clear();
+    this.lfos.forEach((lfo) => {
+      lfo.stop(this.clock.nextBarStartTime + 0.1);
+      const clear = () => {
+        console.log("deleting lfo");
+
+        lfo.disconnect();
+        lfo.removeEventListener("ended", clear);
+        this.lfos.delete(lfo);
+      };
+      lfo.addEventListener("ended", clear);
+    });
     // this.clearReplListeners();
   }
 
@@ -191,7 +208,10 @@ class Drome {
   }
 
   lfo(type: "sawtooth" | "sine" | "square" | "triangle", scale = 1) {
-    return new LfoNode(this.ctx, { type, scale });
+    const lfo = new LfoNode(this.ctx, { type, scale });
+    lfo.bpm(this.clock.beatsPerMin);
+    this.lfos.add(lfo);
+    return lfo;
   }
 
   crush(_bitDepth: NSE, rateReduction = 1) {
