@@ -45,7 +45,6 @@ abstract class Instrument<T> {
   protected _gain: Envelope;
   private _detune: Pattern | Envelope | LfoNode;
   protected _filter: FrequencyParams = { type: "none" };
-  protected _startTime: number | undefined;
   private _connected = false;
 
   // Method Aliases
@@ -321,7 +320,6 @@ abstract class Instrument<T> {
   }
 
   beforePlay(barStart: number, barDuration: number) {
-    this._startTime = barStart;
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
     const cycle = this._cycles.at(cycleIndex);
     const notes: Note<T>[] =
@@ -339,32 +337,25 @@ abstract class Instrument<T> {
     return notes;
   }
 
-  stop(stopTime: number) {
-    const startTime = this._startTime ?? this.ctx.currentTime;
-    const relTime = 0.25;
+  stop(when?: number, fadeTime = 0) {
+    const stopTime = when ?? this.ctx.currentTime;
 
-    if (startTime > stopTime) {
-      this._audioNodes.forEach((node) => node.stop());
+    const handleEnded = (e: Event) => {
       this.cleanup();
-    } else {
-      this._audioNodes.forEach((node) => {
-        if (node instanceof SynthesizerNode || node instanceof SampleNode) {
-          node.gain.cancelScheduledValues(stopTime);
-          node.gain.setValueAtTime(node.gain.value, stopTime);
-          node.gain.linearRampToValueAtTime(0, stopTime + relTime);
-        }
-      });
+      e.target?.removeEventListener("ended", handleEnded);
+    };
 
-      const handleEnded = (e: Event) => {
-        this.cleanup();
-        e.target?.removeEventListener("ended", handleEnded);
-      };
-
-      Array.from(this._audioNodes).forEach((node, i) => {
-        if (i === 0) node.addEventListener("ended", handleEnded);
-        node.stop(stopTime + relTime + 0.1);
-      });
-    }
+    Array.from(this._audioNodes).forEach((node, i) => {
+      if (i === this._audioNodes.size - 1) {
+        node.addEventListener("ended", handleEnded);
+      }
+      if (fadeTime) {
+        node.gain.cancelScheduledValues(stopTime);
+        node.gain.setValueAtTime(node.gain.value, stopTime);
+        node.gain.linearRampToValueAtTime(0, stopTime + fadeTime);
+        node.stop(stopTime + fadeTime + 0.1);
+      }
+    });
   }
 
   cleanup() {

@@ -102,33 +102,22 @@ export default class Sample extends Instrument<number> {
         const playbackRate = this._fitValue
           ? buffer.duration / barDuration / this._fitValue
           : Math.abs(this._playbackRate);
-        // const chopStartTime = note.value * buffer.duration;
-        // const chopDuration = buffer.duration - chopStartTime;
 
         const src = new SampleNode(
           this.ctx,
           this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
-          {
-            playbackRate: playbackRate,
-            loop: this._loop,
-            gain: 0,
-          }
+          { playbackRate, loop: this._loop, gain: 0 }
         );
         this._audioNodes.add(src);
 
-        const duration = this.applyGain(
-          src,
-          note.start,
-          note.duration,
-          noteIndex
-        );
-        const d = this._cut ? duration : 1 - note.value; // TODO: Is this right? Why is it `1 - note.value`?
-        this.applyFilter(src, note.start, d, noteIndex);
-        this.applyDetune(src, note.start, d, noteIndex);
+        const _duration = this._cut ? note.duration : buffer.duration;
+        const duration = this.applyGain(src, note.start, _duration, noteIndex);
+        this.applyFilter(src, note.start, duration, noteIndex);
+        this.applyDetune(src, note.start, duration, noteIndex);
 
         src.connect(this._connectorNode);
         src.start(note.start, note.value);
-        // src.stop(noteStart + endTime + 0.1);
+        src.stop(note.start + duration);
 
         const cleanup = () => {
           src.disconnect();

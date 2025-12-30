@@ -35,6 +35,7 @@ class SampleNode extends AudioWorkletNode {
   private _loopStart: number;
   private _loopEnd: number;
   private _filterType: FilterType;
+  private _stopTime = 0;
   readonly playbackRate: AudioParam;
   readonly detune: AudioParam;
   readonly gain: AudioParam;
@@ -101,8 +102,10 @@ class SampleNode extends AudioWorkletNode {
     });
   }
 
-  stop(when = 0) {
-    this.postMessage({ type: "stop", time: when || this.context.currentTime });
+  stop(when: number = 0) {
+    const stopTime = when === 0 ? this.context.currentTime : when;
+    this._stopTime = stopTime;
+    this.postMessage({ type: "stop", time: stopTime });
   }
 
   setLoop(loop: boolean) {
@@ -159,6 +162,10 @@ class SampleNode extends AudioWorkletNode {
   set filterType(filterType: FilterType) {
     this._filterType = filterType;
     this.postMessage({ type: "filterType", filterType });
+  }
+
+  get stopTime() {
+    return this._stopTime;
   }
 }
 

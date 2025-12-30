@@ -71,8 +71,6 @@ class Drome {
       inst.play(this.barStartTime, this.barDuration);
     });
     this.lfos.forEach((lfo) => {
-      console.log(met.bar, 1 / lfo.currentRate);
-
       if (!lfo.started) lfo.start(this.barStartTime);
     });
   }
@@ -139,16 +137,16 @@ class Drome {
   }
 
   async start() {
-    if (this.suspendTimeoutId) clearTimeout(this.suspendTimeoutId);
     if (!this.clock.paused) return;
+    if (this.suspendTimeoutId) clearTimeout(this.suspendTimeoutId);
     await this.preloadSamples();
-    // await new Promise((r) => setTimeout(r, 100));
     this.clock.start();
   }
 
   stop() {
+    const fade = 0.25;
     this.clock.stop();
-    this.instruments.forEach((inst) => inst.stop(this.ctx.currentTime));
+    this.instruments.forEach((inst) => inst.stop(this.ctx.currentTime, fade));
     this.lfos.forEach((lfo) => {
       const clear = () => {
         lfo.disconnect();
@@ -156,7 +154,7 @@ class Drome {
         this.lfos.delete(lfo);
       };
       lfo.addEventListener("ended", clear);
-      lfo.stop(this.ctx.currentTime + 0.25); // 250ms extension is arbitrary
+      lfo.stop(this.ctx.currentTime + fade);
     });
     // this.clearReplListeners();
     this.audioChannels.forEach((chan) => {
@@ -166,10 +164,11 @@ class Drome {
     this.suspendTimeoutId = setTimeout(() => {
       this.ctx.suspend();
       this.suspendTimeoutId = null;
-    }, 1000); // 1s timeout duration is arbitrary, just needs to be longer than instrument fade out
+    }, 500); // 1s timeout duration is arbitrary, just needs to be longer than instrument fade out
   }
 
   public clear() {
+    this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
     this.instruments.clear();
     this.lfos.forEach((lfo) => {
       const clear = () => {

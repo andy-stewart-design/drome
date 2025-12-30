@@ -29,6 +29,7 @@ type SynthesizerNodeMessage =
 class SynthesizerNode extends AudioWorkletNode {
   private _filterType: FilterType;
   private _oscillatorType: Waveform;
+  private _stopTime = 0;
   readonly frequency: AudioParam;
   readonly detune: AudioParam;
   readonly gain: AudioParam;
@@ -78,6 +79,7 @@ class SynthesizerNode extends AudioWorkletNode {
 
   stop(when: number = 0) {
     const stopTime = when === 0 ? this.context.currentTime : when;
+    this._stopTime = stopTime;
     this.postMessage({ type: "stop", time: stopTime });
   }
 
@@ -107,6 +109,10 @@ class SynthesizerNode extends AudioWorkletNode {
   set filterType(filterType: FilterType) {
     this._filterType = filterType;
     this.postMessage({ type: "filterType", filterType });
+  }
+
+  get stopTime() {
+    return this._stopTime;
   }
 }
 
