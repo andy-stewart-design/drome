@@ -24,24 +24,32 @@ const parameterDescriptors = [
   { name: "rate", defaultValue: 1, minValue: 0, maxValue: 20000 },
 ] as const;
 
-// const polyBlep = (p: number, dt: number) => {
-//   if (p < dt) {
-//     p /= dt;
-//     return p + p - p * p - 1.0;
-//   } else if (p > 1.0 - dt) {
-//     p = (p - 1.0) / dt;
-//     return p * p + p + p + 1.0;
-//   }
-//   return 0;
-// };
+function saw(phase: number, sharpness: number = 1): number {
+  const np = phase - Math.floor(phase); // Normalize phase to [0, 1)
+  const rise = 1 - Math.max(0, Math.min(1, sharpness)) * 0.5; // Calculate the rise duration
+  return np < rise ? -1 + (2 * np) / rise : 1 - (2 * (np - rise)) / (1 - rise);
+}
+
+function sawtooth(phase: number, phaseInc: number, sharpness: number = 1) {
+  const n = phase - Math.floor(phase);
+  const rise = 1 - Math.max(0, Math.min(1, sharpness)) * 0.5;
+  if (n < rise) return -1 + (2 * n) / rise;
+
+  // The steepness of the fall is capped by the phaseIncrement.
+  // We use Math.max to ensure we don't fall below the -1 floor.
+  const fall = 1 - (2 * (n - rise)) / (1 - rise);
+  const cappedFall = 1 - (n - rise) / phaseInc;
+
+  return Math.max(-1, Math.min(fall, cappedFall));
+}
 
 const oscillators = {
   sine: (p: number) => Math.sin(2.0 * Math.PI * p),
-  sawtooth: (p: number, dt: number) => 2.0 * p - 1.0,
-  //   sawtooth: (p: number, dt: number) => 2.0 * p - 1.0 - polyBlep(p, dt),
-  triangle: (p: number) => (p < 0.5 ? 4.0 * p - 1.0 : 3.0 - 4.0 * p),
-  //  square: (p: number) => Math.tanh(Math.sin(2.0 * Math.PI * p) * 15),
-  square: (p: number) => (p < 0.5 ? 1.0 : -1.0),
+  // sawtooth: (p: number) => 2.0 * p - 1.0,
+  sawtooth: (p: number) => saw(p, 0.025),
+  triangle: (p: number) => Math.abs((p % 1.0) * 4 - 2) - 1,
+  square: (p: number) => Math.tanh(Math.sin(2.0 * Math.PI * p) * 25),
+  // square: (p: number) => (p < 0.5 ? 1.0 : -1.0),
 };
 
 class LFOProcessor extends AudioWorkletProcessor {
@@ -143,17 +151,17 @@ class LFOProcessor extends AudioWorkletProcessor {
       const scale = scaleArray?.[i] ?? scaleArray?.[0] ?? 0;
 
       // Calculate sine wave with phase offset
-      const dt = frequency / sampleRate;
-      const oscValue = oscillators[this.type](
-        (this.phase + phaseOffset) % 1.0,
-        dt
-      );
+      const oscValue = oscillators[this.type]((this.phase + phaseOffset) % 1.0);
 
       for (const channel of output) {
         channel[i] = (this.normalize ? (oscValue + 1) / 2 : oscValue) * scale;
       }
 
       const phaseIncrement = frequency / sampleRate;
+      // {phaseIncrement: 0.000005208333333333333}
+      // {phaseIncrement: 0.000020833333333333333}
+      // console.log({ phaseIncrement });
+
       this.phase += phaseIncrement;
       if (this.phase >= 1.0) this.phase -= 1.0;
     }

@@ -2,7 +2,7 @@
 
 import AudioClock from "@/clock/audio-clock";
 import Envelope from "@/automation/envelope";
-// import LFO from "@/automation/lfo";
+import LfoNode from "@/automation/lfo-node";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
 import BitcrusherEffect from "./effects/effect-bitcrusher";
@@ -17,11 +17,10 @@ import { bufferId } from "@/utils/cache-id";
 import { addWorklets } from "@/utils/worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
 import type { SampleBankSchema } from "@/utils/samples-validate";
-import type { DistortionAlgorithm, NSE } from "@/types";
+import type { DistortionAlgorithm, Metronome, NSE } from "@/types";
 import { filterTypeMap, type FilterTypeAlias } from "./constants/index";
 import ReverbEffect from "./effects/effect-reverb";
 import { isString } from "./utils/validators";
-import LfoNode from "./automation/lfo-node";
 
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
@@ -67,13 +66,14 @@ class Drome {
     this.clock.bpm(n);
   }
 
-  private handleTick() {
+  private handleTick(met: Metronome) {
     this.instruments.forEach((inst) => {
       inst.play(this.barStartTime, this.barDuration);
     });
     this.lfos.forEach((lfo) => {
-      if (lfo.started) lfo.reset(this.barStartTime);
-      else lfo.start(this.barStartTime);
+      console.log(met.bar, 1 / lfo.currentRate);
+
+      if (!lfo.started) lfo.start(this.barStartTime);
     });
   }
 
@@ -149,7 +149,15 @@ class Drome {
   stop() {
     this.clock.stop();
     this.instruments.forEach((inst) => inst.stop(this.ctx.currentTime));
-    this.lfos.forEach((lfo) => lfo.stop(this.ctx.currentTime));
+    this.lfos.forEach((lfo) => {
+      const clear = () => {
+        lfo.disconnect();
+        lfo.removeEventListener("ended", clear);
+        this.lfos.delete(lfo);
+      };
+      lfo.addEventListener("ended", clear);
+      lfo.stop(this.ctx.currentTime + 0.25); // 250ms extension is arbitrary
+    });
     // this.clearReplListeners();
     this.audioChannels.forEach((chan) => {
       chan.gain.cancelScheduledValues(this.ctx.currentTime);
@@ -158,21 +166,19 @@ class Drome {
     this.suspendTimeoutId = setTimeout(() => {
       this.ctx.suspend();
       this.suspendTimeoutId = null;
-    }, 1000); // Timeout duration is arbitrary, just needs to be longer than instrument fade out
+    }, 1000); // 1s timeout duration is arbitrary, just needs to be longer than instrument fade out
   }
 
   public clear() {
     this.instruments.clear();
     this.lfos.forEach((lfo) => {
-      lfo.stop(this.clock.nextBarStartTime + 0.1);
       const clear = () => {
-        console.log("deleting lfo");
-
         lfo.disconnect();
         lfo.removeEventListener("ended", clear);
         this.lfos.delete(lfo);
       };
       lfo.addEventListener("ended", clear);
+      lfo.stop(this.clock.nextBarStartTime);
     });
     // this.clearReplListeners();
   }
@@ -207,8 +213,8 @@ class Drome {
     return new Envelope(maxValue, startValue, endValue);
   }
 
-  lfo(type: "sawtooth" | "sine" | "square" | "triangle", scale = 1) {
-    const lfo = new LfoNode(this.ctx, { type, scale });
+  lfo(baseValue: number, scale = 1, rate: number) {
+    const lfo = new LfoNode(this.ctx, { baseValue, scale, rate });
     lfo.bpm(this.clock.beatsPerMin);
     this.lfos.add(lfo);
     return lfo;

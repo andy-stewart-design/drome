@@ -7,7 +7,12 @@ import type {
 
 type Waveform = "sine" | "sawtooth" | "triangle" | "square";
 
-type LfoOptions = Partial<LfoProcessorOptions & LfoParameterData>;
+type LfoOptions = Partial<
+  LfoProcessorOptions &
+    LfoParameterData & {
+      baseValue: number;
+    }
+>;
 type LfoParams = keyof LfoParameterData;
 type LfoNodeMessage =
   | {
@@ -28,6 +33,7 @@ class LfoNode extends AudioWorkletNode {
   private _oscillatorType: Waveform;
   private _started = false;
   private _normalize: boolean;
+  readonly baseValue: number;
   readonly bpmParam: AudioParam;
   readonly bpbParam: AudioParam;
   readonly rateParam: AudioParam;
@@ -36,10 +42,16 @@ class LfoNode extends AudioWorkletNode {
   readonly phaseOffsetParam: AudioParam;
   onended: ((e: AudioEndedEvent) => void) | null = null;
   norm: (normalize: boolean) => this;
+  off: (phaseOffset: number) => this;
 
   constructor(
     ctx: AudioContext,
-    { type = "sine", normalize = false, ...parameterData }: LfoOptions = {}
+    {
+      type = "sine",
+      baseValue = 0,
+      normalize = false,
+      ...parameterData
+    }: LfoOptions = {}
   ) {
     super(ctx, "lfo-processor", {
       numberOfOutputs: 1,
@@ -50,6 +62,7 @@ class LfoNode extends AudioWorkletNode {
 
     this._oscillatorType = type;
     this._normalize = normalize;
+    this.baseValue = baseValue;
     this.bpmParam = getParam<LfoParams>(this, "beatsPerMinute");
     this.bpbParam = getParam<LfoParams>(this, "beatsPerBar");
     this.rateParam = getParam<LfoParams>(this, "rate");
@@ -57,6 +70,7 @@ class LfoNode extends AudioWorkletNode {
     this.phaseOffsetParam = getParam<LfoParams>(this, "phaseOffset");
     this.scaleParam = getParam<LfoParams>(this, "scale");
     this.norm = this.normalize.bind(this);
+    this.off = this.offset.bind(this);
 
     // Listen for messages from the processor
     this.port.onmessage = (event: MessageEvent<LfoProcessorMessage>) => {
@@ -133,6 +147,10 @@ class LfoNode extends AudioWorkletNode {
 
   get normalized() {
     return this._normalize;
+  }
+
+  get currentRate() {
+    return this.rateParam.value;
   }
 }
 

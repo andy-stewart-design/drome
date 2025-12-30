@@ -30,7 +30,7 @@ interface InstrumentOptions<T> {
 
 interface FrequencyParams {
   type: FilterType;
-  frequency?: Pattern | Envelope;
+  frequency?: Pattern | Envelope | LfoNode;
   q?: Pattern | Envelope;
 }
 
@@ -119,6 +119,9 @@ abstract class Instrument<T> {
         cycleIndex,
         chordIndex
       );
+    } else if (this._filter.frequency instanceof LfoNode) {
+      node.filterFrequency.value = this._filter.frequency.baseValue;
+      this._filter.frequency.connect(node.filterFrequency);
     }
 
     if (this._filter.q instanceof Pattern) {
@@ -289,12 +292,14 @@ abstract class Instrument<T> {
     return this;
   }
 
-  filter(type: FilterTypeAlias, f: NSE, q?: NSE) {
+  filter(type: FilterTypeAlias, f: NSE | LfoNode, q?: NSE) {
     this._filter.type = filterTypeMap[type];
 
     if (f instanceof Envelope) {
       this._filter.frequency = f;
       this._filter.frequency.endValue = 30;
+    } else if (f instanceof LfoNode) {
+      this._filter.frequency = f;
     } else {
       const pattern = isString(f) ? parsePatternString(f) : [f];
       this._filter.frequency = new Pattern(...pattern);
@@ -328,8 +333,6 @@ abstract class Instrument<T> {
           duration: barDuration / cycle.length,
         };
       }) ?? [];
-
-    console.log(notes);
 
     this.connectChain(notes, barStart, barDuration);
 
