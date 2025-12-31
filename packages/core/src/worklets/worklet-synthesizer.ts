@@ -1,30 +1,23 @@
 import type { SynthesizerNodeMessage } from "@/audio-nodes/synthesizer-node";
 import FilterProcessor, { type FilterType } from "./worklet-filter";
+import { isNumber } from "@/utils/validators";
 
 interface SynthesizerProcessorOptions {
+  type: Waveform;
   filterType: FilterType;
 }
-
-type SynthesizerParameter = (typeof parameterDescriptors)[number]["name"];
-type SynthesizerParameterData = Record<SynthesizerParameter, number>;
 
 interface SynthesizerOptions {
   processorOptions: Partial<SynthesizerProcessorOptions>;
 }
 
-type SynthesizerProcessorMessage = {
-  type: "ended";
-  time: number;
-};
+type SynthesizerParameter = (typeof parameterDescriptors)[number]["name"];
+type SynthesizerParameterData = Record<SynthesizerParameter, number>;
+type SynthesizerProcessorMessage = { type: "ended"; time: number };
+
+type Waveform = keyof typeof oscillators;
 
 const parameterDescriptors = [
-  {
-    name: "type",
-    automationRate: "k-rate",
-    defaultValue: 0, // 0=sine, 1=sawtooth, 2=triangle, 3=square
-    minValue: 0,
-    maxValue: 3,
-  },
   {
     name: "frequency",
     automationRate: "a-rate",
@@ -62,9 +55,17 @@ const parameterDescriptors = [
   },
 ] as const;
 
+const oscillators = {
+  sine: (p: number) => Math.sin(2.0 * Math.PI * p),
+  sawtooth: (p: number) => 2.0 * p - 1.0,
+  triangle: (p: number) => (p < 0.5 ? 4.0 * p - 1.0 : 3.0 - 4.0 * p),
+  square: (p: number) => (p < 0.5 ? 1.0 : -1.0),
+};
+
 class SynthesizerProcessor extends FilterProcessor {
-  currentPhase = 0.0;
-  isRunning = false;
+  type: Waveform;
+  phase = 0.0;
+  started = false;
   scheduledStartTime: number | null = null;
   scheduledStopTime: number | null = null;
 
@@ -72,16 +73,17 @@ class SynthesizerProcessor extends FilterProcessor {
     return parameterDescriptors;
   }
 
-  constructor({ processorOptions }: SynthesizerOptions) {
+  constructor({ processorOptions = {} }: SynthesizerOptions) {
     super();
     this.updateFilterCoefficients(20000.0, 0.707);
+    this.type = processorOptions.type ?? "sine";
     this.filterType = processorOptions.filterType ?? "none";
 
     this.port.onmessage = ({ data }: MessageEvent<SynthesizerNodeMessage>) => {
       switch (data.type) {
         case "start":
           this.scheduledStartTime = data.time || currentTime;
-          this.currentPhase = 0.0;
+          this.phase = 0.0;
           break;
         case "stop":
           this.scheduledStopTime = data.time || currentTime;
@@ -89,40 +91,11 @@ class SynthesizerProcessor extends FilterProcessor {
         case "filterType":
           this.filterType = data.filterType || "none";
           break;
+        case "oscillatorType":
+          this.type = data.oscillatorType;
+          break;
       }
     };
-  }
-
-  generateWaveform(phase: number, type: number) {
-    // Clamp type to valid range
-    type = Math.max(0, Math.min(3, type));
-
-    // Get the two waveforms to blend between
-    const lowerType = Math.floor(type);
-    const upperType = Math.ceil(type);
-    const blend = type - lowerType; // 0 to 1 interpolation factor
-
-    // Generate both waveforms
-    const lower = this.getWaveformValue(phase, lowerType);
-    const upper = this.getWaveformValue(phase, upperType);
-
-    // Linear interpolation between the two
-    return lower * (1 - blend) + upper * blend;
-  }
-
-  getWaveformValue(phase: number, type: number) {
-    switch (type) {
-      case 0: // Sine
-        return Math.sin(2.0 * Math.PI * phase);
-      case 1: // Sawtooth
-        return 2.0 * phase - 1.0;
-      case 2: // Triangle
-        return phase < 0.5 ? 4.0 * phase - 1.0 : 3.0 - 4.0 * phase;
-      case 3: // Square
-        return phase < 0.5 ? 1.0 : -1.0;
-      default:
-        return Math.sin(2.0 * Math.PI * phase);
-    }
   }
 
   postEndedMessage(time: number) {
@@ -136,82 +109,65 @@ class SynthesizerProcessor extends FilterProcessor {
     parameters: Record<string, Float32Array>
   ) {
     const output = outputs[0];
-    const typeArray = parameters.type;
     const frequencyArray = parameters.frequency;
     const detuneArray = parameters.detune;
     const gainArray = parameters.gain;
     const filterFrequencyArray = parameters.filterFrequency;
     const filterQArray = parameters.filterQ;
 
-    const blockStartTime = currentTime;
-    // const blockDuration = 128 / this.sampleRate;
-    // const blockEndTime = blockStartTime + blockDuration;
-
     // Update filter coefficients (k-rate, so once per block)
-    const outChan = output?.[0];
     const filterFreq = filterFrequencyArray?.[0];
     const filterQ = filterQArray?.[0];
 
-    if (!outChan || filterFreq === undefined || filterQ === undefined) {
+    if (!output || !isNumber(filterFreq) || !isNumber(filterQ)) {
       return true;
     }
 
+    const blocksize = output?.[0]?.length ?? 0;
+    const startTime = this.scheduledStartTime;
+    const stopTime = this.scheduledStopTime;
     const safeFreq = Math.max(20, Math.min(filterFreq, sampleRate * 0.45));
     const safeQ = Math.max(0.001, filterQ);
     this.updateFilterCoefficients(safeFreq, safeQ);
 
-    for (let i = 0; i < outChan.length; i++) {
-      const sampleTime = blockStartTime + i / sampleRate;
+    for (let i = 0; i < blocksize; i++) {
+      const sampleTime = currentTime + i / sampleRate;
 
-      if (
-        this.scheduledStartTime !== null &&
-        sampleTime >= this.scheduledStartTime &&
-        !this.isRunning
-      ) {
-        this.isRunning = true;
+      if (isNumber(startTime) && sampleTime >= startTime && !this.started) {
+        this.started = true;
         this.scheduledStartTime = null;
       }
 
-      if (
-        this.scheduledStopTime !== null &&
-        sampleTime >= this.scheduledStopTime &&
-        this.isRunning
-      ) {
-        this.isRunning = false;
+      if (isNumber(stopTime) && sampleTime >= stopTime && this.started) {
+        this.started = false;
         this.scheduledStopTime = null;
         this.postEndedMessage(currentTime);
         return false;
       }
 
-      if (!this.isRunning) {
-        for (let channel = 0; channel < output.length; channel++) {
-          const target = output[channel];
-          if (target) target[i] = 0.0;
+      if (!this.started) {
+        for (const [j, channel] of output.entries()) {
+          channel[i] = 0.0; // output silence
         }
         continue;
       }
 
-      const baseFrequency = frequencyArray?.[i] ?? frequencyArray?.[0] ?? 440;
-      const detuneCents = detuneArray?.[i] ?? detuneArray?.[0] ?? 0;
       const gain = gainArray?.[i] ?? gainArray?.[0] ?? 1;
+      const sample = oscillators[this.type](this.phase) * gain;
 
-      const detuneFactor = Math.pow(2.0, detuneCents / 1200.0);
-      const actualFrequency = baseFrequency * detuneFactor;
-      const phaseIncrement = actualFrequency / sampleRate;
-
-      // Generate Sawtooth Waveform and apply gain
-      const waveType = typeArray?.[i] ?? typeArray?.[0] ?? 0;
-      const sample = this.generateWaveform(this.currentPhase, waveType) * gain;
-
-      for (let channel = 0; channel < output.length; channel++) {
+      for (const [j, channel] of output.entries()) {
         // Apply filter if enabled, otherwise pass through
-        const target = output[channel];
-        if (target && this.filterType === "none") target[i] = sample;
-        else if (target) target[i] = this.applyFilter(sample, channel);
+        if (this.filterType === "none") channel[i] = sample;
+        else channel[i] = this.applyFilter(sample, j);
       }
 
-      this.currentPhase += phaseIncrement;
-      if (this.currentPhase >= 1.0) this.currentPhase -= 1.0;
+      const baseFrequency = frequencyArray?.[i] ?? frequencyArray?.[0] ?? 440;
+      const detuneCents = detuneArray?.[i] ?? detuneArray?.[0] ?? 0;
+      const detuneFactor = Math.pow(2.0, detuneCents / 1200.0);
+      const phaseIncrement = (baseFrequency * detuneFactor) / sampleRate;
+
+      this.phase += phaseIncrement;
+      if (this.phase >= 1.0) this.phase -= 1.0;
     }
 
     return true;

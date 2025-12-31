@@ -13,11 +13,12 @@ import type {
   AdsrEnvelope,
   InstrumentType,
   Note,
-  NSE,
+  SNEL,
   Nullable,
 } from "../types";
 import type { FilterType } from "@/worklets/worklet-filter";
 import { filterTypeMap, type FilterTypeAlias } from "../constants/index";
+import LfoNode from "@/automation/lfo-node";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
@@ -29,7 +30,7 @@ interface InstrumentOptions<T> {
 
 interface FrequencyParams {
   type: FilterType;
-  frequency?: Pattern | Envelope;
+  frequency?: Pattern | Envelope | LfoNode;
   q?: Pattern | Envelope;
 }
 
@@ -42,10 +43,11 @@ abstract class Instrument<T> {
   private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
   protected _gain: Envelope;
-  private _detune: Pattern | Envelope;
+  private _detune: Pattern | Envelope | LfoNode;
   protected _filter: FrequencyParams = { type: "none" };
-  protected _startTime: number | undefined;
   private _connected = false;
+  protected _stopTime: number | null = null;
+  public onCleanup: (() => void) | undefined;
 
   // Method Aliases
   amp: (input: number | Envelope | string) => this;
@@ -118,6 +120,9 @@ abstract class Instrument<T> {
         cycleIndex,
         chordIndex
       );
+    } else if (this._filter.frequency instanceof LfoNode) {
+      node.filterFrequency.value = this._filter.frequency.baseValue;
+      this._filter.frequency.connect(node.filterFrequency);
     }
 
     if (this._filter.q instanceof Pattern) {
@@ -145,6 +150,8 @@ abstract class Instrument<T> {
       this._detune.apply(node.detune, cycleIndex, chordIndex);
     } else if (this._detune instanceof Envelope) {
       this._detune.apply(node.detune, start, duration, cycleIndex, chordIndex);
+    } else {
+      this._detune.connect(node.detune);
     }
   }
 
@@ -275,8 +282,8 @@ abstract class Instrument<T> {
     return this;
   }
 
-  detune(input: number | Envelope | string) {
-    if (input instanceof Envelope) {
+  detune(input: SNEL) {
+    if (input instanceof Envelope || input instanceof LfoNode) {
       this._detune = input;
     } else {
       const pattern = isString(input) ? parsePatternString(input) : [input];
@@ -286,12 +293,14 @@ abstract class Instrument<T> {
     return this;
   }
 
-  filter(type: FilterTypeAlias, f: NSE, q?: NSE) {
+  filter(type: FilterTypeAlias, f: SNEL, q?: SNEL) {
     this._filter.type = filterTypeMap[type];
 
     if (f instanceof Envelope) {
       this._filter.frequency = f;
       this._filter.frequency.endValue = 30;
+    } else if (f instanceof LfoNode) {
+      this._filter.frequency = f;
     } else {
       const pattern = isString(f) ? parsePatternString(f) : [f];
       this._filter.frequency = new Pattern(...pattern);
@@ -313,7 +322,6 @@ abstract class Instrument<T> {
   }
 
   beforePlay(barStart: number, barDuration: number) {
-    this._startTime = barStart;
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
     const cycle = this._cycles.at(cycleIndex);
     const notes: Note<T>[] =
@@ -331,30 +339,26 @@ abstract class Instrument<T> {
     return notes;
   }
 
-  stop(stopTime: number) {
-    const startTime = this._startTime ?? this.ctx.currentTime;
-    const relTime = 0.25;
+  stop(when?: number, fadeTime?: number) {
+    const stopTime = when ?? this.ctx.currentTime;
 
-    if (startTime > stopTime) {
-      this._audioNodes.forEach((node) => node.stop());
-      this.cleanup();
+    if (!fadeTime) {
+      this._stopTime = stopTime;
     } else {
-      this._audioNodes.forEach((node) => {
-        if (node instanceof SynthesizerNode || node instanceof SampleNode) {
-          node.gain.cancelScheduledValues(stopTime);
-          node.gain.setValueAtTime(node.gain.value, stopTime);
-          node.gain.linearRampToValueAtTime(0, stopTime + relTime);
-        }
-      });
-
       const handleEnded = (e: Event) => {
         this.cleanup();
         e.target?.removeEventListener("ended", handleEnded);
       };
 
       Array.from(this._audioNodes).forEach((node, i) => {
-        if (i === 0) node.addEventListener("ended", handleEnded);
-        node.stop(stopTime + relTime + 0.1);
+        if (i === this._audioNodes.size - 1) {
+          node.addEventListener("ended", handleEnded);
+        }
+
+        node.gain.cancelScheduledValues(stopTime);
+        node.gain.setValueAtTime(node.gain.value, stopTime);
+        node.gain.linearRampToValueAtTime(0, stopTime + fadeTime);
+        node.stop(stopTime + fadeTime + 0.1);
       });
     }
   }
@@ -366,6 +370,7 @@ abstract class Instrument<T> {
     this._signalChain.clear();
     this._connectorNode.disconnect();
     this._connected = false;
+    this.onCleanup?.();
   }
 
   get ctx() {

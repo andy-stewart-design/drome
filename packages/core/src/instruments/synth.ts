@@ -2,6 +2,7 @@ import Instrument, { type InstrumentOptions } from "./instrument";
 import SynthesizerNode from "@/audio-nodes/synthesizer-node";
 import { midiToFrequency } from "@/utils/midi-to-frequency";
 import type Drome from "@/index";
+import { isNumber } from "@/utils/validators";
 
 interface SynthOptions extends InstrumentOptions<number | number[]> {
   type?: OscillatorType[];
@@ -48,6 +49,14 @@ export default class Synth extends Instrument<number | number[]> {
             osc.disconnect();
             osc.removeEventListener("ended", cleanup);
             this._audioNodes.delete(osc);
+            // if (
+            //   this._audioNodes.size === 0 &&
+            //   isNumber(this._stopTime) &&
+            //   this.ctx.currentTime > this._stopTime
+            // ) {
+            //   this._stopTime = null;
+            //   this.cleanup();
+            // }
           };
 
           osc.addEventListener("ended", cleanup);

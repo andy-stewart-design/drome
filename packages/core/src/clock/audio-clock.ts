@@ -10,7 +10,9 @@ class AudioClock {
   readonly metronome: Metronome = { beat: 0, bar: 0 };
   private _paused = true;
   private _bpm = 120;
-  private nextBeatTime = 0.0;
+
+  private _barStart = 0.0;
+  private _nextBeatStart = 0.0;
   private timerID: ReturnType<typeof setTimeout> | null = null;
   private listeners: Map<DromeEventType, DromeEventCallback[]> = new Map();
 
@@ -20,21 +22,23 @@ class AudioClock {
 
   private schedule() {
     const { scheduleAheadTime } = AudioClock;
-    while (this.nextBeatTime < this.ctx.currentTime + scheduleAheadTime) {
+    while (this._nextBeatStart < this.ctx.currentTime + scheduleAheadTime) {
       this.metronome.beat = (this.metronome.beat + 1) % 4;
 
       if (this.metronome.beat === 0) {
         this.metronome.bar++;
+        this._barStart = this._nextBeatStart;
+        // console.log(this.barStartTime);
         this.listeners.get("bar")?.forEach((cb) => {
-          cb({ ...this.metronome }, this.barStartTime);
+          cb({ ...this.metronome }, this._barStart);
         });
       }
 
       this.listeners.get("beat")?.forEach((cb) => {
-        cb({ ...this.metronome }, this.beatStartTime);
+        cb({ ...this.metronome }, this._nextBeatStart);
       });
 
-      this.nextBeatTime += 60.0 / this._bpm;
+      this._nextBeatStart += 60.0 / this._bpm;
     }
     this.timerID = setTimeout(this.schedule.bind(this), AudioClock.lookahead);
   }
@@ -47,12 +51,12 @@ class AudioClock {
     }
     this.metronome.bar = -1;
     this.metronome.beat = -1;
-    this.nextBeatTime = this.ctx.currentTime;
+    this._nextBeatStart = this.ctx.currentTime;
     this.schedule();
     this._paused = false;
 
     this.listeners.get("start")?.forEach((cb) => {
-      cb(this.metronome, this.nextBeatTime);
+      cb(this.metronome, this._nextBeatStart);
     });
   }
 
@@ -73,7 +77,7 @@ class AudioClock {
     this.pause();
     this.metronome.bar = 0;
     this.metronome.beat = 0;
-    this.nextBeatTime = 0;
+    this._nextBeatStart = 0;
   }
 
   public bpm(bpm: number) {
@@ -111,20 +115,28 @@ class AudioClock {
     return this._bpm;
   }
 
-  get barStartTime() {
-    return this.nextBeatTime;
+  get beatDuration() {
+    return 60.0 / this._bpm;
   }
 
   get beatStartTime() {
-    return this.nextBeatTime;
+    return this._nextBeatStart;
+  }
+
+  get nextBeatStartTime() {
+    return this._nextBeatStart + this.beatDuration;
+  }
+
+  get barStartTime() {
+    return this._barStart;
+  }
+
+  get nextBarStartTime() {
+    return this._barStart + this.barDuration;
   }
 
   get barDuration() {
     return this.beatDuration * 4;
-  }
-
-  get beatDuration() {
-    return 60.0 / this._bpm;
   }
 }
 

@@ -46,17 +46,14 @@ function App() {
 
     if (e.altKey && e.key === 'Enter') {
       e.preventDefault()
-
+      drome.clear()
       runCode(drome, editor.state.doc.toString())
       localStorage.setItem(LS_KEY, editor.state.doc.toString())
       flash(editor)
-      if (drome.paused) {
-        drome.start()
-      }
+      if (drome.paused) drome.start()
     } else if (e.altKey && e.key === '≥') {
       e.preventDefault()
       drome.stop()
-      drome.clear()
     }
   }
 
@@ -72,7 +69,6 @@ function runCode(drome: Drome, code: string) {
   // console.log(msg, 'input')
 
   try {
-    drome.clear()
     const result = new Function('drome, d', `${code}`)(drome, drome)
 
     // console.log(`✓ Code executed successfully`, 'output')

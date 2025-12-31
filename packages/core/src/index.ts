@@ -1,8 +1,9 @@
-// TODO: ADD CLEANUP
+// TODO: Continue simplifying cleaup
+// TODO: Reimplement LFO across effects
 
 import AudioClock from "@/clock/audio-clock";
 import Envelope from "@/automation/envelope";
-// import LFO from "@/automation/lfo";
+import LfoNode from "@/automation/lfo-node";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
 import BitcrusherEffect from "./effects/effect-bitcrusher";
@@ -17,7 +18,7 @@ import { bufferId } from "@/utils/cache-id";
 import { addWorklets } from "@/utils/worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
 import type { SampleBankSchema } from "@/utils/samples-validate";
-import type { DistortionAlgorithm, NSE } from "@/types";
+import type { DistortionAlgorithm, Metronome, SNEL } from "@/types";
 import { filterTypeMap, type FilterTypeAlias } from "./constants/index";
 import ReverbEffect from "./effects/effect-reverb";
 import { isString } from "./utils/validators";
@@ -28,6 +29,7 @@ const NUM_CHANNELS = 8;
 class Drome {
   readonly clock: AudioClock;
   readonly instruments: Set<Synth | Sample> = new Set();
+  readonly lfos: Set<LfoNode> = new Set();
   readonly audioChannels: GainNode[];
   readonly bufferCache: Map<string, AudioBuffer[]> = new Map();
   readonly reverbCache: Map<string, AudioBuffer> = new Map();
@@ -35,7 +37,7 @@ class Drome {
   readonly userSamples: Map<string, Map<string, string[]>> = new Map();
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
 
-  fil: (type: FilterTypeAlias, frequency: NSE, q?: number) => DromeFilter;
+  fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
 
   static async init(bpm?: number) {
     const drome = new Drome(bpm);
@@ -65,10 +67,13 @@ class Drome {
     this.clock.bpm(n);
   }
 
-  private handleTick() {
-    this.instruments.forEach((inst) =>
-      inst.play(this.barStartTime, this.barDuration)
-    );
+  private handleTick(met: Metronome) {
+    this.instruments.forEach((inst) => {
+      inst.play(this.barStartTime, this.barDuration);
+    });
+    this.lfos.forEach((lfo) => {
+      if (!lfo.started) lfo.start(this.barStartTime);
+    });
   }
 
   private async preloadSamples() {
@@ -133,16 +138,32 @@ class Drome {
   }
 
   async start() {
-    if (this.suspendTimeoutId) clearTimeout(this.suspendTimeoutId);
     if (!this.clock.paused) return;
+    if (this.suspendTimeoutId) clearTimeout(this.suspendTimeoutId);
     await this.preloadSamples();
-    await new Promise((r) => setTimeout(r, 100));
     this.clock.start();
   }
 
+  private cleanupLfos(when: number) {
+    this.lfos.forEach((lfo) => {
+      const clear = () => {
+        lfo.disconnect();
+        lfo.removeEventListener("ended", clear);
+        this.lfos.delete(lfo);
+      };
+      lfo.addEventListener("ended", clear);
+      lfo.stop(when);
+    });
+  }
+
   stop() {
+    const fade = 0.25;
     this.clock.stop();
-    this.instruments.forEach((inst) => inst.stop(this.ctx.currentTime));
+    this.instruments.forEach((inst) => {
+      inst.onCleanup = () => this.instruments.delete(inst);
+      inst.stop(this.ctx.currentTime, fade);
+    });
+    this.cleanupLfos(this.ctx.currentTime + fade);
     // this.clearReplListeners();
     this.audioChannels.forEach((chan) => {
       chan.gain.cancelScheduledValues(this.ctx.currentTime);
@@ -151,11 +172,13 @@ class Drome {
     this.suspendTimeoutId = setTimeout(() => {
       this.ctx.suspend();
       this.suspendTimeoutId = null;
-    }, 1000); // Timeout duration is arbitrary, just needs to be longer than instrument fade out
+    }, fade * 5000); // convert seconds to milliseconds and double
   }
 
   public clear() {
+    this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
     this.instruments.clear();
+    this.cleanupLfos(this.clock.nextBarStartTime);
     // this.clearReplListeners();
   }
 
@@ -189,7 +212,14 @@ class Drome {
     return new Envelope(maxValue, startValue, endValue);
   }
 
-  crush(_bitDepth: NSE, rateReduction = 1) {
+  lfo(baseValue: number, scale = 1, rate: number) {
+    const lfo = new LfoNode(this.ctx, { baseValue, scale, rate });
+    lfo.bpm(this.clock.beatsPerMin);
+    this.lfos.add(lfo);
+    return lfo;
+  }
+
+  crush(_bitDepth: SNEL, rateReduction = 1) {
     return new BitcrusherEffect(this.ctx, {
       bitDepth: parseParamInput(_bitDepth),
       rateReduction,
@@ -203,7 +233,7 @@ class Drome {
     });
   }
 
-  distort(amount: NSE, postgain?: number, type?: DistortionAlgorithm) {
+  distort(amount: SNEL, postgain?: number, type?: DistortionAlgorithm) {
     return new DistortionEffect(this.ctx, {
       distortion: parseParamInput(amount),
       postgain,
@@ -211,7 +241,7 @@ class Drome {
     });
   }
 
-  filter(type: FilterTypeAlias, frequency: NSE, q?: number) {
+  filter(type: FilterTypeAlias, frequency: SNEL, q?: number) {
     return new DromeFilter(this.ctx, {
       type: filterTypeMap[type],
       frequency: parseParamInput(frequency),
@@ -219,17 +249,17 @@ class Drome {
     });
   }
 
-  gain(input: NSE) {
+  gain(input: SNEL) {
     return new GainEffect(this.ctx, { gain: parseParamInput(input) });
   }
 
-  pan(input: NSE) {
+  pan(input: SNEL) {
     return new PanEffect(this.ctx, { pan: parseParamInput(input) });
   }
 
-  reverb(a: NSE, b?: number, c?: number, d?: number): ReverbEffect;
-  reverb(a: NSE, b?: string, c?: string): ReverbEffect;
-  reverb(mix: NSE, b: unknown = 1, c: unknown = 1600, d?: number) {
+  reverb(a: SNEL, b?: number, c?: number, d?: number): ReverbEffect;
+  reverb(a: SNEL, b?: string, c?: string): ReverbEffect;
+  reverb(mix: SNEL, b: unknown = 1, c: unknown = 1600, d?: number) {
     let effect: ReverbEffect;
     const parsedMix = parseParamInput(mix);
 

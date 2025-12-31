@@ -1,9 +1,9 @@
 import DromeArray from "@/array/drome-array";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
-import Envelope from "@/automation/envelope";
-// import LFO from "@/automation/lfo";
-import { isNullish } from "@/utils/validators";
+import { isEnv, isLfoNode, isNullish } from "@/utils/validators";
 import { applySteppedRamp } from "@/utils/stepped-ramp";
+import type Envelope from "@/automation/envelope";
+import type LfoNode from "@/automation/lfo-node";
 import type { Automation, Note } from "@/types";
 
 abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
@@ -12,21 +12,20 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   protected abstract _target: AudioParam | undefined;
   protected _defaultValue: number;
   protected _cycles: DromeArray<number>;
-  // protected _lfo: LFO | undefined;
+  protected _lfo: LfoNode | undefined;
   protected _env: Envelope | undefined;
 
   constructor(input: Automation, defaultValue = 1) {
     super();
 
-    // if (input instanceof LFO) {
-    //   this._defaultValue = input.value;
-    //   this._cycles = new DromeArray([[this._defaultValue]], this._defaultValue);
-    //   this._lfo = input;
-    // } else
-    if (input instanceof Envelope) {
+    if (isEnv(input)) {
       this._defaultValue = input.startValue;
       this._cycles = new DromeArray(this._defaultValue);
       this._env = input;
+    } else if (isLfoNode(input)) {
+      this._defaultValue = input.baseValue;
+      this._cycles = new DromeArray(this._defaultValue);
+      this._lfo = input;
     } else {
       this._cycles = new DromeArray(0).note(...input);
       this._defaultValue = this._cycles.at(0, 0) ?? defaultValue;
@@ -41,13 +40,10 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   ) {
     if (!this._target) return;
 
-    // if (this._lfo && !this._lfo.paused) this._lfo.stop(startTime);
-
-    // if (this._lfo) {
-    //   this._lfo.create().connect(this._target).start(startTime);
-    // } else
     const cycleIndex = currentBar % this._cycles.length;
-    if (this._env) {
+    if (this._lfo) {
+      this._lfo.connect(this._target);
+    } else if (this._env) {
       for (let i = 0; i < notes.length; i++) {
         const note = notes[i];
         if (isNullish(note)) continue;

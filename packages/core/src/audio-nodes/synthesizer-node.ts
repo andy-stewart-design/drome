@@ -6,12 +6,10 @@ import type {
   SynthesizerProcessorMessage,
 } from "@/worklets/worklet-synthesizer";
 
-type SynthesizerWaveform = "sine" | "sawtooth" | "triangle" | "square";
-type SynthesizerParamSubset = Omit<SynthesizerParameterData, "type">;
+type Waveform = "sine" | "sawtooth" | "triangle" | "square";
 
 type SynthesizerOptions = Partial<
-  SynthesizerProcessorOptions &
-    SynthesizerParamSubset & { type: SynthesizerWaveform | number }
+  SynthesizerProcessorOptions & SynthesizerParameterData
 >;
 type SynthesizerNodeMessage =
   | {
@@ -22,11 +20,16 @@ type SynthesizerNodeMessage =
   | {
       type: "filterType";
       filterType: FilterType;
+    }
+  | {
+      type: "oscillatorType";
+      oscillatorType: Waveform;
     };
 
 class SynthesizerNode extends AudioWorkletNode {
   private _filterType: FilterType;
-  readonly type: AudioParam;
+  private _oscillatorType: Waveform;
+  private _stopTime = 0;
   readonly frequency: AudioParam;
   readonly detune: AudioParam;
   readonly gain: AudioParam;
@@ -42,11 +45,11 @@ class SynthesizerNode extends AudioWorkletNode {
       numberOfOutputs: 1,
       outputChannelCount: [2],
       parameterData: { ...params, type: getOscillatorType(type) },
-      processorOptions: { filterType },
+      processorOptions: { filterType, type },
     });
 
+    this._oscillatorType = type;
     this._filterType = filterType;
-    this.type = getParam(this, "type");
     this.frequency = getParam(this, "frequency");
     this.detune = getParam(this, "detune");
     this.gain = getParam(this, "gain");
@@ -76,12 +79,13 @@ class SynthesizerNode extends AudioWorkletNode {
 
   stop(when: number = 0) {
     const stopTime = when === 0 ? this.context.currentTime : when;
+    this._stopTime = stopTime;
     this.postMessage({ type: "stop", time: stopTime });
   }
 
-  setOscillatorType(type: SynthesizerWaveform | number) {
-    const typeMap = { sine: 0, sawtooth: 1, triangle: 2, square: 3 };
-    this.type.value = getOscillatorType(type);
+  setOscillatorType(oscillatorType: Waveform) {
+    this._oscillatorType = oscillatorType;
+    this.postMessage({ type: "oscillatorType", oscillatorType });
   }
 
   setFilterType(filterType: FilterType) {
@@ -90,13 +94,12 @@ class SynthesizerNode extends AudioWorkletNode {
   }
 
   get oscillatorType() {
-    return this.type.value;
+    return this._oscillatorType;
   }
 
-  set oscillatorType(type: SynthesizerWaveform | number) {
-    const typeMap = { sine: 0, sawtooth: 1, triangle: 2, square: 3 };
-    this.type.value =
-      typeof type === "number" ? Math.min(Math.max(type, 0), 3) : typeMap[type];
+  set oscillatorType(oscillatorType: Waveform) {
+    this._oscillatorType = oscillatorType;
+    this.postMessage({ type: "oscillatorType", oscillatorType });
   }
 
   get filterType() {
@@ -107,7 +110,15 @@ class SynthesizerNode extends AudioWorkletNode {
     this._filterType = filterType;
     this.postMessage({ type: "filterType", filterType });
   }
+
+  get stopTime() {
+    return this._stopTime;
+  }
 }
+
+export default SynthesizerNode;
+
+export type { SynthesizerNodeMessage };
 
 function getParam(node: AudioWorkletNode, name: string) {
   const param = node.parameters.get(name);
@@ -115,11 +126,7 @@ function getParam(node: AudioWorkletNode, name: string) {
   return param;
 }
 
-export default SynthesizerNode;
-
-export type { SynthesizerNodeMessage };
-
-function getOscillatorType(type: SynthesizerWaveform | number) {
+function getOscillatorType(type: Waveform | number) {
   const typeMap = { sine: 0, sawtooth: 1, triangle: 2, square: 3 };
   return typeof type === "number"
     ? Math.min(Math.max(type, 0), 3)
