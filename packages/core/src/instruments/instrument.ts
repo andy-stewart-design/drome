@@ -49,6 +49,8 @@ abstract class Instrument<T> {
   protected _stopTime: number | null = null;
   public onCleanup: (() => void) | undefined;
 
+  // protected readonly _audioNodes2: Set<SynthesizerNode | SampleNode>;
+
   // Method Aliases
   amp: (input: number | Envelope | string) => this;
   dt: (input: number | Envelope | string) => this;
@@ -75,6 +77,8 @@ abstract class Instrument<T> {
     this._baseGain = opts.baseGain ?? 0.35;
     this._gain = new Envelope(0, this._baseGain);
     this._detune = new Pattern(0);
+
+    // this._audioNodes2 = new Set();
 
     this.amp = this.amplitude.bind(this);
     this.dt = this.detune.bind(this);

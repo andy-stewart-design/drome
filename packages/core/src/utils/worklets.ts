@@ -3,6 +3,7 @@ import distortion from "@/worklets/worklet-distortion.js?raw";
 import lfoProcessor from "@/worklets/worklet-lfo?raw";
 import sampleProcessor from "@/worklets/worklet-samples?raw";
 import synthesizerProcessor from "@/worklets/worklet-synthesizer?raw";
+import supersawProcessor from "@/worklets/worklet-supersaw?raw";
 
 const worklets = [
   bitcrush,
@@ -10,6 +11,7 @@ const worklets = [
   lfoProcessor,
   sampleProcessor,
   synthesizerProcessor,
+  supersawProcessor,
 ];
 
 async function addWorklets(ctx: AudioContext) {
