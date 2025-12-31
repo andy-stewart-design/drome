@@ -1,8 +1,7 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
-import SynthesizerNode from "@/audio-nodes/synthesizer-node";
+import SynthesizerNode from "@/audio-nodes/synthesizer-node-2";
 import { midiToFrequency } from "@/utils/midi-to-frequency";
 import type Drome from "@/index";
-import { isNumber } from "@/utils/validators";
 
 interface SynthOptions extends InstrumentOptions<number | number[]> {
   type?: OscillatorType[];
@@ -28,22 +27,26 @@ export default class Synth extends Instrument<number | number[]> {
             frequency: midiToFrequency(midiNote),
             type: type === "custom" ? "sine" : type,
             filterType: this._filter.type,
-            gain: 0,
+            gain: 0.5,
           });
           this._audioNodes.add(osc);
 
-          const duration = this.applyGain(
-            osc,
-            note.start,
-            note.duration,
-            chordIndex
-          );
-          this.applyFilter(osc, note.start, duration, chordIndex);
-          this.applyDetune(osc, note.start, duration, chordIndex);
+          // const duration = this.applyGain(
+          //   osc,
+          //   note.start,
+          //   note.duration,
+          //   chordIndex
+          // );
+          // this.applyFilter(osc, note.start, duration, chordIndex);
+          // this.applyDetune(osc, note.start, duration, chordIndex);
 
+          osc.gain.setValueAtTime(0, note.start);
+          osc.gain.linearRampToValueAtTime(0.5, note.start + 0.1);
+          osc.gain.setValueAtTime(0.5, note.duration - 0.1);
+          osc.gain.linearRampToValueAtTime(0, note.duration);
           osc.connect(this._connectorNode);
           osc.start(note.start);
-          osc.stop(note.start + duration);
+          osc.stop(note.start + note.duration);
 
           const cleanup = () => {
             osc.disconnect();

@@ -2,6 +2,7 @@ import AutomatableEffect from "@/abstracts/effect-automatable";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
 import DromeArrayNullable from "@/array/drome-array-nullable";
 import SynthesizerNode from "@/audio-nodes/synthesizer-node";
+import SynthesizerNode2 from "@/audio-nodes/synthesizer-node-2";
 import SampleNode from "@/audio-nodes/sample-node";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
@@ -39,7 +40,9 @@ abstract class Instrument<T> {
   protected _cycles: DromeArrayNullable<T>;
   private _destination: AudioNode;
   protected _connectorNode: GainNode;
-  protected readonly _audioNodes: Set<SynthesizerNode | SampleNode>;
+  protected readonly _audioNodes: Set<
+    SynthesizerNode | SampleNode | SynthesizerNode2
+  >;
   private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
   protected _gain: Envelope;
@@ -91,7 +94,7 @@ abstract class Instrument<T> {
   }
 
   protected applyGain(
-    node: SynthesizerNode | SampleNode,
+    node: SynthesizerNode | SampleNode | SynthesizerNode2,
     start: number,
     duration: number,
     chordIndex: number
@@ -143,7 +146,7 @@ abstract class Instrument<T> {
   }
 
   protected applyDetune(
-    node: SynthesizerNode | SampleNode,
+    node: SynthesizerNode | SampleNode | SynthesizerNode2,
     start: number,
     duration: number,
     chordIndex: number

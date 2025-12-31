@@ -102,20 +102,17 @@ class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
         max: Number.POSITIVE_INFINITY,
         min: 0,
       },
-
       {
         name: "end",
         defaultValue: 0,
         max: Number.POSITIVE_INFINITY,
         min: 0,
       },
-
       {
         name: "frequency",
         defaultValue: 440,
         min: Number.EPSILON,
       },
-
       {
         name: "panspread",
         defaultValue: 0.4,
@@ -132,7 +129,6 @@ class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
         defaultValue: 0,
         min: 0,
       },
-
       {
         name: "voices",
         defaultValue: 5,
@@ -148,20 +144,22 @@ class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
   ) {
     const begin = params.begin?.[0];
     const end = params.end?.[0];
-
-    if (!isNumber(begin) || !isNumber(end)) {
-      throw new Error("Something has gone wrong");
-    }
-    if (currentTime >= end) return false; // should terminate
-    if (currentTime <= begin) return true; // keep alive
-
     const output = outputs[0];
     const channel = output?.[0];
     const voices = params.voices?.[0]; // k-rate
 
-    if (!output || !channel || !isNumber(voices)) {
+    if (
+      !output ||
+      !channel ||
+      !isNumber(voices) ||
+      !isNumber(begin) ||
+      !isNumber(end)
+    ) {
       throw new Error("Something has gone wrong");
     }
+
+    if (currentTime >= end) return false; // should terminate
+    if (currentTime <= begin) return true; // keep alive
 
     for (let i = 0; i < channel.length; i++) {
       const detune = pv(params.detune, i) ?? 0;

@@ -2,7 +2,7 @@ import bitcrush from "@/worklets/worklet-bitcrusher.js?raw";
 import distortion from "@/worklets/worklet-distortion.js?raw";
 import lfoProcessor from "@/worklets/worklet-lfo?raw";
 import sampleProcessor from "@/worklets/worklet-samples?raw";
-import synthesizerProcessor from "@/worklets/worklet-synthesizer?raw";
+import synthesizerProcessor from "@/worklets/worklet-synthesizer-2?raw";
 import supersawProcessor from "@/worklets/worklet-supersaw?raw";
 
 const worklets = [
