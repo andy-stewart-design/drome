@@ -18,7 +18,7 @@ import { bufferId } from "@/utils/cache-id";
 import { addWorklets } from "@/utils/worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
 import type { SampleBankSchema } from "@/utils/samples-validate";
-import type { DistortionAlgorithm, Metronome, NSE } from "@/types";
+import type { DistortionAlgorithm, Metronome, SNEL } from "@/types";
 import { filterTypeMap, type FilterTypeAlias } from "./constants/index";
 import ReverbEffect from "./effects/effect-reverb";
 import { isString } from "./utils/validators";
@@ -37,7 +37,7 @@ class Drome {
   readonly userSamples: Map<string, Map<string, string[]>> = new Map();
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
 
-  fil: (type: FilterTypeAlias, frequency: NSE, q?: number) => DromeFilter;
+  fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
 
   static async init(bpm?: number) {
     const drome = new Drome(bpm);
@@ -138,7 +138,6 @@ class Drome {
   }
 
   async start() {
-    // console.log(this.instruments.size, this.lfos.size);
     if (!this.clock.paused) return;
     if (this.suspendTimeoutId) clearTimeout(this.suspendTimeoutId);
     await this.preloadSamples();
@@ -177,11 +176,8 @@ class Drome {
   }
 
   public clear() {
-    this.instruments.forEach((inst) => {
-      this.instruments.delete(inst);
-      inst.stop(this.clock.nextBarStartTime);
-    });
-    // this.instruments.clear();
+    this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
+    this.instruments.clear();
     this.cleanupLfos(this.clock.nextBarStartTime);
     // this.clearReplListeners();
   }
@@ -223,7 +219,7 @@ class Drome {
     return lfo;
   }
 
-  crush(_bitDepth: NSE, rateReduction = 1) {
+  crush(_bitDepth: SNEL, rateReduction = 1) {
     return new BitcrusherEffect(this.ctx, {
       bitDepth: parseParamInput(_bitDepth),
       rateReduction,
@@ -237,7 +233,7 @@ class Drome {
     });
   }
 
-  distort(amount: NSE, postgain?: number, type?: DistortionAlgorithm) {
+  distort(amount: SNEL, postgain?: number, type?: DistortionAlgorithm) {
     return new DistortionEffect(this.ctx, {
       distortion: parseParamInput(amount),
       postgain,
@@ -245,7 +241,7 @@ class Drome {
     });
   }
 
-  filter(type: FilterTypeAlias, frequency: NSE, q?: number) {
+  filter(type: FilterTypeAlias, frequency: SNEL, q?: number) {
     return new DromeFilter(this.ctx, {
       type: filterTypeMap[type],
       frequency: parseParamInput(frequency),
@@ -253,17 +249,17 @@ class Drome {
     });
   }
 
-  gain(input: NSE) {
+  gain(input: SNEL) {
     return new GainEffect(this.ctx, { gain: parseParamInput(input) });
   }
 
-  pan(input: NSE) {
+  pan(input: SNEL) {
     return new PanEffect(this.ctx, { pan: parseParamInput(input) });
   }
 
-  reverb(a: NSE, b?: number, c?: number, d?: number): ReverbEffect;
-  reverb(a: NSE, b?: string, c?: string): ReverbEffect;
-  reverb(mix: NSE, b: unknown = 1, c: unknown = 1600, d?: number) {
+  reverb(a: SNEL, b?: number, c?: number, d?: number): ReverbEffect;
+  reverb(a: SNEL, b?: string, c?: string): ReverbEffect;
+  reverb(mix: SNEL, b: unknown = 1, c: unknown = 1600, d?: number) {
     let effect: ReverbEffect;
     const parsedMix = parseParamInput(mix);
 

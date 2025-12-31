@@ -13,7 +13,7 @@ import type {
   AdsrEnvelope,
   InstrumentType,
   Note,
-  NSE,
+  SNEL,
   Nullable,
 } from "../types";
 import type { FilterType } from "@/worklets/worklet-filter";
@@ -46,6 +46,7 @@ abstract class Instrument<T> {
   private _detune: Pattern | Envelope | LfoNode;
   protected _filter: FrequencyParams = { type: "none" };
   private _connected = false;
+  protected _stopTime: number | null = null;
   public onCleanup: (() => void) | undefined;
 
   // Method Aliases
@@ -281,7 +282,7 @@ abstract class Instrument<T> {
     return this;
   }
 
-  detune(input: number | Envelope | LfoNode | string) {
+  detune(input: SNEL) {
     if (input instanceof Envelope || input instanceof LfoNode) {
       this._detune = input;
     } else {
@@ -292,7 +293,7 @@ abstract class Instrument<T> {
     return this;
   }
 
-  filter(type: FilterTypeAlias, f: NSE | LfoNode, q?: NSE) {
+  filter(type: FilterTypeAlias, f: SNEL, q?: SNEL) {
     this._filter.type = filterTypeMap[type];
 
     if (f instanceof Envelope) {
@@ -338,26 +339,28 @@ abstract class Instrument<T> {
     return notes;
   }
 
-  stop(when?: number, fadeTime = 0) {
+  stop(when?: number, fadeTime?: number) {
     const stopTime = when ?? this.ctx.currentTime;
 
-    const handleEnded = (e: Event) => {
-      this.cleanup();
-      e.target?.removeEventListener("ended", handleEnded);
-    };
+    if (!fadeTime) {
+      this._stopTime = stopTime;
+    } else {
+      const handleEnded = (e: Event) => {
+        this.cleanup();
+        e.target?.removeEventListener("ended", handleEnded);
+      };
 
-    const targetIndex = fadeTime ? 0 : this._audioNodes.size - 1;
+      Array.from(this._audioNodes).forEach((node, i) => {
+        if (i === this._audioNodes.size - 1) {
+          node.addEventListener("ended", handleEnded);
+        }
 
-    Array.from(this._audioNodes).forEach((node, i) => {
-      if (i === targetIndex) node.addEventListener("ended", handleEnded);
-
-      if (fadeTime) {
         node.gain.cancelScheduledValues(stopTime);
         node.gain.setValueAtTime(node.gain.value, stopTime);
         node.gain.linearRampToValueAtTime(0, stopTime + fadeTime);
         node.stop(stopTime + fadeTime + 0.1);
-      }
-    });
+      });
+    }
   }
 
   cleanup() {

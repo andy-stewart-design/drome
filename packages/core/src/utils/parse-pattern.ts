@@ -1,7 +1,7 @@
 import Envelope from "@/automation/envelope";
 // import LFO from "@/automation/lfo";
-import { isEnv } from "./validators";
-import type { Pattern, PatternInput } from "../types";
+import { isEnv, isLfoNode } from "./validators";
+import type { SNEL, Pattern, PatternInput } from "../types";
 
 function parsePatternString(input: string) {
   const err = `[DROME] could not parse pattern string: ${input}`;
@@ -20,9 +20,8 @@ function parsePatternInput(input: PatternInput): Pattern {
   return [input];
 }
 
-function parseParamInput(input: number | string | Envelope) {
-  // if (input instanceof Envelope || input instanceof LFO) return input;
-  if (isEnv(input)) return input;
+function parseParamInput(input: SNEL) {
+  if (isEnv(input) || isLfoNode(input)) return input;
   else return parsePatternInput(input);
 }
 

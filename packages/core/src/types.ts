@@ -1,5 +1,6 @@
 import type DromeArray from "@/array/drome-array";
 import type Envelope from "@/automation/envelope";
+import type LfoNode from "./automation/lfo-node";
 // import type LFO from "@/automation/lfo";
 import type * as algos from "@/utils/distortion-algorithms";
 
@@ -15,10 +16,10 @@ type InstrumentType = "synth" | "sample";
 type Nullable<T> = T | null | undefined;
 type Note<T> = { value: T; start: number; duration: number } | null;
 type DromeCycleValue<T> = Nullable<T>[][];
-type Automation = Pattern | Envelope;
+type Automation = Pattern | Envelope | LfoNode;
 type Pattern = (number | number[])[];
 type PatternInput = number | string;
-type NSE = PatternInput | Envelope;
+type SNEL = PatternInput | Envelope | LfoNode;
 
 // AUTOMATION
 type AdsrMode = "fit" | "clip" | "free";
@@ -47,7 +48,7 @@ export type {
   InstrumentType,
   Metronome,
   Note,
-  NSE,
+  SNEL,
   Nullable,
   Pattern,
   PatternInput,

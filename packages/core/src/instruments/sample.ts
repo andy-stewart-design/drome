@@ -2,6 +2,7 @@ import Instrument, { type InstrumentOptions } from "./instrument";
 import SampleNode from "@/audio-nodes/sample-node";
 import { flipBuffer } from "../utils/flip-buffer";
 import type Drome from "@/index";
+import { isNumber } from "@/utils/validators";
 
 type Nullable<T> = T | null | undefined;
 
@@ -123,6 +124,14 @@ export default class Sample extends Instrument<number> {
           src.disconnect();
           src.removeEventListener("ended", cleanup);
           this._audioNodes.delete(src);
+          // if (
+          //   this._audioNodes.size === 0 &&
+          //   isNumber(this._stopTime) &&
+          //   this.ctx.currentTime > this._stopTime
+          // ) {
+          //   this._stopTime = null;
+          //   this.cleanup();
+          // }
         };
 
         src.addEventListener("ended", cleanup);
