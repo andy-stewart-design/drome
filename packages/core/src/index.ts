@@ -1,4 +1,5 @@
-// TODO: ADD CLEANUP
+// TODO: Continue simplifying cleaup
+// TODO: Reimplement LFO across effects
 
 import AudioClock from "@/clock/audio-clock";
 import Envelope from "@/automation/envelope";
@@ -137,16 +138,14 @@ class Drome {
   }
 
   async start() {
+    // console.log(this.instruments.size, this.lfos.size);
     if (!this.clock.paused) return;
     if (this.suspendTimeoutId) clearTimeout(this.suspendTimeoutId);
     await this.preloadSamples();
     this.clock.start();
   }
 
-  stop() {
-    const fade = 0.25;
-    this.clock.stop();
-    this.instruments.forEach((inst) => inst.stop(this.ctx.currentTime, fade));
+  private cleanupLfos(when: number) {
     this.lfos.forEach((lfo) => {
       const clear = () => {
         lfo.disconnect();
@@ -154,8 +153,18 @@ class Drome {
         this.lfos.delete(lfo);
       };
       lfo.addEventListener("ended", clear);
-      lfo.stop(this.ctx.currentTime + fade);
+      lfo.stop(when);
     });
+  }
+
+  stop() {
+    const fade = 0.25;
+    this.clock.stop();
+    this.instruments.forEach((inst) => {
+      inst.onCleanup = () => this.instruments.delete(inst);
+      inst.stop(this.ctx.currentTime, fade);
+    });
+    this.cleanupLfos(this.ctx.currentTime + fade);
     // this.clearReplListeners();
     this.audioChannels.forEach((chan) => {
       chan.gain.cancelScheduledValues(this.ctx.currentTime);
@@ -164,21 +173,16 @@ class Drome {
     this.suspendTimeoutId = setTimeout(() => {
       this.ctx.suspend();
       this.suspendTimeoutId = null;
-    }, 500); // 1s timeout duration is arbitrary, just needs to be longer than instrument fade out
+    }, fade * 5000); // convert seconds to milliseconds and double
   }
 
   public clear() {
-    this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
-    this.instruments.clear();
-    this.lfos.forEach((lfo) => {
-      const clear = () => {
-        lfo.disconnect();
-        lfo.removeEventListener("ended", clear);
-        this.lfos.delete(lfo);
-      };
-      lfo.addEventListener("ended", clear);
-      lfo.stop(this.clock.nextBarStartTime);
+    this.instruments.forEach((inst) => {
+      this.instruments.delete(inst);
+      inst.stop(this.clock.nextBarStartTime);
     });
+    // this.instruments.clear();
+    this.cleanupLfos(this.clock.nextBarStartTime);
     // this.clearReplListeners();
   }
 

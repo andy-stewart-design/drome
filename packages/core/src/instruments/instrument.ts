@@ -46,6 +46,7 @@ abstract class Instrument<T> {
   private _detune: Pattern | Envelope | LfoNode;
   protected _filter: FrequencyParams = { type: "none" };
   private _connected = false;
+  public onCleanup: (() => void) | undefined;
 
   // Method Aliases
   amp: (input: number | Envelope | string) => this;
@@ -345,10 +346,11 @@ abstract class Instrument<T> {
       e.target?.removeEventListener("ended", handleEnded);
     };
 
+    const targetIndex = fadeTime ? 0 : this._audioNodes.size - 1;
+
     Array.from(this._audioNodes).forEach((node, i) => {
-      if (i === this._audioNodes.size - 1) {
-        node.addEventListener("ended", handleEnded);
-      }
+      if (i === targetIndex) node.addEventListener("ended", handleEnded);
+
       if (fadeTime) {
         node.gain.cancelScheduledValues(stopTime);
         node.gain.setValueAtTime(node.gain.value, stopTime);
@@ -365,6 +367,7 @@ abstract class Instrument<T> {
     this._signalChain.clear();
     this._connectorNode.disconnect();
     this._connected = false;
+    this.onCleanup?.();
   }
 
   get ctx() {
