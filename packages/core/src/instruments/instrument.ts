@@ -10,14 +10,7 @@ import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import type Drome from "../index";
 import type SynthNode from "@/audio-nodes/synth-node";
 import type SampleNode from "@/audio-nodes/sample-node";
-import type {
-  AdsrMode,
-  AdsrEnvelope,
-  InstrumentType,
-  Note,
-  SNEL,
-  Nullable,
-} from "@/types";
+import type { AdsrMode, AdsrEnvelope, InstrumentType, Note, SNEL, Nullable, } from "@/types";
 import type { FilterType } from "@/types";
 
 interface InstrumentOptions<T> {
@@ -60,7 +53,7 @@ abstract class Instrument<T> {
   fil: (
     type: FilterTypeAlias,
     f: number | Envelope | string,
-    q: number | Envelope | string
+    q: number | Envelope | string,
   ) => this;
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
@@ -90,7 +83,7 @@ abstract class Instrument<T> {
     node: SynthNode | SampleNode,
     start: number,
     duration: number,
-    chordIndex: number
+    chordIndex: number,
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
     return this._gain.apply(node.gain, start, duration, cycleIndex, chordIndex);
@@ -100,7 +93,7 @@ abstract class Instrument<T> {
     node: SynthNode | SampleNode,
     start: number,
     duration: number,
-    chordIndex: number
+    chordIndex: number,
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
 
@@ -108,7 +101,7 @@ abstract class Instrument<T> {
       this._filter.frequency.apply(
         node.filterFrequency,
         cycleIndex,
-        chordIndex
+        chordIndex,
       );
     } else if (this._filter.frequency instanceof Envelope) {
       this._filter.frequency.apply(
@@ -116,7 +109,7 @@ abstract class Instrument<T> {
         start,
         duration,
         cycleIndex,
-        chordIndex
+        chordIndex,
       );
     } else if (this._filter.frequency instanceof LfoNode) {
       node.filterFrequency.value = this._filter.frequency.baseValue;
@@ -131,7 +124,7 @@ abstract class Instrument<T> {
         start,
         duration,
         cycleIndex,
-        chordIndex
+        chordIndex,
       );
     }
   }
@@ -140,7 +133,7 @@ abstract class Instrument<T> {
     node: SynthNode | SampleNode,
     start: number,
     duration: number,
-    chordIndex: number
+    chordIndex: number,
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
 
@@ -156,7 +149,7 @@ abstract class Instrument<T> {
   private connectChain(
     notes: Note<T>[],
     barStart: number,
-    barDuration: number
+    barDuration: number,
   ) {
     const chain = [
       this._connectorNode,
@@ -192,7 +185,7 @@ abstract class Instrument<T> {
   euclid(
     pulses: number | number[],
     steps: number,
-    rotation: number | number[]
+    rotation: number | number[],
   ) {
     this._cycles.euclid(pulses, steps, rotation);
     return this;
@@ -239,7 +232,9 @@ abstract class Instrument<T> {
     } else {
       const pattern = isString(input) ? parsePatternString(input) : [input];
       const normalizedPattern = pattern.map((x) =>
-        Array.isArray(x) ? x.map((y) => y * this._baseGain) : x * this._baseGain
+        Array.isArray(x)
+          ? x.map((y) => y * this._baseGain)
+          : x * this._baseGain,
       );
       this._gain.maxValue(...normalizedPattern);
     }
