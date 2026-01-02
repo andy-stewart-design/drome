@@ -14,7 +14,7 @@ class DistortionEffect extends AutomatableEffect<AudioWorkletNode> {
 
   constructor(
     ctx: AudioContext,
-    { distortion, postgain = 1, type }: DistortionEffectOptions
+    { distortion, postgain = 1, type }: DistortionEffectOptions,
   ) {
     super(distortion);
 

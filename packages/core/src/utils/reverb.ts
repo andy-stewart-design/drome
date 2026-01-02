@@ -26,12 +26,12 @@ async function renderFilter(
   input: AudioBuffer,
   duration: number,
   lpfStart: number,
-  lpfEnd: number
+  lpfEnd: number,
 ) {
   const ctx = new OfflineAudioContext(
     2,
     getAllChannelData(input)?.[0]?.length ?? 128,
-    input.sampleRate
+    input.sampleRate,
   );
 
   const src = new AudioBufferSourceNode(ctx, { buffer: input });

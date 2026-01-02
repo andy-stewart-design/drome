@@ -63,11 +63,13 @@ export default class Sample extends Instrument<number> {
           return Array.from({ length: chopsPerCycle }, (_, j) => {
             return step * j + chopsPerCycle * step * i;
           });
-        }
+        },
       );
     } else {
       this._cycles.value = input.map((cycle) =>
-        isArray(cycle) ? cycle.map((chord) => convert(chord)) : [convert(cycle)]
+        isArray(cycle)
+          ? cycle.map((chord) => convert(chord))
+          : [convert(cycle)],
       );
     }
 
@@ -119,7 +121,7 @@ export default class Sample extends Instrument<number> {
             loop: this._loop,
             gain: 0,
             filter: this._filter.type ? { type: this._filter.type } : undefined,
-          }
+          },
         );
         this._audioNodes.add(src);
 

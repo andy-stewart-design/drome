@@ -16,7 +16,7 @@ class DromeArray<T> {
   ---------------------------------------------------------------- */
   note(...input: (T | T[])[]) {
     this._value = input.map((cycle) =>
-      Array.isArray(cycle) ? cycle : [cycle]
+      Array.isArray(cycle) ? cycle : [cycle],
     );
     return this;
   }

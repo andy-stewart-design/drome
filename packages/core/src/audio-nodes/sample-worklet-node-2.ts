@@ -1,9 +1,5 @@
 import AudioEndedEvent from "@/events/audio-ended";
-import type {
-  AudioParams,
-  ProcessorOptions,
-  ProcessorMessage,
-} from "@/worklets/worklet-sample-2";
+import type { AudioParams, ProcessorOptions, ProcessorMessage, } from "@/worklets/worklet-sample-2";
 
 type SampleNodeMessage =
   | {
@@ -32,7 +28,7 @@ class SampleNode extends AudioWorkletNode {
   constructor(
     ctx: AudioContext,
     buffer: AudioBuffer,
-    { loop, offset = 0, ...params }: Partial<Params> = {}
+    { loop, offset = 0, ...params }: Partial<Params> = {},
   ) {
     super(ctx, "sample-processor", {
       numberOfOutputs: 1,
@@ -70,7 +66,7 @@ class SampleNode extends AudioWorkletNode {
     const startTime = when === 0 ? this.context.currentTime : when;
     const clampedOffset = Math.max(
       0,
-      Math.min(offset * this._duration, this._duration)
+      Math.min(offset * this._duration, this._duration),
     );
 
     this._begin.value = startTime;

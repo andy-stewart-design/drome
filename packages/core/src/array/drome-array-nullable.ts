@@ -21,7 +21,7 @@ class DromeArrayNullable<T> extends DromeArray<Nullable<T>> {
       const cycle = cycles[i % cycles.length] ?? [];
       const nextCycle =
         patterns[i % patterns.length]?.map((p) =>
-          p === 0 ? null : cycle[noteIndex++ % cycle.length]
+          p === 0 ? null : cycle[noteIndex++ % cycle.length],
         ) ?? [];
       nextCycles.push(nextCycle);
     }
@@ -45,7 +45,7 @@ class DromeArrayNullable<T> extends DromeArray<Nullable<T>> {
   euclid(
     pulses: number | number[],
     steps: number,
-    rotation: number | number[]
+    rotation: number | number[],
   ) {
     this._value = this.applyPattern(euclid(pulses, steps, rotation));
     return this;
@@ -60,7 +60,7 @@ class DromeArrayNullable<T> extends DromeArray<Nullable<T>> {
     const pattern = pulses.map((p) =>
       Array.from({ length: steps }, (_, i) => {
         return [p].flat().includes(i) ? 1 : 0;
-      })
+      }),
     );
     this._value = this.applyPattern(pattern);
     return this;

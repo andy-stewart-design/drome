@@ -1,6 +1,4 @@
-import CompositeAudioNode, {
-  type CompositeAudioNodeOptions,
-} from "./composite-audio-node";
+import CompositeAudioNode, { type CompositeAudioNodeOptions, } from "./composite-audio-node";
 
 type SynthNodeOptions = CompositeAudioNodeOptions & OscillatorOptions;
 

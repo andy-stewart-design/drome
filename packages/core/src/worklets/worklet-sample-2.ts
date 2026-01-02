@@ -55,7 +55,7 @@ class SampleProcessor extends AudioWorkletProcessor {
   process(
     _: Float32Array[][],
     outputs: Float32Array[][],
-    params: Record<AudioParam, Float32Array>
+    params: Record<AudioParam, Float32Array>,
   ) {
     const begin = params.begin?.[0];
     const end = params.end?.[0];

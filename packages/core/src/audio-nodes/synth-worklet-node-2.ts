@@ -1,10 +1,6 @@
 import AudioEndedEvent from "@/events/audio-ended";
 import type { FilterType } from "@/worklets/worklet-filter";
-import type {
-  SynthesizerProcessorOptions,
-  SynthesizerParameterData,
-  SynthesizerProcessorMessage,
-} from "@/worklets/worklet-synthesizer";
+import type { SynthesizerProcessorOptions, SynthesizerParameterData, SynthesizerProcessorMessage, } from "@/worklets/worklet-synthesizer";
 
 type Waveform = "sine" | "sawtooth" | "triangle" | "square";
 
@@ -41,7 +37,7 @@ class SynthesizerNode extends AudioWorkletNode {
 
   constructor(
     ctx: AudioContext,
-    { filterType = "none", type = "sine", ...params }: SynthesizerOptions = {}
+    { filterType = "none", type = "sine", ...params }: SynthesizerOptions = {},
   ) {
     super(ctx, "synth-oscillator", {
       numberOfOutputs: 1,
@@ -63,7 +59,7 @@ class SynthesizerNode extends AudioWorkletNode {
 
     // Listen for messages from the processor
     this.port.onmessage = (
-      event: MessageEvent<SynthesizerProcessorMessage>
+      event: MessageEvent<SynthesizerProcessorMessage>,
     ) => {
       if (event.data.type === "ended") {
         const audioEvent = new AudioEndedEvent(event.data.time);

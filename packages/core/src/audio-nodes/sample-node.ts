@@ -1,6 +1,4 @@
-import CompositeAudioNode, {
-  type CompositeAudioNodeOptions,
-} from "./composite-audio-node";
+import CompositeAudioNode, { type CompositeAudioNodeOptions, } from "./composite-audio-node";
 
 type SampleNodeOptions = CompositeAudioNodeOptions &
   Omit<AudioBufferSourceOptions, "buffer">;
@@ -12,7 +10,7 @@ class SampleNode extends CompositeAudioNode<AudioBufferSourceNode> {
   constructor(
     ctx: AudioContext,
     buffer: AudioBuffer,
-    { gain, filter, ...opts }: SampleNodeOptions
+    { gain, filter, ...opts }: SampleNodeOptions,
   ) {
     super(ctx, { gain, filter });
     this._audioNode = new AudioBufferSourceNode(ctx, { ...opts, buffer });
@@ -23,7 +21,7 @@ class SampleNode extends CompositeAudioNode<AudioBufferSourceNode> {
     this._startTime = when;
     this.audioNode.start(
       when,
-      Math.min(Math.max(offset, 0), 1) * this._duration
+      Math.min(Math.max(offset, 0), 1) * this._duration,
     );
   }
 

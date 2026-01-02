@@ -35,7 +35,7 @@ export default class Synth extends Instrument<number | number[]> {
             osc,
             note.start,
             note.duration,
-            chordIndex
+            chordIndex,
           );
           this.applyFilter(osc, note.start, duration, chordIndex);
           this.applyDetune(osc, note.start, duration, chordIndex);

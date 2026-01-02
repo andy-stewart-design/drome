@@ -1,9 +1,5 @@
 import AudioEndedEvent from "@/events/audio-ended";
-import type {
-  LfoProcessorOptions,
-  LfoParameterData,
-  LfoProcessorMessage,
-} from "@/worklets/worklet-lfo";
+import type { LfoProcessorOptions, LfoParameterData, LfoProcessorMessage, } from "@/worklets/worklet-lfo";
 
 type Waveform = "sine" | "sawtooth" | "triangle" | "square";
 
@@ -51,7 +47,7 @@ class LfoNode extends AudioWorkletNode {
       baseValue = 0,
       normalize = false,
       ...parameterData
-    }: LfoOptions = {}
+    }: LfoOptions = {},
   ) {
     super(ctx, "lfo-processor", {
       numberOfOutputs: 1,

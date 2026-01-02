@@ -29,7 +29,7 @@ abstract class CompositeAudioNode<
   protected get audioNode() {
     if (!this._audioNode) {
       throw new Error(
-        `[${this.nodeType.toLocaleUpperCase()} NODE]: audio node has been disconnected.`
+        `[${this.nodeType.toLocaleUpperCase()} NODE]: audio node has been disconnected.`,
       );
     }
     return this._audioNode;
@@ -38,7 +38,7 @@ abstract class CompositeAudioNode<
   protected get gainNode() {
     if (!this._gainNode) {
       throw new Error(
-        `[${this.nodeType.toLocaleUpperCase()} NODE]: gain node has been disconnected.`
+        `[${this.nodeType.toLocaleUpperCase()} NODE]: gain node has been disconnected.`,
       );
     }
     return this._gainNode;
@@ -47,7 +47,7 @@ abstract class CompositeAudioNode<
   protected get filterNode() {
     if (!this._filterNode) {
       throw new Error(
-        `[${this.nodeType.toLocaleUpperCase()} NODE]: filter node has not been set or has been disconnected.`
+        `[${this.nodeType.toLocaleUpperCase()} NODE]: filter node has not been set or has been disconnected.`,
       );
     }
     return this._filterNode;
@@ -56,7 +56,7 @@ abstract class CompositeAudioNode<
   protected get controller() {
     if (!this._controller) {
       throw new Error(
-        `[${this.nodeType.toLocaleUpperCase()} NODE]: abort controller has not been initialized.`
+        `[${this.nodeType.toLocaleUpperCase()} NODE]: abort controller has not been initialized.`,
       );
     }
     return this._controller;
