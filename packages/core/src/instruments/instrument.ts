@@ -4,6 +4,7 @@ import DromeArrayNullable from "@/array/drome-array-nullable";
 import SynthesizerNode from "@/audio-nodes/synthesizer-node";
 import SynthesizerNode2 from "@/audio-nodes/synthesizer-node-2";
 import SampleNode from "@/audio-nodes/sample-node";
+import SampleNode2 from "@/audio-nodes/sample-node-2";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
 import { parsePatternString } from "../utils/parse-pattern";
@@ -20,6 +21,7 @@ import type {
 import type { FilterType } from "@/worklets/worklet-filter";
 import { filterTypeMap, type FilterTypeAlias } from "../constants/index";
 import LfoNode from "@/automation/lfo-node";
+import type SamplerNode from "@/audio-nodes/sample-node-3";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
@@ -41,7 +43,7 @@ abstract class Instrument<T> {
   private _destination: AudioNode;
   protected _connectorNode: GainNode;
   protected readonly _audioNodes: Set<
-    SynthesizerNode | SampleNode | SynthesizerNode2
+    SynthesizerNode | SampleNode | SynthesizerNode2 | SampleNode2 | SamplerNode
   >;
   private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
@@ -94,7 +96,12 @@ abstract class Instrument<T> {
   }
 
   protected applyGain(
-    node: SynthesizerNode | SampleNode | SynthesizerNode2,
+    node:
+      | SynthesizerNode
+      | SampleNode
+      | SynthesizerNode2
+      | SampleNode2
+      | SamplerNode,
     start: number,
     duration: number,
     chordIndex: number
@@ -104,7 +111,7 @@ abstract class Instrument<T> {
   }
 
   protected applyFilter(
-    node: SynthesizerNode | SampleNode,
+    node: SynthesizerNode | SampleNode | SamplerNode,
     start: number,
     duration: number,
     chordIndex: number
@@ -146,7 +153,12 @@ abstract class Instrument<T> {
   }
 
   protected applyDetune(
-    node: SynthesizerNode | SampleNode | SynthesizerNode2,
+    node:
+      | SynthesizerNode
+      | SampleNode
+      | SynthesizerNode2
+      | SampleNode2
+      | SamplerNode,
     start: number,
     duration: number,
     chordIndex: number

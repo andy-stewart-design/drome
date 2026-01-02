@@ -1,74 +1,56 @@
 import { isNumber } from "@/utils/validators";
 
-// The order is important for dough integration
-const waveshapes = {
-  triangle(phase: number, skew = 0.5) {
-    const x = 1 - skew;
-    if (phase >= skew) {
-      return 1 / x - phase / x;
-    }
-    return phase / skew;
-  },
-  sine(phase: number) {
-    return Math.sin(2 * Math.PI * phase) * 0.5 + 0.5;
-  },
-  sawtooth(phase: number) {
-    return 1 - phase;
-  },
-  square(phase: number, skew = 0.5) {
-    if (phase >= skew) {
-      return 0;
-    }
-    return 1;
-  },
-};
+type Waveform = "sine" | "sawtooth" | "triangle" | "square";
+type AudioParam = (typeof audioParams)[number]["name"];
+
+interface SynthesizerProcessorOptions {
+  type: Waveform;
+  //   filterType: FilterType;
+}
+
+interface SynthesizerOptions {
+  processorOptions: Partial<SynthesizerProcessorOptions>;
+}
+
+function getOscillator(type: Waveform) {
+  switch (type) {
+    case "sawtooth":
+      return (p: number) => 2.0 * p - 1.0;
+    case "triangle":
+      return (p: number) => (p < 0.5 ? 4.0 * p - 1.0 : 3.0 - 4.0 * p);
+    case "square":
+      return (p: number) => (p < 0.5 ? 1.0 : -1.0);
+    default:
+      return (p: number) => Math.sin(2.0 * Math.PI * p);
+  }
+}
+
+const audioParams = [
+  { name: "begin", defaultValue: 0, min: 0, max: 3.4028234663852886e38 },
+  { name: "end", defaultValue: 0, min: 0, max: 3.4028234663852886e38 },
+  { name: "frequency", defaultValue: 440, min: -24000, max: 24000 },
+  { name: "gain", defaultValue: 1, min: 0, max: 3.4028234663852886e38 },
+  { name: "detune", defaultValue: 0, min: -153600, max: 153600 },
+] as const;
 
 class SynthProcessor extends AudioWorkletProcessor {
   private phase = 0;
-  private type: keyof typeof waveshapes;
+  private type: Waveform;
 
-  constructor() {
+  constructor({ processorOptions = {} }: SynthesizerOptions) {
     super();
     this.phase = 0;
-    this.type = "sine";
+    this.type = processorOptions.type ?? "sine";
   }
 
   static get parameterDescriptors() {
-    return [
-      {
-        name: "begin",
-        defaultValue: 0,
-        max: Number.POSITIVE_INFINITY,
-        min: 0,
-      },
-      {
-        name: "end",
-        defaultValue: 0,
-        max: Number.POSITIVE_INFINITY,
-        min: 0,
-      },
-      {
-        name: "frequency",
-        defaultValue: 440,
-        min: Number.EPSILON,
-      },
-      {
-        name: "gain",
-        defaultValue: 1,
-        min: 0,
-        max: 100,
-      },
-      {
-        name: "detune",
-        defaultValue: 0,
-        min: 0,
-      },
-    ];
+    return audioParams;
   }
+
   process(
     _: Float32Array[][],
     outputs: Float32Array[][],
-    params: Record<string, Float32Array>
+    params: Record<AudioParam, Float32Array>
   ) {
     const begin = params.begin?.[0];
     const end = params.end?.[0];
@@ -81,30 +63,33 @@ class SynthProcessor extends AudioWorkletProcessor {
 
     for (let i = 0; i < channel.length; i++) {
       const sampleTime = currentTime + i / sampleRate;
-      let frequency = params.frequency?.[i] ?? params.frequency?.[0] ?? 440;
-      let detune = params.detune?.[i] ?? params.detune?.[0] ?? 0;
-      let gain = params.gain?.[i] ?? params.gain?.[0] ?? 0;
 
-      let outL = output[0];
-      let outR = output[1];
-
-      if (!outL || !outR) {
-        throw new Error("Something has gone wrong bar");
+      if (end > begin && sampleTime > end) {
+        for (let j = i; j < channel.length; j++) {
+          for (const channel of output) channel[j] = 0.0;
+        }
+        return false;
       }
 
-      if (end > begin && sampleTime > end) return false; // should terminate
       if (sampleTime <= begin) {
-        outL.fill(0);
-        outR.fill(0);
-        return true;
+        for (const channel of output) channel[i] = 0.0;
+        continue;
       }
+
+      const frequency = params.frequency?.[i] ?? params.frequency?.[0] ?? 440;
+      const detune = params.detune?.[i] ?? params.detune?.[0] ?? 0;
+      const gain = params.gain?.[i] ?? params.gain?.[0] ?? 0;
 
       const detuneFactor = Math.pow(2.0, detune / 1200.0);
       const dt = (frequency * detuneFactor) / sampleRate;
-      const v = waveshapes[this.type](this.phase, dt);
+      const v = getOscillator(this.type)(this.phase);
 
-      outL[i] = v * gain;
-      outR[i] = v * gain;
+      for (const channel of output) {
+        const fadeSamples = sampleRate * 0.003; // 3ms
+        const t = ((sampleTime - begin) * sampleRate) / fadeSamples;
+        const amp = Math.max(0, Math.min(1, t));
+        channel[i] = v * gain * amp;
+      }
 
       let pn = this.phase + dt;
       if (pn >= 1.0) pn -= 1.0;

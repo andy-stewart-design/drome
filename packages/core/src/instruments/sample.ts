@@ -1,8 +1,9 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
-import SampleNode from "@/audio-nodes/sample-node";
+import SamplerNode from "@/audio-nodes/sample-node-3";
 import { flipBuffer } from "../utils/flip-buffer";
 import type Drome from "@/index";
 import { isNumber } from "@/utils/validators";
+import type { FilterType } from "@/worklets/worklet-filter";
 
 type Nullable<T> = T | null | undefined;
 
@@ -104,11 +105,17 @@ export default class Sample extends Instrument<number> {
           ? buffer.duration / barDuration / this._fitValue
           : Math.abs(this._playbackRate);
 
-        const src = new SampleNode(
+        const src = new SamplerNode(
           this.ctx,
           this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
           { playbackRate, loop: this._loop, gain: 0 }
         );
+
+        // const src = new SampleNode(
+        //   this.ctx,
+        //   this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
+        //   { rate: playbackRate, loop: this._loop, gain: 0 }
+        // );
         this._audioNodes.add(src);
 
         const _duration = this._cut ? note.duration : buffer.duration;
