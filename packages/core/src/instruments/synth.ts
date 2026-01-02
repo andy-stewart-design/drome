@@ -48,14 +48,11 @@ export default class Synth extends Instrument<number | number[]> {
             osc.disconnect();
             osc.removeEventListener("ended", cleanup);
             this._audioNodes.delete(osc);
-            // if (
-            //   this._audioNodes.size === 0 &&
-            //   isNumber(this._stopTime) &&
-            //   this.ctx.currentTime > this._stopTime
-            // ) {
-            //   this._stopTime = null;
-            //   this.cleanup();
-            // }
+            osc.destory();
+
+            if (this._stopTime && this._audioNodes.size === 0) {
+              this.destroy();
+            }
           };
 
           osc.addEventListener("ended", cleanup);

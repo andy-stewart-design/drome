@@ -47,7 +47,7 @@ abstract class Instrument<T> {
   protected _filter: FrequencyParams = {};
   private _connected = false;
   protected _stopTime: number | null = null;
-  public onCleanup: (() => void) | undefined;
+  public onDestory: (() => void) | undefined;
 
   // Method Aliases
   amp: (input: number | Envelope | string) => this;
@@ -103,8 +103,6 @@ abstract class Instrument<T> {
     chordIndex: number
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
-
-    // if (this._filter.frequency) node.setFilterType(this._filter.type);
 
     if (this._filter.frequency instanceof Pattern) {
       this._filter.frequency.apply(
@@ -340,38 +338,38 @@ abstract class Instrument<T> {
     return notes;
   }
 
-  stop(when?: number, fadeTime?: number) {
-    const stopTime = when ?? this.ctx.currentTime;
+  stop(when = 0, fadeTime = 0) {
+    const stopStartTime = when ?? this.ctx.currentTime;
+    this._stopTime = stopStartTime + fadeTime;
 
-    if (!fadeTime) {
-      this._stopTime = stopTime;
-    } else {
-      const handleEnded = (e: Event) => {
-        this.cleanup();
-        e.target?.removeEventListener("ended", handleEnded);
-      };
-
+    if (fadeTime) {
       Array.from(this._audioNodes).forEach((node, i) => {
-        if (i === this._audioNodes.size - 1) {
-          node.addEventListener("ended", handleEnded);
-        }
-
-        node.gain.cancelScheduledValues(stopTime);
-        node.gain.setValueAtTime(node.gain.value, stopTime);
-        node.gain.linearRampToValueAtTime(0, stopTime + fadeTime);
-        node.stop(stopTime + fadeTime + 0.1);
+        node.gain.cancelScheduledValues(stopStartTime);
+        node.gain.setValueAtTime(node.gain.value, stopStartTime);
+        node.gain.linearRampToValueAtTime(0, stopStartTime + fadeTime);
+        node.stop(stopStartTime + fadeTime + 0.1);
       });
     }
   }
 
-  cleanup() {
-    this._audioNodes.forEach((node) => node.disconnect());
-    this._audioNodes.clear();
-    this._signalChain.forEach((node) => node.disconnect());
-    this._signalChain.clear();
+  destroy() {
+    if (this._audioNodes.size) {
+      this._audioNodes.forEach((node) => {
+        node.disconnect();
+        this._audioNodes.delete(node);
+        node.destory();
+      });
+      this._audioNodes.clear();
+    }
+    if (this._signalChain.size) {
+      this._signalChain.forEach((node) => node.disconnect());
+      this._signalChain.clear();
+    }
     this._connectorNode.disconnect();
     this._connected = false;
-    this.onCleanup?.();
+    this._baseGain = 0;
+    this._stopTime = null;
+    this.onDestory?.();
   }
 
   get ctx() {

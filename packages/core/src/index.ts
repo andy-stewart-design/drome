@@ -1,27 +1,26 @@
-// TODO: Continue simplifying cleaup
-// TODO: Reimplement LFO across effects
+// TODO: Add supersaw synth
 
 import AudioClock from "@/clock/audio-clock";
 import Envelope from "@/automation/envelope";
 import LfoNode from "@/automation/lfo-node";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
-import BitcrusherEffect from "./effects/effect-bitcrusher";
-import DelayEffect from "./effects/effect-delay";
-import DistortionEffect from "./effects/effect-distortion";
+import BitcrusherEffect from "@/effects/effect-bitcrusher";
+import DelayEffect from "@/effects/effect-delay";
+import DistortionEffect from "@/effects/effect-distortion";
 import DromeFilter from "@/effects/effect-filter";
 import GainEffect from "@/effects/effect-gain";
 import PanEffect from "@/effects/effect-pan";
+import ReverbEffect from "./effects/effect-reverb";
+import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import { getSampleBanks, getSamplePath } from "@/utils/samples";
 import { loadSample } from "@/utils/load-sample";
 import { bufferId } from "@/utils/cache-id";
+import { isString } from "@/utils/validators";
 import { addWorklets } from "@/utils/worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
 import type { SampleBankSchema } from "@/utils/samples-validate";
 import type { DistortionAlgorithm, Metronome, SNEL } from "@/types";
-import { filterTypeMap, type FilterTypeAlias } from "./constants/index";
-import ReverbEffect from "./effects/effect-reverb";
-import { isString } from "./utils/validators";
 
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
@@ -160,7 +159,7 @@ class Drome {
     const fade = 0.25;
     this.clock.stop();
     this.instruments.forEach((inst) => {
-      inst.onCleanup = () => this.instruments.delete(inst);
+      inst.onDestory = () => this.instruments.delete(inst);
       inst.stop(this.ctx.currentTime, fade);
     });
     this.cleanupLfos(this.ctx.currentTime + fade);
@@ -278,13 +277,6 @@ class Drome {
 
     return effect;
   }
-
-  // lfo(minValue: number, maxValue: number, speed: number) {
-  //   const value = (maxValue + minValue) / 2;
-  //   const depth = maxValue - value;
-  //   const bpm = this.beatsPerMin;
-  //   return new LFO(this.ctx, { value, depth, speed, bpm });
-  // }
 
   get ctx() {
     return this.clock.ctx;

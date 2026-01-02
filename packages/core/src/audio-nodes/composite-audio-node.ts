@@ -13,7 +13,7 @@ abstract class CompositeAudioNode<
   protected abstract _audioNode: T | null;
   protected _gainNode: GainNode | null;
   protected _filterNode: BiquadFilterNode | null;
-  protected _controller: AbortController;
+  protected _controller: AbortController | null;
   protected _connected = false;
   protected _startTime = 0;
   protected _stopTime = 0;
@@ -53,6 +53,15 @@ abstract class CompositeAudioNode<
     return this._filterNode;
   }
 
+  protected get controller() {
+    if (!this._controller) {
+      throw new Error(
+        `[${this.nodeType.toLocaleUpperCase()} NODE]: abort controller has not been initialized.`
+      );
+    }
+    return this._controller;
+  }
+
   protected createFilter(opts: BiquadFilterOptions) {
     this._filterNode = new BiquadFilterNode(this.ctx, opts);
   }
@@ -70,13 +79,21 @@ abstract class CompositeAudioNode<
   }
 
   disconnect() {
-    this._controller.abort();
     this.audioNode.disconnect();
     this.gainNode.disconnect();
     this._filterNode?.disconnect();
+    this._connected = false;
+  }
+
+  destory() {
+    this.controller.abort();
+    this._controller = null;
     this._audioNode = null;
     this._gainNode = null;
     this._filterNode = null;
+    this._startTime = 0;
+    this._stopTime = 0;
+    this._connected = false;
   }
 
   stop(when = 0) {
@@ -103,12 +120,12 @@ abstract class CompositeAudioNode<
   }
 
   addEventListener(type: string, cb: EventListenerOrEventListenerObject) {
-    const { signal } = this._controller;
-    this._audioNode?.addEventListener(type, cb, { signal });
+    const { signal } = this.controller;
+    this.audioNode.addEventListener(type, cb, { signal });
   }
 
   removeEventListener(type: string, cb: EventListenerOrEventListenerObject) {
-    this._audioNode?.removeEventListener(type, cb);
+    this.audioNode.removeEventListener(type, cb);
   }
 
   // AUDIO PARAMS

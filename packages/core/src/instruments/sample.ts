@@ -1,6 +1,7 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
 import SamplerNode from "@/audio-nodes/sample-node";
-import { flipBuffer } from "../utils/flip-buffer";
+import { flipBuffer } from "@/utils/flip-buffer";
+import { isNumber } from "@/utils/validators";
 import type Drome from "@/index";
 
 type Nullable<T> = T | null | undefined;
@@ -15,7 +16,6 @@ interface SampleOptions extends InstrumentOptions<number> {
 export default class Sample extends Instrument<number> {
   private _sampleIds: string[];
   private _sampleBank: string;
-  private _buffer: AudioBuffer | undefined;
   private _playbackRate: number;
   private _loop: boolean;
   private _fitValue: number | undefined;
@@ -32,7 +32,8 @@ export default class Sample extends Instrument<number> {
   preloadSamples() {
     return this._sampleIds.map(async (id) => {
       const [name = "", index] = id.split(":");
-      return this._drome.loadSample(this._sampleBank, name, index);
+      const res = await this._drome.loadSample(this._sampleBank, name, index);
+      return res;
     });
   }
 
@@ -98,7 +99,13 @@ export default class Sample extends Instrument<number> {
       const { buffer } = await this._drome.loadSample(bank, name, index);
 
       notes.forEach((note, noteIndex) => {
-        if (!buffer || typeof note?.value !== "number") return;
+        if (
+          !buffer ||
+          !isNumber(note?.value) ||
+          note.start < this.ctx.currentTime - 0.025
+        ) {
+          return;
+        }
 
         const playbackRate = this._fitValue
           ? buffer.duration / barDuration / this._fitValue
@@ -129,14 +136,11 @@ export default class Sample extends Instrument<number> {
           src.disconnect();
           src.removeEventListener("ended", cleanup);
           this._audioNodes.delete(src);
-          // if (
-          //   this._audioNodes.size === 0 &&
-          //   isNumber(this._stopTime) &&
-          //   this.ctx.currentTime > this._stopTime
-          // ) {
-          //   this._stopTime = null;
-          //   this.cleanup();
-          // }
+          src.destory();
+
+          if (this._stopTime && this._audioNodes.size === 0) {
+            this.destroy();
+          }
         };
 
         src.addEventListener("ended", cleanup);

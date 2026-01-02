@@ -39,6 +39,11 @@ class SampleNode extends CompositeAudioNode<AudioBufferSourceNode> {
     this.audioNode.loopEnd = n;
   }
 
+  override destory(): void {
+    super.destory();
+    this._duration = 0;
+  }
+
   // AUDIO PARAMS
   get playbackRate() {
     return this.audioNode.playbackRate;
