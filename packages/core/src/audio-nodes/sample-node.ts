@@ -1,179 +1,81 @@
-import AudioEndedEvent from "@/events/audio-ended";
-import type { FilterType } from "@/worklets/worklet-filter";
-import type {
-  SampleParameterData,
-  SampleProcessorMessage,
-  SampleProcessorOptions,
-} from "@/worklets/worklet-samples";
+import CompositeAudioNode, {
+  type CompositeAudioNodeOptions,
+} from "./composite-audio-node";
 
-type SampleNodeMessage =
-  | {
-      type: "loop";
-      loop: boolean;
-    }
-  | {
-      type: "start" | "stop";
-      time: number;
-      offset?: number;
-    }
-  | {
-      type: "buffer";
-      buffer: Float32Array<ArrayBuffer>;
-    }
-  | {
-      type: "loopStart" | "loopEnd";
-      offset: number;
-    }
-  | {
-      type: "filterType";
-      filterType: FilterType;
-    };
+type SampleNodeOptions = CompositeAudioNodeOptions &
+  Omit<AudioBufferSourceOptions, "buffer">;
 
-class SampleNode extends AudioWorkletNode {
+class SampleNode extends CompositeAudioNode<AudioBufferSourceNode> {
+  protected _audioNode: AudioBufferSourceNode | null;
   private _duration: number;
-  private _loop: boolean;
-  private _loopStart: number;
-  private _loopEnd: number;
-  private _filterType: FilterType;
-  private _stopTime = 0;
-  readonly playbackRate: AudioParam;
-  readonly detune: AudioParam;
-  readonly gain: AudioParam;
-  readonly filterFrequency: AudioParam;
-  readonly filterQ: AudioParam;
-  onended: ((e: AudioEndedEvent) => void) | null = null;
 
   constructor(
     ctx: AudioContext,
     buffer: AudioBuffer,
-    {
-      filterType = "none",
-      loop = false,
-      loopStart = 0,
-      loopEnd = 1,
-      ...params
-    }: Partial<SampleParameterData & SampleProcessorOptions> = {}
+    { gain, filter, ...opts }: SampleNodeOptions
   ) {
-    super(ctx, "buffer-source-processor", {
-      numberOfOutputs: 1,
-      outputChannelCount: [2],
-      parameterData: params,
-      processorOptions: { filterType, loop, loopStart, loopEnd },
-    });
-
+    super(ctx, { gain, filter });
+    this._audioNode = new AudioBufferSourceNode(ctx, { ...opts, buffer });
     this._duration = buffer.duration;
-
-    this.playbackRate = getParam(this, "playbackRate");
-    this.detune = getParam(this, "detune");
-    this.gain = getParam(this, "gain");
-    this._loop = loop;
-    this._loopStart = loopStart;
-    this._loopEnd = loopEnd;
-    this._filterType = filterType;
-    this.filterFrequency = getParam(this, "filterFrequency");
-    this.filterQ = getParam(this, "filterQ");
-
-    this.postMessage({ type: "buffer", buffer: buffer.getChannelData(0) });
-
-    // Listen for messages from the processor
-    this.port.onmessage = (event: MessageEvent<SampleProcessorMessage>) => {
-      if (event.data.type === "ended") {
-        const audioEvent = new AudioEndedEvent(event.data.time);
-        this.onended?.(audioEvent);
-        this.dispatchEvent(audioEvent);
-      }
-    };
-  }
-
-  private postMessage(msg: SampleNodeMessage) {
-    this.port.postMessage(msg);
   }
 
   start(when = 0, offset = 0) {
-    const clampedOffset = Math.max(
-      0,
-      Math.min(offset * this._duration, this._duration)
+    this._startTime = when;
+    this.audioNode.start(
+      when,
+      Math.min(Math.max(offset, 0), 1) * this._duration
     );
-
-    this.postMessage({
-      type: "start",
-      time: when || this.context.currentTime,
-      offset: clampedOffset * this.context.sampleRate,
-    });
   }
 
-  stop(when: number = 0) {
-    const stopTime = when === 0 ? this.context.currentTime : when;
-    this._stopTime = stopTime;
-    this.postMessage({ type: "stop", time: stopTime });
+  setLoop(n: boolean) {
+    this.audioNode.loop = n;
   }
 
-  setLoop(loop: boolean) {
-    this._loop = loop;
-    this.postMessage({ type: "loop", loop });
+  setLoopStart(n: number) {
+    this.audioNode.loopStart = n;
   }
 
-  setLoopStart(loopStart: number) {
-    this._loopStart = loopStart;
-    this.postMessage({ type: "loopStart", offset: loopStart });
+  setLoopEnd(n: number) {
+    this.audioNode.loopEnd = n;
   }
 
-  setLoopEnd(loopEnd: number) {
-    this._loopEnd = loopEnd;
-    this.postMessage({ type: "loopEnd", offset: loopEnd });
+  // AUDIO PARAMS
+  get playbackRate() {
+    return this.audioNode.playbackRate;
   }
 
-  setFilterType(filterType: FilterType) {
-    this._filterType = filterType;
-    this.postMessage({ type: "filterType", filterType });
+  // STATIC VALUES
+  get buffer() {
+    return this.audioNode.buffer;
+  }
+
+  get duration() {
+    return this._duration;
   }
 
   get loop() {
-    return this._loop;
+    return this.audioNode.loop;
   }
 
-  set loop(loop: boolean) {
-    this._loop = loop;
-    this.postMessage({ type: "loop", loop });
+  set loop(n: boolean) {
+    this.audioNode.loop = n;
   }
 
   get loopStart() {
-    return this._loopStart;
+    return this.audioNode.loopStart;
   }
 
-  set loopStart(loopStart: number) {
-    this._loopStart = loopStart;
-    this.postMessage({ type: "loopStart", offset: loopStart });
+  set loopStart(n: number) {
+    this.audioNode.loopStart = n;
   }
 
   get loopEnd() {
-    return this._loopEnd;
+    return this.audioNode.loopEnd;
   }
 
-  set loopEnd(loopEnd: number) {
-    this._loopEnd = loopEnd;
-    this.postMessage({ type: "loopEnd", offset: loopEnd });
+  set loopEnd(n: number) {
+    this.audioNode.loopEnd = n;
   }
-
-  get filterType() {
-    return this._filterType;
-  }
-
-  set filterType(filterType: FilterType) {
-    this._filterType = filterType;
-    this.postMessage({ type: "filterType", filterType });
-  }
-
-  get stopTime() {
-    return this._stopTime;
-  }
-}
-
-function getParam(node: AudioWorkletNode, name: string) {
-  const param = node.parameters.get(name);
-  if (!param) throw new Error(`Missing AudioParam "${name}"`);
-  return param;
 }
 
 export default SampleNode;
-export type { SampleNodeMessage };

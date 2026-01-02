@@ -1,15 +1,15 @@
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
 import DromeArrayNullable from "@/array/drome-array-nullable";
-import SynthesizerNode from "@/audio-nodes/synthesizer-node";
-import SynthesizerNode2 from "@/audio-nodes/synthesizer-node-2";
-import SampleNode from "@/audio-nodes/sample-node";
-import SampleNode2 from "@/audio-nodes/sample-node-2";
+import LfoNode from "@/automation/lfo-node";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
 import { parsePatternString } from "../utils/parse-pattern";
 import { isNullish, isNumber, isString } from "../utils/validators";
+import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import type Drome from "../index";
+import type SynthNode from "@/audio-nodes/synth-node";
+import type SampleNode from "@/audio-nodes/sample-node";
 import type {
   AdsrMode,
   AdsrEnvelope,
@@ -17,11 +17,8 @@ import type {
   Note,
   SNEL,
   Nullable,
-} from "../types";
-import type { FilterType } from "@/worklets/worklet-filter";
-import { filterTypeMap, type FilterTypeAlias } from "../constants/index";
-import LfoNode from "@/automation/lfo-node";
-import type SamplerNode from "@/audio-nodes/sample-node-3";
+} from "@/types";
+import type { FilterType } from "@/types";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
@@ -32,7 +29,7 @@ interface InstrumentOptions<T> {
 }
 
 interface FrequencyParams {
-  type: FilterType;
+  type?: FilterType;
   frequency?: Pattern | Envelope | LfoNode;
   q?: Pattern | Envelope;
 }
@@ -42,19 +39,15 @@ abstract class Instrument<T> {
   protected _cycles: DromeArrayNullable<T>;
   private _destination: AudioNode;
   protected _connectorNode: GainNode;
-  protected readonly _audioNodes: Set<
-    SynthesizerNode | SampleNode | SynthesizerNode2 | SampleNode2 | SamplerNode
-  >;
+  protected readonly _audioNodes: Set<SynthNode | SampleNode>;
   private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
   protected _gain: Envelope;
   private _detune: Pattern | Envelope | LfoNode;
-  protected _filter: FrequencyParams = { type: "none" };
+  protected _filter: FrequencyParams = {};
   private _connected = false;
   protected _stopTime: number | null = null;
   public onCleanup: (() => void) | undefined;
-
-  // protected readonly _audioNodes2: Set<SynthesizerNode | SampleNode>;
 
   // Method Aliases
   amp: (input: number | Envelope | string) => this;
@@ -83,8 +76,6 @@ abstract class Instrument<T> {
     this._gain = new Envelope(0, this._baseGain);
     this._detune = new Pattern(0);
 
-    // this._audioNodes2 = new Set();
-
     this.amp = this.amplitude.bind(this);
     this.dt = this.detune.bind(this);
     this.env = this.adsr.bind(this);
@@ -96,12 +87,7 @@ abstract class Instrument<T> {
   }
 
   protected applyGain(
-    node:
-      | SynthesizerNode
-      | SampleNode
-      | SynthesizerNode2
-      | SampleNode2
-      | SamplerNode,
+    node: SynthNode | SampleNode,
     start: number,
     duration: number,
     chordIndex: number
@@ -111,14 +97,14 @@ abstract class Instrument<T> {
   }
 
   protected applyFilter(
-    node: SynthesizerNode | SampleNode | SamplerNode,
+    node: SynthNode | SampleNode,
     start: number,
     duration: number,
     chordIndex: number
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
 
-    if (this._filter.frequency) node.setFilterType(this._filter.type);
+    // if (this._filter.frequency) node.setFilterType(this._filter.type);
 
     if (this._filter.frequency instanceof Pattern) {
       this._filter.frequency.apply(
@@ -153,12 +139,7 @@ abstract class Instrument<T> {
   }
 
   protected applyDetune(
-    node:
-      | SynthesizerNode
-      | SampleNode
-      | SynthesizerNode2
-      | SampleNode2
-      | SamplerNode,
+    node: SynthNode | SampleNode,
     start: number,
     duration: number,
     chordIndex: number
@@ -186,8 +167,9 @@ abstract class Instrument<T> {
     ];
 
     chain.forEach((node, i) => {
-      if (node instanceof AutomatableEffect)
+      if (node instanceof AutomatableEffect) {
         node.apply(notes, this._drome.metronome.bar, barStart, barDuration);
+      }
 
       if (this._connected) return;
 

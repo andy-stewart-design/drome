@@ -1,4 +1,4 @@
-import type { SynthesizerNodeMessage } from "@/audio-nodes/synthesizer-node";
+import type { SynthesizerNodeMessage } from "@/audio-nodes/synth-worklet-node-1";
 import FilterProcessor, { type FilterType } from "./worklet-filter";
 import { isNumber } from "@/utils/validators";
 

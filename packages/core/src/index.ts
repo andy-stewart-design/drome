@@ -212,7 +212,7 @@ class Drome {
     return new Envelope(maxValue, startValue, endValue);
   }
 
-  lfo(baseValue: number, scale = 1, rate: number) {
+  lfo(baseValue: number, scale = 1, rate = 1) {
     const lfo = new LfoNode(this.ctx, { baseValue, scale, rate });
     lfo.bpm(this.clock.beatsPerMin);
     this.lfos.add(lfo);

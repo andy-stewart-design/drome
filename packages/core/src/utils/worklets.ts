@@ -1,18 +1,9 @@
 import bitcrush from "@/worklets/worklet-bitcrusher.js?raw";
 import distortion from "@/worklets/worklet-distortion.js?raw";
 import lfoProcessor from "@/worklets/worklet-lfo?raw";
-// import sampleProcessor from "@/worklets/worklet-sample-2?raw";
-import synthesizerProcessor from "@/worklets/worklet-synthesizer-2?raw";
 import supersawProcessor from "@/worklets/worklet-supersaw?raw";
 
-const worklets = [
-  bitcrush,
-  distortion,
-  lfoProcessor,
-  // sampleProcessor,
-  synthesizerProcessor,
-  supersawProcessor,
-];
+const worklets = [bitcrush, distortion, lfoProcessor, supersawProcessor];
 
 async function addWorklets(ctx: AudioContext) {
   const promises = worklets.map((code) => {

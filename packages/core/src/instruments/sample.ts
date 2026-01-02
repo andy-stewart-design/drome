@@ -1,9 +1,7 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
-import SamplerNode from "@/audio-nodes/sample-node-3";
+import SamplerNode from "@/audio-nodes/sample-node";
 import { flipBuffer } from "../utils/flip-buffer";
 import type Drome from "@/index";
-import { isNumber } from "@/utils/validators";
-import type { FilterType } from "@/worklets/worklet-filter";
 
 type Nullable<T> = T | null | undefined;
 
@@ -17,6 +15,7 @@ interface SampleOptions extends InstrumentOptions<number> {
 export default class Sample extends Instrument<number> {
   private _sampleIds: string[];
   private _sampleBank: string;
+  private _buffer: AudioBuffer | undefined;
   private _playbackRate: number;
   private _loop: boolean;
   private _fitValue: number | undefined;
@@ -55,7 +54,6 @@ export default class Sample extends Instrument<number> {
 
     if (!input.length) {
       const chopsPerCycle = Math.floor(numChops / this._cycles.length) || 1;
-      // const step = Math.min(1 / numChops, 1 / this._cycles.length);
       const step = 1 / (chopsPerCycle * this._cycles.length);
 
       this._cycles.value = Array.from(
@@ -94,11 +92,12 @@ export default class Sample extends Instrument<number> {
   play(barStart: number, barDuration: number) {
     const notes = this.beforePlay(barStart, barDuration);
 
-    this._sampleIds.forEach((sampleId) => {
-      notes.forEach(async (note, noteIndex) => {
-        const bank = this._sampleBank;
-        const [name = "", index] = sampleId.split(":");
-        const { buffer } = await this._drome.loadSample(bank, name, index);
+    this._sampleIds.forEach(async (sampleId) => {
+      const bank = this._sampleBank;
+      const [name = "", index] = sampleId.split(":");
+      const { buffer } = await this._drome.loadSample(bank, name, index);
+
+      notes.forEach((note, noteIndex) => {
         if (!buffer || typeof note?.value !== "number") return;
 
         const playbackRate = this._fitValue
@@ -108,14 +107,13 @@ export default class Sample extends Instrument<number> {
         const src = new SamplerNode(
           this.ctx,
           this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
-          { playbackRate, loop: this._loop, gain: 0 }
+          {
+            playbackRate,
+            loop: this._loop,
+            gain: 0,
+            filter: this._filter.type ? { type: this._filter.type } : undefined,
+          }
         );
-
-        // const src = new SampleNode(
-        //   this.ctx,
-        //   this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
-        //   { rate: playbackRate, loop: this._loop, gain: 0 }
-        // );
         this._audioNodes.add(src);
 
         const _duration = this._cut ? note.duration : buffer.duration;

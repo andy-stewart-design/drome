@@ -1,52 +1,59 @@
-import type { FilterType } from "@/worklets/worklet-filter";
+import type { FilterType } from "@/types";
 
-interface SampleNodeOptions extends Omit<AudioBufferSourceOptions, "buffer"> {
+type FilterOptions = Omit<BiquadFilterOptions, "type"> & { type: FilterType };
+
+interface CompositeAudioNodeOptions {
   gain?: number;
-  filter?: BiquadFilterOptions;
+  filter?: FilterOptions;
 }
 
-class SampleNode {
-  private _audioNode: AudioBufferSourceNode | null;
-  private _gainNode: GainNode | null;
-  private _filterNode: BiquadFilterNode | null;
-  private _controller: AbortController;
-  private _duration: number;
-  private _connected = false;
+abstract class CompositeAudioNode<
+  T extends OscillatorNode | AudioBufferSourceNode,
+> {
+  protected abstract _audioNode: T | null;
+  protected _gainNode: GainNode | null;
+  protected _filterNode: BiquadFilterNode | null;
+  protected _controller: AbortController;
+  protected _connected = false;
+  protected _startTime = 0;
+  protected _stopTime = 0;
 
-  constructor(
-    ctx: AudioContext,
-    buffer: AudioBuffer,
-    { gain, filter, ...opts }: SampleNodeOptions
-  ) {
-    this._audioNode = new AudioBufferSourceNode(ctx, { ...opts, buffer });
+  constructor(ctx: AudioContext, { gain, filter }: CompositeAudioNodeOptions) {
     this._gainNode = new GainNode(ctx, { gain });
-    this._duration = buffer.duration;
     this._controller = new AbortController();
     this._filterNode = filter ? new BiquadFilterNode(ctx, filter) : null;
   }
 
-  private get audioNode() {
+  abstract start(when?: number, offset?: number): void;
+
+  protected get audioNode() {
     if (!this._audioNode) {
-      throw new Error("[SAMPLE NODE]: Audio Node has been disconnected.");
+      throw new Error(
+        `[${this.nodeType.toLocaleUpperCase()} NODE]: audio node has been disconnected.`
+      );
     }
     return this._audioNode;
   }
 
-  private get gainNode() {
+  protected get gainNode() {
     if (!this._gainNode) {
-      throw new Error("[SAMPLE NODE]: Gain Node has been disconnected.");
+      throw new Error(
+        `[${this.nodeType.toLocaleUpperCase()} NODE]: gain node has been disconnected.`
+      );
     }
     return this._gainNode;
   }
 
-  private get filterNode() {
+  protected get filterNode() {
     if (!this._filterNode) {
-      throw new Error("[SAMPLE NODE]: Filter Node does not exist.");
+      throw new Error(
+        `[${this.nodeType.toLocaleUpperCase()} NODE]: filter node has not been set or has been disconnected.`
+      );
     }
     return this._filterNode;
   }
 
-  private createFilter(opts: BiquadFilterOptions) {
+  protected createFilter(opts: BiquadFilterOptions) {
     this._filterNode = new BiquadFilterNode(this.ctx, opts);
   }
 
@@ -72,30 +79,12 @@ class SampleNode {
     this._filterNode = null;
   }
 
-  start(when = 0, offset = 0) {
-    this.audioNode.start(
-      when,
-      Math.min(Math.max(offset, 0), 1) * this._duration
-    );
-  }
-
   stop(when = 0) {
-    this.audioNode.stop(when ?? this.audioNode.context.currentTime);
+    this._stopTime = when;
+    this.audioNode.stop(when);
   }
 
-  setLoop(n: boolean) {
-    this.audioNode.loop = n;
-  }
-
-  setLoopStart(n: number) {
-    this.audioNode.loopStart = n;
-  }
-
-  setLoopEnd(n: number) {
-    this.audioNode.loopEnd = n;
-  }
-
-  setFilterType(type: FilterType) {
+  setFilterType(type: FilterType | "none") {
     if (type === "none") {
       if (!this._filterNode) return;
       this._filterNode.disconnect(this.gainNode);
@@ -122,17 +111,9 @@ class SampleNode {
     this._audioNode?.removeEventListener(type, cb);
   }
 
-  get buffer() {
-    return this.audioNode.buffer!; // TODO: replace assertion with a check
-  }
-
   // AUDIO PARAMS
   get detune() {
     return this.audioNode.detune;
-  }
-
-  get playbackRate() {
-    return this.audioNode.playbackRate;
   }
 
   get gain() {
@@ -152,43 +133,27 @@ class SampleNode {
     return this.audioNode.context;
   }
 
-  get connected() {
-    return this._connected;
-  }
-
-  get duration() {
-    return this._duration;
-  }
-
-  get loop() {
-    return this.audioNode.loop;
-  }
-
-  set loop(n: boolean) {
-    this.audioNode.loop = n;
-  }
-
-  get loopStart() {
-    return this.audioNode.loopStart;
-  }
-
-  set loopStart(n: number) {
-    this.audioNode.loopStart = n;
-  }
-
-  get loopEnd() {
-    return this.audioNode.loopEnd;
-  }
-
-  set loopEnd(n: number) {
-    this.audioNode.loopEnd = n;
+  get nodeType() {
+    return this.audioNode instanceof OscillatorNode ? "synth" : "sample";
   }
 
   get filterType(): string {
     return this.filterNode.type;
   }
 
-  set filterType(type: FilterType) {
+  get connected() {
+    return this._connected;
+  }
+
+  get startTime() {
+    return this._startTime;
+  }
+
+  get stopTime() {
+    return this._stopTime;
+  }
+
+  set filterType(type: FilterType | "none") {
     if (type === "none") {
       if (!this._filterNode) return;
       this._filterNode.disconnect(this.gainNode);
@@ -205,4 +170,5 @@ class SampleNode {
   }
 }
 
-export default SampleNode;
+export default CompositeAudioNode;
+export type { CompositeAudioNodeOptions };
