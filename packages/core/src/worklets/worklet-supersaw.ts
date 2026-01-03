@@ -1,6 +1,7 @@
-type SupersawProcessorMessage = { type: "ended"; time: number };
+export type SupersawProcessorMessage = { type: "ended"; time: number };
+export type AudioParamName = (typeof audioParams)[number]["name"];
+export type AudioParamData = Record<AudioParamName, number>;
 
-const INVSR = 1 / sampleRate;
 const frac = (x: number) => x - Math.floor(x);
 
 const applySemitoneDetuneToFrequency = (frequency: number, detune: number) => {
@@ -31,6 +32,16 @@ const sawblep = (phase: number, dt: number) => {
   return 2 * phase - 1 - polyBlep(phase, dt);
 };
 
+const audioParams = [
+  { name: "start", defaultValue: 0, max: Number.POSITIVE_INFINITY, min: 0 },
+  { name: "stop", defaultValue: 0, max: Number.POSITIVE_INFINITY, min: 0 },
+  { name: "frequency", defaultValue: 440, minValue: 20, maxValue: 20000 },
+  { name: "panspread", defaultValue: 0.4, min: 0, max: 1 },
+  { name: "freqspread", defaultValue: 0.2, min: 0 },
+  { name: "detune", defaultValue: 0, min: 0 },
+  { name: "voices", defaultValue: 5, min: 1, automationRate: "k-rate" },
+] as const;
+
 class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
   private phase: number[];
 
@@ -40,20 +51,7 @@ class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
   }
 
   static get parameterDescriptors() {
-    return [
-      { name: "begin", defaultValue: 0, max: Number.POSITIVE_INFINITY, min: 0 },
-      { name: "end", defaultValue: 0, max: Number.POSITIVE_INFINITY, min: 0 },
-      {
-        name: "frequency",
-        defaultValue: 440,
-        minValue: 20.0,
-        maxValue: 20000.0,
-      },
-      { name: "panspread", defaultValue: 0.4, min: 0, max: 1 },
-      { name: "freqspread", defaultValue: 0.2, min: 0 },
-      { name: "detune", defaultValue: 0, min: 0 },
-      { name: "voices", defaultValue: 5, min: 1, automationRate: "k-rate" },
-    ];
+    return audioParams;
   }
 
   postEndedMessage(time: number) {
@@ -64,10 +62,10 @@ class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
   process(
     _: Float32Array[][],
     outputs: Float32Array[][],
-    params: Record<string, Float32Array>,
+    params: Record<AudioParamName, Float32Array>,
   ) {
-    const startTime = params.begin[0];
-    const stopTime = params.end[0];
+    const startTime = params.start[0];
+    const stopTime = params.stop[0];
 
     if (currentTime <= startTime) return true;
 
@@ -97,11 +95,11 @@ class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
       for (let n = 0; n < voices; n++) {
         const phase = this.phase[n] ?? Math.random();
         const freqVoice = applySemitoneDetuneToFrequency(freq, detuner(n));
-        const dt = frac(freqVoice * INVSR);
+        const dt = frac(freqVoice * (1 / sampleRate));
         const v = sawblep(phase, dt);
 
-        output[0][i] += v * gainL * 0.25;
-        output[1][i] += v * gainR * 0.25;
+        output[0][i] += v * gainL * 1.25;
+        output[1][i] += v * gainR * 1.25;
 
         let p = phase + dt;
         if (p >= 1) p -= 1;
@@ -116,4 +114,4 @@ class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor("supersaw-oscillator", SuperSawOscillatorProcessor);
+registerProcessor("supersaw-processor", SuperSawOscillatorProcessor);

@@ -8,8 +8,8 @@ import { parsePatternString } from "../utils/parse-pattern";
 import { isNullish, isNumber, isString } from "../utils/validators";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import type Drome from "../index";
-import type SynthNode from "@/audio-nodes/synth-node";
-import type SampleNode from "@/audio-nodes/sample-node";
+import type SynthNode from "@/audio-nodes/composite-synth-node";
+import type SampleNode from "@/audio-nodes/composite-sample-node";
 import type { AdsrMode, AdsrEnvelope, InstrumentType, Note, SNEL, Nullable, } from "@/types";
 import type { FilterType } from "@/types";
 

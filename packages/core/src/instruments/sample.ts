@@ -1,5 +1,5 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
-import SamplerNode from "@/audio-nodes/sample-node";
+import SamplerNode from "@/audio-nodes/composite-sample-node";
 import { flipBuffer } from "@/utils/flip-buffer";
 import { isNumber } from "@/utils/validators";
 import type Drome from "@/index";

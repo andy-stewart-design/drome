@@ -1,5 +1,5 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
-import SynthNode from "@/audio-nodes/synth-node";
+import SynthNode from "@/audio-nodes/composite-synth-node";
 import { midiToFrequency } from "@/utils/midi-to-frequency";
 import type Drome from "@/index";
 

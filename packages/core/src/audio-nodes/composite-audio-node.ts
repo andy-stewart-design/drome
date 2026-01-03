@@ -1,4 +1,5 @@
 import type { FilterType } from "@/types";
+import type SupersawNode from "./supersaw-worklet-node";
 
 type FilterOptions = Omit<BiquadFilterOptions, "type"> & { type: FilterType };
 
@@ -8,7 +9,7 @@ interface CompositeAudioNodeOptions {
 }
 
 abstract class CompositeAudioNode<
-  T extends OscillatorNode | AudioBufferSourceNode,
+  T extends OscillatorNode | SupersawNode | AudioBufferSourceNode,
 > {
   protected abstract _audioNode: T | null;
   protected _gainNode: GainNode | null;
