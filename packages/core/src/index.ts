@@ -1,4 +1,4 @@
-// TODO: Add supersaw synth
+// TODO: Add methods for supersaw synth
 
 import AudioClock from "@/clock/audio-clock";
 import Envelope from "@/automation/envelope";
