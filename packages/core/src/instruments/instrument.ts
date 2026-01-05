@@ -10,7 +10,14 @@ import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import type Drome from "../index";
 import type SynthNode from "@/audio-nodes/composite-synth-node";
 import type SampleNode from "@/audio-nodes/composite-sample-node";
-import type { AdsrMode, AdsrEnvelope, InstrumentType, Note, SNEL, Nullable, } from "@/types";
+import type {
+  AdsrMode,
+  AdsrEnvelope,
+  InstrumentType,
+  Note,
+  SNEL,
+  Nullable,
+} from "@/types";
 import type { FilterType } from "@/types";
 
 interface InstrumentOptions<T> {

@@ -1,17 +1,16 @@
 import AudioEndedEvent from "@/events/audio-ended";
-import type { AudioParamName, AudioParamData, SupersawProcessorMessage, } from "@/worklets/worklet-supersaw";
+import type {
+  AudioParamName,
+  AudioParamData,
+  SupersawProcessorMessage,
+} from "@/worklets/worklet-supersaw";
 
 type SupersawOptions = Partial<AudioParamData>;
-// type SupersawNodeMessage = {
-//   type: "start" | "stop";
-//   time: number;
-//   offset?: number;
-// };
 
 class SupersawNode extends AudioWorkletNode {
   private _startTime: AudioParam;
   private _stopTime: AudioParam;
-  readonly voices: AudioParam;
+  readonly _voices: AudioParam;
   readonly frequency: AudioParam;
   readonly detune: AudioParam;
   readonly freqspread: AudioParam;
@@ -27,7 +26,7 @@ class SupersawNode extends AudioWorkletNode {
 
     this._startTime = getParam<AudioParamName>(this, "start");
     this._stopTime = getParam<AudioParamName>(this, "stop");
-    this.voices = getParam<AudioParamName>(this, "voices");
+    this._voices = getParam<AudioParamName>(this, "voices");
     this.frequency = getParam<AudioParamName>(this, "frequency");
     this.detune = getParam<AudioParamName>(this, "detune");
     this.freqspread = getParam<AudioParamName>(this, "freqspread");
@@ -42,18 +41,16 @@ class SupersawNode extends AudioWorkletNode {
     };
   }
 
-  //   private postMessage(msg: SupersawNodeMessage) {
-  //     this.port.postMessage(msg);
-  //   }
-
   start(when: number = 0) {
     this._startTime.value = when;
-    // this.postMessage({ type: "start", time: when });
   }
 
   stop(when: number = 0) {
     this._stopTime.value = when;
-    // this.postMessage({ type: "stop", time: when });
+  }
+
+  voices(n: number) {
+    this._voices.value = n;
   }
 
   get startTime() {
@@ -66,7 +63,6 @@ class SupersawNode extends AudioWorkletNode {
 }
 
 export default SupersawNode;
-// export type { SupersawNodeMessage };
 
 function getParam<T extends string>(node: AudioWorkletNode, name: T) {
   const param = node.parameters.get(name);

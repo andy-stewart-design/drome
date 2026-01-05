@@ -1,20 +1,28 @@
-import CompositeAudioNode, { type CompositeAudioNodeOptions, } from "./composite-audio-node";
+import type { SupersawOptions } from "@/worklets/worklet-supersaw";
+import CompositeAudioNode, {
+  type CompositeAudioNodeOptions,
+} from "./composite-audio-node";
 import SupersawNode from "./supersaw-worklet-node";
 
-type OscType = "sawtooth" | "sine" | "square" | "supersaw" | "triangle";
-type Foo = Omit<OscillatorOptions, "type"> & { type: OscType };
-type SynthNodeOptions = CompositeAudioNodeOptions & Foo;
+type Waveform = "sawtooth" | "sine" | "square" | "supersaw" | "triangle";
+type BaseOscillatorOptions = Omit<OscillatorOptions, "type"> & {
+  type: Waveform;
+} & SupersawOptions;
+type SynthNodeOptions = CompositeAudioNodeOptions & BaseOscillatorOptions;
 
 class SynthNode extends CompositeAudioNode<OscillatorNode | SupersawNode> {
   protected _audioNode: OscillatorNode | SupersawNode | null;
 
   constructor(
     ctx: AudioContext,
-    { gain, filter, type, ...opts }: SynthNodeOptions,
+    { gain, filter, type, voices, ...opts }: SynthNodeOptions,
   ) {
     super(ctx, { gain, filter });
     if (type === "supersaw") {
-      this._audioNode = new SupersawNode(ctx, { frequency: opts.frequency });
+      this._audioNode = new SupersawNode(ctx, {
+        frequency: opts.frequency,
+        voices,
+      });
     } else {
       this._audioNode = new OscillatorNode(ctx, { ...opts, type });
     }
@@ -33,9 +41,9 @@ class SynthNode extends CompositeAudioNode<OscillatorNode | SupersawNode> {
     if (!this.isSupersaw(this.audioNode)) this.audioNode.type = type;
   }
 
-  get type(): OscType {
+  get type(): Waveform {
     if (!this.isSupersaw(this.audioNode)) {
-      return this.audioNode.type as OscType;
+      return this.audioNode.type as Waveform;
     }
     return "supersaw";
   }

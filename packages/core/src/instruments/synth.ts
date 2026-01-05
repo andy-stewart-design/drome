@@ -1,4 +1,5 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
+import DromeArray from "@/array/drome-array";
 import SynthNode from "@/audio-nodes/composite-synth-node";
 import { midiToFrequency } from "@/utils/midi-to-frequency";
 import type Drome from "@/index";
@@ -9,10 +10,17 @@ interface SynthOptions extends InstrumentOptions<number | number[]> {
 
 export default class Synth extends Instrument<number | number[]> {
   private _types: OscillatorType[];
+  private _voices: DromeArray<number>;
 
   constructor(drome: Drome, opts: SynthOptions) {
     super(drome, { ...opts, baseGain: 0.125 });
     this._types = opts.type?.length ? opts.type : ["sine"];
+    this._voices = new DromeArray(7);
+  }
+
+  voices(...input: (number | number[])[]) {
+    this._voices.note(...input);
+    return this;
   }
 
   play(barStart: number, barDuration: number) {
@@ -23,11 +31,13 @@ export default class Synth extends Instrument<number | number[]> {
         if (!note) return;
         [note?.value].flat().forEach((midiNote) => {
           // if (!midiNote) return;
+          const cycleIndex = this._drome.metronome.bar % this._voices.length;
           const osc = new SynthNode(this.ctx, {
             frequency: midiToFrequency(midiNote),
             type: type === "custom" ? "sine" : type,
             filter: this._filter.type ? { type: this._filter.type } : undefined,
             gain: 0,
+            voices: this._voices.at(cycleIndex, chordIndex),
           });
           this._audioNodes.add(osc);
 
