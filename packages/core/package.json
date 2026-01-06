@@ -17,7 +17,8 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format": "prettier src --write"
   },
   "author": "Andy Stewart <andy.stewart1170@gmail.com> (https://andystew.art)",
   "repository": {
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "esbuild": "^0.27.0",
+    "prettier-plugin-one-line-imports": "^1.0.1",
     "tsdown": "0.17.0-beta.4"
   },
   "type": "module",

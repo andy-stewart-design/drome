@@ -32,7 +32,7 @@ function getSamplePath(
   banks: SampleBankSchema | null,
   bank: string,
   name: string,
-  index: number | string
+  index: number | string,
 ) {
   if (!banks) return null;
   const data = banks[bank.toLocaleLowerCase()];

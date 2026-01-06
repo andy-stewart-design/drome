@@ -1,5 +1,5 @@
 import FilterProcessor, { type FilterType } from "./worklet-filter";
-import type { SampleNodeMessage } from "../audio-nodes/sample-node";
+import type { SampleNodeMessage } from "../audio-nodes/sample-worklet-node-1";
 
 interface SampleProcessorOptions {
   filterType: FilterType;
@@ -120,7 +120,7 @@ class SampleProcessor extends FilterProcessor {
   process(
     _: Float32Array[][],
     outputs: Float32Array[][],
-    parameters: Record<string, Float32Array>
+    parameters: Record<string, Float32Array>,
   ) {
     const output = outputs[0];
     const outChan = output?.[0];

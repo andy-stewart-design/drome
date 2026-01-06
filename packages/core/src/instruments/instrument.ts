@@ -1,13 +1,15 @@
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
 import DromeArrayNullable from "@/array/drome-array-nullable";
-import SynthesizerNode from "@/audio-nodes/synthesizer-node";
-import SampleNode from "@/audio-nodes/sample-node";
+import LfoNode from "@/automation/lfo-node";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
 import { parsePatternString } from "../utils/parse-pattern";
 import { isNullish, isNumber, isString } from "../utils/validators";
+import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import type Drome from "../index";
+import type SynthNode from "@/audio-nodes/composite-synth-node";
+import type SampleNode from "@/audio-nodes/composite-sample-node";
 import type {
   AdsrMode,
   AdsrEnvelope,
@@ -15,10 +17,8 @@ import type {
   Note,
   SNEL,
   Nullable,
-} from "../types";
-import type { FilterType } from "@/worklets/worklet-filter";
-import { filterTypeMap, type FilterTypeAlias } from "../constants/index";
-import LfoNode from "@/automation/lfo-node";
+} from "@/types";
+import type { FilterType } from "@/types";
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
@@ -29,7 +29,7 @@ interface InstrumentOptions<T> {
 }
 
 interface FrequencyParams {
-  type: FilterType;
+  type?: FilterType;
   frequency?: Pattern | Envelope | LfoNode;
   q?: Pattern | Envelope;
 }
@@ -39,15 +39,15 @@ abstract class Instrument<T> {
   protected _cycles: DromeArrayNullable<T>;
   private _destination: AudioNode;
   protected _connectorNode: GainNode;
-  protected readonly _audioNodes: Set<SynthesizerNode | SampleNode>;
+  protected readonly _audioNodes: Set<SynthNode | SampleNode>;
   private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
   protected _gain: Envelope;
   private _detune: Pattern | Envelope | LfoNode;
-  protected _filter: FrequencyParams = { type: "none" };
+  protected _filter: FrequencyParams = {};
   private _connected = false;
   protected _stopTime: number | null = null;
-  public onCleanup: (() => void) | undefined;
+  public onDestory: (() => void) | undefined;
 
   // Method Aliases
   amp: (input: number | Envelope | string) => this;
@@ -60,7 +60,7 @@ abstract class Instrument<T> {
   fil: (
     type: FilterTypeAlias,
     f: number | Envelope | string,
-    q: number | Envelope | string
+    q: number | Envelope | string,
   ) => this;
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
@@ -87,30 +87,28 @@ abstract class Instrument<T> {
   }
 
   protected applyGain(
-    node: SynthesizerNode | SampleNode,
+    node: SynthNode | SampleNode,
     start: number,
     duration: number,
-    chordIndex: number
+    chordIndex: number,
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
     return this._gain.apply(node.gain, start, duration, cycleIndex, chordIndex);
   }
 
   protected applyFilter(
-    node: SynthesizerNode | SampleNode,
+    node: SynthNode | SampleNode,
     start: number,
     duration: number,
-    chordIndex: number
+    chordIndex: number,
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
-
-    if (this._filter.frequency) node.setFilterType(this._filter.type);
 
     if (this._filter.frequency instanceof Pattern) {
       this._filter.frequency.apply(
         node.filterFrequency,
         cycleIndex,
-        chordIndex
+        chordIndex,
       );
     } else if (this._filter.frequency instanceof Envelope) {
       this._filter.frequency.apply(
@@ -118,7 +116,7 @@ abstract class Instrument<T> {
         start,
         duration,
         cycleIndex,
-        chordIndex
+        chordIndex,
       );
     } else if (this._filter.frequency instanceof LfoNode) {
       node.filterFrequency.value = this._filter.frequency.baseValue;
@@ -133,16 +131,16 @@ abstract class Instrument<T> {
         start,
         duration,
         cycleIndex,
-        chordIndex
+        chordIndex,
       );
     }
   }
 
   protected applyDetune(
-    node: SynthesizerNode | SampleNode,
+    node: SynthNode | SampleNode,
     start: number,
     duration: number,
-    chordIndex: number
+    chordIndex: number,
   ) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
 
@@ -158,7 +156,7 @@ abstract class Instrument<T> {
   private connectChain(
     notes: Note<T>[],
     barStart: number,
-    barDuration: number
+    barDuration: number,
   ) {
     const chain = [
       this._connectorNode,
@@ -167,8 +165,9 @@ abstract class Instrument<T> {
     ];
 
     chain.forEach((node, i) => {
-      if (node instanceof AutomatableEffect)
+      if (node instanceof AutomatableEffect) {
         node.apply(notes, this._drome.metronome.bar, barStart, barDuration);
+      }
 
       if (this._connected) return;
 
@@ -193,7 +192,7 @@ abstract class Instrument<T> {
   euclid(
     pulses: number | number[],
     steps: number,
-    rotation: number | number[]
+    rotation: number | number[],
   ) {
     this._cycles.euclid(pulses, steps, rotation);
     return this;
@@ -240,7 +239,9 @@ abstract class Instrument<T> {
     } else {
       const pattern = isString(input) ? parsePatternString(input) : [input];
       const normalizedPattern = pattern.map((x) =>
-        Array.isArray(x) ? x.map((y) => y * this._baseGain) : x * this._baseGain
+        Array.isArray(x)
+          ? x.map((y) => y * this._baseGain)
+          : x * this._baseGain,
       );
       this._gain.maxValue(...normalizedPattern);
     }
@@ -339,38 +340,38 @@ abstract class Instrument<T> {
     return notes;
   }
 
-  stop(when?: number, fadeTime?: number) {
-    const stopTime = when ?? this.ctx.currentTime;
+  stop(when = 0, fadeTime = 0) {
+    const stopStartTime = when ?? this.ctx.currentTime;
+    this._stopTime = stopStartTime + fadeTime;
 
-    if (!fadeTime) {
-      this._stopTime = stopTime;
-    } else {
-      const handleEnded = (e: Event) => {
-        this.cleanup();
-        e.target?.removeEventListener("ended", handleEnded);
-      };
-
+    if (fadeTime) {
       Array.from(this._audioNodes).forEach((node, i) => {
-        if (i === this._audioNodes.size - 1) {
-          node.addEventListener("ended", handleEnded);
-        }
-
-        node.gain.cancelScheduledValues(stopTime);
-        node.gain.setValueAtTime(node.gain.value, stopTime);
-        node.gain.linearRampToValueAtTime(0, stopTime + fadeTime);
-        node.stop(stopTime + fadeTime + 0.1);
+        node.gain.cancelScheduledValues(stopStartTime);
+        node.gain.setValueAtTime(node.gain.value, stopStartTime);
+        node.gain.linearRampToValueAtTime(0, stopStartTime + fadeTime);
+        node.stop(stopStartTime + fadeTime + 0.1);
       });
     }
   }
 
-  cleanup() {
-    this._audioNodes.forEach((node) => node.disconnect());
-    this._audioNodes.clear();
-    this._signalChain.forEach((node) => node.disconnect());
-    this._signalChain.clear();
+  destroy() {
+    if (this._audioNodes.size) {
+      this._audioNodes.forEach((node) => {
+        node.disconnect();
+        this._audioNodes.delete(node);
+        node.destory();
+      });
+      this._audioNodes.clear();
+    }
+    if (this._signalChain.size) {
+      this._signalChain.forEach((node) => node.disconnect());
+      this._signalChain.clear();
+    }
     this._connectorNode.disconnect();
     this._connected = false;
-    this.onCleanup?.();
+    this._baseGain = 0;
+    this._stopTime = null;
+    this.onDestory?.();
   }
 
   get ctx() {

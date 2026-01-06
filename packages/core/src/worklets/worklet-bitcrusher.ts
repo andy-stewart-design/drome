@@ -22,7 +22,7 @@ class BitcrushProcessor extends AudioWorkletProcessor {
   process(
     inputs: Float32Array[][],
     outputs: Float32Array[][],
-    parameters: Record<string, Float32Array>
+    parameters: Record<string, Float32Array>,
   ) {
     const rateParam = parameters.rateReduction;
     const bitsParam = parameters.bitDepth;

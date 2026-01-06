@@ -1,10 +1,6 @@
 import AudioEndedEvent from "@/events/audio-ended";
 import type { FilterType } from "@/worklets/worklet-filter";
-import type {
-  SynthesizerProcessorOptions,
-  SynthesizerParameterData,
-  SynthesizerProcessorMessage,
-} from "@/worklets/worklet-synthesizer";
+import type { SynthesizerProcessorOptions, SynthesizerParameterData, SynthesizerProcessorMessage, } from "@/worklets/worklet-synthesizer";
 
 type Waveform = "sine" | "sawtooth" | "triangle" | "square";
 
@@ -33,32 +29,37 @@ class SynthesizerNode extends AudioWorkletNode {
   readonly frequency: AudioParam;
   readonly detune: AudioParam;
   readonly gain: AudioParam;
-  readonly filterFrequency: AudioParam;
-  readonly filterQ: AudioParam;
+  readonly begin: AudioParam;
+  readonly end: AudioParam;
+  //   readonly filterFrequency: AudioParam;
+  //   readonly filterQ: AudioParam;
   onended: ((e: AudioEndedEvent) => void) | null = null;
 
   constructor(
     ctx: AudioContext,
-    { filterType = "none", type = "sine", ...params }: SynthesizerOptions = {}
+    { filterType = "none", type = "sine", ...params }: SynthesizerOptions = {},
   ) {
-    super(ctx, "custom-oscillator-processor", {
+    super(ctx, "synth-oscillator", {
       numberOfOutputs: 1,
       outputChannelCount: [2],
-      parameterData: { ...params, type: getOscillatorType(type) },
+      parameterData: params,
       processorOptions: { filterType, type },
     });
 
     this._oscillatorType = type;
     this._filterType = filterType;
+    this.begin = getParam(this, "begin");
+    this.end = getParam(this, "end");
     this.frequency = getParam(this, "frequency");
     this.detune = getParam(this, "detune");
     this.gain = getParam(this, "gain");
-    this.filterFrequency = getParam(this, "filterFrequency");
-    this.filterQ = getParam(this, "filterQ");
+
+    // this.filterFrequency = getParam(this, "filterFrequency");
+    // this.filterQ = getParam(this, "filterQ");
 
     // Listen for messages from the processor
     this.port.onmessage = (
-      event: MessageEvent<SynthesizerProcessorMessage>
+      event: MessageEvent<SynthesizerProcessorMessage>,
     ) => {
       if (event.data.type === "ended") {
         const audioEvent = new AudioEndedEvent(event.data.time);
@@ -75,12 +76,14 @@ class SynthesizerNode extends AudioWorkletNode {
   start(when: number = 0) {
     const startTime = when === 0 ? this.context.currentTime : when;
     this.postMessage({ type: "start", time: startTime });
+    this.begin.value = when;
   }
 
   stop(when: number = 0) {
     const stopTime = when === 0 ? this.context.currentTime : when;
     this._stopTime = stopTime;
     this.postMessage({ type: "stop", time: stopTime });
+    this.end.value = when;
   }
 
   setOscillatorType(oscillatorType: Waveform) {

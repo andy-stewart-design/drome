@@ -102,7 +102,7 @@ class LFOProcessor extends AudioWorkletProcessor {
   process(
     _: Float32Array[][],
     outputs: Float32Array[][],
-    parameters: Record<string, Float32Array>
+    parameters: Record<string, Float32Array>,
   ) {
     const output = outputs[0];
     const bpmArray = parameters.beatsPerMinute;

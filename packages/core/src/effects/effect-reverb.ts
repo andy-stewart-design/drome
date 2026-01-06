@@ -60,7 +60,7 @@ class ReverbEffect extends AutomatableEffect<ConvolverNode> {
     drome: Drome,
     decay: number,
     lpfStart = 0,
-    lpfEnd = 0
+    lpfEnd = 0,
   ) {
     const buffer = createImpulseResponse(drome.ctx, decay);
     if (lpfStart) {

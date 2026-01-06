@@ -36,7 +36,7 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
     notes: Note<unknown>[],
     currentBar: number,
     startTime: number,
-    duration: number
+    duration: number,
   ) {
     if (!this._target) return;
 

@@ -1,7 +1,7 @@
 function euclid(
   pulses: number | number[],
   steps: number,
-  rotation: number | number[] = 0
+  rotation: number | number[] = 0,
 ) {
   const numPulses = Array.isArray(pulses) ? pulses.length : 1;
   const numRotation = Array.isArray(rotation) ? rotation.length : 1;

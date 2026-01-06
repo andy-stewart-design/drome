@@ -5,7 +5,7 @@ function flipBuffer(ctx: AudioContext, buffer: AudioBuffer) {
   const reversedBuffer = ctx.createBuffer(
     buffer.numberOfChannels,
     buffer.length,
-    buffer.sampleRate
+    buffer.sampleRate,
   );
 
   // Reverse each channel's data

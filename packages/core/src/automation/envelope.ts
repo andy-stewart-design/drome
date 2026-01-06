@@ -59,7 +59,7 @@ class Envelope {
     startTime: number,
     duration: number,
     cycleIndex: number,
-    chordIndex: number
+    chordIndex: number,
   ) {
     const envTimes = getAdsrTimes({
       a: this._adsr.a,

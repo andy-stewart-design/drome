@@ -1,8 +1,8 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
-import SampleNode from "@/audio-nodes/sample-node";
-import { flipBuffer } from "../utils/flip-buffer";
-import type Drome from "@/index";
+import SamplerNode from "@/audio-nodes/composite-sample-node";
+import { flipBuffer } from "@/utils/flip-buffer";
 import { isNumber } from "@/utils/validators";
+import type Drome from "@/index";
 
 type Nullable<T> = T | null | undefined;
 
@@ -32,7 +32,8 @@ export default class Sample extends Instrument<number> {
   preloadSamples() {
     return this._sampleIds.map(async (id) => {
       const [name = "", index] = id.split(":");
-      return this._drome.loadSample(this._sampleBank, name, index);
+      const res = await this._drome.loadSample(this._sampleBank, name, index);
+      return res;
     });
   }
 
@@ -54,7 +55,6 @@ export default class Sample extends Instrument<number> {
 
     if (!input.length) {
       const chopsPerCycle = Math.floor(numChops / this._cycles.length) || 1;
-      // const step = Math.min(1 / numChops, 1 / this._cycles.length);
       const step = 1 / (chopsPerCycle * this._cycles.length);
 
       this._cycles.value = Array.from(
@@ -63,11 +63,13 @@ export default class Sample extends Instrument<number> {
           return Array.from({ length: chopsPerCycle }, (_, j) => {
             return step * j + chopsPerCycle * step * i;
           });
-        }
+        },
       );
     } else {
       this._cycles.value = input.map((cycle) =>
-        isArray(cycle) ? cycle.map((chord) => convert(chord)) : [convert(cycle)]
+        isArray(cycle)
+          ? cycle.map((chord) => convert(chord))
+          : [convert(cycle)],
       );
     }
 
@@ -93,21 +95,33 @@ export default class Sample extends Instrument<number> {
   play(barStart: number, barDuration: number) {
     const notes = this.beforePlay(barStart, barDuration);
 
-    this._sampleIds.forEach((sampleId) => {
-      notes.forEach(async (note, noteIndex) => {
-        const bank = this._sampleBank;
-        const [name = "", index] = sampleId.split(":");
-        const { buffer } = await this._drome.loadSample(bank, name, index);
-        if (!buffer || typeof note?.value !== "number") return;
+    this._sampleIds.forEach(async (sampleId) => {
+      const bank = this._sampleBank;
+      const [name = "", index] = sampleId.split(":");
+      const { buffer } = await this._drome.loadSample(bank, name, index);
+
+      notes.forEach((note, noteIndex) => {
+        if (
+          !buffer ||
+          !isNumber(note?.value) ||
+          note.start < this.ctx.currentTime - 0.025
+        ) {
+          return;
+        }
 
         const playbackRate = this._fitValue
           ? buffer.duration / barDuration / this._fitValue
           : Math.abs(this._playbackRate);
 
-        const src = new SampleNode(
+        const src = new SamplerNode(
           this.ctx,
           this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
-          { playbackRate, loop: this._loop, gain: 0 }
+          {
+            playbackRate,
+            loop: this._loop,
+            gain: 0,
+            filter: this._filter.type ? { type: this._filter.type } : undefined,
+          },
         );
         this._audioNodes.add(src);
 
@@ -124,14 +138,11 @@ export default class Sample extends Instrument<number> {
           src.disconnect();
           src.removeEventListener("ended", cleanup);
           this._audioNodes.delete(src);
-          // if (
-          //   this._audioNodes.size === 0 &&
-          //   isNumber(this._stopTime) &&
-          //   this.ctx.currentTime > this._stopTime
-          // ) {
-          //   this._stopTime = null;
-          //   this.cleanup();
-          // }
+          src.destory();
+
+          if (this._stopTime && this._audioNodes.size === 0) {
+            this.destroy();
+          }
         };
 
         src.addEventListener("ended", cleanup);

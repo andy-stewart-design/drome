@@ -13,7 +13,7 @@ class BitcrusherEffect extends AutomatableEffect<AudioWorkletNode> {
 
   constructor(
     ctx: AudioContext,
-    { bitDepth, rateReduction = 1 }: BitcrusherEffectOptions
+    { bitDepth, rateReduction = 1 }: BitcrusherEffectOptions,
   ) {
     super(bitDepth);
 
