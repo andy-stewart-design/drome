@@ -1,8 +1,11 @@
 import type DromeArray from "@/array/drome-array";
 import type Envelope from "@/automation/envelope";
 import type LfoNode from "./automation/lfo-node";
-// import type LFO from "@/automation/lfo";
 import type * as algos from "@/utils/distortion-algorithms";
+import type {
+  basicWaveformAliasMap,
+  waveformAliasMap,
+} from "./utils/synth-alias";
 
 // AUDIO CLOCK
 type Metronome = { beat: number; bar: number };
@@ -13,6 +16,8 @@ type DromeEventCallback = (m: Metronome, time: number) => void;
 type InstrumentType = "synth" | "sample";
 type BasicWaveform = "sawtooth" | "sine" | "square" | "triangle";
 type Waveform = BasicWaveform | "supersaw";
+type BasicWaveformAlias = keyof typeof basicWaveformAliasMap;
+type WaveformAlias = keyof typeof waveformAliasMap;
 
 // CYCLE
 type Nullable<T> = T | null | undefined;
@@ -41,6 +46,7 @@ export type {
   AdsrMode,
   Automation,
   BasicWaveform,
+  BasicWaveformAlias,
   DistortionAlgorithm,
   DistortionFunction,
   DromeCycleValue,
@@ -56,4 +62,5 @@ export type {
   Pattern,
   PatternInput,
   Waveform,
+  WaveformAlias,
 };

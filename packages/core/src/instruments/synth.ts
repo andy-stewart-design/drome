@@ -3,14 +3,15 @@ import DromeArray from "@/array/drome-array";
 import SynthNode from "@/audio-nodes/composite-synth-node";
 import { midiToFrequency } from "@/utils/midi-to-frequency";
 import type Drome from "@/index";
-import type { Waveform } from "@/types";
+import type { WaveformAlias } from "@/types";
+import { getWaveform } from "@/utils/synth-alias";
 
 interface SynthOptions extends InstrumentOptions<number | number[]> {
-  type?: Waveform[];
+  type?: WaveformAlias[];
 }
 
 export default class Synth extends Instrument<number | number[]> {
-  private _types: Waveform[];
+  private _types: WaveformAlias[];
   private _voices: DromeArray<number>;
 
   constructor(drome: Drome, opts: SynthOptions) {
@@ -27,7 +28,7 @@ export default class Synth extends Instrument<number | number[]> {
   play(barStart: number, barDuration: number) {
     const notes = this.beforePlay(barStart, barDuration);
 
-    this._types.forEach((type) => {
+    this._types.forEach((typeAlias) => {
       notes.forEach((note, chordIndex) => {
         if (!note) return;
         [note?.value].flat().forEach((midiNote) => {
@@ -35,7 +36,7 @@ export default class Synth extends Instrument<number | number[]> {
           const cycleIndex = this._drome.metronome.bar % this._voices.length;
           const osc = new SynthNode(this.ctx, {
             frequency: midiToFrequency(midiNote),
-            type: type === "custom" ? "sine" : type,
+            type: getWaveform(typeAlias),
             filter: this._filter.type ? { type: this._filter.type } : undefined,
             gain: 0,
             voices: this._voices.at(cycleIndex, chordIndex),

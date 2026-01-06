@@ -20,7 +20,13 @@ import { isString } from "@/utils/validators";
 import { addWorklets } from "@/utils/worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
 import type { SampleBankSchema } from "@/utils/samples-validate";
-import type { DistortionAlgorithm, Metronome, SNEL } from "@/types";
+import type {
+  DistortionAlgorithm,
+  Metronome,
+  SNEL,
+  Waveform,
+  WaveformAlias,
+} from "@/types";
 
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
@@ -181,7 +187,7 @@ class Drome {
     // this.clearReplListeners();
   }
 
-  synth(...types: OscillatorType[]) {
+  synth(...types: WaveformAlias[]) {
     const destination = this.audioChannels[0];
     if (!destination) throw new Error("Cannot find audio channel");
     const synth = new Synth(this, {

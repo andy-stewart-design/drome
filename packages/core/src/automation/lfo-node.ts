@@ -1,5 +1,6 @@
 import AudioEndedEvent from "@/events/audio-ended";
-import type { BasicWaveform } from "@/types";
+import type { BasicWaveform, BasicWaveformAlias } from "@/types";
+import { getBasicWaveform } from "@/utils/synth-alias";
 import type {
   LfoProcessorOptions,
   LfoParameterData,
@@ -130,9 +131,12 @@ class LfoNode extends AudioWorkletNode {
     return this;
   }
 
-  type(oscillatorType: Waveform) {
-    this._oscillatorType = oscillatorType;
-    this.postMessage({ type: "oscillatorType", oscillatorType });
+  type(oscillatorType: BasicWaveformAlias) {
+    this._oscillatorType = getBasicWaveform(oscillatorType);
+    this.postMessage({
+      type: "oscillatorType",
+      oscillatorType: this._oscillatorType,
+    });
     return this;
   }
 
