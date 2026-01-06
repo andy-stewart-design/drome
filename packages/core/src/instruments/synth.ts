@@ -3,13 +3,14 @@ import DromeArray from "@/array/drome-array";
 import SynthNode from "@/audio-nodes/composite-synth-node";
 import { midiToFrequency } from "@/utils/midi-to-frequency";
 import type Drome from "@/index";
+import type { Waveform } from "@/types";
 
 interface SynthOptions extends InstrumentOptions<number | number[]> {
-  type?: OscillatorType[];
+  type?: Waveform[];
 }
 
 export default class Synth extends Instrument<number | number[]> {
-  private _types: OscillatorType[];
+  private _types: Waveform[];
   private _voices: DromeArray<number>;
 
   constructor(drome: Drome, opts: SynthOptions) {

@@ -11,6 +11,8 @@ type DromeEventCallback = (m: Metronome, time: number) => void;
 
 // INSTRUMENTS
 type InstrumentType = "synth" | "sample";
+type BasicWaveform = "sawtooth" | "sine" | "square" | "triangle";
+type Waveform = BasicWaveform | "supersaw";
 
 // CYCLE
 type Nullable<T> = T | null | undefined;
@@ -38,6 +40,7 @@ export type {
   AdsrEnvelope,
   AdsrMode,
   Automation,
+  BasicWaveform,
   DistortionAlgorithm,
   DistortionFunction,
   DromeCycleValue,
@@ -52,4 +55,5 @@ export type {
   Nullable,
   Pattern,
   PatternInput,
+  Waveform,
 };

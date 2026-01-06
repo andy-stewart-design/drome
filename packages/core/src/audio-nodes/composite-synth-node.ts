@@ -3,8 +3,8 @@ import CompositeAudioNode, {
   type CompositeAudioNodeOptions,
 } from "./composite-audio-node";
 import SupersawNode from "./supersaw-worklet-node";
+import type { Waveform } from "@/types";
 
-type Waveform = "sawtooth" | "sine" | "square" | "supersaw" | "triangle";
 type BaseOscillatorOptions = Omit<OscillatorOptions, "type"> & {
   type: Waveform;
 } & SupersawOptions;
