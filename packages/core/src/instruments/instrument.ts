@@ -10,7 +10,14 @@ import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import type Drome from "../index";
 import type SynthNode from "@/audio-nodes/composite-synth-node";
 import type SampleNode from "@/audio-nodes/composite-sample-node";
-import type { AdsrMode, AdsrEnvelope, InstrumentType, Note, SNEL, Nullable, } from "@/types";
+import type {
+  AdsrMode,
+  AdsrEnvelope,
+  InstrumentType,
+  Note,
+  SNEL,
+  Nullable,
+} from "@/types";
 import type { FilterType } from "@/types";
 
 interface InstrumentOptions<T> {
@@ -40,22 +47,24 @@ abstract class Instrument<T> {
   protected _filter: FrequencyParams = {};
   private _connected = false;
   protected _stopTime: number | null = null;
+  protected _legato = false;
   public onDestory: (() => void) | undefined;
 
   // Method Aliases
   amp: (input: number | Envelope | string) => this;
-  gain: (input: number | Envelope | string) => this;
   dt: (input: number | Envelope | string) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
-  fx: (...nodes: DromeAudioNode[]) => this;
-  rev: () => this;
-  seq: (steps: number, ...pulses: (number | number[])[]) => this;
   fil: (
     type: FilterTypeAlias,
     f: number | Envelope | string,
     q: number | Envelope | string,
   ) => this;
+  fx: (...nodes: DromeAudioNode[]) => this;
+  gain: (input: number | Envelope | string) => this;
+  leg: (v?: boolean) => this
+  rev: () => this;
+  seq: (steps: number, ...pulses: (number | number[])[]) => this;
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
@@ -71,14 +80,15 @@ abstract class Instrument<T> {
     this._detune = new Pattern(0);
 
     this.amp = this.amplitude.bind(this);
-    this.gain = this.amplitude.bind(this);
     this.dt = this.detune.bind(this);
     this.env = this.adsr.bind(this);
-    this.fx = this.effects.bind(this);
     this.envMode = this.adsrMode.bind(this);
+    this.fil = this.filter.bind(this);
+    this.fx = this.effects.bind(this);
+    this.gain = this.amplitude.bind(this);
+    this.leg = this.legato.bind(this);
     this.rev = this.reverse.bind(this);
     this.seq = this.sequence.bind(this);
-    this.fil = this.filter.bind(this);
   }
 
   protected applyGain(
@@ -223,6 +233,11 @@ abstract class Instrument<T> {
     return this;
   }
 
+  legato(v = true) {
+    this._legato = v;
+    return this;
+  }
+
   stretch(multiplier: number) {
     this._cycles.stretch(multiplier);
     return this;
@@ -322,15 +337,20 @@ abstract class Instrument<T> {
   beforePlay(barStart: number, barDuration: number) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
     const cycle = this._cycles.at(cycleIndex);
-    const notes: Note<T>[] =
-      cycle?.map((value, i) => {
-        if (isNullish(value)) return null;
-        return {
-          value,
-          start: barStart + i * (barDuration / cycle.length),
-          duration: barDuration / cycle.length,
-        };
-      }) ?? [];
+    const notes: Note<T>[] = cycle.map((value, i) => {
+      if (isNullish(value)) return null;
+      const start = barStart + i * (barDuration / cycle.length);
+      const baseDuration = barDuration / cycle.length;
+
+      if (!this._legato) {
+        return { value, start, duration: baseDuration };
+      } else {
+        const nextNonNull = cycle.findIndex((v, j) => j > i && v !== null);
+        const nullCount = (nextNonNull === -1 ? cycle.length : nextNonNull) - i;
+        const duration = baseDuration * nullCount;
+        return { value, start, duration };
+      }
+    });
 
     this.connectChain(notes, barStart, barDuration);
 
