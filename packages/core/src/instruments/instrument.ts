@@ -62,7 +62,7 @@ abstract class Instrument<T> {
   ) => this;
   fx: (...nodes: DromeAudioNode[]) => this;
   gain: (input: number | Envelope | string) => this;
-  leg: (v?: boolean) => this
+  leg: (v?: boolean) => this;
   rev: () => this;
   seq: (steps: number, ...pulses: (number | number[])[]) => this;
 
