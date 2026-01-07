@@ -2,13 +2,18 @@ import type DromeArray from "@/array/drome-array";
 import type Envelope from "@/automation/envelope";
 import type LfoNode from "./automation/lfo-node";
 import type * as algos from "@/utils/distortion-algorithms";
-import type { basicWaveformAliasMap, waveformAliasMap, } from "./utils/synth-alias";
+import type {
+  basicWaveformAliasMap,
+  waveformAliasMap,
+} from "./utils/synth-alias";
+import type { scaleAliasMap } from "./utils/get-scale";
 
 // AUDIO CLOCK
 type Metronome = { beat: number; bar: number };
 type DromeEventType = "start" | "pause" | "stop" | "beat" | "bar";
 type DromeEventCallback = (m: Metronome, time: number) => void;
 
+// NOTES + SCALES
 type NaturalNote = "A" | "B" | "C" | "D" | "E" | "F" | "G";
 type Accidental = "#" | "b";
 type AccidentalNote = Exclude<
@@ -18,6 +23,7 @@ type AccidentalNote = Exclude<
 type NoteNameUpper = NaturalNote | AccidentalNote;
 type NoteName = NoteNameUpper | Lowercase<NoteNameUpper>;
 type NoteValue = `${NoteName}${number}`;
+type ScaleAlias = keyof typeof scaleAliasMap;
 
 // INSTRUMENTS
 type InstrumentType = "synth" | "sample";
@@ -66,6 +72,7 @@ export type {
   NoteName,
   NoteValue,
   Note,
+  ScaleAlias,
   SNEL,
   Nullable,
   Pattern,

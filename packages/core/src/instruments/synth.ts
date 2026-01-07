@@ -5,7 +5,8 @@ import { midiToFrequency } from "@/utils/midi-to-frequency";
 import { noteToMidi } from "@/utils/note-string-to-frequency";
 import { getWaveform } from "@/utils/synth-alias";
 import type Drome from "@/index";
-import type { NoteName, NoteValue, WaveformAlias } from "@/types";
+import type { NoteName, NoteValue, ScaleAlias, WaveformAlias } from "@/types";
+import { getScale } from "@/utils/get-scale";
 
 interface SynthOptions extends InstrumentOptions<number | number[]> {
   type?: WaveformAlias[];
@@ -15,11 +16,21 @@ export default class Synth extends Instrument<number | number[]> {
   private _types: WaveformAlias[];
   private _voices: DromeArray<number>;
   private _root = 0;
+  private _scale: number[] | null = null;
 
   constructor(drome: Drome, opts: SynthOptions) {
     super(drome, { ...opts, baseGain: 0.125 });
     this._types = opts.type?.length ? opts.type : ["sine"];
     this._voices = new DromeArray(7);
+  }
+
+  private getFrequncy(note: number) {
+    if (!this._scale) return midiToFrequency(note + this._root);
+
+    const octave = Math.floor(note / 7) * 12;
+    const degree = ((note % 7) + 7) % 7;
+    const step = this._scale[degree];
+    return midiToFrequency(this._root + octave + step);
   }
 
   voices(...input: (number | number[])[]) {
@@ -31,6 +42,11 @@ export default class Synth extends Instrument<number | number[]> {
     if (typeof n === "number") this._root = n;
     else this._root = noteToMidi(n) || 0;
     this._cycles.defaultValue = [[0]];
+    return this;
+  }
+
+  scale(name: ScaleAlias) {
+    this._scale = getScale(name);
     return this;
   }
 
@@ -48,7 +64,7 @@ export default class Synth extends Instrument<number | number[]> {
           // if (!midiNote) return;
           const cycleIndex = this._drome.metronome.bar % this._voices.length;
           const osc = new SynthNode(this.ctx, {
-            frequency: midiToFrequency(midiNote + this._root),
+            frequency: this.getFrequncy(midiNote),
             type: getWaveform(typeAlias),
             filter: this._filter.type ? { type: this._filter.type } : undefined,
             gain: 0,
