@@ -72,14 +72,7 @@ export default class Synth extends Instrument<number | number[]> {
           });
           this._audioNodes.add(osc);
 
-          const duration = this.applyGain(
-            osc,
-            note.start,
-            note.duration,
-            chordIndex,
-          );
-          this.applyFilter(osc, note.start, duration, chordIndex);
-          this.applyDetune(osc, note.start, duration, chordIndex);
+          const duration = this.applyNodeEffects(osc, note, chordIndex);
 
           osc.connect(this._connectorNode);
           osc.start(note.start);

@@ -20,6 +20,8 @@ import type {
 } from "@/types";
 import type { FilterType } from "@/types";
 
+type FooBar = NonNullable<Note<number | number[]>>;
+
 interface InstrumentOptions<T> {
   destination: AudioNode;
   defaultCycle: T;
@@ -91,7 +93,18 @@ abstract class Instrument<T> {
     this.seq = this.sequence.bind(this);
   }
 
-  protected applyGain(
+  protected applyNodeEffects(
+    node: SynthNode | SampleNode,
+    note: FooBar,
+    index: number,
+  ) {
+    const duration = this.applyGain(node, note.start, note.duration, index);
+    this.applyFilter(node, note.start, duration, index);
+    this.applyDetune(node, note.start, duration, index);
+    return duration;
+  }
+
+  private applyGain(
     node: SynthNode | SampleNode,
     start: number,
     duration: number,
@@ -101,7 +114,7 @@ abstract class Instrument<T> {
     return this._gain.apply(node.gain, start, duration, cycleIndex, chordIndex);
   }
 
-  protected applyFilter(
+  private applyFilter(
     node: SynthNode | SampleNode,
     start: number,
     duration: number,
@@ -141,7 +154,7 @@ abstract class Instrument<T> {
     }
   }
 
-  protected applyDetune(
+  private applyDetune(
     node: SynthNode | SampleNode,
     start: number,
     duration: number,
@@ -343,12 +356,12 @@ abstract class Instrument<T> {
       const baseDuration = barDuration / cycle.length;
 
       if (!this._legato) {
-        return { value, start, duration: baseDuration };
+        return { value, start, baseDuration, duration: baseDuration };
       } else {
         const nextNonNull = cycle.findIndex((v, j) => j > i && v !== null);
         const nullCount = (nextNonNull === -1 ? cycle.length : nextNonNull) - i;
         const duration = baseDuration * nullCount;
-        return { value, start, duration };
+        return { value, start, baseDuration, duration };
       }
     });
 

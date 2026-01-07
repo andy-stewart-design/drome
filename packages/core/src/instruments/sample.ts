@@ -129,10 +129,8 @@ export default class Sample extends Instrument<number> {
         );
         this._audioNodes.add(src);
 
-        const _duration = this._cut ? note.duration : buffer.duration;
-        const duration = this.applyGain(src, note.start, _duration, noteIndex);
-        this.applyFilter(src, note.start, duration, noteIndex);
-        this.applyDetune(src, note.start, duration, noteIndex);
+        const _note = this._cut ? note : { ...note, duration: buffer.duration };
+        const duration = this.applyNodeEffects(src, _note, noteIndex);
 
         src.connect(this._connectorNode);
         src.start(note.start, note.value);
