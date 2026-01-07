@@ -20,13 +20,7 @@ import { isString } from "@/utils/validators";
 import { addWorklets } from "@/utils/worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
 import type { SampleBankSchema } from "@/utils/samples-validate";
-import type {
-  DistortionAlgorithm,
-  Metronome,
-  SNEL,
-  Waveform,
-  WaveformAlias,
-} from "@/types";
+import type { DistortionAlgorithm, Metronome, SNEL, Waveform, WaveformAlias, } from "@/types";
 
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
@@ -196,7 +190,6 @@ class Drome {
       defaultCycle: 60,
       nullValue: 0,
     });
-    this.instruments.add(synth);
     return synth;
   }
 
@@ -209,7 +202,6 @@ class Drome {
       defaultCycle: 0,
       nullValue: 0,
     });
-    this.instruments.add(sample);
     return sample;
   }
 

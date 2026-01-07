@@ -92,6 +92,10 @@ export default class Sample extends Instrument<number> {
     return this;
   }
 
+  push() {
+    this._drome.instruments.add(this);
+  }
+
   play(barStart: number, barDuration: number) {
     const notes = this.beforePlay(barStart, barDuration);
 

@@ -10,14 +10,7 @@ import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import type Drome from "../index";
 import type SynthNode from "@/audio-nodes/composite-synth-node";
 import type SampleNode from "@/audio-nodes/composite-sample-node";
-import type {
-  AdsrMode,
-  AdsrEnvelope,
-  InstrumentType,
-  Note,
-  SNEL,
-  Nullable,
-} from "@/types";
+import type { AdsrMode, AdsrEnvelope, InstrumentType, Note, SNEL, Nullable, } from "@/types";
 import type { FilterType } from "@/types";
 
 interface InstrumentOptions<T> {
@@ -51,6 +44,7 @@ abstract class Instrument<T> {
 
   // Method Aliases
   amp: (input: number | Envelope | string) => this;
+  gain: (input: number | Envelope | string) => this;
   dt: (input: number | Envelope | string) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
@@ -77,6 +71,7 @@ abstract class Instrument<T> {
     this._detune = new Pattern(0);
 
     this.amp = this.amplitude.bind(this);
+    this.gain = this.amplitude.bind(this);
     this.dt = this.detune.bind(this);
     this.env = this.adsr.bind(this);
     this.fx = this.effects.bind(this);
@@ -321,6 +316,8 @@ abstract class Instrument<T> {
     nodes.forEach((node) => this._signalChain.add(node));
     return this;
   }
+
+  abstract push(): void;
 
   beforePlay(barStart: number, barDuration: number) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
