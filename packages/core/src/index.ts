@@ -5,6 +5,7 @@ import Envelope from "@/automation/envelope";
 import LfoNode from "@/automation/lfo-node";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
+import Stack from "@/instruments/stack";
 import BitcrusherEffect from "@/effects/effect-bitcrusher";
 import DelayEffect from "@/effects/effect-delay";
 import DistortionEffect from "@/effects/effect-distortion";
@@ -20,7 +21,13 @@ import { isString } from "@/utils/validators";
 import { addWorklets } from "@/utils/worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
 import type { SampleBankSchema } from "@/utils/samples-validate";
-import type { DistortionAlgorithm, Metronome, SNEL, Waveform, WaveformAlias, } from "@/types";
+import type {
+  DistortionAlgorithm,
+  Metronome,
+  SNEL,
+  // Waveform,
+  WaveformAlias,
+} from "@/types";
 
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
@@ -203,6 +210,10 @@ class Drome {
       nullValue: 0,
     });
     return sample;
+  }
+
+  stack(...instruments: (Synth | Sample)[]) {
+    return new Stack(instruments);
   }
 
   env(maxValue: number, startValue = 0, endValue?: number) {

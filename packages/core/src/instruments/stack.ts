@@ -1,7 +1,7 @@
 import type Sample from "@/instruments/sample";
 import type Synth from "@/instruments/synth";
 
-class DromeStack {
+class Stack {
   private _instruments: Set<Sample | Synth>;
 
   constructor(inst: (Synth | Sample)[]) {
@@ -15,10 +15,12 @@ class DromeStack {
 
   push() {
     this._instruments.forEach((inst) => inst.push());
-    return this;
+    this.destroy();
   }
 
   destroy() {
     this._instruments.clear();
   }
 }
+
+export default Stack;
