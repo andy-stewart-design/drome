@@ -53,17 +53,11 @@ abstract class Instrument<T> {
   public onDestory: (() => void) | undefined;
 
   // Method Aliases
-  amp: (input: number | Envelope | string) => this;
   dt: (input: number | Envelope | string) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
-  fil: (
-    type: FilterTypeAlias,
-    f: number | Envelope | string,
-    q: number | Envelope | string,
-  ) => this;
+  fil: (type: FilterTypeAlias, f: SNEL, q: SNEL) => this;
   fx: (...nodes: DromeAudioNode[]) => this;
-  gain: (input: number | Envelope | string) => this;
   leg: (v?: boolean) => this;
   rev: () => this;
   seq: (steps: number, ...pulses: (number | number[])[]) => this;
@@ -81,17 +75,17 @@ abstract class Instrument<T> {
     this._gain = new Envelope(0, this._baseGain);
     this._detune = new Pattern(0);
 
-    this.amp = this.amplitude.bind(this);
     this.dt = this.detune.bind(this);
     this.env = this.adsr.bind(this);
     this.envMode = this.adsrMode.bind(this);
     this.fil = this.filter.bind(this);
     this.fx = this.effects.bind(this);
-    this.gain = this.amplitude.bind(this);
     this.leg = this.legato.bind(this);
     this.rev = this.reverse.bind(this);
     this.seq = this.sequence.bind(this);
   }
+
+  abstract push(): void;
 
   protected applyNodeEffects(
     node: SynthNode | SampleNode,
@@ -246,17 +240,17 @@ abstract class Instrument<T> {
     return this;
   }
 
-  legato(v = true) {
-    this._legato = v;
-    return this;
-  }
-
   stretch(multiplier: number) {
     this._cycles.stretch(multiplier);
     return this;
   }
 
-  amplitude(input: number | Envelope | string) {
+  legato(v = true) {
+    this._legato = v;
+    return this;
+  }
+
+  gain(input: number | Envelope | string) {
     if (input instanceof Envelope) {
       this._gain = input;
     } else {
@@ -344,8 +338,6 @@ abstract class Instrument<T> {
     nodes.forEach((node) => this._signalChain.add(node));
     return this;
   }
-
-  abstract push(): void;
 
   beforePlay(barStart: number, barDuration: number) {
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
