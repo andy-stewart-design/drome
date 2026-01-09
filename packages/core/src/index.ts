@@ -23,6 +23,8 @@ import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
 import type { SampleBankSchema } from "@/utils/samples-validate";
 import type {
   DistortionAlgorithm,
+  DromeEventCallback,
+  DromeEventType,
   Metronome,
   SNEL,
   // Waveform,
@@ -42,6 +44,7 @@ class Drome {
   private sampleBanks: SampleBankSchema | null = null;
   readonly userSamples: Map<string, Map<string, string[]>> = new Map();
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
+  private extListeners: Map<string, DromeEventType> = new Map();
 
   fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
 
@@ -94,6 +97,18 @@ class Drome {
     const paths = this.userSamples.get(bank)?.get(name);
     if (paths) return paths[index % paths.length];
     else return getSamplePath(this.sampleBanks, bank, name, index);
+  }
+
+  private cleanupLfos(when: number) {
+    this.lfos.forEach((lfo) => {
+      const clear = () => {
+        lfo.disconnect();
+        lfo.removeEventListener("ended", clear);
+        this.lfos.delete(lfo);
+      };
+      lfo.addEventListener("ended", clear);
+      lfo.stop(when);
+    });
   }
 
   async addWorklets() {
@@ -150,18 +165,6 @@ class Drome {
     this.clock.start();
   }
 
-  private cleanupLfos(when: number) {
-    this.lfos.forEach((lfo) => {
-      const clear = () => {
-        lfo.disconnect();
-        lfo.removeEventListener("ended", clear);
-        this.lfos.delete(lfo);
-      };
-      lfo.addEventListener("ended", clear);
-      lfo.stop(when);
-    });
-  }
-
   stop() {
     const fade = 0.25;
     this.clock.stop();
@@ -181,11 +184,30 @@ class Drome {
     }, fade * 5000); // convert seconds to milliseconds and double
   }
 
-  public clear() {
+  onBeat(cb: DromeEventCallback) {
+    const id = crypto.randomUUID();
+    this.clock.on("beat", cb, id);
+    this.extListeners.set(id, "beat");
+  }
+
+  onBar(cb: DromeEventCallback) {
+    const id = crypto.randomUUID();
+    this.clock.on("bar", cb, id);
+    this.extListeners.set(id, "bar");
+  }
+
+  clearExtListeners() {
+    this.extListeners.forEach((type, id) => {
+      this.clock.off(type, id);
+    });
+    this.extListeners.clear();
+  }
+
+  clear() {
     this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
     this.instruments.clear();
     this.cleanupLfos(this.clock.nextBarStartTime);
-    // this.clearReplListeners();
+    this.clearExtListeners();
   }
 
   synth(...types: WaveformAlias[]) {

@@ -2,6 +2,8 @@
 
 import type { DromeEventCallback, DromeEventType, Metronome } from "@/types.js";
 
+type ListenerMap = Map<DromeEventType, Map<string, DromeEventCallback>>;
+
 class AudioClock {
   static lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
   static scheduleAheadTime = 0.1; // How far ahead to schedule audio (sec)
@@ -14,7 +16,7 @@ class AudioClock {
   private _barStart = 0.0;
   private _nextBeatStart = 0.0;
   private timerID: ReturnType<typeof setTimeout> | null = null;
-  private listeners: Map<DromeEventType, DromeEventCallback[]> = new Map();
+  private listeners: ListenerMap = new Map();
 
   constructor(bpm = 120) {
     this.bpm(bpm);
@@ -22,13 +24,14 @@ class AudioClock {
 
   private schedule() {
     const { scheduleAheadTime } = AudioClock;
+
     while (this._nextBeatStart < this.ctx.currentTime + scheduleAheadTime) {
       this.metronome.beat = (this.metronome.beat + 1) % 4;
 
       if (this.metronome.beat === 0) {
         this.metronome.bar++;
         this._barStart = this._nextBeatStart;
-        // console.log(this.barStartTime);
+
         this.listeners.get("bar")?.forEach((cb) => {
           cb({ ...this.metronome }, this._barStart);
         });
@@ -40,6 +43,7 @@ class AudioClock {
 
       this._nextBeatStart += 60.0 / this._bpm;
     }
+
     this.timerID = setTimeout(this.schedule.bind(this), AudioClock.lookahead);
   }
 
@@ -55,6 +59,9 @@ class AudioClock {
     this.schedule();
     this._paused = false;
 
+    this.listeners.get("start")?.forEach((cb) => {
+      cb(this.metronome, this._nextBeatStart);
+    });
     this.listeners.get("start")?.forEach((cb) => {
       cb(this.metronome, this._nextBeatStart);
     });
@@ -84,22 +91,24 @@ class AudioClock {
     if (bpm > 0) this._bpm = bpm;
   }
 
-  public on(eventType: DromeEventType, listener: DromeEventCallback) {
-    if (!this.listeners.has(eventType)) {
-      this.listeners.set(eventType, []);
+  public on(type: DromeEventType, fn: DromeEventCallback, id?: string) {
+    if (!this.listeners.has(type)) {
+      this.listeners.set(type, new Map());
     }
-    this.listeners.get(eventType)?.push(listener);
+    this.listeners.get(type)?.set(id ?? crypto.randomUUID(), fn);
   }
 
-  public off(eventType: DromeEventType, listener: DromeEventCallback) {
-    const arr = this.listeners.get(eventType);
-    if (!arr) return;
-    const idx = arr.indexOf(listener);
-    if (idx !== -1) arr.splice(idx, 1);
+  public off(type: DromeEventType, id: string) {
+    if (id) {
+      const arr = this.listeners.get(type);
+      if (!arr) return;
+      arr.delete(id);
+    }
   }
 
   public cleanup() {
     this.stop();
+    this.listeners.forEach((map) => map.clear());
     this.listeners.clear();
     if (this.timerID) {
       clearTimeout(this.timerID);
