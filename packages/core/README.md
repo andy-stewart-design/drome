@@ -5,7 +5,7 @@ A web-based language for live coding music.
 ## TODOs
 
 ### Core
-[ ] Stacks
+[x] Stacks
 [ ] Set root and scale on parent drome class
 [ ] Random arrays
 [ ] Logging

@@ -20,7 +20,7 @@ import type {
 } from "@/types";
 import type { FilterType } from "@/types";
 
-type FooBar = NonNullable<Note<number | number[]>>;
+type NonNullNote = NonNullable<Note<number | number[]>>;
 
 interface InstrumentOptions<T> {
   destination: AudioNode;
@@ -89,7 +89,7 @@ abstract class Instrument<T> {
 
   protected applyNodeEffects(
     node: SynthNode | SampleNode,
-    note: FooBar,
+    note: NonNullNote,
     index: number,
   ) {
     const duration = this.applyGain(node, note.start, note.duration, index);
