@@ -31,6 +31,8 @@ import type {
   WaveformAlias,
 } from "@/types";
 
+type LogCallback = (log: string, logs: string[]) => void;
+
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
 
@@ -45,6 +47,8 @@ class Drome {
   readonly userSamples: Map<string, Map<string, string[]>> = new Map();
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
   private extListeners: Map<string, DromeEventType> = new Map();
+  private logListeners: Map<string, LogCallback> = new Map();
+  private _logs: string[] = [];
 
   fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
 
@@ -184,30 +188,61 @@ class Drome {
     }, fade * 5000); // convert seconds to milliseconds and double
   }
 
+  log(msg: string) {
+    this._logs.push(msg);
+    console.log(`[DROME]: ${msg}`);
+    this.logListeners.forEach((cb) => cb(msg, this._logs));
+  }
+
+  clearLogs() {
+    this._logs.length = 0;
+  }
+
+  on(type: "log", fn: LogCallback): string;
+  on(type: DromeEventType, fn: DromeEventCallback): string;
+  on(type: DromeEventType | "log", fn: DromeEventCallback | LogCallback) {
+    const id = crypto.randomUUID();
+    if (type === "log") {
+      this.logListeners.set(id, fn as LogCallback);
+    } else {
+      this.clock.on(type, fn as DromeEventCallback, id);
+      this.extListeners.set(id, type);
+    }
+    return id;
+  }
+
+  off(type: "log" | DromeEventType, id: string) {
+    if (type === "log") this.logListeners.delete(id);
+    else this.clock.off(type, id);
+  }
+
   onBeat(cb: DromeEventCallback) {
     const id = crypto.randomUUID();
     this.clock.on("beat", cb, id);
     this.extListeners.set(id, "beat");
+    return id;
   }
 
   onBar(cb: DromeEventCallback) {
     const id = crypto.randomUUID();
     this.clock.on("bar", cb, id);
     this.extListeners.set(id, "bar");
+    return id;
   }
 
-  clearExtListeners() {
+  clearListeners() {
     this.extListeners.forEach((type, id) => {
       this.clock.off(type, id);
     });
     this.extListeners.clear();
+    this.logListeners.clear();
   }
 
   clear() {
     this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
     this.instruments.clear();
     this.cleanupLfos(this.clock.nextBarStartTime);
-    this.clearExtListeners();
+    this.clearListeners();
   }
 
   synth(...types: WaveformAlias[]) {

@@ -6,14 +6,14 @@ A web-based language for live coding music.
 
 ### Core
 [x] Stacks
-[ ] Set root and scale on parent drome class
-[ ] Random arrays
-[x] Drome Listeners
-[ ] Logging
-[ ] Audio channels
-[ ] Static pattern methods
-[ ] `instrument()` method (as wrapper for synth/sample)?
+[x] Logging
+[x] Listeners
 [ ] MIDI
+[ ] Random arrays
+[ ] Static pattern methods
+[ ] Audio channels
+[ ] Set root and scale on parent drome class
+[ ] `instrument()` method (as wrapper for synth/sample)?
 
 ### REPL
 [ ] Visualizer
