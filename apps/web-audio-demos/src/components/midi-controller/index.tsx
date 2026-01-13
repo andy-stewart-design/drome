@@ -123,11 +123,7 @@ interface BaseMIDIMessage {
 }
 
 interface DefaultMIDIMessage extends BaseMIDIMessage {
-  type:
-    | "polyphonic_aftertouch"
-    | "program_change"
-    | "channel_aftertouch"
-    | "pitch_bend";
+  type: "polyphonic_aftertouch" | "channel_aftertouch" | "pitch_bend";
   data1: number;
   data2: number;
 }
@@ -138,11 +134,17 @@ interface MIDINoteMessage extends BaseMIDIMessage {
   velocity: number;
 }
 
-interface MIDICCMessage extends BaseMIDIMessage {
+interface MIDIControlMessage extends BaseMIDIMessage {
   type: "control_change";
-  controller: number;
+  controlNumber: number;
   value: number;
 }
+
+interface MIDIProgramMessage extends BaseMIDIMessage {
+  type: "program_change";
+  program: number;
+}
+
 const MIDIMessageTypeEntries = [
   ["8", "note_off"],
   ["9", "note_on"],
@@ -158,7 +160,12 @@ const MIDIMessageTypeMap = new Map<string, MIDIMessageType>(
 );
 
 type MIDIMessageType = (typeof MIDIMessageTypeEntries)[number][1];
-type MIDIMessage = DefaultMIDIMessage | MIDINoteMessage | MIDICCMessage | null;
+type MIDIMessage =
+  | DefaultMIDIMessage
+  | MIDINoteMessage
+  | MIDIControlMessage
+  | MIDIProgramMessage
+  | null;
 
 function readMIDIMessage(data: Uint8Array, input: MIDIInput): MIDIMessage {
   const status = data[0];
@@ -174,17 +181,19 @@ function readMIDIMessage(data: Uint8Array, input: MIDIInput): MIDIMessage {
   if (!type || !name) return null;
   const source = { name: name.toLocaleLowerCase(), id };
 
-  if (type === "note_on" && data2 === 0) {
-    type = "note_off"; // note_on with velocity 0 = note_off
-  }
+  if (type === "note_on" && data2 === 0) type = "note_off"; // note_on with velocity 0 = note_off
 
-  if (type === "note_on" || type === "note_off") {
-    return { type, source, channel, note: data1, velocity: data2 };
-  } else if (type === "control_change") {
-    return { type, source, channel, controller: data1, value: data2 };
+  switch (type) {
+    case "note_on":
+    case "note_off":
+      return { type, source, channel, note: data1, velocity: data2 };
+    case "control_change":
+      return { type, source, channel, controlNumber: data1, value: data2 };
+    case "program_change":
+      return { type, source, channel, program: data1 };
+    default:
+      return { type, source, channel, data1, data2 };
   }
-
-  return { type, source, channel, data1, data2 };
 }
 
 function formatNoteCommand(t: "on" | "off", c: number, n: number, v: number) {
