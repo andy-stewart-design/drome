@@ -1,24 +1,21 @@
-import { MIDIInputChangeEvent, MIDIOutputChangeEvent } from "./events";
-import { formatNoteCommand, readMIDIMessage, getMIDIPort } from "./utils";
-import { type MIDIMessage } from "./midi-message";
-
-type PortData = Partial<{ name: string | null; id: string | null }>;
-type InputChangeHandler = (e: MIDIInputChangeEvent) => void;
-type OutputChangeHandler = (e: MIDIOutputChangeEvent) => void;
-interface MIDIControllerListeners {
-  inputs: Set<InputChangeHandler>;
-  outputs: Set<OutputChangeHandler>;
-}
+import { getMIDIPort } from "./utils";
+import { CustomInput, CustomOutput } from "./midi-ports";
+import type {
+  MIDIControllerListeners,
+  MIDIControllerPorts,
+  InputChangeHandler,
+  OutputChangeHandler,
+} from "./types";
 
 class MIDIController {
   private _midi: MIDIAccess;
-  private _ports: { in: Map<string, MIDIIn>; out: Map<string, MIDIOut> };
+  private _ports: MIDIControllerPorts;
   private _listeners: MIDIControllerListeners;
   private _controller: AbortController;
 
   private constructor(midi: MIDIAccess) {
     this._midi = midi;
-    this._ports = { in: new Map(), out: new Map() };
+    this._ports = { inputs: new Map(), outputs: new Map() };
     this._controller = new AbortController();
     this._listeners = { inputs: new Set(), outputs: new Set() };
 
@@ -30,18 +27,18 @@ class MIDIController {
         const { port } = e;
 
         if (port instanceof MIDIInput) {
-          const event = new MIDIInputChangeEvent(this.midi.inputs);
-          this._listeners.inputs.forEach((fn) => fn(event));
+          const inputs = Array.from(this.midi.inputs.values());
+          this._listeners.inputs.forEach((fn) => fn(inputs));
         } else if (port instanceof MIDIOutput) {
-          const event = new MIDIOutputChangeEvent(this.midi.outputs);
-          this._listeners.outputs.forEach((fn) => fn(event));
+          const outputs = Array.from(this.midi.outputs.values());
+          this._listeners.outputs.forEach((fn) => fn(outputs));
         }
       },
       { signal: this._controller.signal },
     );
   }
 
-  static async create() {
+  static async init() {
     const midi = await navigator.requestMIDIAccess();
     return new MIDIController(midi);
   }
@@ -61,127 +58,67 @@ class MIDIController {
     }
   }
 
-  input(data: PortData) {
-    const name = data.name!;
-    const cached = this._ports.in.get(name);
+  removeListener(type: "input-change", fn: InputChangeHandler): void;
+  removeListener(type: "output-change", fn: OutputChangeHandler): void;
+  removeListener(
+    type: "input-change" | "output-change",
+    fn: InputChangeHandler | OutputChangeHandler,
+  ) {
+    if (type === "input-change") {
+      this._listeners.inputs.delete(fn as InputChangeHandler);
+    } else {
+      this._listeners.outputs.delete(fn as OutputChangeHandler);
+    }
+  }
+
+  input(ident: string | { id: string }) {
+    const name = typeof ident === "string" ? ident : ident.id;
+    const cached = this._ports.inputs.get(name);
     if (cached) return cached;
 
-    const port = getMIDIPort(this.midi.inputs, data);
+    const port = getMIDIPort(this.midi.inputs, ident);
     if (port) {
-      const newPort = new MIDIIn(port);
-      this._ports.in.set(name, newPort);
+      const newPort = new CustomInput(port);
+      this._ports.inputs.set(name, newPort);
       return newPort;
     }
     return null;
   }
 
-  output(data: PortData) {
-    const port = getMIDIPort(this.midi.outputs, data);
-    if (port) return new MIDIOut(port);
+  output(ident: string | { id: string }) {
+    const name = typeof ident === "string" ? ident : ident.id;
+    const cached = this._ports.outputs.get(name);
+    if (cached) return cached;
+
+    const port = getMIDIPort(this.midi.outputs, ident);
+    if (port) {
+      const newPort = new CustomOutput(port);
+      this._ports.outputs.set(name, newPort);
+      return newPort;
+    }
     return null;
   }
 
   destroy() {
     this._controller.abort();
+    this._ports.inputs.forEach((p) => p.destroy());
+    this._ports.inputs.clear();
+    this._ports.outputs.clear();
     this._listeners.inputs.clear();
     this._listeners.outputs.clear();
   }
 
   get midi() {
-    if (!this._midi) {
-      throw new Error("MIDI Access not available");
-    }
     return this._midi;
+  }
+
+  get inputs() {
+    return Array.from(this._midi.inputs.values());
+  }
+
+  get outputs() {
+    return Array.from(this._midi.outputs.values());
   }
 }
 
 export default MIDIController;
-
-type MIDIMessageCallback = (msg: MIDIMessage) => void;
-
-class MIDIIn {
-  private _port: MIDIInput;
-  readonly _channels: Map<number, MIDIChannel>;
-
-  constructor(port: MIDIInput) {
-    this._port = port;
-    this._channels = new Map();
-
-    this._port.addEventListener("midimessage", (e: MIDIMessageEvent) => {
-      if (!e.data || !(e.target instanceof MIDIInput)) return;
-      const message = readMIDIMessage(e.data, e.target);
-
-      if (message) {
-        const channel = this._channels.get(message.channel);
-        channel?.dispatch(message);
-      }
-    });
-  }
-
-  channel(index: number) {
-    const channel = this._channels.get(index);
-    if (channel) return channel;
-
-    const newChannel = new MIDIChannel(this, index);
-    this._channels.set(index, newChannel);
-    return newChannel;
-  }
-}
-
-class MIDIChannel {
-  private _parent: MIDIIn;
-  private _index: number;
-  private _listeners: Set<MIDIMessageCallback>;
-
-  constructor(parent: MIDIIn, index: number) {
-    this._parent = parent;
-    this._index = index;
-    this._listeners = new Set();
-  }
-
-  addListener(fn: MIDIMessageCallback) {
-    this._listeners.add(fn);
-    return () => this._listeners.delete(fn);
-  }
-
-  removeListener(fn: MIDIMessageCallback) {
-    this._listeners.delete(fn);
-  }
-
-  destroy() {
-    this._listeners.clear();
-    this._parent._channels.delete(this._index);
-  }
-
-  dispatch(msg: MIDIMessage) {
-    this._listeners.forEach((fn) => fn(msg));
-  }
-}
-
-class MIDIOut {
-  private _port: MIDIOutput;
-
-  constructor(port: MIDIOutput) {
-    this._port = port;
-  }
-
-  noteOn(note: number, chan: number | number[] = 1, vel = 127) {
-    if (Array.isArray(chan)) {
-      chan.forEach((c) => {
-        this._port.send(formatNoteCommand("on", c, note, vel));
-      });
-    } else {
-      this._port.send(formatNoteCommand("on", chan, note, vel));
-    }
-  }
-
-  noteOff(note: number, chan: number | number[] = 1, vel = 127) {
-    if (Array.isArray(chan)) {
-      chan.forEach((c) => {
-        this._port.send(formatNoteCommand("off", c, note, vel));
-      });
-    } else {
-      this._port.send(formatNoteCommand("off", chan, note, vel));
-    }
-  }
-}

@@ -1,23 +1,25 @@
-import { MIDIMessageTypeMap, type MIDIMessage } from "./midi-message";
+import { MIDIMessageTypeMap } from "./midi-message";
+import type { MIDIMessage } from "./types";
 
-type PortData = Partial<{ name: string | null; id: string | null }>;
+type Identifier = string | { id: string };
 
-function getMIDIPort(ports: MIDIInputMap, data: PortData): MIDIInput | null;
-function getMIDIPort(ports: MIDIOutputMap, data: PortData): MIDIOutput | null;
+function getMIDIPort(p: MIDIInputMap, i: Identifier): MIDIInput | null;
+function getMIDIPort(p: MIDIOutputMap, i: Identifier): MIDIOutput | null;
 function getMIDIPort(
   ports: MIDIInputMap | MIDIOutputMap,
-  data: PortData,
+  ident: Identifier,
 ): MIDIInput | MIDIOutput | null {
-  if (data.name) {
-    const n = data.name.toLocaleLowerCase();
+  if (typeof ident === "string") {
+    const name = ident.toLocaleLowerCase();
     for (const [_, port] of ports) {
-      if (port.name?.toLocaleLowerCase() === n) return port;
+      if (port.name?.toLocaleLowerCase() === name) return port;
     }
-  } else if (data.id) {
-    const port = ports.get(data.id);
+  } else {
+    const port = ports.get(ident.id);
     if (port) return port;
   }
-  console.warn(`No input port found with: ${JSON.stringify(data)}`);
+
+  console.warn(`No input port found with: ${JSON.stringify(ident)}`);
   return null;
 }
 
@@ -25,7 +27,7 @@ function formatNoteCommand(t: "on" | "off", c: number, n: number, v: number) {
   const type = t === "on" ? 9 : 8;
   const channel = Math.min(Math.max(c - 1, 0), 15);
   const command = (type << 4) | channel;
-  const note = Math.min(Math.max(n, 21), 127);
+  const note = Math.min(Math.max(n, 0), 127);
   const velocity = t === "off" ? 0 : Math.min(Math.max(v, 0), 127);
   return [command, note, velocity] as const;
 }

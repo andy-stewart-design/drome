@@ -1,10 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import MIDIController from "@/classes/midi-controller";
-import {
-  MIDIInputChangeEvent,
-  MIDIOutputChangeEvent,
-} from "@/classes/midi-controller/events";
-import type { MIDIMessage } from "@/classes/midi-controller/midi-message";
+import type { MIDIMessage } from "@/classes/midi-controller/types";
 
 export default function MidiController() {
   const [controller, setController] = useState<MIDIController | null>(null);
@@ -17,18 +13,18 @@ export default function MidiController() {
 
     async function init() {
       try {
-        controller = await MIDIController.create();
+        controller = await MIDIController.init();
 
         setController(controller);
-        setInputs(Array.from(controller.midi.inputs.values()));
-        setOutputs(Array.from(controller.midi.outputs.values()));
+        setInputs(controller.inputs);
+        setOutputs(controller.outputs);
 
-        controller.addListener("input-change", (e: MIDIInputChangeEvent) =>
-          setInputs(e.inputs),
+        controller.addListener("input-change", (ports: MIDIInput[]) =>
+          setInputs(ports),
         );
 
-        controller.addListener("output-change", (e: MIDIOutputChangeEvent) =>
-          setOutputs(e.outputs),
+        controller.addListener("output-change", (ports: MIDIOutput[]) =>
+          setOutputs(ports),
         );
       } catch (e) {
         console.error("Failed to get MIDI access", e);
@@ -45,7 +41,7 @@ export default function MidiController() {
 
   return (
     <div>
-      <h2>Midi Inputs</h2>
+      <h2>Inputs</h2>
       <ul>
         {inputs.map((entry) => (
           <li key={entry.id}>
@@ -53,13 +49,15 @@ export default function MidiController() {
               type="checkbox"
               onChange={(e) => {
                 if (e.target.checked) {
+                  const { id } = entry;
                   controller
-                    ?.input({ name: entry.name })
+                    ?.input(entry.name ?? { id })
                     ?.channel(1)
                     .addListener(handleMIDIMessage);
                 } else {
+                  const { id } = entry;
                   controller
-                    ?.input({ name: entry.name })
+                    ?.input(entry.name ?? { id })
                     ?.channel(1)
                     .removeListener(handleMIDIMessage);
                 }
@@ -69,17 +67,19 @@ export default function MidiController() {
           </li>
         ))}
       </ul>
-      <h2>Midi Outputs</h2>
+      <h2>Outputs</h2>
       <ul>
         {outputs.map((entry) => (
           <li key={entry.id}>
             {entry.name} ({entry.id})
             <button
               onMouseDown={() => {
-                controller?.output({ name: entry.name })?.noteOn(60, 1);
+                const { id } = entry;
+                controller?.output(entry.name ?? { id })?.noteOn(60, 1);
               }}
               onMouseUp={() => {
-                controller?.output({ name: entry.name })?.noteOff(60, 1);
+                const { id } = entry;
+                controller?.output(entry.name ?? { id })?.noteOff(60, 1);
               }}
             >
               Send MIDI
