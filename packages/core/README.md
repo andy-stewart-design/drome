@@ -8,7 +8,8 @@ A web-based language for live coding music.
 [x] Stacks
 [x] Logging
 [x] Listeners
-[ ] MIDI
+[ ] Merge 1-6-migrate into main
+[-] MIDI
 [ ] Random arrays
 [ ] Static pattern methods
 [ ] Audio channels
