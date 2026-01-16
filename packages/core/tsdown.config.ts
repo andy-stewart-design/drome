@@ -10,7 +10,7 @@ export default defineConfig({
 });
 
 function importRaw() {
-  const outDir = ".tsdown-temp";
+  const outDir = `.tsdown-temp-${crypto.randomUUID()}`;
 
   return {
     name: "raw-import",
@@ -29,7 +29,12 @@ function importRaw() {
     },
     async closeBundle() {
       try {
-        await rm(outDir, { recursive: true, force: true });
+        await rm(outDir, {
+          recursive: true,
+          force: true,
+          maxRetries: 3,
+          retryDelay: 100,
+        });
         console.log("[RAW IMPORT] cleaned .tsdown-temp");
       } catch (err) {
         console.warn("[RAW IMPORT] cleanup failed:", err);
