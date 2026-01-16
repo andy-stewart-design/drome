@@ -29,6 +29,7 @@ function importRaw() {
     },
     async closeBundle() {
       try {
+        await new Promise((resolve) => setTimeout(resolve, 100));
         await rm(outDir, {
           recursive: true,
           force: true,
