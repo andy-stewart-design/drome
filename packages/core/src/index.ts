@@ -48,7 +48,7 @@ class Drome {
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
   private extListeners: Map<string, DromeEventType> = new Map();
   private logListeners: Map<string, LogCallback> = new Map();
-  private midi: MIDIController | null = null;
+  private _midi: MIDIController | null = null;
   private _logs: string[] = [];
 
   fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
@@ -57,7 +57,15 @@ class Drome {
     const drome = new Drome(bpm);
 
     try {
-      await Promise.all([drome.loadSampleBanks(), drome.addWorklets()]);
+      const midiPromise = await navigator.permissions.query({ name: "midi" });
+      const [midiPermissions] = await Promise.all([
+        midiPromise,
+        drome.loadSampleBanks(),
+        drome.addWorklets(),
+      ]);
+      if (midiPermissions.state === "granted") {
+        await drome.createMidiController();
+      }
     } catch (error) {
       console.warn(error);
     }
@@ -173,9 +181,11 @@ class Drome {
   async createMidiController() {
     try {
       const midi = await MIDIController.init();
-      this.midi = midi;
+      this._midi = midi;
+      return true;
     } catch (e) {
       console.warn(e);
+      return false;
     }
   }
 
@@ -360,6 +370,10 @@ class Drome {
 
   get metronome() {
     return this.clock.metronome;
+  }
+
+  get midi() {
+    return this._midi;
   }
 
   get currentTime() {

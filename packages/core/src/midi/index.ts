@@ -39,7 +39,7 @@ class MIDIController {
   }
 
   static async init() {
-    const midi = await navigator.requestMIDIAccess();
+    const midi = await navigator.requestMIDIAccess({ sysex: false });
     return new MIDIController(midi);
   }
 

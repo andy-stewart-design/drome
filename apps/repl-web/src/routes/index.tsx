@@ -59,6 +59,20 @@ function App() {
 
   return (
     <main>
+      <div className="header">
+        {!!drome && (
+          <button
+            className="midi"
+            disabled={!!drome.midi}
+            onClick={async () => {
+              await drome?.createMidiController()
+              console.log(drome?.midi)
+            }}
+          >
+            {!!drome.midi ? 'MIDI enabled' : 'Enable MIDI'}
+          </button>
+        )}
+      </div>
       <div ref={editorContainer} />
     </main>
   )
