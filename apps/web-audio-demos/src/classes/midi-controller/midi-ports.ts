@@ -67,29 +67,30 @@ class MIDIChannel {
 
 class CustomOutput {
   private _port: MIDIOutput;
+  private _channels: number[] = [1];
 
   constructor(port: MIDIOutput) {
     this._port = port;
   }
 
-  noteOn(note: number, chan: number | number[] = 1, vel = 127) {
-    if (Array.isArray(chan)) {
-      chan.forEach((c) => {
-        this._port.send(formatNoteCommand("on", c, note, vel));
-      });
-    } else {
-      this._port.send(formatNoteCommand("on", chan, note, vel));
-    }
+  channel(chan: number | number[]) {
+    this._channels.length = 0;
+
+    if (Array.isArray(chan)) this._channels.push(...chan);
+    else this._channels.push(chan);
+    return this;
   }
 
-  noteOff(note: number, chan: number | number[] = 1, vel = 127) {
-    if (Array.isArray(chan)) {
-      chan.forEach((c) => {
-        this._port.send(formatNoteCommand("off", c, note, vel));
-      });
-    } else {
-      this._port.send(formatNoteCommand("off", chan, note, vel));
-    }
+  noteOn(note: number, vel = 127) {
+    this._channels.forEach((c) => {
+      this._port.send(formatNoteCommand("on", c, note, vel));
+    });
+  }
+
+  noteOff(note: number, vel = 127) {
+    this._channels.forEach((c) => {
+      this._port.send(formatNoteCommand("off", c, note, vel));
+    });
   }
 }
 

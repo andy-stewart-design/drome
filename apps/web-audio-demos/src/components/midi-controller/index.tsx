@@ -75,11 +75,17 @@ export default function MidiController() {
             <button
               onMouseDown={() => {
                 const { id } = entry;
-                controller?.output(entry.name ?? { id })?.noteOn(60, 1);
+                controller
+                  ?.output(entry.name ?? { id })
+                  ?.channel(1)
+                  .noteOn(60);
               }}
               onMouseUp={() => {
                 const { id } = entry;
-                controller?.output(entry.name ?? { id })?.noteOff(60, 1);
+                controller
+                  ?.output(entry.name ?? { id })
+                  ?.channel(1)
+                  .noteOff(60);
               }}
             >
               Send MIDI
