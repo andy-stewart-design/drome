@@ -12,9 +12,9 @@ export const Route = createFileRoute('/')({ component: App })
 const LS_KEY = 'drome_sketch'
 
 function App() {
-  const editorContainer = useRef<HTMLDivElement>(null)
   const [drome, setDrome] = useState<Drome | null>(null)
   const [editor, setEditor] = useState<EditorView | null>(null)
+  const editorContainer = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!editorContainer.current) return
