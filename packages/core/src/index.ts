@@ -5,6 +5,7 @@ import Envelope from "@/automation/envelope";
 import LfoNode from "@/automation/lfo-node";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
+import Stack from "@/instruments/stack";
 import BitcrusherEffect from "@/effects/effect-bitcrusher";
 import DelayEffect from "@/effects/effect-delay";
 import DistortionEffect from "@/effects/effect-distortion";
@@ -20,7 +21,17 @@ import { isString } from "@/utils/validators";
 import { addWorklets } from "@/utils/worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
 import type { SampleBankSchema } from "@/utils/samples-validate";
-import type { DistortionAlgorithm, Metronome, SNEL } from "@/types";
+import type {
+  DistortionAlgorithm,
+  DromeEventCallback,
+  DromeEventType,
+  Metronome,
+  SNEL,
+  // Waveform,
+  WaveformAlias,
+} from "@/types";
+
+type LogCallback = (log: string, logs: string[]) => void;
 
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
@@ -35,6 +46,9 @@ class Drome {
   private sampleBanks: SampleBankSchema | null = null;
   readonly userSamples: Map<string, Map<string, string[]>> = new Map();
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
+  private extListeners: Map<string, DromeEventType> = new Map();
+  private logListeners: Map<string, LogCallback> = new Map();
+  private _logs: string[] = [];
 
   fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
 
@@ -87,6 +101,18 @@ class Drome {
     const paths = this.userSamples.get(bank)?.get(name);
     if (paths) return paths[index % paths.length];
     else return getSamplePath(this.sampleBanks, bank, name, index);
+  }
+
+  private cleanupLfos(when: number) {
+    this.lfos.forEach((lfo) => {
+      const clear = () => {
+        lfo.disconnect();
+        lfo.removeEventListener("ended", clear);
+        this.lfos.delete(lfo);
+      };
+      lfo.addEventListener("ended", clear);
+      lfo.stop(when);
+    });
   }
 
   async addWorklets() {
@@ -143,18 +169,6 @@ class Drome {
     this.clock.start();
   }
 
-  private cleanupLfos(when: number) {
-    this.lfos.forEach((lfo) => {
-      const clear = () => {
-        lfo.disconnect();
-        lfo.removeEventListener("ended", clear);
-        this.lfos.delete(lfo);
-      };
-      lfo.addEventListener("ended", clear);
-      lfo.stop(when);
-    });
-  }
-
   stop() {
     const fade = 0.25;
     this.clock.stop();
@@ -174,14 +188,64 @@ class Drome {
     }, fade * 5000); // convert seconds to milliseconds and double
   }
 
-  public clear() {
+  log(msg: string) {
+    this._logs.push(msg);
+    console.log(`[DROME]: ${msg}`);
+    this.logListeners.forEach((cb) => cb(msg, this._logs));
+  }
+
+  clearLogs() {
+    this._logs.length = 0;
+  }
+
+  on(type: "log", fn: LogCallback): string;
+  on(type: DromeEventType, fn: DromeEventCallback): string;
+  on(type: DromeEventType | "log", fn: DromeEventCallback | LogCallback) {
+    const id = crypto.randomUUID();
+    if (type === "log") {
+      this.logListeners.set(id, fn as LogCallback);
+    } else {
+      this.clock.on(type, fn as DromeEventCallback, id);
+      this.extListeners.set(id, type);
+    }
+    return id;
+  }
+
+  off(type: "log" | DromeEventType, id: string) {
+    if (type === "log") this.logListeners.delete(id);
+    else this.clock.off(type, id);
+  }
+
+  onBeat(cb: DromeEventCallback) {
+    const id = crypto.randomUUID();
+    this.clock.on("beat", cb, id);
+    this.extListeners.set(id, "beat");
+    return id;
+  }
+
+  onBar(cb: DromeEventCallback) {
+    const id = crypto.randomUUID();
+    this.clock.on("bar", cb, id);
+    this.extListeners.set(id, "bar");
+    return id;
+  }
+
+  clearListeners() {
+    this.extListeners.forEach((type, id) => {
+      this.clock.off(type, id);
+    });
+    this.extListeners.clear();
+    this.logListeners.clear();
+  }
+
+  clear() {
     this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
     this.instruments.clear();
     this.cleanupLfos(this.clock.nextBarStartTime);
-    // this.clearReplListeners();
+    this.clearListeners();
   }
 
-  synth(...types: OscillatorType[]) {
+  synth(...types: WaveformAlias[]) {
     const destination = this.audioChannels[0];
     if (!destination) throw new Error("Cannot find audio channel");
     const synth = new Synth(this, {
@@ -190,7 +254,6 @@ class Drome {
       defaultCycle: 60,
       nullValue: 0,
     });
-    this.instruments.add(synth);
     return synth;
   }
 
@@ -203,8 +266,11 @@ class Drome {
       defaultCycle: 0,
       nullValue: 0,
     });
-    this.instruments.add(sample);
     return sample;
+  }
+
+  stack(...instruments: (Synth | Sample)[]) {
+    return new Stack(instruments);
   }
 
   env(maxValue: number, startValue = 0, endValue?: number) {

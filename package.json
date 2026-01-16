@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=!repl-test",
     "dev:repl": "turbo run dev --filter=repl-web",
     "build": "turbo run build",
     "build:core": "turbo run build --filter=drome-live",

@@ -2,15 +2,21 @@ import Instrument, { type InstrumentOptions } from "./instrument";
 import DromeArray from "@/array/drome-array";
 import SynthNode from "@/audio-nodes/composite-synth-node";
 import { midiToFrequency } from "@/utils/midi-to-frequency";
+import { noteToMidi } from "@/utils/note-string-to-frequency";
+import { getWaveform } from "@/utils/synth-alias";
 import type Drome from "@/index";
+import type { NoteName, NoteValue, ScaleAlias, WaveformAlias } from "@/types";
+import { getScale } from "@/utils/get-scale";
 
 interface SynthOptions extends InstrumentOptions<number | number[]> {
-  type?: OscillatorType[];
+  type?: WaveformAlias[];
 }
 
 export default class Synth extends Instrument<number | number[]> {
-  private _types: OscillatorType[];
+  private _types: WaveformAlias[];
   private _voices: DromeArray<number>;
+  private _root = 0;
+  private _scale: number[] | null = null;
 
   constructor(drome: Drome, opts: SynthOptions) {
     super(drome, { ...opts, baseGain: 0.125 });
@@ -18,37 +24,55 @@ export default class Synth extends Instrument<number | number[]> {
     this._voices = new DromeArray(7);
   }
 
+  private getFrequncy(note: number) {
+    if (!this._scale) return midiToFrequency(note + this._root);
+
+    const octave = Math.floor(note / 7) * 12;
+    const degree = ((note % 7) + 7) % 7;
+    const step = this._scale[degree];
+    return midiToFrequency(this._root + octave + step);
+  }
+
   voices(...input: (number | number[])[]) {
     this._voices.note(...input);
     return this;
   }
 
+  root(n: NoteName | NoteValue | number) {
+    if (typeof n === "number") this._root = n;
+    else this._root = noteToMidi(n) || 0;
+    this._cycles.defaultValue = [[0]];
+    return this;
+  }
+
+  scale(name: ScaleAlias) {
+    this._scale = getScale(name);
+    return this;
+  }
+
+  push() {
+    this._drome.instruments.add(this);
+  }
+
   play(barStart: number, barDuration: number) {
     const notes = this.beforePlay(barStart, barDuration);
 
-    this._types.forEach((type) => {
+    this._types.forEach((typeAlias) => {
       notes.forEach((note, chordIndex) => {
         if (!note) return;
         [note?.value].flat().forEach((midiNote) => {
           // if (!midiNote) return;
           const cycleIndex = this._drome.metronome.bar % this._voices.length;
           const osc = new SynthNode(this.ctx, {
-            frequency: midiToFrequency(midiNote),
-            type: type === "custom" ? "sine" : type,
+            frequency: this.getFrequncy(midiNote),
+            type: getWaveform(typeAlias),
             filter: this._filter.type ? { type: this._filter.type } : undefined,
             gain: 0,
             voices: this._voices.at(cycleIndex, chordIndex),
           });
           this._audioNodes.add(osc);
 
-          const duration = this.applyGain(
-            osc,
-            note.start,
-            note.duration,
-            chordIndex,
-          );
-          this.applyFilter(osc, note.start, duration, chordIndex);
-          this.applyDetune(osc, note.start, duration, chordIndex);
+          const duration = this.applyNodeEffects(osc, note, chordIndex);
 
           osc.connect(this._connectorNode);
           osc.start(note.start);

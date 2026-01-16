@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "typecheck": "tsc --noEmit",
+    "check-types": "tsc --noEmit",
     "format": "prettier src --write"
   },
   "author": "Andy Stewart <andy.stewart1170@gmail.com> (https://andystew.art)",

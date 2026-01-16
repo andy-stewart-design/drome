@@ -1,7 +1,11 @@
 import AudioEndedEvent from "@/events/audio-ended";
-import type { LfoProcessorOptions, LfoParameterData, LfoProcessorMessage, } from "@/worklets/worklet-lfo";
-
-type Waveform = "sine" | "sawtooth" | "triangle" | "square";
+import type { BasicWaveform, BasicWaveformAlias } from "@/types";
+import { getBasicWaveform } from "@/utils/synth-alias";
+import type {
+  LfoProcessorOptions,
+  LfoParameterData,
+  LfoProcessorMessage,
+} from "@/worklets/worklet-lfo";
 
 type LfoOptions = Partial<
   LfoProcessorOptions &
@@ -18,7 +22,7 @@ type LfoNodeMessage =
     }
   | {
       type: "oscillatorType";
-      oscillatorType: Waveform;
+      oscillatorType: BasicWaveform;
     }
   | {
       type: "normalize";
@@ -26,7 +30,7 @@ type LfoNodeMessage =
     };
 
 class LfoNode extends AudioWorkletNode {
-  private _oscillatorType: Waveform;
+  private _oscillatorType: BasicWaveform;
   private _started = false;
   private _normalize: boolean;
   readonly baseValue: number;
@@ -127,9 +131,12 @@ class LfoNode extends AudioWorkletNode {
     return this;
   }
 
-  type(oscillatorType: Waveform) {
-    this._oscillatorType = oscillatorType;
-    this.postMessage({ type: "oscillatorType", oscillatorType });
+  type(oscillatorType: BasicWaveformAlias) {
+    this._oscillatorType = getBasicWaveform(oscillatorType);
+    this.postMessage({
+      type: "oscillatorType",
+      oscillatorType: this._oscillatorType,
+    });
     return this;
   }
 
