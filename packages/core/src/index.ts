@@ -11,6 +11,7 @@ import DelayEffect from "@/effects/effect-delay";
 import DistortionEffect from "@/effects/effect-distortion";
 import DromeFilter from "@/effects/effect-filter";
 import GainEffect from "@/effects/effect-gain";
+// import MIDIController from "./midi";
 import PanEffect from "@/effects/effect-pan";
 import ReverbEffect from "./effects/effect-reverb";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
@@ -27,7 +28,6 @@ import type {
   DromeEventType,
   Metronome,
   SNEL,
-  // Waveform,
   WaveformAlias,
 } from "@/types";
 
@@ -48,6 +48,7 @@ class Drome {
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
   private extListeners: Map<string, DromeEventType> = new Map();
   private logListeners: Map<string, LogCallback> = new Map();
+  // private _midi: MIDIController | null = null;
   private _logs: string[] = [];
 
   fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
@@ -56,7 +57,15 @@ class Drome {
     const drome = new Drome(bpm);
 
     try {
-      await Promise.all([drome.loadSampleBanks(), drome.addWorklets()]);
+      const midiPromise = await navigator.permissions.query({ name: "midi" });
+      const [midiPermissions] = await Promise.all([
+        midiPromise,
+        drome.loadSampleBanks(),
+        drome.addWorklets(),
+      ]);
+      // if (midiPermissions.state === "granted") {
+      //   await drome.createMidiController();
+      // }
     } catch (error) {
       console.warn(error);
     }
@@ -168,6 +177,17 @@ class Drome {
     await this.preloadSamples();
     this.clock.start();
   }
+
+  // async createMidiController() {
+  //   try {
+  //     const midi = await MIDIController.init();
+  //     this._midi = midi;
+  //     return true;
+  //   } catch (e) {
+  //     console.warn(e);
+  //     return false;
+  //   }
+  // }
 
   stop() {
     const fade = 0.25;
@@ -351,6 +371,10 @@ class Drome {
   get metronome() {
     return this.clock.metronome;
   }
+
+  // get midi() {
+  //   return this._midi;
+  // }
 
   get currentTime() {
     return this.ctx.currentTime;

@@ -43,3 +43,31 @@ body {
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
 }
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  inset: 0 0 auto 0;
+  z-index: 1;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.5), transparent);
+  block-size: 5.5rem;
+  padding-inline: 2rem;
+  pointer-events: none;
+}
+
+.midi {
+  display: inline-block;
+  margin: 0;
+  background: rgb(0 0 0 / 0.75);
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(255 255 255 / 0.15);
+  border-radius: 100vmax;
+  pointer-events: auto;
+
+  &:disabled {
+    color: inherit;
+  }
+}

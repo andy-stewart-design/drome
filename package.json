@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "turbo run dev --filter=!repl-test",
     "dev:repl": "turbo run dev --filter=repl-web",
-    "build": "turbo run build",
+    "dev:demos": "turbo run dev --filter=web-audio-demos",
+    "build": "turbo run build --filter=!drome-samples --filter=!repl-test",
     "build:core": "turbo run build --filter=drome-live",
     "lint": "turbo run lint",
     "test": "turbo run test",
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@types/node": "^24.10.1",
     "prettier": "^3.6.2",
+    "prettier-plugin-astro": "^0.14.1",
     "tsc-alias": "^1.8.16",
     "turbo": "^2.6.1",
     "typescript": "^5.9.3"
