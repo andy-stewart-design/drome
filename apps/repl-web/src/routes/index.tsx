@@ -59,7 +59,7 @@ function App() {
 
   return (
     <main>
-      <div className="header">
+      {/*<div className="header">
         {!!drome && (
           <button
             className="midi"
@@ -72,7 +72,7 @@ function App() {
             {!!drome.midi ? 'MIDI enabled' : 'Enable MIDI'}
           </button>
         )}
-      </div>
+      </div>*/}
       <div ref={editorContainer} />
     </main>
   )
