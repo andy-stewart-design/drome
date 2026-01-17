@@ -1,11 +1,11 @@
 ---
-import MidiController from '../components/midi-controller';
-
+import Layout from '@/layouts/Layout.astro';
 ---
 
-<h1>MIDI Controller</h1>
-<MidiController client:load/>
-
-<style is:global>
-  html { color-scheme: dark;}
-</style>
+<Layout>
+    <ul>
+        <li>
+            <a href="/web-midi">MIDI Controller</a>
+        </li>
+    </ul>
+</Layout>
