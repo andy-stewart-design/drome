@@ -1,31 +1,29 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import MIDIController from "@/classes/midi-controller";
+import MIDIController2 from "@/classes/midi-controller-2";
+import MIDIOberserver from "@/classes/midi-controller-2/midi-observer";
 import type { MIDIMessage } from "@/classes/midi-controller/types";
 
 export default function MidiController() {
-  const [controller, setController] = useState<MIDIController | null>(null);
+  const [controller, setController] = useState<MIDIController2 | null>(null);
   const [inputs, setInputs] = useState<MIDIInput[]>([]);
   const [outputs, setOutputs] = useState<MIDIOutput[]>([]);
   const [message, setMessage] = useState<MIDIMessage | null>(null);
+  const observerRef = useRef<Map<string, MIDIOberserver<any>>>(new Map());
 
   useEffect(() => {
-    let controller: MIDIController | undefined;
+    let controller: MIDIController2 | undefined;
 
     async function init() {
       try {
-        controller = await MIDIController.init();
+        controller = await MIDIController2.init();
 
         setController(controller);
         setInputs(controller.inputs);
         setOutputs(controller.outputs);
 
-        controller.subscribe("inputchange", (ports: MIDIInput[]) =>
-          setInputs(ports),
-        );
-
-        controller.subscribe("outputchange", (ports: MIDIOutput[]) =>
-          setOutputs(ports),
-        );
+        controller.onInputChange((ports: MIDIInput[]) => setInputs(ports));
+        controller.onOututChange((ports: MIDIOutput[]) => setOutputs(ports));
       } catch (e) {
         console.error("Failed to get MIDI access", e);
       }
@@ -43,27 +41,31 @@ export default function MidiController() {
     <div>
       <h2>Inputs</h2>
       <ul>
-        {inputs.map((entry) => (
-          <li key={entry.id}>
+        {inputs.map((port) => (
+          <li key={port.id}>
             <input
               type="checkbox"
               onChange={(e) => {
                 if (e.target.checked) {
-                  const { id } = entry;
-                  controller
-                    ?.input(entry.name ?? entry.id)
-                    ?.channel(1)
-                    .subscribe(handleMIDIMessage);
+                  const noteObs = new MIDIOberserver("note", port.id).onUpdate(
+                    handleMIDIMessage,
+                  );
+                  const ccObs = new MIDIOberserver(
+                    "controlchange",
+                    port.id,
+                  ).onUpdate(handleMIDIMessage);
+                  controller?.addObserver(noteObs)?.addObserver(ccObs);
+                  observerRef.current.set(`note-${port.id}`, noteObs);
+                  observerRef.current.set(`cc-${port.id}`, ccObs);
                 } else {
-                  const { id } = entry;
-                  controller
-                    ?.input(entry.name ?? entry.id)
-                    ?.channel(1)
-                    .unsubscribe(handleMIDIMessage);
+                  const noteObs = observerRef.current.get(`note-${port.id}`);
+                  const ccObs = observerRef.current.get(`cc-${port.id}`);
+                  if (noteObs) controller?.removeObserver(noteObs);
+                  if (ccObs) controller?.removeObserver(ccObs);
                 }
               }}
             />
-            {entry.name} ({entry.id})
+            {port.name} ({port.id})
           </li>
         ))}
       </ul>
@@ -74,16 +76,16 @@ export default function MidiController() {
             {entry.name} ({entry.id})
             <button
               onMouseDown={() => {
-                controller
-                  ?.output(entry.name ?? entry.id)
-                  ?.channel(1)
-                  .noteOn(60);
+                // controller
+                //   ?.output(entry.name ?? entry.id)
+                //   ?.channel(1)
+                //   .noteOn(60);
               }}
               onMouseUp={() => {
-                controller
-                  ?.output(entry.name ?? entry.id)
-                  ?.channel(1)
-                  .noteOff(60);
+                // controller
+                //   ?.output(entry.name ?? entry.id)
+                //   ?.channel(1)
+                //   .noteOff(60);
               }}
             >
               Send MIDI
