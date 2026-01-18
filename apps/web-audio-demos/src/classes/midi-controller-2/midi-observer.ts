@@ -28,8 +28,8 @@ class MIDIOberserver<T extends "note" | "controlchange"> {
   }
 }
 
-const data = {
-  type: "note_off",
+const noteData: MIDINoteMessage = {
+  type: "noteoff",
   source: {
     name: "iphone bluetooth",
     id: "1986674228",
@@ -39,5 +39,7 @@ const data = {
   velocity: 0,
 };
 
+const ccData = {};
+
 const foo = new MIDIOberserver("note").onUpdate((data: MIDINoteMessage) => {});
-foo.update();
+foo.update(noteData);
