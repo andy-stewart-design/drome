@@ -19,11 +19,11 @@ export default function MidiController() {
         setInputs(controller.inputs);
         setOutputs(controller.outputs);
 
-        controller.addListener("input-change", (ports: MIDIInput[]) =>
+        controller.subscribe("inputchange", (ports: MIDIInput[]) =>
           setInputs(ports),
         );
 
-        controller.addListener("output-change", (ports: MIDIOutput[]) =>
+        controller.subscribe("outputchange", (ports: MIDIOutput[]) =>
           setOutputs(ports),
         );
       } catch (e) {
@@ -51,15 +51,15 @@ export default function MidiController() {
                 if (e.target.checked) {
                   const { id } = entry;
                   controller
-                    ?.input(entry.name ?? { id })
+                    ?.input(entry.name ?? entry.id)
                     ?.channel(1)
-                    .addListener(handleMIDIMessage);
+                    .subscribe(handleMIDIMessage);
                 } else {
                   const { id } = entry;
                   controller
-                    ?.input(entry.name ?? { id })
+                    ?.input(entry.name ?? entry.id)
                     ?.channel(1)
-                    .removeListener(handleMIDIMessage);
+                    .unsubscribe(handleMIDIMessage);
                 }
               }}
             />
@@ -74,16 +74,14 @@ export default function MidiController() {
             {entry.name} ({entry.id})
             <button
               onMouseDown={() => {
-                const { id } = entry;
                 controller
-                  ?.output(entry.name ?? { id })
+                  ?.output(entry.name ?? entry.id)
                   ?.channel(1)
                   .noteOn(60);
               }}
               onMouseUp={() => {
-                const { id } = entry;
                 controller
-                  ?.output(entry.name ?? { id })
+                  ?.output(entry.name ?? entry.id)
                   ?.channel(1)
                   .noteOff(60);
               }}

@@ -1,19 +1,19 @@
 import type { MIDIMessageTypeEntries } from "./midi-message";
-import type { MIDIInputStream, MIDIOutputRouter } from "./midi-ports";
+// import type { MIDIInputStream, MIDIOutputRouter } from "./midi-ports";
 
-type InputChangeHandler = (e: MIDIInput[]) => void;
-type OutputChangeHandler = (e: MIDIOutput[]) => void;
-type MIDIMessageHandler = (msg: MIDIMessage) => void;
+// type InputChangeHandler = (e: MIDIInput[]) => void;
+// type OutputChangeHandler = (e: MIDIOutput[]) => void;
+// type MIDIMessageHandler = (msg: MIDIMessage) => void;
 
-interface MIDIControllerPorts {
-  inputs: Map<string, MIDIInputStream>;
-  outputs: Map<string, MIDIOutputRouter>;
-}
+// interface MIDIControllerPorts {
+//   inputs: Map<string, MIDIInputStream>;
+//   outputs: Map<string, MIDIOutputRouter>;
+// }
 
-interface MIDIControllerListeners {
-  inputs: Set<InputChangeHandler>;
-  outputs: Set<OutputChangeHandler>;
-}
+// interface MIDIControllerListeners {
+//   inputs: Set<InputChangeHandler>;
+//   outputs: Set<OutputChangeHandler>;
+// }
 
 // MIDI Messages
 interface BaseMIDIMessage {
@@ -54,11 +54,11 @@ type MIDIMessage =
   | null;
 
 export type {
-  InputChangeHandler,
-  OutputChangeHandler,
-  MIDIMessageHandler,
-  MIDIControllerPorts,
-  MIDIControllerListeners,
+  // InputChangeHandler,
+  // OutputChangeHandler,
+  // MIDIMessageHandler,
+  // MIDIControllerPorts,
+  // MIDIControllerListeners,
   MIDIControlMessage,
   MIDIMessageType,
   MIDIMessage,
