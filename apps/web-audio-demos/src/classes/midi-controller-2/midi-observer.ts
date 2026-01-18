@@ -28,5 +28,16 @@ class MIDIOberserver<T extends "note" | "controlchange"> {
   }
 }
 
+const data = {
+  type: "note_off",
+  source: {
+    name: "iphone bluetooth",
+    id: "1986674228",
+  },
+  channel: 1,
+  note: 45,
+  velocity: 0,
+};
+
 const foo = new MIDIOberserver("note").onUpdate((data: MIDINoteMessage) => {});
 foo.update();
