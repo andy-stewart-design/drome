@@ -29,8 +29,8 @@ class MIDIObservable<T extends MIDIObserverType> {
   }
 
   private emit(e: MIDIMessageEvent) {
-    if (!e.data) return;
-    const parsed = readMIDIMessage(e.data, this._input);
+    if (!e.data || !(e.target instanceof MIDIInput)) return;
+    const parsed = readMIDIMessage(e.data, e.target);
     if (!parsed) return;
 
     const isNoteMessage = parsed.type === "noteon" || parsed.type === "noteoff";

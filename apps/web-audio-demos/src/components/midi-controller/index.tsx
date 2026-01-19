@@ -12,7 +12,8 @@ export default function MidiController() {
   const observerRef = useRef<Map<string, MIDIOberserver<any>>>(new Map());
 
   useEffect(() => {
-    let controller: MIDIController2 | undefined;
+    let controller: MIDIController2;
+    let observer: MIDIOberserver<"portchange">;
 
     async function init() {
       try {
@@ -22,15 +23,25 @@ export default function MidiController() {
         setInputs(controller.inputs);
         setOutputs(controller.outputs);
 
-        controller.onInputChange((ports: MIDIInput[]) => setInputs(ports));
-        controller.onOututChange((ports: MIDIOutput[]) => setOutputs(ports));
+        observer = new MIDIOberserver("portchange").onUpdate(
+          ({ portType, ports }) => {
+            if (portType === "input") setInputs(ports);
+            else setOutputs(ports);
+          },
+        );
+
+        controller.addObserver(observer);
       } catch (e) {
         console.error("Failed to get MIDI access", e);
       }
     }
 
     init();
-    return () => controller?.destroy();
+
+    return () => {
+      controller.removeObserver(observer);
+      controller.destroy();
+    };
   }, []);
 
   const handleMIDIMessage = useCallback((e: MIDIMessage) => {

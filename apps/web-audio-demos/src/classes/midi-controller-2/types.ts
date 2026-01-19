@@ -53,6 +53,18 @@ type MIDIMessage =
   | MIDIProgramMessage
   | null;
 
+type MIDIPortChangeMessage =
+  | {
+      type: "portchange";
+      portType: "input";
+      ports: Array<MIDIInput>;
+    }
+  | {
+      type: "portchange";
+      portType: "output";
+      ports: Array<MIDIOutput>;
+    };
+
 export type {
   InputChangeHandler,
   OutputChangeHandler,
@@ -63,4 +75,5 @@ export type {
   MIDIMessageType,
   MIDIMessage,
   MIDINoteMessage,
+  MIDIPortChangeMessage,
 };

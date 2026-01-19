@@ -1,8 +1,13 @@
-import type { MIDIControlMessage, MIDINoteMessage } from "./types";
+import type {
+  MIDIControlMessage,
+  MIDINoteMessage,
+  MIDIPortChangeMessage,
+} from "./types";
 
 interface MIDIObserverDataMap {
   note: MIDINoteMessage;
   controlchange: MIDIControlMessage;
+  portchange: MIDIPortChangeMessage;
 }
 
 type MIDIObserverType = keyof MIDIObserverDataMap;
@@ -14,9 +19,14 @@ class MIDIOberserver<T extends MIDIObserverType> {
   private _update: ((data: MIDIObserverDataMap[T]) => void) | undefined;
   private _defaultValue: number | undefined;
 
-  constructor(type: T, ident: string, defaultValue?: number) {
+  constructor(type: T, ident?: string, defaultValue?: number) {
+    if ((type === "note" || type === "controlchange") && !ident) {
+      console.log(type);
+      console.error("[MIDI Observer]: must provide a port id or name.");
+    }
+
     this._type = type;
-    this._identifier = ident;
+    this._identifier = ident ?? crypto.randomUUID();
     this._defaultValue = defaultValue;
   }
 
@@ -95,4 +105,4 @@ class MIDIOberserver<T extends MIDIObserverType> {
 // bar.update(ccData);
 
 export default MIDIOberserver;
-export type { MIDIObserverType, MIDIOberserver };
+export type { MIDIOberserver, MIDIObserverType };
