@@ -1,4 +1,4 @@
-import MIDIObservable from "./midi-observable-2";
+import MIDIObservable from "./midi-observable";
 import MIDIObserver, { type MIDIObserverType } from "./midi-observer";
 import { getMIDIPort } from "./utils";
 

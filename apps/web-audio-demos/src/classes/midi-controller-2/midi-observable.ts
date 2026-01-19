@@ -1,14 +1,24 @@
 import type { MIDIOberserver, MIDIObserverType } from "./midi-observer";
 import { readMIDIMessage } from "./utils";
 
-class MIDIObservable<T extends MIDIObserverType> {
-  private _input: MIDIInput;
+class MIDIPortChangeObservable<T extends MIDIObserverType> {
+  private _controller: AbortController;
   private _subscribers: Set<MIDIOberserver<T>>;
 
-  constructor(input: MIDIInput) {
-    this._input = input;
+  constructor(target: MIDIAccess | MIDIInput) {
     this._subscribers = new Set();
-    this._input.addEventListener("midimessage", this.emit.bind(this));
+    this._controller = new AbortController();
+    const { signal } = this._controller;
+
+    if (target instanceof MIDIAccess) {
+      target.addEventListener("statechange", this.emitPortChange.bind(this), {
+        signal,
+      });
+    } else {
+      target.addEventListener("midimessage", this.emitMIDIMessage.bind(this), {
+        signal,
+      });
+    }
   }
 
   subscribe(subscriber: MIDIOberserver<T>) {
@@ -28,7 +38,25 @@ class MIDIObservable<T extends MIDIObserverType> {
     return this;
   }
 
-  private emit(e: MIDIMessageEvent) {
+  private emitPortChange(e: MIDIConnectionEvent) {
+    const midi = e.target;
+    const portType = e.port?.type;
+    if (!portType || !(midi instanceof MIDIAccess)) return;
+
+    this._subscribers.forEach((obs) => {
+      if (!obs.isType("portchange")) return;
+
+      if (portType === "input") {
+        const ports = Array.from(midi.inputs.values());
+        obs.update({ type: "portchange", portType, ports });
+      } else {
+        const ports = Array.from(midi.outputs.values());
+        obs.update({ type: "portchange", portType, ports });
+      }
+    });
+  }
+
+  private emitMIDIMessage(e: MIDIMessageEvent) {
     if (!e.data || !(e.target instanceof MIDIInput)) return;
     const parsed = readMIDIMessage(e.data, e.target);
     if (!parsed) return;
@@ -43,6 +71,11 @@ class MIDIObservable<T extends MIDIObserverType> {
       }
     });
   }
+
+  destroy() {
+    this.unsubscribeAll();
+    this._controller.abort();
+  }
 }
 
-export default MIDIObservable;
+export default MIDIPortChangeObservable;
