@@ -104,5 +104,7 @@ class MIDIOberserver<T extends MIDIObserverType> {
 // const bar = new MIDIOberserver("controlchange").onUpdate((data) => {});
 // bar.update(ccData);
 
+// const baz = new MIDIOberserver("portchange").onUpdate((data) => {});
+
 export default MIDIOberserver;
 export type { MIDIOberserver, MIDIObserverType };
