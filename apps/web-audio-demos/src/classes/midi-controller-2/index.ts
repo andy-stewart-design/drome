@@ -20,6 +20,7 @@ class MIDIController {
     if (observer.type === "portchange") {
       const observable = new MIDIObservable<T>(this._midi);
       const { identifier } = observer;
+
       this._observables.set(identifier, observable);
       observable.subscribe(observer);
     } else {
@@ -28,10 +29,12 @@ class MIDIController {
       if (!port) return null;
 
       let observable = this._observables.get(identifier);
+
       if (!observable) {
         observable = new MIDIObservable<T>(port);
         this._observables.set(identifier, observable);
       }
+
       observable.subscribe(observer);
     }
     return this;
@@ -65,3 +68,28 @@ class MIDIController {
 }
 
 export default MIDIController;
+
+// class TypedMap<T extends Record<PropertyKey, any>> {
+//   private map = new Map<keyof T, T[keyof T]>();
+
+//   get<K extends keyof T>(key: K): T[K] | undefined {
+//     return this.map.get(key) as T[K] | undefined;
+//   }
+
+//   set<K extends keyof T>(key: K, value: T[K]): void {
+//     this.map.set(key, value);
+//   }
+// }
+
+// interface MyMap {
+//   foo: string[];
+//   bar: number[];
+// }
+
+// const myMap = new TypedMap<MyMap>();
+
+// myMap.set("foo", ["a", "b"]);
+// myMap.set("bar", [1, 2, 3]);
+
+// const foo = myMap.get("bar"); // string[] | undefined
+// const bar = myMap.get("bar"); // number[] | undefined

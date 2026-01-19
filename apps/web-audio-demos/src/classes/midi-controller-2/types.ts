@@ -65,6 +65,28 @@ type MIDIPortChangeMessage =
       ports: Array<MIDIOutput>;
     };
 
+type MIDIConnectionAction = "connected" | "disconnected" | "opened" | "closed";
+
+interface BaseMIDIStateChange {
+  action: MIDIConnectionAction;
+  connected: boolean; // (port.state === "connected")
+  open: boolean; // (port.connection === "open")
+  active: boolean; // (connected && open)
+  ports: { inputs: MIDIInput[]; outputs: MIDIOutput[] };
+}
+
+interface MIDIInputStateChange extends BaseMIDIStateChange {
+  type: "input";
+  port: MIDIInput;
+}
+
+interface MIDIOutputStateChange extends BaseMIDIStateChange {
+  type: "output";
+  port: MIDIOutput;
+}
+
+type MIDIPortChange = MIDIInputStateChange | MIDIOutputStateChange;
+
 export type {
   InputChangeHandler,
   OutputChangeHandler,
@@ -75,5 +97,6 @@ export type {
   MIDIMessageType,
   MIDIMessage,
   MIDINoteMessage,
+  MIDIPortChange,
   MIDIPortChangeMessage,
 };

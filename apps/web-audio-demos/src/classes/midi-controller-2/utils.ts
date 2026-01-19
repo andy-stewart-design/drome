@@ -1,5 +1,5 @@
 import { MIDIMessageTypeMap } from "./midi-message";
-import type { MIDIMessage } from "./types";
+import type { MIDIMessage, MIDIPortChange } from "./types";
 
 // ----------------------------------------------------------------
 // MIDI PORT ACCESSOR
@@ -29,7 +29,7 @@ function getPortByName(ports: MIDIInputMap | MIDIOutputMap, name: string) {
 // ----------------------------------------------------------------
 // ENCODE MIDI OUTPUT DATA
 // ----------------------------------------------------------------
-function formatNoteCommand(t: "on" | "off", c: number, n: number, v: number) {
+function encodeNoteCommand(t: "on" | "off", c: number, n: number, v: number) {
   const type = t === "on" ? 9 : 8;
   const channel = Math.min(Math.max(c - 1, 0), 15);
   const command = (type << 4) | channel;
@@ -41,7 +41,7 @@ function formatNoteCommand(t: "on" | "off", c: number, n: number, v: number) {
 // ----------------------------------------------------------------
 // PARSE MIDI INPUT DATA
 // ----------------------------------------------------------------
-function readMIDIMessage(data: Uint8Array, input: MIDIInput): MIDIMessage {
+function parseMIDIMessage(data: Uint8Array, input: MIDIInput): MIDIMessage {
   const status = data[0];
   const rawType = (status & 0xf0) >> 4;
   const channel = (status & 0x0f) + 1;
@@ -70,4 +70,50 @@ function readMIDIMessage(data: Uint8Array, input: MIDIInput): MIDIMessage {
   }
 }
 
-export { formatNoteCommand, readMIDIMessage, getMIDIPort };
+// ----------------------------------------------------------------
+// PARSE MIDI CONNECTION EVENT
+// ----------------------------------------------------------------
+function parseMIDIPortChange(e: MIDIConnectionEvent): MIDIPortChange | null {
+  const midi = e.target;
+  const p = e.port;
+  if (!p || !(midi instanceof MIDIAccess)) return null;
+
+  const base = {
+    action: parsePortChangeType(p),
+    connected: p.state === "connected",
+    open: p.connection === "open",
+    active: p.state === "connected" && p.connection === "open",
+    ports: {
+      inputs: Array.from(midi.inputs.values()),
+      outputs: Array.from(midi.outputs.values()),
+    },
+  } as const;
+
+  if (p instanceof MIDIInput) {
+    return { ...base, type: "input", port: p };
+  } else if (p instanceof MIDIOutput) {
+    return { ...base, type: "output", port: p };
+  } else return null;
+}
+
+function parsePortChangeType(p: MIDIPort) {
+  if (p.state === "disconnected") {
+    return "disconnected"; // If it's disconnected, the hardware was removed.
+  } else if (p.state === "connected" && p.connection === "open") {
+    return "opened"; // If it's connected and open, it just finished the opening handshake.
+  } else if (p.state === "connected" && p.connection === "closed") {
+    // If it's connected but closed, it was either just plugged in
+    // OR it was just manually closed via port.close().
+    // Usually, we treat this as a hardware connection discovery.
+    return "connected";
+  } else {
+    return "closed"; // Fallback for 'pending' or other transitions
+  }
+}
+
+export {
+  encodeNoteCommand,
+  parseMIDIMessage,
+  getMIDIPort,
+  parseMIDIPortChange,
+};

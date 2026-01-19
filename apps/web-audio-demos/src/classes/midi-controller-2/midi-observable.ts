@@ -1,7 +1,8 @@
 import type { MIDIOberserver, MIDIObserverType } from "./midi-observer";
-import { readMIDIMessage } from "./utils";
+import { parseMIDIPortChange, parseMIDIMessage } from "./utils";
 
 class MIDIPortChangeObservable<T extends MIDIObserverType> {
+  private _input: MIDIInput | undefined;
   private _controller: AbortController;
   private _subscribers: Set<MIDIOberserver<T>>;
 
@@ -15,6 +16,7 @@ class MIDIPortChangeObservable<T extends MIDIObserverType> {
         signal,
       });
     } else {
+      this._input = target;
       target.addEventListener("midimessage", this.emitMIDIMessage.bind(this), {
         signal,
       });
@@ -45,20 +47,14 @@ class MIDIPortChangeObservable<T extends MIDIObserverType> {
 
     this._subscribers.forEach((obs) => {
       if (!obs.isType("portchange")) return;
-
-      if (portType === "input") {
-        const ports = Array.from(midi.inputs.values());
-        obs.update({ type: "portchange", portType, ports });
-      } else {
-        const ports = Array.from(midi.outputs.values());
-        obs.update({ type: "portchange", portType, ports });
-      }
+      const data = parseMIDIPortChange(e);
+      if (data) obs.update(data);
     });
   }
 
   private emitMIDIMessage(e: MIDIMessageEvent) {
     if (!e.data || !(e.target instanceof MIDIInput)) return;
-    const parsed = readMIDIMessage(e.data, e.target);
+    const parsed = parseMIDIMessage(e.data, e.target);
     if (!parsed) return;
 
     const isNoteMessage = parsed.type === "noteon" || parsed.type === "noteoff";
@@ -75,6 +71,14 @@ class MIDIPortChangeObservable<T extends MIDIObserverType> {
   destroy() {
     this.unsubscribeAll();
     this._controller.abort();
+  }
+
+  get input() {
+    return this._input;
+  }
+
+  get subscribers() {
+    return this._subscribers;
   }
 }
 

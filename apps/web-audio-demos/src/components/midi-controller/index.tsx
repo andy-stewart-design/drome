@@ -23,12 +23,10 @@ export default function MidiController() {
         setInputs(controller.inputs);
         setOutputs(controller.outputs);
 
-        observer = new MIDIOberserver("portchange").onUpdate(
-          ({ portType, ports }) => {
-            if (portType === "input") setInputs(ports);
-            else setOutputs(ports);
-          },
-        );
+        observer = new MIDIOberserver("portchange").onUpdate((e) => {
+          if (e.type === "input") setInputs(e.ports.inputs);
+          else setOutputs(e.ports.outputs);
+        });
 
         controller.addObserver(observer);
       } catch (e) {

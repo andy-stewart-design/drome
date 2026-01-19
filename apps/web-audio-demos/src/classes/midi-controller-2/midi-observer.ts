@@ -1,13 +1,13 @@
 import type {
   MIDIControlMessage,
   MIDINoteMessage,
-  MIDIPortChangeMessage,
+  MIDIPortChange,
 } from "./types";
 
 interface MIDIObserverDataMap {
   note: MIDINoteMessage;
   controlchange: MIDIControlMessage;
-  portchange: MIDIPortChangeMessage;
+  portchange: MIDIPortChange;
 }
 
 type MIDIObserverType = keyof MIDIObserverDataMap;
