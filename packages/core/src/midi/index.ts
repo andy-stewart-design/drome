@@ -65,6 +65,16 @@ class MIDIController {
   get outputs() {
     return Array.from(this._midi.outputs.values());
   }
+
+  get obserablesCount() {
+    return this._observables.size;
+  }
+
+  get observersCount() {
+    return Array.from(this._observables.values()).reduce((acc, obs) => {
+      return acc + obs.subscribers.size;
+    }, 0);
+  }
 }
 
 export default MIDIController;

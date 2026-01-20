@@ -196,6 +196,7 @@ class Drome {
       inst.stop(this.ctx.currentTime, fade);
     });
     this.cleanupLfos(this.ctx.currentTime + fade);
+    this.midi?.clearObservers();
     // this.clearReplListeners();
     this.audioChannels.forEach((chan) => {
       chan.gain.cancelScheduledValues(this.ctx.currentTime);
@@ -260,6 +261,7 @@ class Drome {
   clear() {
     this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
     this.instruments.clear();
+    this.midi?.clearObservers();
     this.cleanupLfos(this.clock.nextBarStartTime);
     this.clearListeners();
   }
