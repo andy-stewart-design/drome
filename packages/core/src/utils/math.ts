@@ -10,4 +10,14 @@ function squash(x: number) {
   return x / (1 + x);
 }
 
-export { clamp, mod, squash };
+function map(
+  value: number,
+  oldMin: number,
+  oldMax: number,
+  newMin: number,
+  newMax: number,
+) {
+  return ((value - oldMin) / (oldMax - oldMin)) * (newMax - newMin) + newMin;
+}
+
+export { clamp, map, mod, squash };

@@ -4,6 +4,7 @@ import DromeArrayNullable from "@/array/drome-array-nullable";
 import LfoNode from "@/automation/lfo-node";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
+import { MIDIObserver } from "@/midi";
 import { parsePatternString } from "../utils/parse-pattern";
 import { isNullish, isNumber, isString } from "../utils/validators";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
@@ -45,7 +46,7 @@ abstract class Instrument<T> {
   private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
   protected _gain: Envelope;
-  private _detune: Pattern | Envelope | LfoNode;
+  private _detune: Pattern | Envelope | LfoNode | MIDIObserver<"controlchange">;
   protected _filter: FrequencyParams = {};
   private _connected = false;
   protected _stopTime: number | null = null;
@@ -160,6 +161,14 @@ abstract class Instrument<T> {
       this._detune.apply(node.detune, cycleIndex, chordIndex);
     } else if (this._detune instanceof Envelope) {
       this._detune.apply(node.detune, start, duration, cycleIndex, chordIndex);
+    } else if (this._detune instanceof MIDIObserver) {
+      this._detune.onUpdate(({ value }) => {
+        try {
+          node.detune.setValueAtTime(value, this.ctx.currentTime);
+        } catch (e) {
+          console.warn(e);
+        }
+      });
     } else {
       this._detune.connect(node.detune);
     }
@@ -300,8 +309,12 @@ abstract class Instrument<T> {
     return this;
   }
 
-  detune(input: SNEL) {
-    if (input instanceof Envelope || input instanceof LfoNode) {
+  detune(input: SNEL | MIDIObserver<"controlchange">) {
+    if (
+      input instanceof Envelope ||
+      input instanceof LfoNode ||
+      input instanceof MIDIObserver
+    ) {
       this._detune = input;
     } else {
       const pattern = isString(input) ? parsePatternString(input) : [input];
@@ -340,6 +353,8 @@ abstract class Instrument<T> {
   }
 
   beforePlay(barStart: number, barDuration: number) {
+    if (this._detune instanceof MIDIObserver) this._detune.clear();
+
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
     const cycle = this._cycles.at(cycleIndex);
     const notes: Note<T>[] = cycle.map((value, i) => {

@@ -1,48 +1,33 @@
 import type { MIDIMessageTypeEntries } from "./midi-message";
-import type { CustomInput, CustomOutput } from "./midi-ports";
 
-type InputChangeHandler = (e: MIDIInput[]) => void;
-
-type OutputChangeHandler = (e: MIDIOutput[]) => void;
-
-type MIDIMessageHandler = (msg: MIDIMessage) => void;
-
-interface MIDIControllerPorts {
-  inputs: Map<string, CustomInput>;
-  outputs: Map<string, CustomOutput>;
-}
-
-interface MIDIControllerListeners {
-  inputs: Set<InputChangeHandler>;
-  outputs: Set<OutputChangeHandler>;
-}
-
-// MIDI Messages
+// ——————————————————————————————————————————————————————
+// MIDI MESSAGE EVENT
+// ——————————————————————————————————————————————————————
 interface BaseMIDIMessage {
-  source: { name: string; id: string };
   channel: number;
+  input: MIDIInput;
 }
 
 interface DefaultMIDIMessage extends BaseMIDIMessage {
-  type: "polyphonic_aftertouch" | "channel_aftertouch" | "pitch_bend";
+  type: "aftertouch" | "pitchbend";
   data1: number;
   data2: number;
 }
 
 interface MIDINoteMessage extends BaseMIDIMessage {
-  type: "note_on" | "note_off";
+  type: "noteon" | "noteoff";
   note: number;
   velocity: number;
 }
 
 interface MIDIControlMessage extends BaseMIDIMessage {
-  type: "control_change";
+  type: "controlchange";
   controlNumber: number;
   value: number;
 }
 
 interface MIDIProgramMessage extends BaseMIDIMessage {
-  type: "program_change";
+  type: "programchange";
   program: number;
 }
 
@@ -55,12 +40,48 @@ type MIDIMessage =
   | MIDIProgramMessage
   | null;
 
+// ——————————————————————————————————————————————————————
+// MIDI PORT (STATE) CHANGE EVENT
+// ——————————————————————————————————————————————————————
+type MIDIPortChangeMessage =
+  | {
+      type: "portchange";
+      portType: "input";
+      ports: Array<MIDIInput>;
+    }
+  | {
+      type: "portchange";
+      portType: "output";
+      ports: Array<MIDIOutput>;
+    };
+
+type MIDIConnectionAction = "connected" | "disconnected" | "opened" | "closed";
+
+interface BaseMIDIStateChange {
+  action: MIDIConnectionAction;
+  connected: boolean; // (port.state === "connected")
+  open: boolean; // (port.connection === "open")
+  active: boolean; // (connected && open)
+  ports: { inputs: MIDIInput[]; outputs: MIDIOutput[] };
+}
+
+interface MIDIInputStateChange extends BaseMIDIStateChange {
+  type: "input";
+  port: MIDIInput;
+}
+
+interface MIDIOutputStateChange extends BaseMIDIStateChange {
+  type: "output";
+  port: MIDIOutput;
+}
+
+type MIDIPortChange = MIDIInputStateChange | MIDIOutputStateChange;
+
 export type {
-  InputChangeHandler,
-  OutputChangeHandler,
-  MIDIMessageHandler,
-  MIDIControllerPorts,
-  MIDIControllerListeners,
+  MIDIControlMessage,
   MIDIMessageType,
   MIDIMessage,
+  MIDINoteMessage,
+  MIDIPortChange,
+  MIDIPortChangeMessage,
 };

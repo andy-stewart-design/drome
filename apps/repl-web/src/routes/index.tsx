@@ -15,10 +15,14 @@ function App() {
   const editorContainer = useRef<HTMLDivElement>(null)
   const [drome, setDrome] = useState<Drome | null>(null)
   const [editor, setEditor] = useState<EditorView | null>(null)
+  const [midi, setMidi] = useState<boolean>(false)
 
   useEffect(() => {
     if (!editorContainer.current) return
-    Drome.init(120).then((d) => setDrome(d))
+    Drome.init(120).then((d) => {
+      setDrome(d)
+      if (d.midi) setMidi(true)
+    })
 
     const doc = localStorage.getItem(LS_KEY)
 
@@ -59,20 +63,20 @@ function App() {
 
   return (
     <main>
-      {/*<div className="header">
+      <div className="header">
         {!!drome && (
           <button
             className="midi"
-            disabled={!!drome.midi}
+            disabled={midi}
             onClick={async () => {
-              await drome?.createMidiController()
-              console.log(drome?.midi)
+              const midi = await drome?.createMidiController()
+              if (midi) setMidi(true)
             }}
           >
-            {!!drome.midi ? 'MIDI enabled' : 'Enable MIDI'}
+            {midi ? 'MIDI enabled' : 'Enable MIDI'}
           </button>
         )}
-      </div>*/}
+      </div>
       <div ref={editorContainer} />
     </main>
   )
