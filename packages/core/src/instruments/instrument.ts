@@ -155,6 +155,7 @@ abstract class Instrument<T> {
     duration: number,
     chordIndex: number,
   ) {
+    if (!node.detune) return;
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
 
     if (this._detune instanceof Pattern) {
@@ -162,12 +163,12 @@ abstract class Instrument<T> {
     } else if (this._detune instanceof Envelope) {
       this._detune.apply(node.detune, start, duration, cycleIndex, chordIndex);
     } else if (this._detune instanceof MIDIObserver) {
+      node.detune.setValueAtTime(
+        this._detune.currentValue,
+        this.ctx.currentTime,
+      );
       this._detune.onUpdate(({ value }) => {
-        try {
-          node.detune.setValueAtTime(value, this.ctx.currentTime);
-        } catch (e) {
-          console.warn(e);
-        }
+        node.detune?.setValueAtTime(value, this.ctx.currentTime);
       });
     } else {
       this._detune.connect(node.detune);

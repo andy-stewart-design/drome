@@ -22,6 +22,7 @@ class MIDIOberserver<T extends MIDIObserverType> {
   private _identifier: string; // port name or id
   private _channels: number[] = [1];
   private _update: Set<UpdateCallback<T>>;
+  private _currentValue: number;
   private _defaultValue: number;
   private _min: number | undefined;
   private _max: number | undefined;
@@ -37,6 +38,7 @@ class MIDIOberserver<T extends MIDIObserverType> {
     this._type = type;
     this._identifier = ident ?? crypto.randomUUID();
     this._defaultValue = defaultValue;
+    this._currentValue = defaultValue;
     this._update = new Set();
     this.chan = this.channel.bind(this);
   }
@@ -57,16 +59,17 @@ class MIDIOberserver<T extends MIDIObserverType> {
       console.warn("[MIDIObserver]: update function is undefined");
     }
 
-    if (
-      data.type === "controlchange" &&
-      isNumber(this._min) &&
-      isNumber(this._max)
-    ) {
-      const mappedData = {
-        ...data,
-        value: map(data.value, 0, 127, this._min, this._max),
-      };
-      this._update.forEach((fn) => fn(mappedData));
+    if (data.type === "controlchange") {
+      this._currentValue = data.value;
+
+      if (isNumber(this._min) && isNumber(this._max)) {
+        const mappedValue = map(data.value, 0, 127, this._min, this._max);
+        const mappedData = { ...data, value: mappedValue };
+        this._currentValue = mappedData.value;
+        this._update.forEach((fn) => fn(mappedData));
+      } else {
+        this._currentValue = data.value;
+      }
     } else {
       this._update.forEach((fn) => fn(data));
     }
@@ -90,10 +93,11 @@ class MIDIOberserver<T extends MIDIObserverType> {
     return this._channels;
   }
 
+  get currentValue() {
+    return this._currentValue;
+  }
+
   get defaultValue() {
-    if (this.type === "controlchange") {
-      return this._defaultValue || 0;
-    }
     return this._defaultValue;
   }
 
