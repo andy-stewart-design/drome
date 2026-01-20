@@ -50,23 +50,20 @@ function parseMIDIMessage(data: Uint8Array, input: MIDIInput): MIDIMessage {
   let type = MIDIMessageTypeMap.get(key);
   const data1 = data[1];
   const data2 = data[2];
-  const { name, id } = input;
 
-  if (!type || !name) return null;
-  const source = { name: name.toLocaleLowerCase(), id };
-
+  if (!type) return null;
   if (type === "noteon" && data2 === 0) type = "noteoff"; // note_on with velocity 0 = note_off
 
   switch (type) {
     case "noteon":
     case "noteoff":
-      return { type, source, channel, note: data1, velocity: data2 };
+      return { type, input, channel, note: data1, velocity: data2 };
     case "controlchange":
-      return { type, source, channel, controlNumber: data1, value: data2 };
+      return { type, input, channel, controlNumber: data1, value: data2 };
     case "programchange":
-      return { type, source, channel, program: data1 };
+      return { type, input, channel, program: data1 };
     default:
-      return { type, source, channel, data1, data2 };
+      return { type, input, channel, data1, data2 };
   }
 }
 

@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import MIDIController from "@/classes/midi-controller";
 import MIDIController2 from "@/classes/midi-controller-2";
 import MIDIOberserver from "@/classes/midi-controller-2/midi-observer";
-import type { MIDIMessage } from "@/classes/midi-controller/types";
+import type { MIDIMessage } from "@/classes/midi-controller-2/types";
 
 export default function MidiController() {
   const [controller, setController] = useState<MIDIController2 | null>(null);

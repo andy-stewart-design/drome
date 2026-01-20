@@ -1,24 +1,11 @@
 import type { MIDIMessageTypeEntries } from "./midi-message";
-// import type { MIDIInputStream, MIDIOutputRouter } from "./midi-ports";
 
-type InputChangeHandler = (e: MIDIInput[]) => void;
-type OutputChangeHandler = (e: MIDIOutput[]) => void;
-// type MIDIMessageHandler = (msg: MIDIMessage) => void;
-
-// interface MIDIControllerPorts {
-//   inputs: Map<string, MIDIInputStream>;
-//   outputs: Map<string, MIDIOutputRouter>;
-// }
-
-interface MIDIControllerListeners {
-  inputs: Set<InputChangeHandler>;
-  outputs: Set<OutputChangeHandler>;
-}
-
-// MIDI Messages
+// ——————————————————————————————————————————————————————
+// MIDI MESSAGE EVENT
+// ——————————————————————————————————————————————————————
 interface BaseMIDIMessage {
-  source: { name: string; id: string };
   channel: number;
+  input: MIDIInput;
 }
 
 interface DefaultMIDIMessage extends BaseMIDIMessage {
@@ -53,6 +40,9 @@ type MIDIMessage =
   | MIDIProgramMessage
   | null;
 
+// ——————————————————————————————————————————————————————
+// MIDI PORT (STATE) CHANGE EVENT
+// ——————————————————————————————————————————————————————
 type MIDIPortChangeMessage =
   | {
       type: "portchange";
@@ -88,11 +78,6 @@ interface MIDIOutputStateChange extends BaseMIDIStateChange {
 type MIDIPortChange = MIDIInputStateChange | MIDIOutputStateChange;
 
 export type {
-  InputChangeHandler,
-  OutputChangeHandler,
-  // MIDIMessageHandler,
-  // MIDIControllerPorts,
-  MIDIControllerListeners,
   MIDIControlMessage,
   MIDIMessageType,
   MIDIMessage,
