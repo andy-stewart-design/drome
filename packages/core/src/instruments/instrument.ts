@@ -51,7 +51,7 @@ abstract class Instrument<T> {
   private _connected = false;
   protected _stopTime: number | null = null;
   protected _legato = false;
-  public onDestory: (() => void) | undefined;
+  public onDestroy: (() => void) | undefined;
 
   // Method Aliases
   dt: (input: number | Envelope | string) => this;
@@ -409,7 +409,7 @@ abstract class Instrument<T> {
     this._connected = false;
     this._baseGain = 0;
     this._stopTime = null;
-    this.onDestory?.();
+    this.onDestroy?.();
   }
 
   get ctx() {

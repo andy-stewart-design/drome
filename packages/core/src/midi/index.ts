@@ -5,10 +5,12 @@ import { getMIDIPort } from "./utils";
 class MIDIController {
   private _midi: MIDIAccess;
   private _observables: Map<string, MIDIObservable<any>>;
+  private _cachedValues: Map<string, number>;
 
   private constructor(midi: MIDIAccess) {
     this._midi = midi;
     this._observables = new Map();
+    this._cachedValues = new Map();
   }
 
   static async init() {
@@ -17,26 +19,21 @@ class MIDIController {
   }
 
   addObserver<T extends MIDIObserverType>(observer: MIDIObserver<T>) {
-    if (observer.type === "portchange") {
-      const observable = new MIDIObservable<T>(this._midi);
-      const { identifier } = observer;
+    const { identifier } = observer;
+    const port = getMIDIPort(this.midi.inputs, identifier);
+    const input = observer.type === "portchange" ? this._midi : port;
+    if (!input) return null;
 
+    let observable = this._observables.get(identifier);
+
+    if (!observable) {
+      observable = new MIDIObservable<T>(input);
       this._observables.set(identifier, observable);
-      observable.subscribe(observer);
-    } else {
-      const { identifier } = observer;
-      const port = getMIDIPort(this.midi.inputs, identifier);
-      if (!port) return null;
-
-      let observable = this._observables.get(identifier);
-
-      if (!observable) {
-        observable = new MIDIObservable<T>(port);
-        this._observables.set(identifier, observable);
-      }
-
-      observable.subscribe(observer);
     }
+
+    observer.controller(this);
+    observable.subscribe(observer);
+
     return this;
   }
 
@@ -49,13 +46,22 @@ class MIDIController {
     this._observables.forEach((obs) => obs.unsubscribeAll());
   }
 
+  cacheValue(id: string, value: number) {
+    this._cachedValues.set(id, value);
+  }
+
   destroy() {
     this._observables.forEach((obs) => obs.destroy());
     this._observables.clear();
+    this._cachedValues.clear();
   }
 
   get midi() {
     return this._midi;
+  }
+
+  get cachedValues() {
+    return this._cachedValues;
   }
 
   get inputs() {
@@ -66,11 +72,21 @@ class MIDIController {
     return Array.from(this._midi.outputs.values());
   }
 
-  get obserablesCount() {
+  get observables() {
+    return Array.from(this._observables.values());
+  }
+
+  get obserableCount() {
     return this._observables.size;
   }
 
-  get observersCount() {
+  get observers() {
+    return Array.from(this._observables.values()).flatMap((observable) => {
+      return Array.from(observable.subscribers.values());
+    });
+  }
+
+  get observerCount() {
     return Array.from(this._observables.values()).reduce((acc, obs) => {
       return acc + obs.subscribers.size;
     }, 0);

@@ -7,6 +7,7 @@ type ListenerMap = Map<DromeEventType, Map<string, DromeEventCallback>>;
 class AudioClock {
   static lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
   static scheduleAheadTime = 0.1; // How far ahead to schedule audio (sec)
+  static lookaheadOffset = 0.1;
 
   readonly ctx = new AudioContext();
   readonly metronome: Metronome = { beat: 0, bar: 0 };
@@ -15,6 +16,7 @@ class AudioClock {
 
   private _barStart = 0.0;
   private _nextBeatStart = 0.0;
+  private _preEventFired = false;
   private timerID: ReturnType<typeof setTimeout> | null = null;
   private listeners: ListenerMap = new Map();
 
@@ -23,9 +25,35 @@ class AudioClock {
   }
 
   private schedule() {
-    const { scheduleAheadTime } = AudioClock;
+    const { scheduleAheadTime, lookaheadOffset } = AudioClock;
+    const timeUntilNextBeat = this._nextBeatStart - this.ctx.currentTime;
+
+    if (!this._preEventFired && timeUntilNextBeat <= lookaheadOffset) {
+      const nextBeat = (this.metronome.beat + 1) % 4;
+      const nextBar =
+        nextBeat === 0 ? this.metronome.bar + 1 : this.metronome.bar;
+
+      // Fire preBeat
+      this.listeners
+        .get("prebeat")
+        ?.forEach((cb) =>
+          cb({ beat: nextBeat, bar: nextBar }, this._nextBeatStart),
+        );
+
+      // Fire preBar if the next beat is 0
+      if (nextBeat === 0) {
+        this.listeners
+          .get("prebar")
+          ?.forEach((cb) =>
+            cb({ beat: nextBeat, bar: nextBar }, this._nextBeatStart),
+          );
+      }
+
+      this._preEventFired = true;
+    }
 
     while (this._nextBeatStart < this.ctx.currentTime + scheduleAheadTime) {
+      this._preEventFired = false;
       this.metronome.beat = (this.metronome.beat + 1) % 4;
 
       if (this.metronome.beat === 0) {
@@ -106,7 +134,7 @@ class AudioClock {
     }
   }
 
-  public cleanup() {
+  public destroy() {
     this.stop();
     this.listeners.forEach((map) => map.clear());
     this.listeners.clear();

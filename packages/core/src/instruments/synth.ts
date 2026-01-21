@@ -51,7 +51,8 @@ export default class Synth extends Instrument<number | number[]> {
   }
 
   push() {
-    this._drome.instruments.add(this);
+    // this._drome.instruments.add(this);
+    this._drome.queue(this);
   }
 
   play(barStart: number, barDuration: number) {

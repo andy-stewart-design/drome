@@ -1,5 +1,5 @@
-import type { MIDIOberserver, MIDIObserverType } from "./midi-observer";
 import { parseMIDIPortChange, parseMIDIMessage } from "./utils";
+import type { MIDIOberserver, MIDIObserverType } from "./midi-observer";
 
 class MIDIPortChangeObservable<T extends MIDIObserverType> {
   private _input: MIDIInput | undefined;
@@ -36,6 +36,7 @@ class MIDIPortChangeObservable<T extends MIDIObserverType> {
   }
 
   unsubscribeAll() {
+    this.subscribers.forEach((obs) => obs.destroy());
     this._subscribers.clear();
     return this;
   }

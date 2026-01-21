@@ -10,7 +10,14 @@ import type { scaleAliasMap } from "./utils/get-scale";
 
 // AUDIO CLOCK
 type Metronome = { beat: number; bar: number };
-type DromeEventType = "start" | "pause" | "stop" | "beat" | "bar";
+type DromeEventType =
+  | "start"
+  | "pause"
+  | "stop"
+  | "prebeat"
+  | "prebar"
+  | "beat"
+  | "bar";
 type DromeEventCallback = (m: Metronome, time: number) => void;
 
 // NOTES + SCALES

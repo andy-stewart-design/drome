@@ -19,7 +19,12 @@ function App() {
 
   useEffect(() => {
     if (!editorContainer.current) return
+    let controller = new AbortController()
+    let drome: Drome
+
     Drome.init(120).then((d) => {
+      if (controller.signal.aborted) return
+      drome = d
       setDrome(d)
       if (d.midi) setMidi(true)
     })
@@ -34,7 +39,11 @@ function App() {
 
     setEditor(editor)
 
-    return () => editor.destroy()
+    return () => {
+      controller.abort()
+      drome?.midi?.destroy()
+      editor.destroy()
+    }
   }, [])
 
   useEffect(() => {
