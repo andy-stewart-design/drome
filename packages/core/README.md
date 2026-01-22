@@ -16,6 +16,9 @@ A web-based language for live coding music.
   [x] MIDI CC: allow for all params
   [ ] MIDI note input
 [-] MIDI Output
+  [x] Add methods for translating clock time to DOMHighResTimeStamp (like performance.now()) 
+  [x] Add methods for creating MIDI router 
+  [ ] Add MIDI output logic to instrument play functions
 [ ] Random arrays
 [ ] Static pattern methods
 [ ] Audio channels

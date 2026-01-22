@@ -1,15 +1,18 @@
 import MIDIObservable from "./midi-observable";
+import MIDIRouter from "./midi-router";
 import MIDIObserver, { type MIDIObserverType } from "./midi-observer";
 import { getMIDIPort } from "./utils";
 
 class MIDIController {
   private _midi: MIDIAccess;
   private _observables: Map<string, MIDIObservable<any>>;
+  private _routers: Map<string, MIDIRouter>;
   private _cachedValues: Map<string, number>;
 
   private constructor(midi: MIDIAccess) {
     this._midi = midi;
     this._observables = new Map();
+    this._routers = new Map();
     this._cachedValues = new Map();
   }
 
@@ -18,6 +21,8 @@ class MIDIController {
     return new MIDIController(midi);
   }
 
+  // ——————————————————————————————————————————————————————————————————
+  // Observer (input) methods
   addObserver<T extends MIDIObserverType>(observer: MIDIObserver<T>) {
     const { identifier } = observer;
     const port = getMIDIPort(this.midi.inputs, identifier);
@@ -50,6 +55,35 @@ class MIDIController {
     this._cachedValues.set(id, value);
   }
 
+  // ——————————————————————————————————————————————————————————————————
+  // Router (output) methods
+  createRouter(identifier: string) {
+    const cachedRouter = this._routers.get(identifier);
+    if (cachedRouter) return cachedRouter;
+
+    const port = getMIDIPort(this.midi.outputs, identifier);
+    if (!port) return null;
+
+    const router = new MIDIRouter(port);
+    this._routers.set(identifier, router);
+
+    return router;
+  }
+
+  removeRouter(router: MIDIRouter) {
+    const { identifier } = router;
+    if (!this._routers.has(identifier)) return;
+    this._routers.get(identifier)?.destroy();
+    this._routers.delete(identifier);
+  }
+
+  clearRouters() {
+    this._routers.forEach((r) => r.destroy());
+    this._routers.clear();
+  }
+
+  // ——————————————————————————————————————————————————————————————————
+  // General methods
   destroy() {
     this._observables.forEach((obs) => obs.destroy());
     this._observables.clear();

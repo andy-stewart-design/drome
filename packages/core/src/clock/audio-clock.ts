@@ -9,8 +9,9 @@ class AudioClock {
   static scheduleAheadTime = 0.1; // How far ahead to schedule audio (sec)
   static lookaheadOffset = 0.1;
 
-  readonly ctx = new AudioContext();
+  readonly ctx: AudioContext;
   readonly metronome: Metronome = { beat: 0, bar: 0 };
+  readonly timeOrigin: number;
   private _paused = true;
   private _bpm = 120;
 
@@ -21,6 +22,8 @@ class AudioClock {
   private listeners: ListenerMap = new Map();
 
   constructor(bpm = 120) {
+    this.ctx = new AudioContext();
+    this.timeOrigin = performance.now() - this.ctx.currentTime * 1000;
     this.bpm(bpm);
   }
 
@@ -124,6 +127,10 @@ class AudioClock {
       this.listeners.set(type, new Map());
     }
     this.listeners.get(type)?.set(id ?? crypto.randomUUID(), fn);
+  }
+
+  public audioTimeToMIDITime(audioTimeSeconds: number) {
+    return this.timeOrigin + audioTimeSeconds * 1000;
   }
 
   public off(type: DromeEventType, id: string) {

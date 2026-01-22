@@ -113,15 +113,16 @@ class Drome {
   }
 
   private preTick() {
-    if (!this._queue) return;
-    console.log(this._queue);
+    if (this._queue?.lfos) {
+      this.cleanupLfos(this.clock.nextBarStartTime);
+    }
 
-    if (this._queue.lfos) this.cleanupLfos(this.clock.nextBarStartTime);
-    if (this._queue.observers) {
+    if (this._queue?.observers) {
       console.log(this._queue.observers);
       this.midi?.clearObservers();
     }
-    if (this._queue.instruments) {
+
+    if (this._queue?.instruments) {
       this.instruments.forEach((inst) =>
         inst.stop(this.clock.nextBarStartTime),
       );
@@ -129,7 +130,9 @@ class Drome {
     }
   }
 
-  private handleTick(met: Metronome) {
+  private handleTick(met: Metronome, time: number) {
+    console.log(time, performance.now());
+
     if (this._queue?.instruments) this.instruments = this._queue.instruments;
     if (this._queue?.lfos) this.lfos = this._queue.lfos;
     if (this._queue?.observers && this.midi) {

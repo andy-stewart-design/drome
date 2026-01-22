@@ -20,6 +20,7 @@ import type {
   Nullable,
 } from "@/types";
 import type { FilterType } from "@/types";
+import type MIDIRouter from "@/midi/midi-router";
 
 type NonNullNote = NonNullable<Note<number | number[]>>;
 
@@ -40,6 +41,7 @@ interface FrequencyParams {
 abstract class Instrument<T> {
   protected _drome: Drome;
   protected _cycles: DromeArrayNullable<T>;
+  protected _midiRouter: MIDIRouter | null;
   private _destination: AudioNode;
   protected _connectorNode: GainNode;
   protected readonly _audioNodes: Set<SynthNode | SampleNode>;
@@ -47,6 +49,7 @@ abstract class Instrument<T> {
   private _baseGain: number;
   protected _gain: Envelope;
   private _detune: Pattern | Envelope | LfoNode | MIDIObserver<"controlchange">;
+  private _muted: boolean;
   protected _filter: FrequencyParams = {};
   private _connected = false;
   protected _stopTime: number | null = null;
@@ -66,6 +69,7 @@ abstract class Instrument<T> {
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
     this._cycles = new DromeArrayNullable(opts.defaultCycle);
+    this._midiRouter = null;
 
     this._destination = opts.destination;
     this._connectorNode = new GainNode(drome.ctx);
@@ -75,6 +79,7 @@ abstract class Instrument<T> {
     this._baseGain = opts.baseGain ?? 0.35;
     this._gain = new Envelope(0, this._baseGain);
     this._detune = new Pattern(0);
+    this._muted = false;
 
     this.dt = this.detune.bind(this);
     this.env = this.adsr.bind(this);
@@ -348,8 +353,30 @@ abstract class Instrument<T> {
     return this;
   }
 
+  mute(mute = false) {
+    this._muted = mute;
+    return this;
+  }
+
   effects(...nodes: DromeAudioNode[]) {
     nodes.forEach((node) => this._signalChain.add(node));
+    return this;
+  }
+
+  midi(identifier: string) {
+    if (!this._drome.midi) {
+      console.warn("Must enable MIDI access before using midi commands.");
+      return this;
+    }
+
+    const router = this._drome.midi?.createRouter(identifier);
+
+    if (!router) {
+      console.warn(`Could not find MIDI device for: ${identifier}`);
+      return this;
+    }
+
+    this._midiRouter = router;
     return this;
   }
 
