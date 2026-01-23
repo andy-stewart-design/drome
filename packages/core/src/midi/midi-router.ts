@@ -4,6 +4,7 @@ class MIDIRouter {
   private _port: MIDIOutput;
   private _identifier: string; // port name or id
   private _channels: number[] = [1];
+  private _velocity = 100;
 
   constructor(port: MIDIOutput, ident?: string) {
     this._port = port;
@@ -18,15 +19,23 @@ class MIDIRouter {
     return this;
   }
 
-  noteOn(note: number, vel = 127) {
+  velocity(v: number) {
+    this._velocity = v;
+    return this;
+  }
+
+  noteOn(note: number, when?: number, vel?: number) {
     this._channels.forEach((c) => {
-      this._port.send(encodeNoteCommand("on", c, note, vel));
+      this._port.send(
+        encodeNoteCommand("on", c, note, vel ?? this._velocity),
+        when,
+      );
     });
   }
 
-  noteOff(note: number, vel = 127) {
+  noteOff(note: number, when?: number) {
     this._channels.forEach((c) => {
-      this._port.send(encodeNoteCommand("off", c, note, vel));
+      this._port.send(encodeNoteCommand("off", c, note, 0), when);
     });
   }
 

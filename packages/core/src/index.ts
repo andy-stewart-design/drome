@@ -72,6 +72,7 @@ class Drome {
       ]);
       if (midiPermissions.state === "granted") {
         await drome.createMidiController();
+        // console.log(drome.midi?.outputs);
       }
     } catch (error) {
       console.warn(error);
@@ -131,8 +132,6 @@ class Drome {
   }
 
   private handleTick(met: Metronome, time: number) {
-    console.log(time, performance.now());
-
     if (this._queue?.instruments) this.instruments = this._queue.instruments;
     if (this._queue?.lfos) this.lfos = this._queue.lfos;
     if (this._queue?.observers && this.midi) {

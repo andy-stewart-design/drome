@@ -266,6 +266,8 @@ abstract class Instrument<T> {
   }
 
   gain(input: number | Envelope | string) {
+    if (this._muted) return this;
+
     if (input instanceof Envelope) {
       this._gain = input;
     } else {
@@ -355,6 +357,7 @@ abstract class Instrument<T> {
 
   mute(mute = false) {
     this._muted = mute;
+    this.gain(0);
     return this;
   }
 
@@ -363,7 +366,7 @@ abstract class Instrument<T> {
     return this;
   }
 
-  midi(identifier: string) {
+  midi(identifier: string, velocity?: number) {
     if (!this._drome.midi) {
       console.warn("Must enable MIDI access before using midi commands.");
       return this;
@@ -376,6 +379,7 @@ abstract class Instrument<T> {
       return this;
     }
 
+    if (velocity) router.velocity(velocity);
     this._midiRouter = router;
     return this;
   }
@@ -441,6 +445,10 @@ abstract class Instrument<T> {
 
   get ctx() {
     return this._drome.ctx;
+  }
+
+  get clock() {
+    return this._drome.clock;
   }
 
   get type() {

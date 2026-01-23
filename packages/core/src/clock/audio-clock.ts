@@ -11,7 +11,7 @@ class AudioClock {
 
   readonly ctx: AudioContext;
   readonly metronome: Metronome = { beat: 0, bar: 0 };
-  readonly timeOrigin: number;
+  private _timeOrigin: number;
   private _paused = true;
   private _bpm = 120;
 
@@ -23,7 +23,7 @@ class AudioClock {
 
   constructor(bpm = 120) {
     this.ctx = new AudioContext();
-    this.timeOrigin = performance.now() - this.ctx.currentTime * 1000;
+    this._timeOrigin = performance.now() - this.ctx.currentTime * 1000;
     this.bpm(bpm);
   }
 
@@ -83,6 +83,7 @@ class AudioClock {
     if (this.ctx.state === "suspended") {
       console.log("audio context is suspended", this.ctx.state);
       await this.ctx.resume();
+      this._timeOrigin = performance.now() - this.ctx.currentTime * 1000;
     }
     this.metronome.bar = -1;
     this.metronome.beat = -1;
@@ -130,7 +131,7 @@ class AudioClock {
   }
 
   public audioTimeToMIDITime(audioTimeSeconds: number) {
-    return this.timeOrigin + audioTimeSeconds * 1000;
+    return this._timeOrigin + audioTimeSeconds * 1000;
   }
 
   public off(type: DromeEventType, id: string) {
