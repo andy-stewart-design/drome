@@ -76,9 +76,7 @@ class MIDIController {
   removeRouter(router: MIDIRouter) {
     const { identifier } = router;
     if (!this._routers.has(identifier)) return;
-
     this._routers.get(identifier)?.delete(router);
-    router.destroy();
   }
 
   clearRouters() {

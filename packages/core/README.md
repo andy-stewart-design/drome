@@ -18,7 +18,8 @@ A web-based language for live coding music.
 [-] MIDI Output
   [x] Add methods for translating clock time to DOMHighResTimeStamp (like performance.now()) 
   [x] Add methods for creating MIDI router 
-  [ ] Add MIDI output logic to instrument play functions
+  [x] Add MIDI output logic to instrument play functions
+  [x] Make sure cleanup is logic in eval cycle
 [ ] Random arrays
 [ ] Static pattern methods
 [ ] Audio channels

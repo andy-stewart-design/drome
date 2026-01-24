@@ -448,6 +448,10 @@ abstract class Instrument<T> {
       this._signalChain.forEach((node) => node.disconnect());
       this._signalChain.clear();
     }
+    if (this._midiRouter) {
+      this._drome.midi?.removeRouter(this._midiRouter);
+      this._midiRouter.destroy();
+    }
     this._connectorNode.disconnect();
     this._connected = false;
     this._baseGain = 0;
