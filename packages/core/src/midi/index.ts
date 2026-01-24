@@ -6,7 +6,7 @@ import { getMIDIPort } from "./utils";
 class MIDIController {
   private _midi: MIDIAccess;
   private _observables: Map<string, MIDIObservable<any>>;
-  private _routers: Map<string, MIDIRouter>;
+  private _routers: Map<string, Set<MIDIRouter>>;
   private _cachedValues: Map<string, number>;
 
   private constructor(midi: MIDIAccess) {
@@ -58,14 +58,17 @@ class MIDIController {
   // ——————————————————————————————————————————————————————————————————
   // Router (output) methods
   createRouter(identifier: string) {
-    const cachedRouter = this._routers.get(identifier);
-    if (cachedRouter) return cachedRouter;
-
     const port = getMIDIPort(this.midi.outputs, identifier);
     if (!port) return null;
 
+    let routerSet = this._routers.get(identifier);
+    if (!routerSet) {
+      routerSet = new Set();
+      this._routers.set(identifier, routerSet);
+    }
+
     const router = new MIDIRouter(port);
-    this._routers.set(identifier, router);
+    routerSet.add(router);
 
     return router;
   }
@@ -73,12 +76,16 @@ class MIDIController {
   removeRouter(router: MIDIRouter) {
     const { identifier } = router;
     if (!this._routers.has(identifier)) return;
-    this._routers.get(identifier)?.destroy();
-    this._routers.delete(identifier);
+
+    this._routers.get(identifier)?.delete(router);
+    router.destroy();
   }
 
   clearRouters() {
-    this._routers.forEach((r) => r.destroy());
+    this._routers.forEach((set) => {
+      set.forEach((r) => r.destroy());
+      set.clear();
+    });
     this._routers.clear();
   }
 

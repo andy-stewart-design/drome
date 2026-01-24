@@ -63,6 +63,7 @@ abstract class Instrument<T> {
   fil: (type: FilterTypeAlias, f: SNEL, q: SNEL) => this;
   fx: (...nodes: DromeAudioNode[]) => this;
   leg: (v?: boolean) => this;
+  midichan: (n: number | number[]) => this;
   rev: () => this;
   seq: (steps: number, ...pulses: (number | number[])[]) => this;
 
@@ -87,6 +88,7 @@ abstract class Instrument<T> {
     this.fil = this.filter.bind(this);
     this.fx = this.effects.bind(this);
     this.leg = this.legato.bind(this);
+    this.midichan = this.midichannel.bind(this);
     this.rev = this.reverse.bind(this);
     this.seq = this.sequence.bind(this);
   }
@@ -384,7 +386,17 @@ abstract class Instrument<T> {
     return this;
   }
 
-  beforePlay(barStart: number, barDuration: number) {
+  midichannel(n: number | number[]) {
+    if (!this._midiRouter) {
+      console.warn("Must use `midi` method before calling `midichannel`");
+      return this;
+    }
+
+    this._midiRouter.channel(n);
+    return this;
+  }
+
+  protected beforePlay(barStart: number, barDuration: number) {
     if (this._detune instanceof MIDIObserver) this._detune.clear();
 
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;

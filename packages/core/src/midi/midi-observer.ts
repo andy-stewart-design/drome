@@ -1,11 +1,11 @@
-import type MIDIController from "./index";
 import { map } from "@/utils/math";
+import { isNumber } from "@/utils/validators";
+import type MIDIController from "./index";
 import type {
   MIDIControlMessage,
   MIDINoteMessage,
   MIDIPortChange,
 } from "./types";
-import { isNumber } from "@/utils/validators";
 
 interface MIDIObserverDataMap {
   note: MIDINoteMessage;
@@ -41,7 +41,8 @@ class MIDIOberserver<T extends MIDIObserverType> {
 
   channel(n: number | number[]) {
     this._channels.length = 0;
-    this._channels.push(...[n].flat());
+    if (!Array.isArray(n)) this._channels.push(n);
+    else this._channels.push(...n);
     return this;
   }
 

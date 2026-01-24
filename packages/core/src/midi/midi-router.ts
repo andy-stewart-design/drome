@@ -26,10 +26,8 @@ class MIDIRouter {
 
   noteOn(note: number, when?: number, vel?: number) {
     this._channels.forEach((c) => {
-      this._port.send(
-        encodeNoteCommand("on", c, note, vel ?? this._velocity),
-        when,
-      );
+      const midiData = encodeNoteCommand("on", c, note, vel ?? this._velocity);
+      this._port.send(midiData, when);
     });
   }
 
