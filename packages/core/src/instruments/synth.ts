@@ -90,7 +90,9 @@ export default class Synth extends Instrument<number | number[]> {
 
           if (this._midiRouter) {
             const start = this.clock.audioTimeToMIDITime(note.start);
-            const end = this.clock.audioTimeToMIDITime(note.start + duration);
+            const end = this.clock.audioTimeToMIDITime(
+              note.start + note.duration,
+            );
             this._midiRouter?.noteOn(this.getMidiNote(midiNote), start);
             this._midiRouter?.noteOff(this.getMidiNote(midiNote), end);
           }
