@@ -40,6 +40,22 @@ interface Queue {
   instruments: Set<Synth | Sample>;
   lfos: Set<LfoNode>;
   observers: Set<MIDIObserver<any>>;
+  listeners: Partial<{
+    log: Set<LogCallback>;
+    clock: Map<DromeEventCallback, DromeEventType>;
+  }>;
+}
+
+type QueueCallback =
+  | { type: "log"; fn: LogCallback }
+  | { type: "clock"; fnType: DromeEventType; fn: DromeEventCallback };
+
+interface ListenerMap {
+  log: Set<LogCallback>;
+  clock: {
+    internal: Set<() => boolean>;
+    external: Set<() => boolean>;
+  };
 }
 
 class Drome {
@@ -53,11 +69,15 @@ class Drome {
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
   private _logs: string[] = [];
 
+  private _queue: Partial<Queue> | null = null;
   private instruments: Set<Synth | Sample> = new Set();
   private lfos: Set<LfoNode> = new Set();
-  private extClockListeners: Map<string, DromeEventType> = new Map();
-  private logListeners: Map<string, LogCallback> = new Map();
-  private _queue: Partial<Queue> | null = null;
+  private readonly _listeners: ListenerMap = {
+    log: new Set(),
+    clock: { internal: new Set(), external: new Set() },
+  };
+  // private extClockListeners: Map<string, DromeEventType> = new Map();
+  // private logListeners: Map<string, LogCallback> = new Map();
 
   fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
 
@@ -72,7 +92,6 @@ class Drome {
       ]);
       if (midiPermissions.state === "granted") {
         await drome.createMidiController();
-        // console.log(drome.midi?.outputs);
       }
     } catch (error) {
       console.warn(error);
@@ -88,8 +107,10 @@ class Drome {
       gain.connect(this.ctx.destination);
       return gain;
     });
-    this.clock.on("prebar", this.preTick.bind(this));
-    this.clock.on("bar", this.handleTick.bind(this));
+    const prebarCb = this.clock.on("prebar", this.preTick.bind(this));
+    const barCb = this.clock.on("bar", this.handleTick.bind(this));
+    this._listeners.clock.internal.add(prebarCb);
+    this._listeners.clock.internal.add(barCb);
 
     this.fil = this.filter.bind(this);
   }
@@ -98,7 +119,7 @@ class Drome {
     this.clock.bpm(n);
   }
 
-  queue(input: Synth | Sample | LfoNode | MIDIObserver<any>) {
+  queue(input: Synth | Sample | LfoNode | MIDIObserver<any> | QueueCallback) {
     if (!this._queue) this._queue = {};
 
     if (input instanceof LfoNode) {
@@ -107,10 +128,36 @@ class Drome {
     } else if (input instanceof MIDIObserver) {
       if (!this._queue.observers) this._queue.observers = new Set();
       this._queue.observers.add(input);
-    } else {
+    } else if (input instanceof Synth || input instanceof Sample) {
       if (!this._queue.instruments) this._queue.instruments = new Set();
       this._queue.instruments.add(input);
+    } else if (input.type === "clock") {
+      if (!this._queue.listeners) this._queue.listeners = {};
+      if (!this._queue.listeners.clock) this._queue.listeners.clock = new Map();
+      this._queue.listeners.clock.set(input.fn, input.fnType);
+    } else if (input.type === "log") {
+      if (!this._queue.listeners) this._queue.listeners = {};
+      if (!this._queue.listeners.log) this._queue.listeners.log = new Set();
+      this._queue.listeners.log.add(input.fn);
     }
+  }
+
+  private commitQueue() {
+    if (this._queue?.instruments) this.instruments = this._queue.instruments;
+    if (this._queue?.lfos) this.lfos = this._queue.lfos;
+    if (this._queue?.observers && this.midi) {
+      this._queue.observers.forEach((obs) => this._midi?.addObserver(obs));
+    }
+    if (this._queue?.listeners?.log) {
+      this._listeners.log = this._queue.listeners.log;
+    }
+    if (this._queue?.listeners?.clock) {
+      this._queue.listeners.clock.forEach((type, fn) => {
+        const clockCb = this.clock.on(type, fn);
+        this._listeners.clock.external.add(clockCb);
+      });
+    }
+    if (this._queue) this._queue = null;
   }
 
   private preTick() {
@@ -129,15 +176,19 @@ class Drome {
       );
       this.instruments.clear();
     }
+
+    if (this._queue?.listeners?.clock) {
+      this._listeners.clock.external.forEach((fn) => fn());
+      this._listeners.clock.external.clear();
+    }
+
+    if (this._queue?.listeners?.log) {
+      this._listeners.log.clear();
+    }
   }
 
   private handleTick(met: Metronome, time: number) {
-    if (this._queue?.instruments) this.instruments = this._queue.instruments;
-    if (this._queue?.lfos) this.lfos = this._queue.lfos;
-    if (this._queue?.observers && this.midi) {
-      this._queue.observers.forEach((obs) => this._midi?.addObserver(obs));
-    }
-    if (this._queue) this._queue = null;
+    this.commitQueue();
 
     this.instruments.forEach((inst) => {
       inst.play(this.barStartTime, this.barDuration);
@@ -261,60 +312,61 @@ class Drome {
   log(msg: string) {
     this._logs.push(msg);
     console.log(`[DROME]: ${msg}`);
-    this.logListeners.forEach((cb) => cb(msg, this._logs));
+    this._listeners.log.forEach((cb) => cb(msg, this._logs));
   }
 
   clearLogs() {
     this._logs.length = 0;
   }
 
-  on(type: "log", fn: LogCallback): string;
-  on(type: DromeEventType, fn: DromeEventCallback): string;
+  on(type: "log", fn: LogCallback): void;
+  on(type: DromeEventType, fn: DromeEventCallback): void;
   on(type: DromeEventType | "log", fn: DromeEventCallback | LogCallback) {
-    const id = crypto.randomUUID();
     if (type === "log") {
-      this.logListeners.set(id, fn as LogCallback);
+      // this._listeners.log.add(fn as LogCallback);
+      this.queue({ type: "log", fn: fn as LogCallback });
     } else {
-      this.clock.on(type, fn as DromeEventCallback, id);
-      this.extClockListeners.set(id, type);
+      // const clockCb = this.clock.on(type, fn as DromeEventCallback);
+      // this._listeners.clock.external.add(clockCb);
+      this.queue({ type: "clock", fnType: type, fn: fn as DromeEventCallback });
     }
-    return id;
   }
 
-  off(type: "log" | DromeEventType, id: string) {
-    if (type === "log") this.logListeners.delete(id);
-    else this.clock.off(type, id);
-  }
+  // off(type: "log" | DromeEventType, id: string) {
+  //   if (type === "log") this.logListeners.delete(id);
+  //   else this.clock.off(type, id);
+  // }
 
-  onBeat(cb: DromeEventCallback) {
-    const id = crypto.randomUUID();
-    this.clock.on("beat", cb, id);
-    this.extClockListeners.set(id, "beat");
-    return id;
-  }
+  // onBeat(cb: DromeEventCallback) {
+  //   const id = crypto.randomUUID();
+  //   const clockCb = this.clock.on("beat", cb, id);
+  //   this.extClockListeners.set(id, "beat");
 
-  onBar(cb: DromeEventCallback) {
-    const id = crypto.randomUUID();
-    this.clock.on("bar", cb, id);
-    this.extClockListeners.set(id, "bar");
-    return id;
-  }
+  //   this._listeners.clock.external.add
 
-  clearListeners() {
-    this.extClockListeners.forEach((type, id) => {
-      this.clock.off(type, id);
-    });
-    this.extClockListeners.clear();
-    this.logListeners.clear();
-  }
+  //   // return id;
+  // }
 
-  clear() {
-    // this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
-    // this.instruments.clear();
-    // this.midi?.clearObservers();
-    // this.cleanupLfos(this.clock.nextBarStartTime);
-    this.clearListeners();
-  }
+  // onBar(cb: DromeEventCallback) {
+  //   const id = crypto.randomUUID();
+  //   this.clock.on("bar", cb, id);
+  //   this.extClockListeners.set(id, "bar");
+  //   return id;
+  // }
+
+  // clearListeners() {
+  //   this._listeners.log.clear();
+  //   this._listeners.clock.external.forEach((fn) => fn());
+  //   this._listeners.clock.external.clear();
+  // }
+
+  // clear() {
+  //   // this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
+  //   // this.instruments.clear();
+  //   // this.midi?.clearObservers();
+  //   // this.cleanupLfos(this.clock.nextBarStartTime);
+  //   // this.clearListeners();
+  // }
 
   synth(...types: WaveformAlias[]) {
     const destination = this.audioChannels[0];

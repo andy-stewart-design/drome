@@ -2,7 +2,7 @@
 
 import type { DromeEventCallback, DromeEventType, Metronome } from "@/types.js";
 
-type ListenerMap = Map<DromeEventType, Map<string, DromeEventCallback>>;
+type ListenerMap = Map<DromeEventType, Set<DromeEventCallback>>;
 
 class AudioClock {
   static lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
@@ -123,23 +123,23 @@ class AudioClock {
     if (bpm > 0) this._bpm = bpm;
   }
 
-  public on(type: DromeEventType, fn: DromeEventCallback, id?: string) {
-    if (!this.listeners.has(type)) {
-      this.listeners.set(type, new Map());
-    }
-    this.listeners.get(type)?.set(id ?? crypto.randomUUID(), fn);
-  }
-
   public audioTimeToMIDITime(audioTimeSeconds: number) {
     return this._timeOrigin + audioTimeSeconds * 1000;
   }
 
-  public off(type: DromeEventType, id: string) {
-    if (id) {
-      const arr = this.listeners.get(type);
-      if (!arr) return;
-      arr.delete(id);
+  public on(type: DromeEventType, fn: DromeEventCallback) {
+    let listenerGroup = this.listeners.get(type);
+    if (!listenerGroup) {
+      listenerGroup = new Set();
+      this.listeners.set(type, listenerGroup);
     }
+    listenerGroup.add(fn);
+    return () => listenerGroup.delete(fn);
+  }
+
+  public off(type: DromeEventType, fn: DromeEventCallback) {
+    const listenerSet = this.listeners.get(type);
+    if (listenerSet?.has(fn)) listenerSet.delete(fn);
   }
 
   public destroy() {

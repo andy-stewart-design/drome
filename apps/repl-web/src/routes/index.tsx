@@ -59,7 +59,7 @@ function App() {
 
     if (e.altKey && e.key === 'Enter') {
       e.preventDefault()
-      drome.clear()
+      // drome.clear()
       runCode(drome, editor.state.doc.toString())
       localStorage.setItem(LS_KEY, editor.state.doc.toString())
       flash(editor)
