@@ -9,23 +9,25 @@ A web-based language for live coding music.
 [x] Logging
 [x] Listeners
 [x] Merge 1-6-migrate into main
-[-] MIDI Input
+[x] MIDI CC Input
   [x] MIDI Controller: maintain cache of current cc values
-  [-] Add beforeTick method to clock where I call unsubscriball
-    [ ] Move listeners to queue system
+  [x] Add beforeTick method to clock where I call unsubscriball
+    [x] Move listeners to queue system
   [x] MIDI CC: allow for all params
-  [ ] MIDI note input
-[-] MIDI Output
+[x] MIDI Output
   [x] Add methods for translating clock time to DOMHighResTimeStamp (like performance.now()) 
   [x] Add methods for creating MIDI router 
   [x] Add MIDI output logic to instrument play functions
   [x] Make sure cleanup is logic in eval cycle
+[ ] Sample Manager
+[ ] MIDI Note Input
 [ ] Random arrays
 [ ] Static pattern methods
 [ ] Audio channels
 [ ] Set root and scale on parent drome class
 [ ] `instrument()` method (as wrapper for synth/sample)?
 [ ] add Drome `destroy` method
+[ ] Synth/SuperSaw: add ss-specific methods
 
 ### REPL
 [ ] Play/pause buttons

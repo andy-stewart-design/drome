@@ -1,11 +1,9 @@
-// TODO: Add methods for supersaw synth
-
-import AudioClock from "@/clock/audio-clock";
 import Envelope from "@/automation/envelope";
 import LfoNode from "@/automation/lfo-node";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
 import Stack from "@/instruments/stack";
+import SessionManager, { type QueueInput } from "./session-manager";
 import BitcrusherEffect from "@/effects/effect-bitcrusher";
 import DelayEffect from "@/effects/effect-delay";
 import DistortionEffect from "@/effects/effect-distortion";
@@ -13,7 +11,7 @@ import DromeFilter from "@/effects/effect-filter";
 import GainEffect from "@/effects/effect-gain";
 import PanEffect from "@/effects/effect-pan";
 import ReverbEffect from "./effects/effect-reverb";
-import { MIDIController, MIDIObserver } from "./midi";
+import { MIDIObserver } from "./midi";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import { getSampleBanks, getSamplePath } from "@/utils/samples";
 import { loadSample } from "@/utils/load-sample";
@@ -36,31 +34,8 @@ type LogCallback = (log: string, logs: string[]) => void;
 const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
 
-interface Queue {
-  instruments: Set<Synth | Sample>;
-  lfos: Set<LfoNode>;
-  observers: Set<MIDIObserver<any>>;
-  listeners: Partial<{
-    log: Set<LogCallback>;
-    clock: Map<DromeEventCallback, DromeEventType>;
-  }>;
-}
-
-type QueueCallback =
-  | { type: "log"; fn: LogCallback }
-  | { type: "clock"; fnType: DromeEventType; fn: DromeEventCallback };
-
-interface ListenerMap {
-  log: Set<LogCallback>;
-  clock: {
-    internal: Set<() => boolean>;
-    external: Set<() => boolean>;
-  };
-}
-
 class Drome {
-  readonly clock: AudioClock;
-  private _midi: MIDIController | null = null;
+  private _sessionManager: SessionManager;
   readonly audioChannels: GainNode[];
   private sampleBanks: SampleBankSchema | null = null;
   readonly bufferCache: Map<string, AudioBuffer[]> = new Map();
@@ -69,30 +44,14 @@ class Drome {
   private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
   private _logs: string[] = [];
 
-  private _queue: Partial<Queue> | null = null;
-  private instruments: Set<Synth | Sample> = new Set();
-  private lfos: Set<LfoNode> = new Set();
-  private readonly _listeners: ListenerMap = {
-    log: new Set(),
-    clock: { internal: new Set(), external: new Set() },
-  };
-  // private extClockListeners: Map<string, DromeEventType> = new Map();
-  // private logListeners: Map<string, LogCallback> = new Map();
-
   fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
 
   static async init(bpm?: number) {
-    const drome = new Drome(bpm);
+    const manager = await SessionManager.init();
+    const drome = new Drome(manager, bpm);
 
     try {
-      const [midiPermissions] = await Promise.all([
-        navigator.permissions.query({ name: "midi" }),
-        drome.loadSampleBanks(),
-        drome.addWorklets(),
-      ]);
-      if (midiPermissions.state === "granted") {
-        await drome.createMidiController();
-      }
+      await Promise.all([drome.loadSampleBanks(), drome.addWorklets()]);
     } catch (error) {
       console.warn(error);
     }
@@ -100,8 +59,8 @@ class Drome {
     return drome;
   }
 
-  constructor(bpm?: number) {
-    this.clock = new AudioClock(bpm);
+  constructor(manager: SessionManager, bpm?: number) {
+    this._sessionManager = manager;
     this.audioChannels = Array.from({ length: NUM_CHANNELS }, () => {
       const gain = new GainNode(this.ctx, { gain: BASE_GAIN });
       gain.connect(this.ctx.destination);
@@ -109,8 +68,8 @@ class Drome {
     });
     const prebarCb = this.clock.on("prebar", this.preTick.bind(this));
     const barCb = this.clock.on("bar", this.handleTick.bind(this));
-    this._listeners.clock.internal.add(prebarCb);
-    this._listeners.clock.internal.add(barCb);
+    this.listeners.clock.internal.add(prebarCb);
+    this.listeners.clock.internal.add(barCb);
 
     this.fil = this.filter.bind(this);
   }
@@ -119,76 +78,16 @@ class Drome {
     this.clock.bpm(n);
   }
 
-  queue(input: Synth | Sample | LfoNode | MIDIObserver<any> | QueueCallback) {
-    if (!this._queue) this._queue = {};
-
-    if (input instanceof LfoNode) {
-      if (!this._queue.lfos) this._queue.lfos = new Set();
-      this._queue.lfos.add(input);
-    } else if (input instanceof MIDIObserver) {
-      if (!this._queue.observers) this._queue.observers = new Set();
-      this._queue.observers.add(input);
-    } else if (input instanceof Synth || input instanceof Sample) {
-      if (!this._queue.instruments) this._queue.instruments = new Set();
-      this._queue.instruments.add(input);
-    } else if (input.type === "clock") {
-      if (!this._queue.listeners) this._queue.listeners = {};
-      if (!this._queue.listeners.clock) this._queue.listeners.clock = new Map();
-      this._queue.listeners.clock.set(input.fn, input.fnType);
-    } else if (input.type === "log") {
-      if (!this._queue.listeners) this._queue.listeners = {};
-      if (!this._queue.listeners.log) this._queue.listeners.log = new Set();
-      this._queue.listeners.log.add(input.fn);
-    }
-  }
-
-  private commitQueue() {
-    if (this._queue?.instruments) this.instruments = this._queue.instruments;
-    if (this._queue?.lfos) this.lfos = this._queue.lfos;
-    if (this._queue?.observers && this.midi) {
-      this._queue.observers.forEach((obs) => this._midi?.addObserver(obs));
-    }
-    if (this._queue?.listeners?.log) {
-      this._listeners.log = this._queue.listeners.log;
-    }
-    if (this._queue?.listeners?.clock) {
-      this._queue.listeners.clock.forEach((type, fn) => {
-        const clockCb = this.clock.on(type, fn);
-        this._listeners.clock.external.add(clockCb);
-      });
-    }
-    if (this._queue) this._queue = null;
+  queue(input: QueueInput) {
+    this._sessionManager.enqueue(input);
   }
 
   private preTick() {
-    if (this._queue?.lfos) {
-      this.cleanupLfos(this.clock.nextBarStartTime);
-    }
-
-    if (this._queue?.observers) {
-      console.log(this._queue.observers);
-      this.midi?.clearObservers();
-    }
-
-    if (this._queue?.instruments) {
-      this.instruments.forEach((inst) =>
-        inst.stop(this.clock.nextBarStartTime),
-      );
-      this.instruments.clear();
-    }
-
-    if (this._queue?.listeners?.clock) {
-      this._listeners.clock.external.forEach((fn) => fn());
-      this._listeners.clock.external.clear();
-    }
-
-    if (this._queue?.listeners?.log) {
-      this._listeners.log.clear();
-    }
+    this._sessionManager.precommit();
   }
 
   private handleTick(met: Metronome, time: number) {
-    this.commitQueue();
+    this._sessionManager.commit();
 
     this.instruments.forEach((inst) => {
       inst.play(this.barStartTime, this.barDuration);
@@ -210,18 +109,6 @@ class Drome {
     const paths = this.userSamples.get(bank)?.get(name);
     if (paths) return paths[index % paths.length];
     else return getSamplePath(this.sampleBanks, bank, name, index);
-  }
-
-  private cleanupLfos(when: number) {
-    this.lfos.forEach((lfo) => {
-      const clear = () => {
-        lfo.disconnect();
-        lfo.removeEventListener("ended", clear);
-        this.lfos.delete(lfo);
-      };
-      lfo.addEventListener("ended", clear);
-      lfo.stop(when);
-    });
   }
 
   async addWorklets() {
@@ -275,36 +162,18 @@ class Drome {
     if (!this.clock.paused) return;
     if (this.suspendTimeoutId) clearTimeout(this.suspendTimeoutId);
     await this.preloadSamples();
-    this.clock.start();
-  }
-
-  async createMidiController() {
-    try {
-      const midi = await MIDIController.init();
-      this._midi = midi;
-      return midi;
-    } catch (e) {
-      console.warn(e);
-      return null;
-    }
+    this._sessionManager.start();
   }
 
   stop() {
     const fade = 0.25;
-    this.clock.stop();
-    this.instruments.forEach((inst) => {
-      inst.onDestroy = () => this.instruments.delete(inst);
-      inst.stop(this.ctx.currentTime, fade);
-    });
-    this.cleanupLfos(this.ctx.currentTime + fade);
-    // this.midi?.clearObservers();
-    // this.clearReplListeners();
+    this._sessionManager.stop(fade);
     this.audioChannels.forEach((chan) => {
       chan.gain.cancelScheduledValues(this.ctx.currentTime);
       chan.gain.value = BASE_GAIN;
     });
     this.suspendTimeoutId = setTimeout(() => {
-      this.ctx.suspend();
+      this._sessionManager.suspend();
       this.suspendTimeoutId = null;
     }, fade * 5000); // convert seconds to milliseconds and double
   }
@@ -312,7 +181,7 @@ class Drome {
   log(msg: string) {
     this._logs.push(msg);
     console.log(`[DROME]: ${msg}`);
-    this._listeners.log.forEach((cb) => cb(msg, this._logs));
+    this.listeners.log.forEach((cb) => cb(msg, this._logs));
   }
 
   clearLogs() {
@@ -323,50 +192,11 @@ class Drome {
   on(type: DromeEventType, fn: DromeEventCallback): void;
   on(type: DromeEventType | "log", fn: DromeEventCallback | LogCallback) {
     if (type === "log") {
-      // this._listeners.log.add(fn as LogCallback);
       this.queue({ type: "log", fn: fn as LogCallback });
     } else {
-      // const clockCb = this.clock.on(type, fn as DromeEventCallback);
-      // this._listeners.clock.external.add(clockCb);
       this.queue({ type: "clock", fnType: type, fn: fn as DromeEventCallback });
     }
   }
-
-  // off(type: "log" | DromeEventType, id: string) {
-  //   if (type === "log") this.logListeners.delete(id);
-  //   else this.clock.off(type, id);
-  // }
-
-  // onBeat(cb: DromeEventCallback) {
-  //   const id = crypto.randomUUID();
-  //   const clockCb = this.clock.on("beat", cb, id);
-  //   this.extClockListeners.set(id, "beat");
-
-  //   this._listeners.clock.external.add
-
-  //   // return id;
-  // }
-
-  // onBar(cb: DromeEventCallback) {
-  //   const id = crypto.randomUUID();
-  //   this.clock.on("bar", cb, id);
-  //   this.extClockListeners.set(id, "bar");
-  //   return id;
-  // }
-
-  // clearListeners() {
-  //   this._listeners.log.clear();
-  //   this._listeners.clock.external.forEach((fn) => fn());
-  //   this._listeners.clock.external.clear();
-  // }
-
-  // clear() {
-  //   // this.instruments.forEach((inst) => inst.stop(this.clock.nextBarStartTime));
-  //   // this.instruments.clear();
-  //   // this.midi?.clearObservers();
-  //   // this.cleanupLfos(this.clock.nextBarStartTime);
-  //   // this.clearListeners();
-  // }
 
   synth(...types: WaveformAlias[]) {
     const destination = this.audioChannels[0];
@@ -397,7 +227,7 @@ class Drome {
   }
 
   midicc(nameOrId: string, defaultValue = 0) {
-    if (!this._midi) return 0;
+    if (!this.midi) return 0;
     const observer = new MIDIObserver("controlchange", nameOrId, defaultValue);
     this.queue(observer);
     return observer;
@@ -479,12 +309,28 @@ class Drome {
     return this.clock.ctx;
   }
 
+  get clock() {
+    return this._sessionManager.clock;
+  }
+
   get metronome() {
     return this.clock.metronome;
   }
 
   get midi() {
-    return this._midi;
+    return this._sessionManager.midi;
+  }
+
+  get listeners() {
+    return this._sessionManager.listeners;
+  }
+
+  get instruments() {
+    return this._sessionManager.instruments;
+  }
+
+  get lfos() {
+    return this._sessionManager.lfos;
   }
 
   get currentTime() {
@@ -505,6 +351,10 @@ class Drome {
 
   get beatsPerMin() {
     return this.clock.beatsPerMin;
+  }
+
+  get createMidiController() {
+    return this._sessionManager.createMidiController;
   }
 }
 
