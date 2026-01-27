@@ -131,7 +131,7 @@ abstract class CompositeAudioNode<
 
   // AUDIO PARAMS
   get detune() {
-    return this.audioNode.detune;
+    return this._audioNode?.detune;
   }
 
   get gain() {

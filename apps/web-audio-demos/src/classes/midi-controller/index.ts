@@ -1,5 +1,5 @@
 import { getMIDIPort } from "./utils";
-import { CustomInput, CustomOutput } from "./midi-ports";
+import { MIDIInputStream, MIDIOutputRouter } from "./midi-ports";
 import type {
   MIDIControllerListeners,
   MIDIControllerPorts,
@@ -9,15 +9,15 @@ import type {
 
 class MIDIController {
   private _midi: MIDIAccess;
-  private _ports: MIDIControllerPorts;
+  private _activePorts: MIDIControllerPorts;
   private _listeners: MIDIControllerListeners;
   private _controller: AbortController;
 
   private constructor(midi: MIDIAccess) {
     this._midi = midi;
-    this._ports = { inputs: new Map(), outputs: new Map() };
-    this._controller = new AbortController();
+    this._activePorts = { inputs: new Map(), outputs: new Map() };
     this._listeners = { inputs: new Set(), outputs: new Set() };
+    this._controller = new AbortController();
 
     this.midi.addEventListener(
       "statechange",
@@ -43,13 +43,13 @@ class MIDIController {
     return new MIDIController(midi);
   }
 
-  addListener(type: "input-change", fn: InputChangeHandler): void;
-  addListener(type: "output-change", fn: OutputChangeHandler): void;
-  addListener(
-    type: "input-change" | "output-change",
+  subscribe(type: "inputchange", fn: InputChangeHandler): void;
+  subscribe(type: "outputchange", fn: OutputChangeHandler): void;
+  subscribe(
+    type: "inputchange" | "outputchange",
     fn: InputChangeHandler | OutputChangeHandler,
   ) {
-    if (type === "input-change") {
+    if (type === "inputchange") {
       this._listeners.inputs.add(fn as InputChangeHandler);
       return () => this._listeners.inputs.delete(fn as InputChangeHandler);
     } else {
@@ -58,52 +58,54 @@ class MIDIController {
     }
   }
 
-  removeListener(type: "input-change", fn: InputChangeHandler): void;
-  removeListener(type: "output-change", fn: OutputChangeHandler): void;
-  removeListener(
-    type: "input-change" | "output-change",
+  unsubscribe(type: "inputchange", fn: InputChangeHandler): void;
+  unsubscribe(type: "outputchange", fn: OutputChangeHandler): void;
+  unsubscribe(
+    type: "inputchange" | "outputchange",
     fn: InputChangeHandler | OutputChangeHandler,
   ) {
-    if (type === "input-change") {
+    if (type === "inputchange") {
       this._listeners.inputs.delete(fn as InputChangeHandler);
     } else {
       this._listeners.outputs.delete(fn as OutputChangeHandler);
     }
   }
 
-  input(ident: string | { id: string }) {
-    const name = typeof ident === "string" ? ident : ident.id;
-    const cached = this._ports.inputs.get(name);
+  input(nameOrId: string) {
+    const cached = this._activePorts.inputs.get(nameOrId);
     if (cached) return cached;
 
-    const port = getMIDIPort(this.midi.inputs, ident);
+    const port = getMIDIPort(this.midi.inputs, nameOrId);
+
     if (port) {
-      const newPort = new CustomInput(port);
-      this._ports.inputs.set(name, newPort);
+      const newPort = new MIDIInputStream(port);
+      this._activePorts.inputs.set(nameOrId, newPort);
       return newPort;
     }
+
     return null;
   }
 
-  output(ident: string | { id: string }) {
-    const name = typeof ident === "string" ? ident : ident.id;
-    const cached = this._ports.outputs.get(name);
+  output(nameOrId: string) {
+    const cached = this._activePorts.outputs.get(nameOrId);
     if (cached) return cached;
 
-    const port = getMIDIPort(this.midi.outputs, ident);
+    const port = getMIDIPort(this.midi.outputs, nameOrId);
+
     if (port) {
-      const newPort = new CustomOutput(port);
-      this._ports.outputs.set(name, newPort);
+      const newPort = new MIDIOutputRouter(port);
+      this._activePorts.outputs.set(nameOrId, newPort);
       return newPort;
     }
+
     return null;
   }
 
   destroy() {
     this._controller.abort();
-    this._ports.inputs.forEach((p) => p.destroy());
-    this._ports.inputs.clear();
-    this._ports.outputs.clear();
+    this._activePorts.inputs.forEach((p) => p.destroy());
+    this._activePorts.inputs.clear();
+    this._activePorts.outputs.clear();
     this._listeners.inputs.clear();
     this._listeners.outputs.clear();
   }

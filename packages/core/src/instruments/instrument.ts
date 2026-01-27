@@ -4,6 +4,7 @@ import DromeArrayNullable from "@/array/drome-array-nullable";
 import LfoNode from "@/automation/lfo-node";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
+import { MIDIObserver } from "@/midi";
 import { parsePatternString } from "../utils/parse-pattern";
 import { isNullish, isNumber, isString } from "../utils/validators";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
@@ -19,6 +20,7 @@ import type {
   Nullable,
 } from "@/types";
 import type { FilterType } from "@/types";
+import type MIDIRouter from "@/midi/midi-router";
 
 type NonNullNote = NonNullable<Note<number | number[]>>;
 
@@ -39,18 +41,20 @@ interface FrequencyParams {
 abstract class Instrument<T> {
   protected _drome: Drome;
   protected _cycles: DromeArrayNullable<T>;
+  protected _midiRouter: MIDIRouter | null;
   private _destination: AudioNode;
   protected _connectorNode: GainNode;
   protected readonly _audioNodes: Set<SynthNode | SampleNode>;
   private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
   protected _gain: Envelope;
-  private _detune: Pattern | Envelope | LfoNode;
+  private _detune: Pattern | Envelope | LfoNode | MIDIObserver<"controlchange">;
+  private _muted: boolean;
   protected _filter: FrequencyParams = {};
   private _connected = false;
   protected _stopTime: number | null = null;
   protected _legato = false;
-  public onDestory: (() => void) | undefined;
+  public onDestroy: (() => void) | undefined;
 
   // Method Aliases
   dt: (input: number | Envelope | string) => this;
@@ -59,12 +63,14 @@ abstract class Instrument<T> {
   fil: (type: FilterTypeAlias, f: SNEL, q: SNEL) => this;
   fx: (...nodes: DromeAudioNode[]) => this;
   leg: (v?: boolean) => this;
+  midichan: (n: number | number[]) => this;
   rev: () => this;
   seq: (steps: number, ...pulses: (number | number[])[]) => this;
 
   constructor(drome: Drome, opts: InstrumentOptions<T>) {
     this._drome = drome;
     this._cycles = new DromeArrayNullable(opts.defaultCycle);
+    this._midiRouter = null;
 
     this._destination = opts.destination;
     this._connectorNode = new GainNode(drome.ctx);
@@ -74,6 +80,7 @@ abstract class Instrument<T> {
     this._baseGain = opts.baseGain ?? 0.35;
     this._gain = new Envelope(0, this._baseGain);
     this._detune = new Pattern(0);
+    this._muted = false;
 
     this.dt = this.detune.bind(this);
     this.env = this.adsr.bind(this);
@@ -81,6 +88,7 @@ abstract class Instrument<T> {
     this.fil = this.filter.bind(this);
     this.fx = this.effects.bind(this);
     this.leg = this.legato.bind(this);
+    this.midichan = this.midichannel.bind(this);
     this.rev = this.reverse.bind(this);
     this.seq = this.sequence.bind(this);
   }
@@ -154,12 +162,21 @@ abstract class Instrument<T> {
     duration: number,
     chordIndex: number,
   ) {
+    if (!node.detune) return;
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
 
     if (this._detune instanceof Pattern) {
       this._detune.apply(node.detune, cycleIndex, chordIndex);
     } else if (this._detune instanceof Envelope) {
       this._detune.apply(node.detune, start, duration, cycleIndex, chordIndex);
+    } else if (this._detune instanceof MIDIObserver) {
+      node.detune.setValueAtTime(
+        this._detune.currentValue,
+        this.ctx.currentTime,
+      );
+      this._detune.onUpdate(({ value }) => {
+        node.detune?.setValueAtTime(value, this.ctx.currentTime);
+      });
     } else {
       this._detune.connect(node.detune);
     }
@@ -251,6 +268,8 @@ abstract class Instrument<T> {
   }
 
   gain(input: number | Envelope | string) {
+    if (this._muted) return this;
+
     if (input instanceof Envelope) {
       this._gain = input;
     } else {
@@ -300,8 +319,12 @@ abstract class Instrument<T> {
     return this;
   }
 
-  detune(input: SNEL) {
-    if (input instanceof Envelope || input instanceof LfoNode) {
+  detune(input: SNEL | MIDIObserver<"controlchange">) {
+    if (
+      input instanceof Envelope ||
+      input instanceof LfoNode ||
+      input instanceof MIDIObserver
+    ) {
       this._detune = input;
     } else {
       const pattern = isString(input) ? parsePatternString(input) : [input];
@@ -334,12 +357,48 @@ abstract class Instrument<T> {
     return this;
   }
 
+  mute(mute = false) {
+    this._muted = mute;
+    this.gain(0);
+    return this;
+  }
+
   effects(...nodes: DromeAudioNode[]) {
     nodes.forEach((node) => this._signalChain.add(node));
     return this;
   }
 
-  beforePlay(barStart: number, barDuration: number) {
+  midi(identifier: string, velocity?: number) {
+    if (!this._drome.midi) {
+      console.warn("Must enable MIDI access before using midi commands.");
+      return this;
+    }
+
+    const router = this._drome.midi?.createRouter(identifier);
+
+    if (!router) {
+      console.warn(`Could not find MIDI device for: ${identifier}`);
+      return this;
+    }
+
+    if (velocity) router.velocity(velocity);
+    this._midiRouter = router;
+    return this;
+  }
+
+  midichannel(n: number | number[]) {
+    if (!this._midiRouter) {
+      console.warn("Must use `midi` method before calling `midichannel`");
+      return this;
+    }
+
+    this._midiRouter.channel(n);
+    return this;
+  }
+
+  protected beforePlay(barStart: number, barDuration: number) {
+    if (this._detune instanceof MIDIObserver) this._detune.clear();
+
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
     const cycle = this._cycles.at(cycleIndex);
     const notes: Note<T>[] = cycle.map((value, i) => {
@@ -389,15 +448,23 @@ abstract class Instrument<T> {
       this._signalChain.forEach((node) => node.disconnect());
       this._signalChain.clear();
     }
+    if (this._midiRouter) {
+      this._drome.midi?.removeRouter(this._midiRouter);
+      this._midiRouter.destroy();
+    }
     this._connectorNode.disconnect();
     this._connected = false;
     this._baseGain = 0;
     this._stopTime = null;
-    this.onDestory?.();
+    this.onDestroy?.();
   }
 
   get ctx() {
     return this._drome.ctx;
+  }
+
+  get clock() {
+    return this._drome.clock;
   }
 
   get type() {

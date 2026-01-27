@@ -1,13 +1,13 @@
 import type { MIDIMessageType } from "./types";
 
 const MIDIMessageTypeEntries = [
-  ["8", "note_off"],
-  ["9", "note_on"],
-  ["A", "polyphonic_aftertouch"],
-  ["B", "control_change"],
-  ["C", "program_change"],
-  ["D", "channel_aftertouch"],
-  ["E", "pitch_bend"],
+  ["8", "noteoff"],
+  ["9", "noteon"],
+  ["A", "aftertouch"],
+  ["B", "controlchange"],
+  ["C", "programchange"],
+  ["D", "aftertouch"],
+  ["E", "pitchbend"],
 ] as const;
 
 const MIDIMessageTypeMap = new Map<string, MIDIMessageType>(
