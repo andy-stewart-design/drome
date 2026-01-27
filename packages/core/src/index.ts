@@ -43,12 +43,12 @@ class Drome {
 
   static async init(bpm?: number) {
     const ctx = new AudioContext();
-    const [seshManager, sampManager] = await Promise.all([
+    const [sessionManager, sampleManager] = await Promise.all([
       SessionManager.init(ctx, bpm),
       SampleManager.init(ctx),
     ]);
 
-    const drome = new Drome(ctx, seshManager, sampManager);
+    const drome = new Drome(ctx, sessionManager, sampleManager);
 
     try {
       await Promise.all([drome.addWorklets()]);
@@ -59,14 +59,10 @@ class Drome {
     return drome;
   }
 
-  constructor(
-    ctx: AudioContext,
-    seshManager: SessionManager,
-    sampManager: SampleManager,
-  ) {
+  constructor(ctx: AudioContext, sesh: SessionManager, samp: SampleManager) {
     this.context = ctx;
-    this._sessionManager = seshManager;
-    this._sampleManager = sampManager;
+    this._sessionManager = sesh;
+    this._sampleManager = samp;
     this.audioChannels = Array.from({ length: NUM_CHANNELS }, () => {
       const gain = new GainNode(this.ctx, { gain: BASE_GAIN });
       gain.connect(this.ctx.destination);
