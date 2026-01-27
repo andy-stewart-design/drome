@@ -21,8 +21,8 @@ class AudioClock {
   private timerID: ReturnType<typeof setTimeout> | null = null;
   private listeners: ListenerMap = new Map();
 
-  constructor(bpm = 120) {
-    this.ctx = new AudioContext();
+  constructor(ctx: AudioContext, bpm = 120) {
+    this.ctx = ctx;
     this._timeOrigin = performance.now() - this.ctx.currentTime * 1000;
     this.bpm(bpm);
   }

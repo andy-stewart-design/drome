@@ -3,7 +3,7 @@ import LfoNode from "@/automation/lfo-node";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
 import Stack from "@/instruments/stack";
-import SessionManager, { type QueueInput } from "./session-manager";
+import SessionManager, { type QueueInput } from "@/managers/session-manager";
 import BitcrusherEffect from "@/effects/effect-bitcrusher";
 import DelayEffect from "@/effects/effect-delay";
 import DistortionEffect from "@/effects/effect-distortion";
@@ -13,13 +13,9 @@ import PanEffect from "@/effects/effect-pan";
 import ReverbEffect from "./effects/effect-reverb";
 import { MIDIObserver } from "./midi";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
-import { getSampleBanks, getSamplePath } from "@/utils/samples";
-import { loadSample } from "@/utils/load-sample";
-import { bufferId } from "@/utils/cache-id";
 import { isString } from "@/utils/validators";
 import { addWorklets } from "@/utils/worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
-import type { SampleBankSchema } from "@/utils/samples-validate";
 import type {
   DistortionAlgorithm,
   DromeEventCallback,
@@ -28,6 +24,7 @@ import type {
   SNEL,
   WaveformAlias,
 } from "@/types";
+import SampleManager from "./managers/sample-manager";
 
 type LogCallback = (log: string, logs: string[]) => void;
 
@@ -35,23 +32,26 @@ const BASE_GAIN = 0.8;
 const NUM_CHANNELS = 8;
 
 class Drome {
-  private _sessionManager: SessionManager;
+  readonly context: AudioContext;
   readonly audioChannels: GainNode[];
-  private sampleBanks: SampleBankSchema | null = null;
-  readonly bufferCache: Map<string, AudioBuffer[]> = new Map();
-  readonly reverbCache: Map<string, AudioBuffer> = new Map();
-  readonly userSamples: Map<string, Map<string, string[]>> = new Map();
-  private suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
+  private _sessionManager: SessionManager;
+  private _sampleManager: SampleManager;
+  private _suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
   private _logs: string[] = [];
 
   fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
 
   static async init(bpm?: number) {
-    const manager = await SessionManager.init();
-    const drome = new Drome(manager, bpm);
+    const ctx = new AudioContext();
+    const [seshManager, sampManager] = await Promise.all([
+      SessionManager.init(ctx, bpm),
+      SampleManager.init(ctx),
+    ]);
+
+    const drome = new Drome(ctx, seshManager, sampManager);
 
     try {
-      await Promise.all([drome.loadSampleBanks(), drome.addWorklets()]);
+      await Promise.all([drome.addWorklets()]);
     } catch (error) {
       console.warn(error);
     }
@@ -59,8 +59,14 @@ class Drome {
     return drome;
   }
 
-  constructor(manager: SessionManager, bpm?: number) {
-    this._sessionManager = manager;
+  constructor(
+    ctx: AudioContext,
+    seshManager: SessionManager,
+    sampManager: SampleManager,
+  ) {
+    this.context = ctx;
+    this._sessionManager = seshManager;
+    this._sampleManager = sampManager;
     this.audioChannels = Array.from({ length: NUM_CHANNELS }, () => {
       const gain = new GainNode(this.ctx, { gain: BASE_GAIN });
       gain.connect(this.ctx.destination);
@@ -72,14 +78,6 @@ class Drome {
     this.listeners.clock.internal.add(barCb);
 
     this.fil = this.filter.bind(this);
-  }
-
-  bpm(n: number) {
-    this.clock.bpm(n);
-  }
-
-  queue(input: QueueInput) {
-    this._sessionManager.enqueue(input);
   }
 
   private preTick() {
@@ -97,71 +95,22 @@ class Drome {
     });
   }
 
-  private async preloadSamples() {
-    const samplePromises = [...this.instruments].flatMap((inst) => {
-      if (inst instanceof Synth) return [];
-      return inst.preloadSamples();
-    });
-    await Promise.all(samplePromises);
-  }
-
-  private getSamplePath(bank: string, name: string, index: number) {
-    const paths = this.userSamples.get(bank)?.get(name);
-    if (paths) return paths[index % paths.length];
-    else return getSamplePath(this.sampleBanks, bank, name, index);
-  }
-
-  async addWorklets() {
+  private async addWorklets() {
     await addWorklets(this.ctx);
   }
 
-  async loadSampleBanks() {
-    const response = await getSampleBanks();
-
-    if (response.data) this.sampleBanks = response.data;
+  bpm(n: number) {
+    this.clock.bpm(n);
   }
 
-  addSamples(record: Record<string, string | string[]>, bank = "user") {
-    const samples = Object.entries(record).map(([k, v]) => {
-      return [k, Array.isArray(v) ? v : [v]] as const;
-    });
-
-    this.userSamples.set(bank, new Map(samples));
-  }
-
-  async loadSample(bank: string, name: string, i: string | number | undefined) {
-    const [id, index] = bufferId(bank, name, i);
-
-    const samplePath = this.getSamplePath(bank, name, index);
-    const cachedBuffers = this.bufferCache.get(id);
-
-    if (cachedBuffers?.[index]) {
-      return { path: samplePath, buffer: cachedBuffers[index] };
-    } else if (!samplePath) {
-      console.warn(`Couldn't find a sample: ${bank} ${name}`);
-      return { path: null, buffer: null };
-    }
-
-    const buffer = await loadSample(this.ctx, samplePath);
-
-    if (!buffer) {
-      console.warn(`Couldn't load sample ${name} from ${samplePath}`);
-      return { path: null, buffer: null };
-    } else if (cachedBuffers && !cachedBuffers[index]) {
-      cachedBuffers[index] = buffer;
-    } else if (!cachedBuffers) {
-      const buffers: AudioBuffer[] = [];
-      buffers[index] = buffer;
-      this.bufferCache.set(id, buffers);
-    }
-
-    return { path: samplePath, buffer };
+  queue(input: QueueInput) {
+    this._sessionManager.enqueue(input);
   }
 
   async start() {
     if (!this.clock.paused) return;
-    if (this.suspendTimeoutId) clearTimeout(this.suspendTimeoutId);
-    await this.preloadSamples();
+    if (this._suspendTimeoutId) clearTimeout(this._suspendTimeoutId);
+    await this._sampleManager.preloadSamples(this.instruments);
     this._sessionManager.start();
   }
 
@@ -172,9 +121,9 @@ class Drome {
       chan.gain.cancelScheduledValues(this.ctx.currentTime);
       chan.gain.value = BASE_GAIN;
     });
-    this.suspendTimeoutId = setTimeout(() => {
+    this._suspendTimeoutId = setTimeout(() => {
       this._sessionManager.suspend();
-      this.suspendTimeoutId = null;
+      this._suspendTimeoutId = null;
     }, fade * 5000); // convert seconds to milliseconds and double
   }
 
@@ -240,7 +189,6 @@ class Drome {
   lfo(baseValue: number, scale = 1, rate = 1) {
     const lfo = new LfoNode(this.ctx, { baseValue, scale, rate });
     lfo.bpm(this.clock.beatsPerMin);
-    // this.lfos.add(lfo);
     this.queue(lfo);
     return lfo;
   }
@@ -306,7 +254,7 @@ class Drome {
   }
 
   get ctx() {
-    return this.clock.ctx;
+    return this.context;
   }
 
   get clock() {
@@ -334,7 +282,7 @@ class Drome {
   }
 
   get currentTime() {
-    return this.ctx.currentTime;
+    return this.context.currentTime;
   }
 
   get paused() {
@@ -353,8 +301,32 @@ class Drome {
     return this.clock.beatsPerMin;
   }
 
+  get sampleBanks() {
+    return this._sampleManager.sampleBanks;
+  }
+
+  get bufferCache() {
+    return this._sampleManager.bufferCache;
+  }
+
+  get reverbCache() {
+    return this._sampleManager.reverbCache;
+  }
+
+  get userSamples() {
+    return this._sampleManager.userSamples;
+  }
+
   get createMidiController() {
-    return this._sessionManager.createMidiController;
+    return this._sessionManager.createMidiController.bind(this._sessionManager);
+  }
+
+  get addSamples() {
+    return this._sampleManager.addSamples.bind(this._sampleManager);
+  }
+
+  get loadSample() {
+    return this._sampleManager.loadSample.bind(this._sampleManager);
   }
 }
 

@@ -1,17 +1,18 @@
-import AudioClock from "./clock/audio-clock";
+import AudioClock from "@/clock/audio-clock";
 import LfoNode from "@/automation/lfo-node";
-import MIDIController, { MIDIObserver } from "./midi";
+import MIDIController, { MIDIObserver } from "@/midi";
 import Sample from "@/instruments/sample";
-import Synth from "./instruments/synth";
+import Synth from "@/instruments/synth";
 import type { DromeEventCallback, DromeEventType, SNEL } from "@/types";
 
 type LogCallback = (log: string, logs: string[]) => void;
+type UnsubsribeCallback = () => boolean;
 
 interface ListenerMap {
   log: Set<LogCallback>;
   clock: {
-    internal: Set<() => boolean>;
-    external: Set<() => boolean>;
+    internal: Set<UnsubsribeCallback>;
+    external: Set<UnsubsribeCallback>;
   };
 }
 type QueueCallback =
@@ -38,8 +39,8 @@ class SessionManager {
   private _lfos: Set<LfoNode>;
   private readonly _listeners: ListenerMap;
 
-  static async init() {
-    const manager = new SessionManager();
+  static async init(ctx: AudioContext, bpm?: number) {
+    const manager = new SessionManager(ctx, bpm);
     const midiPermissions = await manager.checkMidiPermissions();
     if (midiPermissions === "granted") {
       await manager.createMidiController();
@@ -47,8 +48,8 @@ class SessionManager {
     return manager;
   }
 
-  constructor() {
-    this._clock = new AudioClock();
+  constructor(ctx: AudioContext, bpm?: number) {
+    this._clock = new AudioClock(ctx, bpm);
     this._midi = null;
     this._queue = null;
     this._instruments = new Set();
