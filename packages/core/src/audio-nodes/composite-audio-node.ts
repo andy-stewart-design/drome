@@ -135,15 +135,15 @@ abstract class CompositeAudioNode<
   }
 
   get gain() {
-    return this.gainNode.gain;
+    return this._gainNode?.gain;
   }
 
   get filterQ() {
-    return this.filterNode.Q;
+    return this._filterNode?.Q;
   }
 
   get filterFrequency() {
-    return this.filterNode.frequency;
+    return this._filterNode?.frequency;
   }
 
   // STATIC VALUES

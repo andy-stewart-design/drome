@@ -34,8 +34,8 @@ interface InstrumentOptions<T> {
 
 interface FrequencyParams {
   type?: FilterType;
-  frequency?: Pattern | Envelope | LfoNode;
-  q?: Pattern | Envelope;
+  frequency?: Pattern | Envelope | LfoNode | MIDIObserver<"controlchange">;
+  q?: Pattern | Envelope | MIDIObserver<"controlchange">;
 }
 
 abstract class Instrument<T> {
@@ -109,50 +109,51 @@ abstract class Instrument<T> {
   private applyGain(
     node: SynthNode | SampleNode,
     start: number,
-    duration: number,
-    chordIndex: number,
+    dur: number,
+    chordIdx: number,
   ) {
+    if (!node.gain) return 0;
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
-    return this._gain.apply(node.gain, start, duration, cycleIndex, chordIndex);
+    return this._gain.apply(node.gain, start, dur, cycleIndex, chordIdx);
   }
 
   private applyFilter(
     node: SynthNode | SampleNode,
     start: number,
-    duration: number,
-    chordIndex: number,
+    dur: number,
+    chordIdx: number,
   ) {
+    const { filterFrequency: filFreq, filterQ: filQ } = node;
+    if (!filFreq || !filQ) return;
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
 
     if (this._filter.frequency instanceof Pattern) {
-      this._filter.frequency.apply(
-        node.filterFrequency,
-        cycleIndex,
-        chordIndex,
-      );
+      this._filter.frequency.apply(filFreq, cycleIndex, chordIdx);
     } else if (this._filter.frequency instanceof Envelope) {
-      this._filter.frequency.apply(
-        node.filterFrequency,
-        start,
-        duration,
-        cycleIndex,
-        chordIndex,
-      );
+      this._filter.frequency.apply(filFreq, start, dur, cycleIndex, chordIdx);
     } else if (this._filter.frequency instanceof LfoNode) {
-      node.filterFrequency.value = this._filter.frequency.baseValue;
-      this._filter.frequency.connect(node.filterFrequency);
+      filFreq.value = this._filter.frequency.baseValue;
+      this._filter.frequency.connect(filFreq);
+    } else if (this._filter.frequency instanceof MIDIObserver) {
+      const { currentValue } = this._filter.frequency;
+      filFreq.setValueAtTime(currentValue, this.ctx.currentTime);
+      this._filter.frequency.onUpdate(({ value }) => {
+        filFreq.setValueAtTime(value, this.ctx.currentTime);
+      });
+    } else {
+      console.warn("Invalid type:", this._filter.frequency satisfies undefined);
     }
 
     if (this._filter.q instanceof Pattern) {
-      this._filter.q.apply(node.filterQ, cycleIndex, chordIndex);
+      this._filter.q.apply(filQ, cycleIndex, chordIdx);
     } else if (this._filter.q instanceof Envelope) {
-      this._filter.q.apply(
-        node.filterQ,
-        start,
-        duration,
-        cycleIndex,
-        chordIndex,
-      );
+      this._filter.q.apply(filQ, start, dur, cycleIndex, chordIdx);
+    } else if (this._filter.q instanceof MIDIObserver) {
+      const { currentValue } = this._filter.q;
+      filQ.setValueAtTime(currentValue, this.ctx.currentTime);
+      this._filter.q.onUpdate(({ value }) => {
+        filQ.setValueAtTime(value, this.ctx.currentTime);
+      });
     }
   }
 
@@ -177,8 +178,10 @@ abstract class Instrument<T> {
       this._detune.onUpdate(({ value }) => {
         node.detune?.setValueAtTime(value, this.ctx.currentTime);
       });
-    } else {
+    } else if (this._detune instanceof LfoNode) {
       this._detune.connect(node.detune);
+    } else {
+      console.warn("Invalid type:", this._detune satisfies never);
     }
   }
 
@@ -334,24 +337,34 @@ abstract class Instrument<T> {
     return this;
   }
 
-  filter(type: FilterTypeAlias, f: SNEL, q?: SNEL) {
+  filter(
+    type: FilterTypeAlias,
+    f: SNEL | MIDIObserver<"controlchange">,
+    q?: SNEL,
+  ) {
     this._filter.type = filterTypeMap[type];
 
     if (f instanceof Envelope) {
       this._filter.frequency = f;
       this._filter.frequency.endValue = 30;
-    } else if (f instanceof LfoNode) {
+    } else if (f instanceof LfoNode || f instanceof MIDIObserver) {
       this._filter.frequency = f;
-    } else {
+    } else if (isNumber(f) || isString(f)) {
       const pattern = isString(f) ? parsePatternString(f) : [f];
       this._filter.frequency = new Pattern(...pattern);
+    } else {
+      console.warn("Invalid type:", f satisfies never);
     }
 
-    if (q instanceof Envelope) {
+    if (q instanceof Envelope || q instanceof MIDIObserver) {
       this._filter.q = q;
     } else if (isString(q) || isNumber(q)) {
       const pattern = isString(q) ? parsePatternString(q) : [q];
       this._filter.q = new Pattern(...pattern);
+    } else if (q instanceof LfoNode) {
+      // TODO: Figure out what to do here
+    } else {
+      console.warn("Invalid type:", q satisfies LfoNode | undefined);
     }
 
     return this;
@@ -427,9 +440,9 @@ abstract class Instrument<T> {
 
     if (fadeTime) {
       Array.from(this._audioNodes).forEach((node, i) => {
-        node.gain.cancelScheduledValues(stopStartTime);
-        node.gain.setValueAtTime(node.gain.value, stopStartTime);
-        node.gain.linearRampToValueAtTime(0, stopStartTime + fadeTime);
+        node.gain?.cancelScheduledValues(stopStartTime);
+        node.gain?.setValueAtTime(node.gain?.value, stopStartTime);
+        node.gain?.linearRampToValueAtTime(0, stopStartTime + fadeTime);
         node.stop(stopStartTime + fadeTime + 0.1);
       });
     }

@@ -13,7 +13,7 @@ A web-based language for live coding music.
   [x] MIDI Controller: maintain cache of current cc values
   [x] Add beforeTick method to clock where I call unsubscriball
     [x] Move listeners to queue system
-  [x] MIDI CC: allow for all params
+  [ ] MIDI CC: allow for all params
 [x] MIDI Output
   [x] Add methods for translating clock time to DOMHighResTimeStamp (like performance.now()) 
   [x] Add methods for creating MIDI router 
