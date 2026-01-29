@@ -1,7 +1,7 @@
 import type Envelope from "@/automation/envelope";
 import type Sample from "@/instruments/sample";
 import type Synth from "@/instruments/synth";
-import type { AdsrMode, SNEL } from "@/types";
+import type { AdsrMode, SNELO } from "@/types";
 import type { FilterTypeAlias } from "@/constants/index";
 import type DromeAudioNode from "@/abstracts/drome-audio-node";
 
@@ -12,7 +12,7 @@ class Stack {
   dt: (input: number | Envelope | string) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
-  fil: (type: FilterTypeAlias, f: SNEL, q: SNEL) => this;
+  fil: (type: FilterTypeAlias, f: SNELO, q: SNELO) => this;
   fx: (...nodes: DromeAudioNode[]) => this;
 
   constructor(inst: (Synth | Sample)[]) {
@@ -60,12 +60,12 @@ class Stack {
     return this;
   }
 
-  detune(input: SNEL) {
+  detune(input: SNELO) {
     this._instruments.forEach((inst) => inst.detune(input));
     return this;
   }
 
-  filter(type: FilterTypeAlias, f: SNEL, q?: SNEL) {
+  filter(type: FilterTypeAlias, f: SNELO, q?: SNELO) {
     this._instruments.forEach((inst) => inst.filter(type, f, q));
     return this;
   }

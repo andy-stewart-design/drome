@@ -1,3 +1,5 @@
+import { isArray } from "./validators";
+
 // prettier-ignore
 const sampleBankNames = [
   "9000","ace","cr78","d70","dmx","dr550", "hr16",
@@ -36,7 +38,7 @@ function validateSampleBankData(data: unknown): asserts data is SampleBankData {
     if (typeof key !== "string") {
       throw new Error(`slugs key must be a string, got ${typeof key}`);
     }
-    if (!Array.isArray(value)) {
+    if (!isArray(value)) {
       throw new Error(`slugs.${key} must be an array`);
     }
     if (!value.every((item) => typeof item === "string")) {

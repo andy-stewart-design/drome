@@ -1,5 +1,5 @@
 import { map } from "@/utils/math";
-import { isNumber } from "@/utils/validators";
+import { isArray, isNumber } from "@/utils/validators";
 import type MIDIController from "./index";
 import type {
   MIDIControlMessage,
@@ -41,7 +41,7 @@ class MIDIOberserver<T extends MIDIObserverType> {
 
   channel(n: number | number[]) {
     this._channels.length = 0;
-    if (!Array.isArray(n)) this._channels.push(n);
+    if (!isArray(n)) this._channels.push(n);
     else this._channels.push(...n);
     return this;
   }

@@ -6,7 +6,7 @@ import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
 import { MIDIObserver } from "@/midi";
 import { parsePatternString } from "../utils/parse-pattern";
-import { isNullish, isNumber, isString } from "../utils/validators";
+import { isArray, isNullish, isNumber, isString } from "../utils/validators";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import type Drome from "../index";
 import type SynthNode from "@/audio-nodes/composite-synth-node";
@@ -16,7 +16,7 @@ import type {
   AdsrEnvelope,
   InstrumentType,
   Note,
-  SNEL,
+  SNELO,
   Nullable,
 } from "@/types";
 import type { FilterType } from "@/types";
@@ -60,7 +60,7 @@ abstract class Instrument<T> {
   dt: (input: number | Envelope | string) => this;
   env: (a: number, d?: number, s?: number, r?: number) => this;
   envMode: (mode: AdsrMode) => this;
-  fil: (type: FilterTypeAlias, f: SNEL, q: SNEL) => this;
+  fil: (type: FilterTypeAlias, f: SNELO, q: SNELO) => this;
   fx: (...nodes: DromeAudioNode[]) => this;
   leg: (v?: boolean) => this;
   midichan: (n: number | number[]) => this;
@@ -278,9 +278,7 @@ abstract class Instrument<T> {
     } else {
       const pattern = isString(input) ? parsePatternString(input) : [input];
       const normalizedPattern = pattern.map((x) =>
-        Array.isArray(x)
-          ? x.map((y) => y * this._baseGain)
-          : x * this._baseGain,
+        isArray(x) ? x.map((y) => y * this._baseGain) : x * this._baseGain,
       );
       this._gain.maxValue(...normalizedPattern);
     }
@@ -322,7 +320,7 @@ abstract class Instrument<T> {
     return this;
   }
 
-  detune(input: SNEL | MIDIObserver<"controlchange">) {
+  detune(input: SNELO | MIDIObserver<"controlchange">) {
     if (
       input instanceof Envelope ||
       input instanceof LfoNode ||
@@ -339,8 +337,8 @@ abstract class Instrument<T> {
 
   filter(
     type: FilterTypeAlias,
-    f: SNEL | MIDIObserver<"controlchange">,
-    q?: SNEL,
+    f: SNELO | MIDIObserver<"controlchange">,
+    q?: SNELO,
   ) {
     this._filter.type = filterTypeMap[type];
 

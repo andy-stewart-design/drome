@@ -2,6 +2,7 @@ import Synth from "@/instruments/synth";
 import { bufferId } from "@/utils/cache-id";
 import { loadSample } from "@/utils/load-sample";
 import { getSampleBanks, getSamplePath } from "@/utils/samples";
+import { isArray } from "@/utils/validators";
 import type Sample from "@/instruments/sample";
 import type { SampleBankSchema } from "@/utils/samples-validate";
 
@@ -68,7 +69,7 @@ class SampleManager {
 
   addSamples(record: Record<string, string | string[]>, bank = "user") {
     const samples = Object.entries(record).map(([k, v]) => {
-      return [k, Array.isArray(v) ? v : [v]] as const;
+      return [k, isArray(v) ? v : [v]] as const;
     });
 
     this.userSamples.set(bank, new Map(samples));

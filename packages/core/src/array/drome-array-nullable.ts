@@ -1,6 +1,7 @@
 import DromeArray from "@/array/drome-array";
 import { euclid } from "@/utils/euclid";
 import { hex } from "@/utils/hex";
+import { isArray } from "@/utils/validators";
 import type { DromeCycleValue, Nullable, Pattern } from "@/types";
 
 class DromeArrayNullable<T> extends DromeArray<Nullable<T>> {
@@ -74,7 +75,7 @@ class DromeArrayNullable<T> extends DromeArray<Nullable<T>> {
           return acc;
         }, []);
       }
-      return Array.isArray(c) ? c.map((n) => (n ? 1 : 0)) : c ? [1] : [0];
+      return isArray(c) ? c.map((n) => (n ? 1 : 0)) : c ? [1] : [0];
     });
     this._value = this.applyPattern(pattern);
     return this;

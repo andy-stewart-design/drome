@@ -1,3 +1,4 @@
+import { isArray } from "@/utils/validators";
 import { encodeNoteCommand } from "./utils";
 
 class MIDIRouter {
@@ -14,7 +15,7 @@ class MIDIRouter {
   channel(chan: number | number[]) {
     this._channels.length = 0;
 
-    if (Array.isArray(chan)) this._channels.push(...chan);
+    if (isArray(chan)) this._channels.push(...chan);
     else this._channels.push(chan);
     return this;
   }

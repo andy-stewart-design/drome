@@ -1,7 +1,12 @@
-import Envelope from "@/automation/envelope";
-// import LFO from "@/automation/lfo";
-import { isEnv, isLfoNode } from "./validators";
-import type { SNEL, Pattern, PatternInput } from "../types";
+import {
+  isArray,
+  isEnv,
+  isLfoNode,
+  isNumber,
+  isObserver,
+  isString,
+} from "./validators";
+import type { SNELO, Pattern, PatternInput } from "../types";
 
 function parsePatternString(input: string) {
   const err = `[DROME] could not parse pattern string: ${input}`;
@@ -20,17 +25,22 @@ function parsePatternInput(input: PatternInput): Pattern {
   return [input];
 }
 
-function parseParamInput(input: SNEL) {
-  if (isEnv(input) || isLfoNode(input)) return input;
-  else return parsePatternInput(input);
+function parseParamInput(input: SNELO) {
+  if (isEnv(input) || isLfoNode(input) || isObserver<"controlchange">(input)) {
+    return input;
+  } else if (isString(input) || isNumber(input)) {
+    return parsePatternInput(input);
+  } else {
+    throw new Error("Invalid input:", input satisfies never);
+  }
 }
 
 function isStepPattern(input: unknown): input is Pattern {
   return (
-    Array.isArray(input) &&
+    isArray(input) &&
     input.reduce<boolean>((_, x) => {
       if (typeof x === "number") return true;
-      else if (Array.isArray(x)) return x.every((x) => typeof x === "number");
+      else if (isArray(x)) return x.every((x) => typeof x === "number");
       return false;
     }, true)
   );

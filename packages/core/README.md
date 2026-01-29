@@ -13,7 +13,9 @@ A web-based language for live coding music.
   [x] MIDI Controller: maintain cache of current cc values
   [x] Add beforeTick method to clock where I call unsubscriball
     [x] Move listeners to queue system
-  [ ] MIDI CC: allow for all params
+  [x] MIDI CC: allow for all params
+    [x] Source node filter
+    [x] Automatable effects
 [x] MIDI Output
   [x] Add methods for translating clock time to DOMHighResTimeStamp (like performance.now()) 
   [x] Add methods for creating MIDI router 
@@ -29,6 +31,7 @@ A web-based language for live coding music.
 [ ] Error handling (set up logging system)
 [ ] `instrument()` method (as wrapper for synth/sample)?
 [ ] Set root and scale on parent drome class
+[ ] Standardize interfaces for Envelopes, LFOs, and MIDIControllers
 
 ### REPL
 [ ] Play/pause buttons

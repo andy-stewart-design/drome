@@ -21,7 +21,7 @@ import type {
   DromeEventCallback,
   DromeEventType,
   Metronome,
-  SNEL,
+  SNELO,
   WaveformAlias,
 } from "@/types";
 import SampleManager from "./managers/sample-manager";
@@ -39,7 +39,7 @@ class Drome {
   private _suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
   private _logs: string[] = [];
 
-  fil: (type: FilterTypeAlias, frequency: SNEL, q?: number) => DromeFilter;
+  fil: (type: FilterTypeAlias, frequency: SNELO, q?: number) => DromeFilter;
 
   static async init(bpm?: number) {
     const ctx = new AudioContext();
@@ -189,7 +189,7 @@ class Drome {
     return lfo;
   }
 
-  crush(_bitDepth: SNEL, rateReduction = 1) {
+  crush(_bitDepth: SNELO, rateReduction = 1) {
     return new BitcrusherEffect(this.ctx, {
       bitDepth: parseParamInput(_bitDepth),
       rateReduction,
@@ -203,7 +203,7 @@ class Drome {
     });
   }
 
-  distort(amount: SNEL, postgain?: number, type?: DistortionAlgorithm) {
+  distort(amount: SNELO, postgain?: number, type?: DistortionAlgorithm) {
     return new DistortionEffect(this.ctx, {
       distortion: parseParamInput(amount),
       postgain,
@@ -211,7 +211,7 @@ class Drome {
     });
   }
 
-  filter(type: FilterTypeAlias, frequency: SNEL, q?: number) {
+  filter(type: FilterTypeAlias, frequency: SNELO, q?: number) {
     return new DromeFilter(this.ctx, {
       type: filterTypeMap[type],
       frequency: parseParamInput(frequency),
@@ -219,17 +219,17 @@ class Drome {
     });
   }
 
-  gain(input: SNEL) {
+  gain(input: SNELO) {
     return new GainEffect(this.ctx, { gain: parseParamInput(input) });
   }
 
-  pan(input: SNEL) {
+  pan(input: SNELO) {
     return new PanEffect(this.ctx, { pan: parseParamInput(input) });
   }
 
-  reverb(a: SNEL, b?: number, c?: number, d?: number): ReverbEffect;
-  reverb(a: SNEL, b?: string, c?: string): ReverbEffect;
-  reverb(mix: SNEL, b: unknown = 1, c: unknown = 1600, d?: number) {
+  reverb(a: SNELO, b?: number, c?: number, d?: number): ReverbEffect;
+  reverb(a: SNELO, b?: string, c?: string): ReverbEffect;
+  reverb(mix: SNELO, b: unknown = 1, c: unknown = 1600, d?: number) {
     let effect: ReverbEffect;
     const parsedMix = parseParamInput(mix);
 

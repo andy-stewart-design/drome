@@ -1,13 +1,15 @@
+import { isArray } from "@/utils/validators";
+
 class DromeArray<T> {
   protected _value: T[][] = [];
   protected _defaultValue: T[][];
   protected _nullValue: T;
 
   constructor(...input: (T | T[])[]) {
-    const dv = Array.isArray(input[0]) ? input[0][0] : input[0];
+    const dv = isArray(input[0]) ? input[0][0] : input[0];
     if (dv === undefined) throw new Error("Invalid drome array input");
 
-    this._defaultValue = input.map((c) => (Array.isArray(c) ? c : [c]));
+    this._defaultValue = input.map((c) => (isArray(c) ? c : [c]));
     this._nullValue = dv;
   }
 
@@ -15,9 +17,7 @@ class DromeArray<T> {
   /* PATTERN SETTERS
   ---------------------------------------------------------------- */
   note(...input: (T | T[])[]) {
-    this._value = input.map((cycle) =>
-      Array.isArray(cycle) ? cycle : [cycle],
-    );
+    this._value = input.map((cycle) => (isArray(cycle) ? cycle : [cycle]));
     return this;
   }
 

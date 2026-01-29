@@ -3,7 +3,7 @@ import LfoNode from "@/automation/lfo-node";
 import MIDIController, { MIDIObserver } from "@/midi";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
-import type { DromeEventCallback, DromeEventType, SNEL } from "@/types";
+import type { DromeEventCallback, DromeEventType, SNELO } from "@/types";
 
 type LogCallback = (log: string, logs: string[]) => void;
 type UnsubsribeCallback = () => boolean;
