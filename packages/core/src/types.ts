@@ -7,10 +7,18 @@ import type {
   waveformAliasMap,
 } from "./utils/synth-alias";
 import type { scaleAliasMap } from "./utils/get-scale";
+import type { MIDIObserver } from "./midi";
 
 // AUDIO CLOCK
 type Metronome = { beat: number; bar: number };
-type DromeEventType = "start" | "pause" | "stop" | "beat" | "bar";
+type DromeEventType =
+  | "start"
+  | "pause"
+  | "stop"
+  | "prebeat"
+  | "prebar"
+  | "beat"
+  | "bar";
 type DromeEventCallback = (m: Metronome, time: number) => void;
 
 // NOTES + SCALES
@@ -36,10 +44,10 @@ type WaveformAlias = keyof typeof waveformAliasMap;
 type Nullable<T> = T | null | undefined;
 type Note<T> = { value: T; start: number; duration: number } | null;
 type DromeCycleValue<T> = Nullable<T>[][];
-type Automation = Pattern | Envelope | LfoNode;
+type Automation = Pattern | Envelope | LfoNode | MIDIObserver<"controlchange">;
 type Pattern = (number | number[])[];
 type PatternInput = number | string;
-type SNEL = PatternInput | Envelope | LfoNode;
+type SNELO = PatternInput | Envelope | LfoNode | MIDIObserver<"controlchange">;
 
 // AUTOMATION
 type AdsrMode = "fit" | "clip" | "free";
@@ -73,7 +81,7 @@ export type {
   NoteValue,
   Note,
   ScaleAlias,
-  SNEL,
+  SNELO,
   Nullable,
   Pattern,
   PatternInput,

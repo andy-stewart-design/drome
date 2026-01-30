@@ -1,115 +1,106 @@
+import MIDIObservable from "./midi-observable";
+import MIDIRouter from "./midi-router";
+import MIDIObserver, { type MIDIObserverType } from "./midi-observer";
 import { getMIDIPort } from "./utils";
-import { CustomInput, CustomOutput } from "./midi-ports";
-import type {
-  MIDIControllerListeners,
-  MIDIControllerPorts,
-  InputChangeHandler,
-  OutputChangeHandler,
-} from "./types";
 
 class MIDIController {
   private _midi: MIDIAccess;
-  private _ports: MIDIControllerPorts;
-  private _listeners: MIDIControllerListeners;
-  private _controller: AbortController;
+  private _observables: Map<string, MIDIObservable<any>>;
+  private _routers: Map<string, Set<MIDIRouter>>;
+  private _cachedValues: Map<string, number>;
 
   private constructor(midi: MIDIAccess) {
     this._midi = midi;
-    this._ports = { inputs: new Map(), outputs: new Map() };
-    this._controller = new AbortController();
-    this._listeners = { inputs: new Set(), outputs: new Set() };
-
-    this.midi.addEventListener(
-      "statechange",
-      (e) => {
-        if (!(e.target instanceof MIDIAccess) || !e.port) return;
-
-        const { port } = e;
-
-        if (port instanceof MIDIInput) {
-          const inputs = Array.from(this.midi.inputs.values());
-          this._listeners.inputs.forEach((fn) => fn(inputs));
-        } else if (port instanceof MIDIOutput) {
-          const outputs = Array.from(this.midi.outputs.values());
-          this._listeners.outputs.forEach((fn) => fn(outputs));
-        }
-      },
-      { signal: this._controller.signal },
-    );
+    this._observables = new Map();
+    this._routers = new Map();
+    this._cachedValues = new Map();
   }
 
   static async init() {
-    const midi = await navigator.requestMIDIAccess({ sysex: false });
+    const midi = await navigator.requestMIDIAccess();
     return new MIDIController(midi);
   }
 
-  addListener(type: "input-change", fn: InputChangeHandler): void;
-  addListener(type: "output-change", fn: OutputChangeHandler): void;
-  addListener(
-    type: "input-change" | "output-change",
-    fn: InputChangeHandler | OutputChangeHandler,
-  ) {
-    if (type === "input-change") {
-      this._listeners.inputs.add(fn as InputChangeHandler);
-      return () => this._listeners.inputs.delete(fn as InputChangeHandler);
-    } else {
-      this._listeners.outputs.add(fn as OutputChangeHandler);
-      return () => this._listeners.outputs.delete(fn as OutputChangeHandler);
+  // ——————————————————————————————————————————————————————————————————
+  // Observer (input) methods
+  addObserver<T extends MIDIObserverType>(observer: MIDIObserver<T>) {
+    const { identifier } = observer;
+    const port = getMIDIPort(this.midi.inputs, identifier);
+    const input = observer.type === "portchange" ? this._midi : port;
+    if (!input) return null;
+
+    let observable = this._observables.get(identifier);
+
+    if (!observable) {
+      observable = new MIDIObservable<T>(input);
+      this._observables.set(identifier, observable);
     }
+
+    observer.controller(this);
+    observable.subscribe(observer);
+
+    return this;
   }
 
-  removeListener(type: "input-change", fn: InputChangeHandler): void;
-  removeListener(type: "output-change", fn: OutputChangeHandler): void;
-  removeListener(
-    type: "input-change" | "output-change",
-    fn: InputChangeHandler | OutputChangeHandler,
-  ) {
-    if (type === "input-change") {
-      this._listeners.inputs.delete(fn as InputChangeHandler);
-    } else {
-      this._listeners.outputs.delete(fn as OutputChangeHandler);
-    }
+  removeObserver<T extends MIDIObserverType>(observer: MIDIObserver<T>) {
+    const { identifier } = observer;
+    this._observables.get(identifier)?.unsubscribe(observer);
   }
 
-  input(ident: string | { id: string }) {
-    const name = typeof ident === "string" ? ident : ident.id;
-    const cached = this._ports.inputs.get(name);
-    if (cached) return cached;
-
-    const port = getMIDIPort(this.midi.inputs, ident);
-    if (port) {
-      const newPort = new CustomInput(port);
-      this._ports.inputs.set(name, newPort);
-      return newPort;
-    }
-    return null;
+  clearObservers() {
+    this._observables.forEach((obs) => obs.unsubscribeAll());
   }
 
-  output(ident: string | { id: string }) {
-    const name = typeof ident === "string" ? ident : ident.id;
-    const cached = this._ports.outputs.get(name);
-    if (cached) return cached;
-
-    const port = getMIDIPort(this.midi.outputs, ident);
-    if (port) {
-      const newPort = new CustomOutput(port);
-      this._ports.outputs.set(name, newPort);
-      return newPort;
-    }
-    return null;
+  cacheValue(id: string, value: number) {
+    this._cachedValues.set(id, value);
   }
 
+  // ——————————————————————————————————————————————————————————————————
+  // Router (output) methods
+  createRouter(identifier: string) {
+    const port = getMIDIPort(this.midi.outputs, identifier);
+    if (!port) return null;
+
+    let routerSet = this._routers.get(identifier);
+    if (!routerSet) {
+      routerSet = new Set();
+      this._routers.set(identifier, routerSet);
+    }
+
+    const router = new MIDIRouter(port);
+    routerSet.add(router);
+
+    return router;
+  }
+
+  removeRouter(router: MIDIRouter) {
+    const { identifier } = router;
+    if (!this._routers.has(identifier)) return;
+    this._routers.get(identifier)?.delete(router);
+  }
+
+  clearRouters() {
+    this._routers.forEach((set) => {
+      set.forEach((r) => r.destroy());
+      set.clear();
+    });
+    this._routers.clear();
+  }
+
+  // ——————————————————————————————————————————————————————————————————
+  // General methods
   destroy() {
-    this._controller.abort();
-    this._ports.inputs.forEach((p) => p.destroy());
-    this._ports.inputs.clear();
-    this._ports.outputs.clear();
-    this._listeners.inputs.clear();
-    this._listeners.outputs.clear();
+    this._observables.forEach((obs) => obs.destroy());
+    this._observables.clear();
+    this._cachedValues.clear();
   }
 
   get midi() {
     return this._midi;
+  }
+
+  get cachedValues() {
+    return this._cachedValues;
   }
 
   get inputs() {
@@ -119,6 +110,52 @@ class MIDIController {
   get outputs() {
     return Array.from(this._midi.outputs.values());
   }
+
+  get observables() {
+    return Array.from(this._observables.values());
+  }
+
+  get obserableCount() {
+    return this._observables.size;
+  }
+
+  get observers() {
+    return Array.from(this._observables.values()).flatMap((observable) => {
+      return Array.from(observable.subscribers.values());
+    });
+  }
+
+  get observerCount() {
+    return Array.from(this._observables.values()).reduce((acc, obs) => {
+      return acc + obs.subscribers.size;
+    }, 0);
+  }
 }
 
 export default MIDIController;
+export { MIDIController, MIDIObserver };
+
+// class TypedMap<T extends Record<PropertyKey, any>> {
+//   private map = new Map<keyof T, T[keyof T]>();
+
+//   get<K extends keyof T>(key: K): T[K] | undefined {
+//     return this.map.get(key) as T[K] | undefined;
+//   }
+
+//   set<K extends keyof T>(key: K, value: T[K]): void {
+//     this.map.set(key, value);
+//   }
+// }
+
+// interface MyMap {
+//   foo: string[];
+//   bar: number[];
+// }
+
+// const myMap = new TypedMap<MyMap>();
+
+// myMap.set("foo", ["a", "b"]);
+// myMap.set("bar", [1, 2, 3]);
+
+// const foo = myMap.get("bar"); // string[] | undefined
+// const bar = myMap.get("bar"); // number[] | undefined

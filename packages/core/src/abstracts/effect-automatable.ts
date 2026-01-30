@@ -1,7 +1,14 @@
 import DromeArray from "@/array/drome-array";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
-import { isEnv, isLfoNode, isNullish } from "@/utils/validators";
+import {
+  isArray,
+  isEnv,
+  isLfoNode,
+  isNullish,
+  isObserver,
+} from "@/utils/validators";
 import { applySteppedRamp } from "@/utils/stepped-ramp";
+import { MIDIObserver } from "@/midi";
 import type Envelope from "@/automation/envelope";
 import type LfoNode from "@/automation/lfo-node";
 import type { Automation, Note } from "@/types";
@@ -12,23 +19,31 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   protected abstract _target: AudioParam | undefined;
   protected _defaultValue: number;
   protected _cycles: DromeArray<number>;
-  protected _lfo: LfoNode | undefined;
-  protected _env: Envelope | undefined;
+  protected _automation:
+    | LfoNode
+    | Envelope
+    | MIDIObserver<"controlchange">
+    | undefined;
 
   constructor(input: Automation, defaultValue = 1) {
     super();
 
-    if (isEnv(input)) {
-      this._defaultValue = input.startValue;
-      this._cycles = new DromeArray(this._defaultValue);
-      this._env = input;
-    } else if (isLfoNode(input)) {
-      this._defaultValue = input.baseValue;
-      this._cycles = new DromeArray(this._defaultValue);
-      this._lfo = input;
-    } else {
-      this._cycles = new DromeArray(0).note(...input);
-      this._defaultValue = this._cycles.at(0, 0) ?? defaultValue;
+    switch (true) {
+      case isEnv(input):
+      case isLfoNode(input):
+      case isObserver<"controlchange">(input):
+        this._defaultValue = input.defaultValue;
+        this._cycles = new DromeArray(this._defaultValue);
+        this._automation = input;
+        break;
+      case isArray(input):
+        this._cycles = new DromeArray(0).note(...input);
+        this._defaultValue = this._cycles.at(0, 0) ?? defaultValue;
+        break;
+      default:
+        console.warn("Invalid input", input satisfies never);
+        this._defaultValue = defaultValue;
+        this._cycles = new DromeArray(0);
     }
   }
 
@@ -40,18 +55,29 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   ) {
     if (!this._target) return;
 
-    const cycleIndex = currentBar % this._cycles.length;
-    if (this._lfo) {
-      this._lfo.connect(this._target);
-    } else if (this._env) {
-      for (let i = 0; i < notes.length; i++) {
-        const note = notes[i];
-        if (isNullish(note)) continue;
-        this._env.apply(this._target, note.start, note.duration, cycleIndex, i);
-      }
-    } else {
-      const steps = this._cycles.at(cycleIndex) ?? [];
-      applySteppedRamp({ target: this._target, startTime, duration, steps });
+    const cycleIdx = currentBar % this._cycles.length;
+
+    switch (true) {
+      case isLfoNode(this._automation):
+        this._automation.connect(this._target);
+        break;
+      case isEnv(this._automation):
+        for (let i = 0; i < notes.length; i++) {
+          const note = notes[i];
+          if (isNullish(note)) continue;
+          const { start, duration } = note;
+          this._automation.apply(this._target, start, duration, cycleIdx, i);
+        }
+        break;
+      case isObserver<"controlchange">(this._automation):
+        this._target.setValueAtTime(this._automation.currentValue, startTime);
+        this._automation.onUpdate(({ value }) => {
+          this._target?.setValueAtTime(value, 0);
+        });
+        break;
+      default:
+        const steps = this._cycles.at(cycleIdx) ?? [];
+        applySteppedRamp({ target: this._target, startTime, duration, steps });
     }
   }
 
@@ -63,21 +89,16 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
     this._input.disconnect();
   }
 
-  get effect() {
-    return this._effect;
-  }
-
-  get env() {
-    return this._env;
+  destroy() {
+    this._target = undefined;
+    this._automation = undefined;
+    this._cycles.clear();
+    this._defaultValue = 0;
   }
 
   get input() {
     return this._input;
   }
-
-  // get lfo() {
-  //   return this._lfo;
-  // }
 }
 
 export default AutomatableEffect;

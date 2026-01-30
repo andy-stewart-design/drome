@@ -3,6 +3,7 @@ abstract class DromeAudioNode {
 
   abstract connect(dest: AudioNode): void;
   abstract disconnect(): void;
+  abstract destroy(): void;
   abstract get input(): AudioNode;
 }
 

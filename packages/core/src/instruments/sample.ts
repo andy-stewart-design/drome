@@ -1,7 +1,7 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
 import SamplerNode from "@/audio-nodes/composite-sample-node";
 import { flipBuffer } from "@/utils/flip-buffer";
-import { isNumber } from "@/utils/validators";
+import { isArray, isNumber } from "@/utils/validators";
 import type Drome from "@/index";
 
 type Nullable<T> = T | null | undefined;
@@ -48,7 +48,6 @@ export default class Sample extends Instrument<number> {
   }
 
   chop(numChops: number, ...input: (number | number[])[]) {
-    const isArray = Array.isArray;
     const convert = (n: Nullable<number>) => {
       return typeof n === "number" ? (1 / numChops) * (n % numChops) : null;
     };
@@ -93,7 +92,8 @@ export default class Sample extends Instrument<number> {
   }
 
   push() {
-    this._drome.instruments.add(this);
+    // this._drome.instruments.add(this);
+    this._drome.queue(this);
   }
 
   play(barStart: number, barDuration: number) {
@@ -108,7 +108,7 @@ export default class Sample extends Instrument<number> {
         if (
           !buffer ||
           !isNumber(note?.value) ||
-          note.start < this.ctx.currentTime - 0.025
+          note.start < this.ctx.currentTime - 0.0375
         ) {
           return;
         }

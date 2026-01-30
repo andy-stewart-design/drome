@@ -1,10 +1,12 @@
+import { isArray } from "./validators";
+
 function euclid(
   pulses: number | number[],
   steps: number,
   rotation: number | number[] = 0,
 ) {
-  const numPulses = Array.isArray(pulses) ? pulses.length : 1;
-  const numRotation = Array.isArray(rotation) ? rotation.length : 1;
+  const numPulses = isArray(pulses) ? pulses.length : 1;
+  const numRotation = isArray(rotation) ? rotation.length : 1;
   const numCycles = Math.max(numPulses, numRotation);
   const cycles: number[][] = [];
 
@@ -23,7 +25,7 @@ export { euclid };
 // INTERNAL
 // ————————————————————————————————————————————————————————————————
 function getValue<T>(v: T | T[], i: number, fb: T) {
-  return Array.isArray(v) ? (v[i % v.length] ?? fb) : v;
+  return isArray(v) ? (v[i % v.length] ?? fb) : v;
 }
 
 function _euclid(pulse: number, steps: number, rotation: number) {

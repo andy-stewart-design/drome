@@ -24,7 +24,16 @@ export default class Synth extends Instrument<number | number[]> {
     this._voices = new DromeArray(7);
   }
 
-  private getFrequncy(note: number) {
+  private getMidiNote(note: number) {
+    if (!this._scale) return note + this._root;
+
+    const octave = Math.floor(note / 7) * 12;
+    const degree = ((note % 7) + 7) % 7;
+    const step = this._scale[degree];
+    return this._root + octave + step;
+  }
+
+  private getFrequency(note: number) {
     if (!this._scale) return midiToFrequency(note + this._root);
 
     const octave = Math.floor(note / 7) * 12;
@@ -51,7 +60,8 @@ export default class Synth extends Instrument<number | number[]> {
   }
 
   push() {
-    this._drome.instruments.add(this);
+    // this._drome.instruments.add(this);
+    this._drome.queue(this);
   }
 
   play(barStart: number, barDuration: number) {
@@ -64,7 +74,7 @@ export default class Synth extends Instrument<number | number[]> {
           // if (!midiNote) return;
           const cycleIndex = this._drome.metronome.bar % this._voices.length;
           const osc = new SynthNode(this.ctx, {
-            frequency: this.getFrequncy(midiNote),
+            frequency: this.getFrequency(midiNote),
             type: getWaveform(typeAlias),
             filter: this._filter.type ? { type: this._filter.type } : undefined,
             gain: 0,
@@ -77,6 +87,15 @@ export default class Synth extends Instrument<number | number[]> {
           osc.connect(this._connectorNode);
           osc.start(note.start);
           osc.stop(note.start + duration);
+
+          if (this._midiRouter) {
+            const start = this.clock.audioTimeToMIDITime(note.start);
+            const end = this.clock.audioTimeToMIDITime(
+              note.start + note.duration,
+            );
+            this._midiRouter?.noteOn(this.getMidiNote(midiNote), start);
+            this._midiRouter?.noteOff(this.getMidiNote(midiNote), end);
+          }
 
           const cleanup = () => {
             osc.disconnect();

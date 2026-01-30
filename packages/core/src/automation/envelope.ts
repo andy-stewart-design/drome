@@ -92,6 +92,10 @@ class Envelope {
     this._endValue = v;
   }
 
+  get defaultValue() {
+    return this._startValue;
+  }
+
   get a() {
     return this._adsr.a;
   }

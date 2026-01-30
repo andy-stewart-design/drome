@@ -1,12 +1,12 @@
 import DromeArray from "@/array/drome-array";
-// import type { Nullable } from "@/types";
+import { isArray } from "@/utils/validators";
 
 class Pattern {
   private _value: DromeArray<number>;
   private _defaultValue: number;
 
   constructor(...input: (number | number[])[]) {
-    const defaultValue = Array.isArray(input[0]) ? input[0][0] : input[0];
+    const defaultValue = isArray(input[0]) ? input[0][0] : input[0];
     if (defaultValue === undefined) throw new Error("Invalid pattern input");
 
     this._value = new DromeArray(defaultValue);

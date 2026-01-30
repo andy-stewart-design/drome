@@ -15,10 +15,19 @@ function App() {
   const editorContainer = useRef<HTMLDivElement>(null)
   const [drome, setDrome] = useState<Drome | null>(null)
   const [editor, setEditor] = useState<EditorView | null>(null)
+  const [midi, setMidi] = useState<boolean>(false)
 
   useEffect(() => {
     if (!editorContainer.current) return
-    Drome.init(120).then((d) => setDrome(d))
+    let controller = new AbortController()
+    let drome: Drome
+
+    Drome.init(120).then((d) => {
+      if (controller.signal.aborted) return
+      drome = d
+      setDrome(d)
+      if (d.midi) setMidi(true)
+    })
 
     const doc = localStorage.getItem(LS_KEY)
 
@@ -30,7 +39,11 @@ function App() {
 
     setEditor(editor)
 
-    return () => editor.destroy()
+    return () => {
+      controller.abort()
+      drome?.destroy()
+      editor.destroy()
+    }
   }, [])
 
   useEffect(() => {
@@ -46,7 +59,7 @@ function App() {
 
     if (e.altKey && e.key === 'Enter') {
       e.preventDefault()
-      drome.clear()
+      // drome.clear()
       runCode(drome, editor.state.doc.toString())
       localStorage.setItem(LS_KEY, editor.state.doc.toString())
       flash(editor)
@@ -59,20 +72,20 @@ function App() {
 
   return (
     <main>
-      {/*<div className="header">
+      <div className="header">
         {!!drome && (
           <button
             className="midi"
-            disabled={!!drome.midi}
+            disabled={midi}
             onClick={async () => {
-              await drome?.createMidiController()
-              console.log(drome?.midi)
+              const midi = await drome?.createMidiController()
+              if (midi) setMidi(true)
             }}
           >
-            {!!drome.midi ? 'MIDI enabled' : 'Enable MIDI'}
+            {midi ? 'MIDI enabled' : 'Enable MIDI'}
           </button>
         )}
-      </div>*/}
+      </div>
       <div ref={editorContainer} />
     </main>
   )

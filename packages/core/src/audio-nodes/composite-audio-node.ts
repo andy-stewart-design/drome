@@ -131,19 +131,19 @@ abstract class CompositeAudioNode<
 
   // AUDIO PARAMS
   get detune() {
-    return this.audioNode.detune;
+    return this._audioNode?.detune;
   }
 
   get gain() {
-    return this.gainNode.gain;
+    return this._gainNode?.gain;
   }
 
   get filterQ() {
-    return this.filterNode.Q;
+    return this._filterNode?.Q;
   }
 
   get filterFrequency() {
-    return this.filterNode.frequency;
+    return this._filterNode?.frequency;
   }
 
   // STATIC VALUES

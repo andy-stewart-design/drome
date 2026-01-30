@@ -1,15 +1,13 @@
 import type { MIDIMessageTypeEntries } from "./midi-message";
-import type { CustomInput, CustomOutput } from "./midi-ports";
+import type { MIDIInputStream, MIDIOutputRouter } from "./midi-ports";
 
 type InputChangeHandler = (e: MIDIInput[]) => void;
-
 type OutputChangeHandler = (e: MIDIOutput[]) => void;
-
 type MIDIMessageHandler = (msg: MIDIMessage) => void;
 
 interface MIDIControllerPorts {
-  inputs: Map<string, CustomInput>;
-  outputs: Map<string, CustomOutput>;
+  inputs: Map<string, MIDIInputStream>;
+  outputs: Map<string, MIDIOutputRouter>;
 }
 
 interface MIDIControllerListeners {
@@ -24,25 +22,25 @@ interface BaseMIDIMessage {
 }
 
 interface DefaultMIDIMessage extends BaseMIDIMessage {
-  type: "polyphonic_aftertouch" | "channel_aftertouch" | "pitch_bend";
+  type: "aftertouch" | "pitchbend";
   data1: number;
   data2: number;
 }
 
 interface MIDINoteMessage extends BaseMIDIMessage {
-  type: "note_on" | "note_off";
+  type: "noteon" | "noteoff";
   note: number;
   velocity: number;
 }
 
 interface MIDIControlMessage extends BaseMIDIMessage {
-  type: "control_change";
+  type: "controlchange";
   controlNumber: number;
   value: number;
 }
 
 interface MIDIProgramMessage extends BaseMIDIMessage {
-  type: "program_change";
+  type: "programchange";
   program: number;
 }
 
@@ -61,6 +59,8 @@ export type {
   MIDIMessageHandler,
   MIDIControllerPorts,
   MIDIControllerListeners,
+  MIDIControlMessage,
   MIDIMessageType,
   MIDIMessage,
+  MIDINoteMessage,
 };

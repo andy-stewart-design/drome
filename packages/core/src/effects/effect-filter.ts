@@ -27,7 +27,7 @@ class DromeFilter extends AutomatableEffect<BiquadFilterNode> {
   }
 
   createEnvelope(max: number, adsr: number[]) {
-    this._env = new Envelope(this._defaultValue, max, 30)
+    this._automation = new Envelope(this._defaultValue, max, 30)
       .att(adsr[0] ?? 0.125)
       .dec(adsr[1] ?? 0.125)
       .sus(adsr[2] ?? 1)

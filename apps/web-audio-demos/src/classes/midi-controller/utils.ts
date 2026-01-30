@@ -1,25 +1,23 @@
 import { MIDIMessageTypeMap } from "./midi-message";
 import type { MIDIMessage } from "./types";
 
-type Identifier = string | { id: string };
-
-function getMIDIPort(p: MIDIInputMap, i: Identifier): MIDIInput | null;
-function getMIDIPort(p: MIDIOutputMap, i: Identifier): MIDIOutput | null;
+function getMIDIPort(p: MIDIInputMap, i: string): MIDIInput | null;
+function getMIDIPort(p: MIDIOutputMap, i: string): MIDIOutput | null;
 function getMIDIPort(
   ports: MIDIInputMap | MIDIOutputMap,
-  ident: Identifier,
+  nameOrId: string,
 ): MIDIInput | MIDIOutput | null {
-  if (typeof ident === "string") {
-    const name = ident.toLocaleLowerCase();
-    for (const [_, port] of ports) {
-      if (port.name?.toLocaleLowerCase() === name) return port;
-    }
-  } else {
-    const port = ports.get(ident.id);
-    if (port) return port;
-  }
+  const port = ports.get(nameOrId) ?? getPortByName(ports, nameOrId);
+  if (port) return port;
+  console.warn(`No MIDI port found matching: ${nameOrId}`);
+  return null;
+}
 
-  console.warn(`No input port found with: ${JSON.stringify(ident)}`);
+function getPortByName(ports: MIDIInputMap | MIDIOutputMap, name: string) {
+  const n = name.toLocaleLowerCase();
+  for (const [_, port] of ports) {
+    if (port.name?.toLocaleLowerCase() === n) return port;
+  }
   return null;
 }
 
@@ -46,15 +44,15 @@ function readMIDIMessage(data: Uint8Array, input: MIDIInput): MIDIMessage {
   if (!type || !name) return null;
   const source = { name: name.toLocaleLowerCase(), id };
 
-  if (type === "note_on" && data2 === 0) type = "note_off"; // note_on with velocity 0 = note_off
+  if (type === "noteon" && data2 === 0) type = "noteoff"; // note_on with velocity 0 = note_off
 
   switch (type) {
-    case "note_on":
-    case "note_off":
+    case "noteon":
+    case "noteoff":
       return { type, source, channel, note: data1, velocity: data2 };
-    case "control_change":
+    case "controlchange":
       return { type, source, channel, controlNumber: data1, value: data2 };
-    case "program_change":
+    case "programchange":
       return { type, source, channel, program: data1 };
     default:
       return { type, source, channel, data1, data2 };
