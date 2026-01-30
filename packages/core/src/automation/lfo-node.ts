@@ -1,5 +1,6 @@
 import AudioEndedEvent from "@/events/audio-ended";
 import type { BasicWaveform, BasicWaveformAlias } from "@/types";
+import { getParam } from "@/utils/audio-params";
 import { getBasicWaveform } from "@/utils/synth-alias";
 import type {
   LfoProcessorOptions,
@@ -155,13 +156,11 @@ class LfoNode extends AudioWorkletNode {
   get currentRate() {
     return this.rateParam.value;
   }
+
+  get defaultValue() {
+    return this.baseValue;
+  }
 }
 
 export default LfoNode;
 export { type LfoNodeMessage };
-
-function getParam<T extends string & {}>(node: AudioWorkletNode, name: T) {
-  const param = node.parameters.get(name);
-  if (!param) throw new Error(`Missing AudioParam "${name}"`);
-  return param;
-}

@@ -31,7 +31,7 @@ interface Queue {
 }
 
 class SessionManager {
-  readonly _clock: AudioClock;
+  readonly clock: AudioClock;
   private _midi: MIDIController | null;
 
   private _queue: Partial<Queue> | null;
@@ -49,7 +49,7 @@ class SessionManager {
   }
 
   constructor(ctx: AudioContext, bpm?: number) {
-    this._clock = new AudioClock(ctx, bpm);
+    this.clock = new AudioClock(ctx, bpm);
     this._midi = null;
     this._queue = null;
     this._instruments = new Set();
@@ -86,10 +86,10 @@ class SessionManager {
   precommit() {
     if (this._queue) {
       this._instruments.forEach((inst) =>
-        inst.stop(this._clock.nextBarStartTime),
+        inst.stop(this.clock.nextBarStartTime),
       );
       this._instruments.clear();
-      this.cleanupLfos(this._clock.nextBarStartTime);
+      this.cleanupLfos(this.clock.nextBarStartTime);
       this._midi?.clearObservers();
       this._listeners.clock.external.forEach((fn) => fn());
       this._listeners.clock.external.clear();
@@ -113,7 +113,7 @@ class SessionManager {
     }
     if (this._queue.listeners?.clock) {
       this._queue.listeners.clock.forEach((type, fn) => {
-        const clockCb = this._clock.on(type, fn);
+        const clockCb = this.clock.on(type, fn);
         this._listeners.clock.external.add(clockCb);
       });
     }
@@ -121,18 +121,18 @@ class SessionManager {
   }
 
   start() {
-    this._clock.start();
+    this.clock.start();
   }
 
   stop(when = 0.25) {
-    this._clock.stop();
+    this.clock.stop();
     // cleanup instruments
     this._instruments.forEach((inst) => {
       inst.onDestroy = () => this._instruments.delete(inst);
-      inst.stop(this._clock.ctx.currentTime, when);
+      inst.stop(this.clock.ctx.currentTime, when);
     });
     // cleanup lfos
-    this.cleanupLfos(this._clock.ctx.currentTime + when);
+    this.cleanupLfos(this.clock.ctx.currentTime + when);
     // cleanup midi
     this._midi?.clearObservers();
     this._midi?.clearRouters();
@@ -143,7 +143,7 @@ class SessionManager {
   }
 
   suspend() {
-    this._clock.ctx.suspend();
+    this.clock.ctx.suspend();
   }
 
   async checkMidiPermissions() {
@@ -174,8 +174,17 @@ class SessionManager {
     });
   }
 
-  get clock() {
-    return this._clock;
+  destroy() {
+    this.clock.destroy();
+    this._midi?.destroy();
+    this._midi = null;
+    this._queue = null;
+    this.instruments.clear();
+    this.cleanupLfos(this.clock.ctx.currentTime);
+    this._lfos.clear();
+    this._listeners.log.clear();
+    this._listeners.clock.external.clear();
+    this._listeners.clock.internal.clear();
   }
 
   get queue() {

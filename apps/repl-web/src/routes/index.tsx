@@ -41,7 +41,7 @@ function App() {
 
     return () => {
       controller.abort()
-      drome?.midi?.destroy()
+      drome?.destroy()
       editor.destroy()
     }
   }, [])

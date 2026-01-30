@@ -362,7 +362,7 @@ abstract class Instrument<T> {
     } else if (q instanceof LfoNode) {
       // TODO: Figure out what to do here
     } else {
-      console.warn("Invalid type:", q satisfies LfoNode | undefined);
+      q satisfies undefined;
     }
 
     return this;
@@ -456,7 +456,10 @@ abstract class Instrument<T> {
       this._audioNodes.clear();
     }
     if (this._signalChain.size) {
-      this._signalChain.forEach((node) => node.disconnect());
+      this._signalChain.forEach((node) => {
+        node.disconnect();
+        node.destroy();
+      });
       this._signalChain.clear();
     }
     if (this._midiRouter) {

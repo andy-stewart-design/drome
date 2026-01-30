@@ -1,4 +1,5 @@
 import AudioEndedEvent from "@/events/audio-ended";
+import { getParam } from "@/utils/audio-params";
 import type {
   AudioParamName,
   AudioParamData,
@@ -63,9 +64,3 @@ class SupersawNode extends AudioWorkletNode {
 }
 
 export default SupersawNode;
-
-function getParam<T extends string>(node: AudioWorkletNode, name: T) {
-  const param = node.parameters.get(name);
-  if (!param) throw new Error(`Missing AudioParam "${name}"`);
-  return param;
-}

@@ -8,7 +8,7 @@ import type { SampleBankSchema } from "@/utils/samples-validate";
 
 class SampleManager {
   private _ctx: AudioContext;
-  readonly sampleBanks: SampleBankSchema | null = null;
+  public sampleBanks: SampleBankSchema | null = null;
   readonly bufferCache: Map<string, AudioBuffer[]> = new Map();
   readonly reverbCache: Map<string, AudioBuffer> = new Map();
   readonly userSamples: Map<string, Map<string, string[]>> = new Map();
@@ -73,6 +73,13 @@ class SampleManager {
     });
 
     this.userSamples.set(bank, new Map(samples));
+  }
+
+  destroy() {
+    this.sampleBanks = null;
+    this.bufferCache.clear();
+    this.reverbCache.clear();
+    this.userSamples.clear();
   }
 }
 

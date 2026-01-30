@@ -19,36 +19,27 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   protected abstract _target: AudioParam | undefined;
   protected _defaultValue: number;
   protected _cycles: DromeArray<number>;
-  protected _lfo: LfoNode | undefined;
-  protected _env: Envelope | undefined;
-  protected _midiObserver: MIDIObserver<"controlchange"> | undefined;
+  protected _automation:
+    | LfoNode
+    | Envelope
+    | MIDIObserver<"controlchange">
+    | undefined;
 
   constructor(input: Automation, defaultValue = 1) {
     super();
 
     switch (true) {
-      case isEnv(input): {
-        this._defaultValue = input.startValue;
-        this._cycles = new DromeArray(this._defaultValue);
-        this._env = input;
-        break;
-      }
-      case isLfoNode(input): {
-        this._defaultValue = input.baseValue;
-        this._cycles = new DromeArray(this._defaultValue);
-        this._lfo = input;
-        break;
-      }
+      case isEnv(input):
+      case isLfoNode(input):
       case isObserver<"controlchange">(input):
-        this._defaultValue = input.currentValue;
+        this._defaultValue = input.defaultValue;
         this._cycles = new DromeArray(this._defaultValue);
-        this._midiObserver = input;
+        this._automation = input;
         break;
-      case isArray(input): {
+      case isArray(input):
         this._cycles = new DromeArray(0).note(...input);
         this._defaultValue = this._cycles.at(0, 0) ?? defaultValue;
         break;
-      }
       default:
         console.warn("Invalid input", input satisfies never);
         this._defaultValue = defaultValue;
@@ -67,19 +58,20 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
     const cycleIdx = currentBar % this._cycles.length;
 
     switch (true) {
-      case !!this._lfo:
-        this._lfo.connect(this._target);
+      case isLfoNode(this._automation):
+        this._automation.connect(this._target);
         break;
-      case !!this._env:
+      case isEnv(this._automation):
         for (let i = 0; i < notes.length; i++) {
           const note = notes[i];
           if (isNullish(note)) continue;
-          this._env.apply(this._target, note.start, note.duration, cycleIdx, i);
+          const { start, duration } = note;
+          this._automation.apply(this._target, start, duration, cycleIdx, i);
         }
         break;
-      case !!this._midiObserver:
-        this._target.setValueAtTime(this._midiObserver.currentValue, startTime);
-        this._midiObserver.onUpdate(({ value }) => {
+      case isObserver<"controlchange">(this._automation):
+        this._target.setValueAtTime(this._automation.currentValue, startTime);
+        this._automation.onUpdate(({ value }) => {
           this._target?.setValueAtTime(value, 0);
         });
         break;
@@ -97,12 +89,11 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
     this._input.disconnect();
   }
 
-  get effect() {
-    return this._effect;
-  }
-
-  get env() {
-    return this._env;
+  destroy() {
+    this._target = undefined;
+    this._automation = undefined;
+    this._cycles.clear();
+    this._defaultValue = 0;
   }
 
   get input() {

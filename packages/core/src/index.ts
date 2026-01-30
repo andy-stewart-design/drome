@@ -249,6 +249,15 @@ class Drome {
     return effect;
   }
 
+  destroy() {
+    this.context.close();
+    this.audioChannels.length = 0;
+    this._logs.length = 0;
+    this._suspendTimeoutId = undefined;
+    this._sessionManager.destroy();
+    this._sampleManager.destroy();
+  }
+
   get ctx() {
     return this.context;
   }

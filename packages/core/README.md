@@ -31,7 +31,7 @@ A web-based language for live coding music.
 [ ] Error handling (set up logging system)
 [ ] `instrument()` method (as wrapper for synth/sample)?
 [ ] Set root and scale on parent drome class
-[ ] Standardize interfaces for Envelopes, LFOs, and MIDIControllers
+[x] Standardize interfaces for Envelopes, LFOs, and MIDIControllers
 
 ### REPL
 [ ] Play/pause buttons

@@ -115,6 +115,10 @@ class MIDIOberserver<T extends MIDIObserverType> {
     return this._currentValue;
   }
 
+  get defaultValue() {
+    return this._currentValue;
+  }
+
   get identifier() {
     return this._identifier;
   }
