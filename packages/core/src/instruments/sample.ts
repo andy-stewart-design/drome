@@ -108,7 +108,7 @@ export default class Sample extends Instrument<number> {
         if (
           !buffer ||
           !isNumber(note?.value) ||
-          note.start < this.ctx.currentTime - 0.025
+          note.start < this.ctx.currentTime - 0.0375
         ) {
           return;
         }
