@@ -1,18 +1,25 @@
 import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
+import tailwindcss from '@tailwindcss/vite'
+
+import { tanstackStart } from '@tanstack/solid-start/plugin/vite'
+import solidPlugin from 'vite-plugin-solid'
 import { nitro } from 'nitro/vite'
 
-const config = defineConfig({
+import lucidePreprocess from 'vite-plugin-lucide-preprocess'
+
+export default defineConfig({
   plugins: [
+    lucidePreprocess(),
     devtools(),
     nitro(),
-    viteTsConfigPaths({ projects: ['./tsconfig.json'] }), // this is the plugin that enables path aliases
+    // this is the plugin that enables path aliases
+    viteTsConfigPaths({
+      projects: ['./tsconfig.json'],
+    }),
+    tailwindcss(),
     tanstackStart(),
-    viteReact(),
+    solidPlugin({ ssr: true }),
   ],
 })
-
-export default config
