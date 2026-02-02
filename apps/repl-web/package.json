@@ -26,10 +26,8 @@
     "@tanstack/solid-start": "^1.132.25",
     "codemirror": "^6.0.2",
     "drome-live": "workspace:*",
-    "lucide-solid": "^0.544.0",
     "nitro": "npm:nitro-nightly@latest",
     "solid-js": "^1.9.9",
-    "tailwindcss": "^4.0.6",
     "vite": "^7.1.7",
     "vite-plugin-lucide-preprocess": "^1.4.6",
     "vite-tsconfig-paths": "^5.1.4"
