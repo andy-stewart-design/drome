@@ -10,7 +10,7 @@
   --cm-editor-font-family: MDIO, Consolas, monospace;
   --cm-editor-line-height: 1.6;
   --cm-editor-padding-block-start: 4rem;
-  --cm-editor-padding-block-end: 50vw;
+  --cm-editor-padding-block-end: 50vh;
   --cm-editor-padding-inline: 1rem;
 
   --cm-cursor-fg: var(--color-cyan-200);
