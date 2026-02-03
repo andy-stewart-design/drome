@@ -20,10 +20,6 @@ function App() {
   onMount(async () => {
     const { default: Drome } = await import('drome-live')
 
-    const d = await Drome.init(120)
-    setDrome(d)
-    console.log(drome())
-
     const doc = localStorage.getItem(LS_KEY)
 
     const ed = new EditorView({
@@ -33,6 +29,9 @@ function App() {
     })
 
     setEditor(ed)
+
+    const d = await Drome.init(120)
+    setDrome(d)
 
     const { signal } = controller
     const handleKeyDown = (e: KeyboardEvent) => onkeyDown(e, drome(), editor())
@@ -46,8 +45,22 @@ function App() {
   })
 
   return (
-    <div>
-      <div ref={editorContainer}></div>
+    <div
+      style={{
+        display: 'grid',
+        'grid-template-columns': 'minmax(0,1fr) 320px',
+      }}
+    >
+      <div
+        ref={editorContainer}
+        style={{
+          display: 'grid',
+          width: '100%',
+          border: '2px solid red',
+          overflow: 'clip',
+          '--cm-editor-width': '100%',
+        }}
+      />
     </div>
   )
 }

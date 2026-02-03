@@ -44,7 +44,7 @@ body {
   margin: 0;
 }
 
-.header {
+/*.header {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -70,4 +70,4 @@ body {
   &:disabled {
     color: inherit;
   }
-}
+}*/
