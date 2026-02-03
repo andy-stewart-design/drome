@@ -1,12 +1,10 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { createSignal, onCleanup, onMount } from 'solid-js'
-
-import { basicSetup, EditorView } from 'codemirror'
-import { theme } from '@/codemirror/theme'
-import { javascript } from '@/codemirror/language'
-import { flash, flashField } from '@/codemirror/flash'
+import type { EditorView } from 'codemirror'
 import type Drome from 'drome-live'
-import '@/codemirror/theme-default.css'
+
+import CodeMirror from '@/components/CodeMirror'
+import { flash } from '@/codemirror/flash'
 
 export const Route = createFileRoute('/')({ component: App })
 const LS_KEY = 'drome_sketch'
@@ -14,27 +12,16 @@ const LS_KEY = 'drome_sketch'
 function App() {
   const [drome, setDrome] = createSignal<Drome | undefined>(undefined)
   const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
-  let editorContainer: HTMLDivElement | undefined
   const controller = new AbortController()
 
   onMount(async () => {
     const { default: Drome } = await import('drome-live')
 
-    const doc = localStorage.getItem(LS_KEY)
-
-    const ed = new EditorView({
-      doc: doc ?? 'd.sample("bd:3").bank("tr909").euclid([3, 5], 8)',
-      extensions: [basicSetup, theme, javascript(), flashField],
-      parent: editorContainer,
-    })
-
-    setEditor(ed)
-
     const d = await Drome.init(120)
     setDrome(d)
 
     const { signal } = controller
-    const handleKeyDown = (e: KeyboardEvent) => onkeyDown(e, drome(), editor())
+    const handleKeyDown = (e: KeyboardEvent) => onKeyDown(e, drome(), editor())
     window.addEventListener('keydown', handleKeyDown, { signal })
   })
 
@@ -48,19 +35,10 @@ function App() {
     <div
       style={{
         display: 'grid',
-        'grid-template-columns': 'minmax(0,1fr) 320px',
+        'grid-template-columns': 'minmax(0,1fr) var(--app-sidebar-width)',
       }}
     >
-      <div
-        ref={editorContainer}
-        style={{
-          display: 'grid',
-          width: '100%',
-          border: '2px solid red',
-          overflow: 'clip',
-          '--cm-editor-width': '100%',
-        }}
-      />
+      <CodeMirror onLoad={setEditor} />
     </div>
   )
 }
@@ -81,7 +59,7 @@ function runCode(drome: Drome, code: string) {
   }
 }
 
-function onkeyDown(e: KeyboardEvent, drome?: Drome, editor?: EditorView) {
+function onKeyDown(e: KeyboardEvent, drome?: Drome, editor?: EditorView) {
   if (!drome || !editor) return
 
   if (e.altKey && e.key === 'Enter') {

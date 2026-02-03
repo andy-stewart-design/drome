@@ -1,0 +1,7 @@
+.container {
+  --cm-editor-width: calc(100vw - var(--app-sidebar-width));
+
+  display: grid;
+  width: 100%;
+  overflow: clip;
+}
