@@ -1,24 +1,33 @@
-const DATABASE_NAME = 'todoDatabase'
-const STORE_NAME = 'todos'
+import { z } from 'zod'
+
+const DATABASE_NAME = 'dromeSketchDB'
+const STORE_NAME = 'sketches'
 const DB_VERSION = 1
 
-export interface CreatedTodo {
-  task: string
-  completed: boolean
-}
+const rawSketchSchema = z.object({
+  code: z.string(),
+  author: z.string(),
+  title: z.string(),
+})
 
-export interface SavedTodo extends CreatedTodo {
-  id: number
-}
+const savedSketchSchema = rawSketchSchema.extend({
+  id: z.number(),
+})
+
+const savedSketchesSchema = z.array(savedSketchSchema)
+
+type RawSketch = z.infer<typeof rawSketchSchema>
+type SavedSketch = z.infer<typeof savedSketchSchema>
 
 type TransactionType = 'readonly' | 'readwrite'
 
-const initDB = async (): Promise<IDBDatabase> => {
-  return new Promise((resolve, reject) => {
+const initDB = async () => {
+  return new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(DATABASE_NAME, DB_VERSION)
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result
+
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, {
           keyPath: 'id',
@@ -38,42 +47,67 @@ async function getStore(type: TransactionType) {
   return transaction.objectStore(STORE_NAME)
 }
 
-export const getTodos = async (): Promise<SavedTodo[]> => {
+type GetSketchesReturnValue =
+  | { success: true; data: any[] }
+  | { success: false; error: string }
+
+export const getSketches = async () => {
   const store = await getStore('readonly')
 
-  return new Promise((resolve, reject) => {
+  const results = await new Promise<GetSketchesReturnValue>((resolve) => {
     const request = store.getAll()
-    request.onsuccess = () => resolve(request.result)
-    request.onerror = () => reject(request.error)
+
+    request.onsuccess = () => {
+      resolve({ success: true, data: request.result })
+    }
+
+    request.onerror = () => {
+      const error = request.error?.message ?? 'Unknown error'
+      resolve({ success: false, error })
+    }
+  })
+
+  if (!results.success) {
+    console.error(results.error)
+    return null
+  }
+
+  const parsed = savedSketchesSchema.safeParse(results.data)
+
+  if (!parsed.success) {
+    console.error(parsed.error)
+    return null
+  }
+
+  return parsed.data
+}
+
+export const addSketch = async (sketch: RawSketch) => {
+  const store = await getStore('readwrite')
+
+  return new Promise<DOMException | null>((resolve) => {
+    const request = store.add(sketch)
+    request.onsuccess = () => resolve(null)
+    request.onerror = () => resolve(request.error)
   })
 }
 
-export const addTodo = async (todo: CreatedTodo): Promise<void> => {
+export const deleteSketch = async (id: number) => {
   const store = await getStore('readwrite')
 
-  return new Promise((resolve, reject) => {
-    const request = store.add(todo)
-    request.onsuccess = () => resolve()
-    request.onerror = () => reject(request.error)
-  })
-}
-
-export const deleteTodo = async (id: number): Promise<void> => {
-  const store = await getStore('readwrite')
-
-  return new Promise((resolve, reject) => {
+  return new Promise<DOMException | null>((resolve) => {
     const request = store.delete(id)
-    request.onsuccess = () => resolve()
-    request.onerror = () => reject(request.error)
+    request.onsuccess = () => resolve(null)
+    request.onerror = () => resolve(request.error)
   })
 }
 
-export const updateTodo = async (updatedTodo: SavedTodo): Promise<void> => {
+export const updateSketch = async (updatedTodo: SavedSketch) => {
   const store = await getStore('readwrite')
 
-  return new Promise((resolve, reject) => {
+  return new Promise<DOMException | null>((resolve) => {
     const request = store.put(updatedTodo)
-    request.onsuccess = () => resolve()
-    request.onerror = () => reject(request.error)
+    request.onsuccess = () => resolve(null)
+    request.onerror = () => resolve(request.error)
   })
 }
