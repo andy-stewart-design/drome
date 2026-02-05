@@ -1,4 +1,4 @@
-import { onMount } from 'solid-js'
+import { createEffect, onMount } from 'solid-js'
 
 import { basicSetup, EditorView } from 'codemirror'
 import { theme } from '@/codemirror/theme'
@@ -7,22 +7,39 @@ import { flashField } from '@/codemirror/flash'
 
 import s from './style.module.css'
 import '@/codemirror/theme-default.css'
+import { workingSketchSchema, type WorkingSketch } from '@/utils/indexdb'
 
-const LS_KEY = 'drome_sketch'
+interface Props {
+  editor: () => EditorView | undefined
+  sketch: () => WorkingSketch
+  onLoad: (ed: EditorView) => void
+}
 
-function CodeMirror({ onLoad }: { onLoad: (ed: EditorView) => {} }) {
+function CodeMirror({ editor, onLoad, sketch }: Props) {
   let editorContainer: HTMLDivElement | undefined
 
   onMount(() => {
-    const doc = localStorage.getItem(LS_KEY)
-
     const ed = new EditorView({
-      doc: doc ?? 'd.sample("bd:3").bank("tr909").euclid([3, 5], 8)',
+      doc: '',
       extensions: [basicSetup, theme, javascript(), flashField],
       parent: editorContainer,
     })
 
     onLoad(ed)
+  })
+
+  createEffect(() => {
+    const ed = editor()
+    if (!ed) return
+    console.log('Sketch update', sketch())
+
+    ed.dispatch({
+      changes: {
+        from: 0,
+        to: ed.state.doc.length,
+        insert: sketch().code,
+      },
+    })
   })
 
   return <div ref={editorContainer} class={s.container} />
