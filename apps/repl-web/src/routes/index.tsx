@@ -16,19 +16,18 @@ import {
   updateSketch,
   getSketches,
   deleteSketch,
-  // workingSketchSchema,
   type SavedSketch,
   type WorkingSketch,
 } from '@/utils/indexdb'
 import { userSchema, type DromeUser } from '@/utils/user'
 
 export const Route = createFileRoute('/')({ component: App })
-// const LS_WORKING_SKETCH_KEY = 'drome_sketch'
 const LS_USER_KEY = 'drome_user'
 
 function App() {
   const [drome, setDrome] = createSignal<Drome | undefined>(undefined)
   const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
+  const [user, setUser] = createSignal<DromeUser>(createUser())
   const [workingSketch, setWorkingSketch] =
     createSignal<WorkingSketch>(createSketch())
   const [savedSketches, setSavedSketches] = createSignal<SavedSketch[]>([])
@@ -40,16 +39,23 @@ function App() {
       .then((d) => setDrome(d))
 
     getSketches().then((sketches) => {
-      if (sketches) setSavedSketches(sketches)
+      if (sketches) setSavedSketches(sortSketches(sketches))
       const sketch = loadLatestWorkingSketch(sketches)
       setWorkingSketch(sketch)
     })
 
-    // console.log(getUserData())
+    const cachedUser = getUserData()
+    if (cachedUser) {
+      setUser(cachedUser)
+      localStorage.setItem(LS_USER_KEY, JSON.stringify(cachedUser))
+    } else {
+      localStorage.setItem(LS_USER_KEY, JSON.stringify(user()))
+    }
+
     const { signal } = controller
 
     const handleKeyDown = (e: KeyboardEvent) =>
-      onKeyDown(e, workingSketch(), setWorkingSketch, drome(), editor())
+      onKeyDown(e, setWorkingSketch, drome(), editor())
 
     const handleUnload = (e: Event) =>
       beforeClose(workingSketch(), savedSketches(), e)
@@ -71,8 +77,31 @@ function App() {
         'grid-template-columns': 'minmax(0,1fr) var(--app-sidebar-width)',
       }}
     >
-      <CodeMirror editor={editor} sketch={workingSketch} onLoad={setEditor} />
-      <div>
+      <div
+        style={{
+          // border: '2px solid red',
+          width: '100%',
+          height: '100dvh',
+          display: 'flex',
+          'flex-direction': 'column',
+        }}
+      >
+        <details>
+          <summary>sketch metadata</summary>
+          <p>Title: {workingSketch().title}</p>
+          <p>Author: {workingSketch().author}</p>
+          <p>Last Saved: {workingSketch().updatedAt}</p>
+        </details>
+        <CodeMirror editor={editor} sketch={workingSketch} onLoad={setEditor} />
+      </div>
+      <div style={{ overflow: 'auto', 'overscroll-behavior': 'contain' }}>
+        <button
+          onClick={() => {
+            setWorkingSketch(createSketch({ author: user().name }))
+          }}
+        >
+          New
+        </button>
         <button
           onClick={async () => {
             const ed = editor()
@@ -84,19 +113,27 @@ function App() {
             if (result.success) {
               setWorkingSketch(result.data)
               const sketches = await getSketches()
-              if (sketches) setSavedSketches(sketches)
+              if (sketches) setSavedSketches(sortSketches(sketches))
             }
           }}
         >
           Save
         </button>
-        <ul style={{ padding: 0, 'list-style': 'none' }}>
+
+        <ul style={{ padding: 0, margin: 0, 'list-style': 'none' }}>
           <For each={savedSketches()}>
             {(item) => (
               <li style={{ display: 'flex' }}>
                 <div>
-                  <p>
-                    <span style={{ 'font-size': '13px' }}>{item.title}</span>
+                  <p style={{ margin: 0 }}>
+                    <button
+                      style={{ 'font-size': '13px' }}
+                      onClick={() => {
+                        setWorkingSketch(item)
+                      }}
+                    >
+                      {item.title}
+                    </button>
                     <span style={{ 'font-size': '13px', opacity: 0.6 }}>
                       {item.author}
                     </span>
@@ -117,6 +154,23 @@ function App() {
         </ul>
       </div>
     </div>
+    // <div
+    //   style={{
+    //     display: 'grid',
+    //     'grid-template-columns': 'minmax(0,1fr) var(--app-sidebar-width)',
+    //   }}
+    // >
+    //   <div>
+    //     <details>
+    //       <summary>sketch metadata</summary>
+    //       <p>Title: {workingSketch().title}</p>
+    //       <p>Author: {workingSketch().author}</p>
+    //       <p>Last Saved: {workingSketch().updatedAt}</p>
+    //     </details>
+    //     <CodeMirror editor={editor} sketch={workingSketch} onLoad={setEditor} />
+    //   </div>
+
+    // </div>
   )
 }
 
@@ -138,7 +192,6 @@ function runCode(drome: Drome, code: string) {
 
 function onKeyDown(
   e: KeyboardEvent,
-  sketch: WorkingSketch,
   setSketch: Setter<WorkingSketch>,
   drome?: Drome,
   editor?: EditorView,
@@ -152,9 +205,6 @@ function onKeyDown(
     setSketch((s) => ({ ...s, code }))
     flash(editor)
     if (drome.paused) drome.start()
-
-    // localStorage.setItem(LS_KEY, editor.state.doc.toString())
-    // saveWorkingSketchLS({ ...sketch, code: editor.state.doc.toString() })
   } else if (e.altKey && e.key === '≥') {
     e.preventDefault()
     drome.stop()
@@ -173,10 +223,6 @@ function beforeClose(working: WorkingSketch, saved: SavedSketch[], e: Event) {
   }
 }
 
-// function saveWorkingSketchLS(workingSketch: WorkingSketch) {
-//   localStorage.setItem(LS_WORKING_SKETCH_KEY, JSON.stringify(workingSketch))
-// }
-
 async function saveWorkingSketch(sketch: WorkingSketch) {
   let res: Awaited<ReturnType<typeof updateSketch>>
 
@@ -186,8 +232,6 @@ async function saveWorkingSketch(sketch: WorkingSketch) {
     res = await addSketch(sketch)
   }
 
-  // if (res.success) saveWorkingSketchLS(res.data)
-
   return res
 }
 
@@ -196,11 +240,6 @@ function loadLatestWorkingSketch(
 ): WorkingSketch {
   if (!sketches) return createSketch()
   return getMostRecentSketch(sketches)
-  // const sketch = localStorage.getItem(LS_WORKING_SKETCH_KEY)
-  // if (!sketch) return createSketch()
-  // const parsed = workingSketchSchema.safeParse(JSON.parse(sketch))
-  // if (!parsed.success) return createSketch()
-  // return parsed.data
 }
 
 function createSketch({
@@ -220,7 +259,7 @@ function createSketch({
     style: 'capital',
   })
   const a = author ?? `Anonymous ${randomAnimal}`
-  const c = code ?? 'd.synth("sine").note(60).push()'
+  const c = code ?? ''
 
   return {
     title: t,
@@ -246,10 +285,10 @@ function sortSketches(sketches: SavedSketch[]) {
 
 function getUserData() {
   const user = localStorage.getItem(LS_USER_KEY)
-  if (!user) return createUser()
+  if (!user) return null
 
   const parsed = userSchema.safeParse(JSON.parse(user))
-  if (!parsed.success) return createUser()
+  if (!parsed.success) return null
 
   return parsed.data
 }
@@ -266,6 +305,5 @@ function createUser() {
     id: crypto.randomUUID(),
   }
 
-  localStorage.setItem(LS_USER_KEY, JSON.stringify(user))
   return user
 }

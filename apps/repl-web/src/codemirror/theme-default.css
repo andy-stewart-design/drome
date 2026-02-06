@@ -9,15 +9,15 @@
   --cm-editor-font-size: 14px;
   --cm-editor-font-family: MDIO, Consolas, monospace;
   --cm-editor-line-height: 1.6;
-  --cm-editor-padding-block-start: 4rem;
+  --cm-editor-padding-block-start: 0.75rem;
   --cm-editor-padding-block-end: 50vh;
   --cm-editor-padding-inline: 1rem;
 
   --cm-cursor-fg: var(--color-cyan-200);
   --cm-cursor-width: 1.2px;
 
-  --cm-scrollbar-width: 8px;
-  --cm-scrollbar-height: 8px;
+  --cm-scrollbar-width: 5px;
+  --cm-scrollbar-height: 5px;
   --cm-scrollbar-color-bg: var(--color-neutral-900);
   --cm-scrollbar-thumb-color-bg: var(--color-neutral-800);
   --cm-scrollbar-thumb-hover-color-bg: var(--color-neutral-700);

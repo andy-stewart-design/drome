@@ -20,7 +20,7 @@ function CodeMirror({ editor, onLoad, sketch }: Props) {
 
   onMount(() => {
     const ed = new EditorView({
-      doc: '',
+      doc: sketch().code,
       extensions: [basicSetup, theme, javascript(), flashField],
       parent: editorContainer,
     })
