@@ -4,7 +4,7 @@ const DATABASE_NAME = 'dromeSketchDB'
 const STORE_NAME = 'sketches'
 const DB_VERSION = 1
 
-const rawSketchSchema = z.object({
+const sketchSchema = z.object({
   code: z.string(),
   author: z.string(),
   title: z.string(),
@@ -12,19 +12,19 @@ const rawSketchSchema = z.object({
   updatedAt: z.string(),
 })
 
-const savedSketchSchema = rawSketchSchema.extend({
+const savedSketchSchema = sketchSchema.extend({
   id: z.number(),
 })
 
-const workingSketchSchema = rawSketchSchema.extend({
+const workingSketchSchema = sketchSchema.extend({
   id: z.number().optional(),
 })
 
 const savedSketchesSchema = z.array(savedSketchSchema)
 
-type RawSketch = z.infer<typeof rawSketchSchema>
+type NewSketch = z.infer<typeof sketchSchema>
 type SavedSketch = z.infer<typeof savedSketchSchema>
-type WorkingSketch = RawSketch | SavedSketch
+type WorkingSketch = NewSketch | SavedSketch
 type TransactionType = 'readonly' | 'readwrite'
 
 const initDB = async () => {
@@ -119,13 +119,43 @@ const getSketch = async (id: number) => {
   return parsed.data
 }
 
-const addSketch = async (sketch: RawSketch) => {
+type CRUDReturnValue =
+  | { success: true; data: SavedSketch }
+  | { success: false; error: string }
+
+const addSketch = async (sketch: NewSketch) => {
   const store = await getStore('readwrite')
 
-  return new Promise<DOMException | null>((resolve) => {
+  return new Promise<CRUDReturnValue>((resolve) => {
     const request = store.add(sketch)
-    request.onsuccess = () => resolve(null)
-    request.onerror = () => resolve(request.error)
+
+    request.onsuccess = () => {
+      const id =
+        typeof request.result === 'number'
+          ? request.result
+          : Number(request.result)
+      resolve({ success: true, data: { ...sketch, id } })
+    }
+
+    request.onerror = () => {
+      const error = request.error?.message ?? 'Unknown error'
+      resolve({ success: false, error })
+    }
+  })
+}
+
+const updateSketch = async (sketch: SavedSketch) => {
+  const store = await getStore('readwrite')
+
+  return new Promise<CRUDReturnValue>((resolve) => {
+    const request = store.put(sketch)
+
+    request.onsuccess = () => resolve({ success: true, data: sketch })
+
+    request.onerror = () => {
+      const error = request.error?.message ?? 'Unknown error'
+      resolve({ success: false, error })
+    }
   })
 }
 
@@ -139,16 +169,6 @@ const deleteSketch = async (id: number) => {
   })
 }
 
-const updateSketch = async (updatedTodo: SavedSketch) => {
-  const store = await getStore('readwrite')
-
-  return new Promise<DOMException | null>((resolve) => {
-    const request = store.put(updatedTodo)
-    request.onsuccess = () => resolve(null)
-    request.onerror = () => resolve(request.error)
-  })
-}
-
 export {
   addSketch,
   deleteSketch,
@@ -156,7 +176,7 @@ export {
   getSketches,
   updateSketch,
   workingSketchSchema,
-  type RawSketch,
+  type NewSketch,
   type SavedSketch,
   type WorkingSketch,
 }

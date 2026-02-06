@@ -7,7 +7,7 @@ import { flashField } from '@/codemirror/flash'
 
 import s from './style.module.css'
 import '@/codemirror/theme-default.css'
-import { workingSketchSchema, type WorkingSketch } from '@/utils/indexdb'
+import { type WorkingSketch } from '@/utils/indexdb'
 
 interface Props {
   editor: () => EditorView | undefined
@@ -31,14 +31,9 @@ function CodeMirror({ editor, onLoad, sketch }: Props) {
   createEffect(() => {
     const ed = editor()
     if (!ed) return
-    console.log('Sketch update', sketch())
 
     ed.dispatch({
-      changes: {
-        from: 0,
-        to: ed.state.doc.length,
-        insert: sketch().code,
-      },
+      changes: { from: 0, to: ed.state.doc.length, insert: sketch().code },
     })
   })
 

@@ -28,6 +28,7 @@
     "drome-live": "workspace:*",
     "nitro": "npm:nitro-nightly@latest",
     "solid-js": "^1.9.9",
+    "unique-names-generator": "^4.7.1",
     "vite": "^7.1.7",
     "vite-plugin-lucide-preprocess": "^1.4.6",
     "vite-tsconfig-paths": "^5.1.4",
