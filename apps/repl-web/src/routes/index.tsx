@@ -19,6 +19,8 @@ import { userSchema, type DromeUser } from '@/utils/user'
 import SketchMetadata from '@/components/SketchMetadata'
 import SketchManager from '@/components/SketchManager'
 import SidebarResizer from '@/components/SidebarResizer'
+import EditorHeader from '@/components/EditorHeader'
+import EditorToolbar from '@/components/EditorToolbar'
 
 export const Route = createFileRoute('/')({ component: App })
 const LS_USER_KEY = 'drome_user'
@@ -30,6 +32,10 @@ function App() {
   const [workingSketch, setWorkingSketch] =
     createSignal<WorkingSketch>(createSketch())
   const [savedSketches, setSavedSketches] = createSignal<SavedSketch[]>([])
+
+  const [showSidebar, setShowSidebar] = createSignal(true)
+  const [sidebarSize, setSidebarSize] = createSignal(360)
+
   const controller = new AbortController()
 
   onMount(() => {
@@ -73,23 +79,26 @@ function App() {
     <div
       style={{
         display: 'grid',
-        'grid-template-columns': 'minmax(0,1fr) var(--app-sidebar-width)',
+        'grid-template-columns': `minmax(0,1fr) ${showSidebar() ? sidebarSize() : 0}px`,
       }}
     >
       <div
         style={{
-          // border: '2px solid red',
           width: '100%',
           height: '100dvh',
           display: 'flex',
           'flex-direction': 'column',
         }}
       >
-        <SketchMetadata sketch={workingSketch} />
+        <EditorHeader>
+          <SketchMetadata sketch={workingSketch} />
+          <EditorToolbar onToggleSidebar={() => setShowSidebar((c) => !c)} />
+        </EditorHeader>
         <CodeMirror editor={editor} sketch={workingSketch} onLoad={setEditor} />
       </div>
       <div
         style={{
+          display: showSidebar() ? 'block' : 'none',
           position: 'relative',
           overflow: 'auto',
           'overscroll-behavior': 'contain',
@@ -124,7 +133,7 @@ function App() {
             if (sketches) setSavedSketches(sketches)
           }}
         />
-        <SidebarResizer />
+        <SidebarResizer onResize={(n) => setSidebarSize(n)} />
       </div>
     </div>
   )

@@ -1,0 +1,15 @@
+.toolbar {
+  width: max-content;
+  height: max-content;
+  padding: 0.375rem;
+  padding-inline-end: 1rem;
+  justify-self: end;
+
+  button {
+    display: flex;
+    padding: 0.25rem;
+    background: none;
+    border: none;
+    border-radius: 0.25rem;
+  }
+}

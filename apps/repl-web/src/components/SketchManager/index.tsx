@@ -37,7 +37,7 @@ function SketchManager({
               <button
                 classList={clst(s.button, s.primary)}
                 onClick={() => onReplace(sketch)}
-                data-currentz={currentSketch().title === sketch.title}
+                data-current={currentSketch().title === sketch.title}
               >
                 <p>{sketch.title}</p>
                 <p>{sketch.author}</p>

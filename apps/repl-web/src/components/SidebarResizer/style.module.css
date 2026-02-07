@@ -4,10 +4,6 @@
   left: 0;
   bottom: 0;
   width: 8px;
+  cursor: col-resize;
   background: transparent;
-  cursor: ew-resize;
-
-  &:is(:hover, [data-dragging='true']) {
-    background: rgb(var(--color-neutral-50-rgb) / 0.15);
-  }
 }

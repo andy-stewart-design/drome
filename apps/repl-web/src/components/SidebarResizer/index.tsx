@@ -1,7 +1,11 @@
 import { createSignal, onMount } from 'solid-js'
 import s from './style.module.css'
 
-function SidebarResizer() {
+interface Props {
+  onResize(n: number): void
+}
+
+function SidebarResizer({ onResize }: Props) {
   const [dragging, setDragging] = createSignal(false)
   const controller = new AbortController()
 
@@ -10,10 +14,7 @@ function SidebarResizer() {
       'pointermove',
       (e) => {
         if (dragging()) {
-          document.documentElement.style.setProperty(
-            '--app-sidebar-width',
-            `${window.innerWidth - e.clientX}px`,
-          )
+          onResize(window.innerWidth - e.clientX)
         }
       },
       {
