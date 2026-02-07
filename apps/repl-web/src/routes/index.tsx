@@ -20,6 +20,7 @@ import {
   type WorkingSketch,
 } from '@/utils/indexdb'
 import { userSchema, type DromeUser } from '@/utils/user'
+import SketchMetadata from '@/components/SketchMetadata'
 
 export const Route = createFileRoute('/')({ component: App })
 const LS_USER_KEY = 'drome_user'
@@ -86,12 +87,7 @@ function App() {
           'flex-direction': 'column',
         }}
       >
-        <details>
-          <summary>sketch metadata</summary>
-          <p>Title: {workingSketch().title}</p>
-          <p>Author: {workingSketch().author}</p>
-          <p>Last Saved: {workingSketch().updatedAt}</p>
-        </details>
+        <SketchMetadata sketch={workingSketch} />
         <CodeMirror editor={editor} sketch={workingSketch} onLoad={setEditor} />
       </div>
       <div style={{ overflow: 'auto', 'overscroll-behavior': 'contain' }}>

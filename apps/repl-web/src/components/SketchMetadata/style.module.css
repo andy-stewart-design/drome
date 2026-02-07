@@ -1,0 +1,43 @@
+.details {
+  border-bottom: 1px solid rgb(255 255 255 / 0.15);
+  padding-inline: 1.25rem;
+  font-size: 0.875rem;
+
+  & > summary {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    list-style: none;
+    user-select: none;
+    padding-block: 0.625rem;
+
+    &::marker {
+      display: none;
+    }
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  &[open] svg {
+    rotate: 90deg;
+  }
+}
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.625rem;
+  padding-inline-start: 1.425rem;
+  padding-block-end: 1rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.date {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
