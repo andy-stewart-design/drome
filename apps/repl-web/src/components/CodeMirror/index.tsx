@@ -7,7 +7,7 @@ import { flashField } from '@/codemirror/flash'
 
 import s from './style.module.css'
 import '@/codemirror/theme-default.css'
-import { type WorkingSketch } from '@/utils/indexdb'
+import { type WorkingSketch } from '@/utils/sketch-db'
 
 interface Props {
   editor: () => EditorView | undefined

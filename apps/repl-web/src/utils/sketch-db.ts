@@ -1,3 +1,9 @@
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  colors,
+  animals,
+} from 'unique-names-generator'
 import { z } from 'zod'
 
 const DATABASE_NAME = 'dromeSketchDB'
@@ -25,7 +31,16 @@ const savedSketchesSchema = z.array(savedSketchSchema)
 type NewSketch = z.infer<typeof sketchSchema>
 type SavedSketch = z.infer<typeof savedSketchSchema>
 type WorkingSketch = NewSketch | SavedSketch
+
 type TransactionType = 'readonly' | 'readwrite'
+
+type IDBReturnValue =
+  | { success: true; data: any }
+  | { success: false; error: string }
+
+type CRUDReturnValue =
+  | { success: true; data: SavedSketch }
+  | { success: false; error: string }
 
 const initDB = async () => {
   return new Promise<IDBDatabase>((resolve, reject) => {
@@ -52,10 +67,6 @@ async function getStore(type: TransactionType) {
   const transaction = db.transaction(STORE_NAME, type)
   return transaction.objectStore(STORE_NAME)
 }
-
-type IDBReturnValue =
-  | { success: true; data: any }
-  | { success: false; error: string }
 
 const getSketches = async () => {
   const store = await getStore('readonly')
@@ -85,7 +96,7 @@ const getSketches = async () => {
     return null
   }
 
-  return parsed.data
+  return sortSketches(parsed.data)
 }
 
 const getSketch = async (id: number) => {
@@ -118,10 +129,6 @@ const getSketch = async (id: number) => {
 
   return parsed.data
 }
-
-type CRUDReturnValue =
-  | { success: true; data: SavedSketch }
-  | { success: false; error: string }
 
 const addSketch = async (sketch: NewSketch) => {
   const store = await getStore('readwrite')
@@ -169,11 +176,68 @@ const deleteSketch = async (id: number) => {
   })
 }
 
+function createSketch({
+  code,
+  title,
+  author,
+}: { code?: string; title?: string; author?: string } = {}): WorkingSketch {
+  const t =
+    title ??
+    uniqueNamesGenerator({
+      dictionaries: [adjectives, colors, animals],
+      separator: ' ',
+      style: 'capital',
+    })
+  const randomAnimal = uniqueNamesGenerator({
+    dictionaries: [animals],
+    style: 'capital',
+  })
+  const a = author ?? `Anonymous ${randomAnimal}`
+  const c = code ?? ''
+
+  return {
+    title: t,
+    author: a,
+    code: c,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+}
+
+async function saveSketch(sketch: WorkingSketch) {
+  let res: Awaited<ReturnType<typeof updateSketch>>
+
+  if ('id' in sketch) {
+    res = await updateSketch({ ...sketch, updatedAt: new Date().toISOString() })
+  } else {
+    res = await addSketch(sketch)
+  }
+
+  return res
+}
+
+function getLatestSketch(sketches: SavedSketch[] | null) {
+  if (!sketches) return createSketch()
+  return sketches.reduce((latest, current) =>
+    new Date(current.updatedAt) > new Date(latest.updatedAt) ? current : latest,
+  )
+}
+
+function sortSketches(sketches: SavedSketch[]) {
+  // TODO: Replace with Array.toSorted
+  return [...sketches].sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+  )
+}
+
 export {
   addSketch,
+  createSketch,
   deleteSketch,
+  getLatestSketch,
   getSketch,
   getSketches,
+  saveSketch,
   updateSketch,
   workingSketchSchema,
   type NewSketch,

@@ -1,4 +1,4 @@
-import type { WorkingSketch } from '@/utils/indexdb'
+import type { WorkingSketch } from '@/utils/sketch-db'
 import { createSignal, type Accessor } from 'solid-js'
 import s from './style.module.css'
 
