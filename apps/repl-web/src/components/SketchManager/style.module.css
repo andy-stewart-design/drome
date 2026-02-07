@@ -13,12 +13,12 @@
   display: flex;
 
   &:not(:last-of-type) {
-    border-block-end: 1px solid rgb(255 255 255 / 0.15);
+    border-block-end: 1px solid var(--border-subtle);
   }
 
   &:is(:hover, :focus-visible),
   &:has(:hover, :focus-visible) {
-    background: rgb(255 255 255 / 0.1);
+    background: rgb(var(--color-neutral-50-rgb) / 0.1);
   }
 }
 
@@ -30,10 +30,13 @@
 }
 
 .tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   padding: 0.5rem;
 
   .toolbar:has(:hover, :focus-visible) &:not(:hover, :focus-visible) {
-    opacity: 0.5;
+    color: var(--color-fg-tertiary);
   }
 }
 
@@ -46,10 +49,10 @@
   text-align: left;
   padding-block: 1rem;
   padding-inline: 0.875rem 1rem;
-  border-inline-start: 0.125rem solid var(--border-color);
+  border-inline-start: 0.125rem solid var(--border-color, transparent);
 
   &[data-current='true'] {
-    --border-color: rgb(255 255 255);
+    --border-color: var(--border-strong);
   }
 
   p {
@@ -61,18 +64,22 @@
   }
 
   &:not(:hover, :focus-visible) p:last-of-type {
-    opacity: 0.6;
+    color: var(--color-fg-tertiary);
   }
 }
 
 .delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 1rem;
 
   .item:not(:hover, :focus-visible) &:not(:hover, :focus-visible) {
     opacity: 0;
   }
 
-  &:not(:hover, :focus-visible) {
-    opacity: 0.5;
+  .item:has(:hover, :focus-visible) &:not(:hover, :focus-visible) {
+    opacity: 1;
+    color: var(--color-fg-tertiary);
   }
 }
