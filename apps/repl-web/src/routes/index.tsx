@@ -18,6 +18,7 @@ import {
 import { userSchema, type DromeUser } from '@/utils/user'
 import SketchMetadata from '@/components/SketchMetadata'
 import SketchManager from '@/components/SketchManager'
+import SidebarResizer from '@/components/SidebarResizer'
 
 export const Route = createFileRoute('/')({ component: App })
 const LS_USER_KEY = 'drome_user'
@@ -89,6 +90,7 @@ function App() {
       </div>
       <div
         style={{
+          position: 'relative',
           overflow: 'auto',
           'overscroll-behavior': 'contain',
           'border-inline-start': '1px solid rgb(255 255 255 / 0.15);',
@@ -122,6 +124,7 @@ function App() {
             if (sketches) setSavedSketches(sketches)
           }}
         />
+        <SidebarResizer />
       </div>
     </div>
   )

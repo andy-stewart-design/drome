@@ -1,0 +1,13 @@
+.resizer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 8px;
+  background: transparent;
+  cursor: ew-resize;
+
+  &:is(:hover, [data-dragging='true']) {
+    background: rgb(var(--color-neutral-50-rgb) / 0.15);
+  }
+}
