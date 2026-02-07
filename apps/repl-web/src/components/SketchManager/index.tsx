@@ -1,8 +1,10 @@
 import { For, type Accessor } from 'solid-js'
-import type { SavedSketch } from '@/utils/sketch-db'
+import type { SavedSketch, WorkingSketch } from '@/utils/sketch-db'
+import s from './style.module.css'
 
 interface Props {
   sketches: Accessor<SavedSketch[]>
+  currentSketch: Accessor<WorkingSketch>
   onCreateNew(): void
   onReplace(sketch: SavedSketch): void
   onSave(): Promise<void>
@@ -11,6 +13,7 @@ interface Props {
 
 function SketchManager({
   sketches,
+  currentSketch,
   onCreateNew,
   onReplace,
   onSave,
@@ -18,27 +21,33 @@ function SketchManager({
 }: Props) {
   return (
     <div>
-      <button onClick={onCreateNew}>New</button>
-      <button onClick={onSave}>Save</button>
+      <div class={s.toolbar}>
+        <button classList={clst(s.button, s.tool)} onClick={onSave}>
+          Save
+        </button>
+        <button classList={clst(s.button, s.tool)} onClick={onCreateNew}>
+          + New
+        </button>
+      </div>
 
-      <ul style={{ padding: 0, margin: 0, 'list-style': 'none' }}>
+      <ul class={s.list}>
         <For each={sketches()}>
           {(sketch) => (
-            <li style={{ display: 'flex' }}>
-              <div>
-                <p style={{ margin: 0 }}>
-                  <button
-                    style={{ 'font-size': '13px' }}
-                    onClick={() => onReplace(sketch)}
-                  >
-                    {sketch.title}
-                  </button>
-                  <span style={{ 'font-size': '13px', opacity: 0.6 }}>
-                    {sketch.author}
-                  </span>
-                </p>
-              </div>
-              <button onClick={() => onDelete(sketch.id)}>✕</button>
+            <li class={s.item}>
+              <button
+                classList={clst(s.button, s.primary)}
+                onClick={() => onReplace(sketch)}
+                data-current={currentSketch().title === sketch.title}
+              >
+                <p>{sketch.title}</p>
+                <p>{sketch.author}</p>
+              </button>
+              <button
+                classList={clst(s.button, s.delete)}
+                onClick={() => onDelete(sketch.id)}
+              >
+                ✕
+              </button>
             </li>
           )}
         </For>
@@ -48,3 +57,7 @@ function SketchManager({
 }
 
 export default SketchManager
+
+function clst(...classNames: string[]) {
+  return Object.fromEntries(classNames.map((cn) => [cn, true]))
+}

@@ -87,9 +87,16 @@ function App() {
         <SketchMetadata sketch={workingSketch} />
         <CodeMirror editor={editor} sketch={workingSketch} onLoad={setEditor} />
       </div>
-      <div style={{ overflow: 'auto', 'overscroll-behavior': 'contain' }}>
+      <div
+        style={{
+          overflow: 'auto',
+          'overscroll-behavior': 'contain',
+          'border-inline-start': '1px solid rgb(255 255 255 / 0.15);',
+        }}
+      >
         <SketchManager
           sketches={savedSketches}
+          currentSketch={workingSketch}
           onCreateNew={() => {
             setWorkingSketch(createSketch({ author: user().name }))
           }}

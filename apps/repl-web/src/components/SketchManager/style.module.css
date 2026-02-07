@@ -1,0 +1,78 @@
+.toolbar {
+  padding: 0.5rem;
+  padding-block-end: 0;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+
+  &:not(:last-of-type) {
+    border-block-end: 1px solid rgb(255 255 255 / 0.15);
+  }
+
+  &:is(:hover, :focus-visible),
+  &:has(:hover, :focus-visible) {
+    background: rgb(255 255 255 / 0.1);
+  }
+}
+
+/* BUTTONS */
+.button {
+  background: none;
+  border: none;
+  font-size: 0.8125rem;
+}
+
+.tool {
+  padding: 0.5rem;
+
+  .toolbar:has(:hover, :focus-visible) &:not(:hover, :focus-visible) {
+    opacity: 0.5;
+  }
+}
+
+.primary {
+  --border-color: transparent;
+
+  flex: 1 0 0;
+  display: grid;
+  gap: 0.375rem;
+  text-align: left;
+  padding-block: 1rem;
+  padding-inline: 0.875rem 1rem;
+  border-inline-start: 0.125rem solid var(--border-color);
+
+  &[data-current='true'] {
+    --border-color: rgb(255 255 255);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  p:first-of-type {
+    font-size: 0.875rem;
+  }
+
+  &:not(:hover, :focus-visible) p:last-of-type {
+    opacity: 0.6;
+  }
+}
+
+.delete {
+  padding: 1rem;
+
+  .item:not(:hover, :focus-visible) &:not(:hover, :focus-visible) {
+    opacity: 0;
+  }
+
+  &:not(:hover, :focus-visible) {
+    opacity: 0.5;
+  }
+}

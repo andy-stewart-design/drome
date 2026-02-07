@@ -14,7 +14,7 @@ function SketchMetadata({ sketch }: { sketch: Accessor<WorkingSketch> }) {
       }}
     >
       <summary>
-        <Chevron /> Sketch Metadata {!open() && `· ${sketch().title}`}
+        <Chevron /> Sketch Metadata {!open() && <span>{sketch().title}</span>}
       </summary>
       <div class={s.content}>
         <p>Title: {sketch().title}</p>
