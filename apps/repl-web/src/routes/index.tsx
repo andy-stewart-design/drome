@@ -33,6 +33,8 @@ function App() {
     createSignal<WorkingSketch>(createSketch())
   const [savedSketches, setSavedSketches] = createSignal<SavedSketch[]>([])
 
+  const [paused, setPaused] = createSignal(true)
+  const [beat, setBeat] = createSignal(1)
   const [showSidebar, setShowSidebar] = createSignal(true)
   const [sidebarSize, setSidebarSize] = createSignal(360)
 
@@ -41,7 +43,12 @@ function App() {
   onMount(() => {
     import('drome-live')
       .then(({ default: Drome }) => Drome.init(120))
-      .then((d) => setDrome(d))
+      .then((d) => {
+        setDrome(d)
+        d.on('start', () => setPaused(false))
+        d.on('stop', () => setPaused(true))
+        d.on('beat', ({ beat }) => setBeat(beat + 1))
+      })
 
     getSketches().then((sketches) => {
       if (sketches) setSavedSketches(sketches)
@@ -52,7 +59,7 @@ function App() {
     const cachedUser = getUserData()
     if (cachedUser) {
       setUser(cachedUser)
-      localStorage.setItem(LS_USER_KEY, JSON.stringify(cachedUser))
+      // localStorage.setItem(LS_USER_KEY, JSON.stringify(cachedUser))
     } else {
       localStorage.setItem(LS_USER_KEY, JSON.stringify(user()))
     }
