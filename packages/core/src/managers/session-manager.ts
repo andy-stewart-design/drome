@@ -120,6 +120,10 @@ class SessionManager {
     this._queue = null;
   }
 
+  clearQueue() {
+    this._queue = null;
+  }
+
   start() {
     this.clock.start();
   }

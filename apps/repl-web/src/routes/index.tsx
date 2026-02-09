@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { createSignal, onCleanup, onMount, type Setter } from 'solid-js'
+import { uniqueNamesGenerator, animals } from 'unique-names-generator'
 import type { EditorView } from 'codemirror'
 import type Drome from 'drome-live'
-import { uniqueNamesGenerator, animals } from 'unique-names-generator'
 
 import CodeMirror from '@/components/CodeMirror'
 import { flash } from '@/codemirror/flash'
@@ -45,9 +45,9 @@ function App() {
       .then(({ default: Drome }) => Drome.init(120))
       .then((d) => {
         setDrome(d)
-        d.on('start', () => setPaused(false))
-        d.on('stop', () => setPaused(true))
-        d.on('beat', ({ beat }) => setBeat(beat + 1))
+        d.clock.on('start', () => setPaused(false))
+        d.clock.on('stop', () => setPaused(true))
+        d.clock.on('beat', ({ beat }) => setBeat(beat + 1))
       })
 
     getSketches().then((sketches) => {
@@ -100,6 +100,7 @@ function App() {
         <EditorHeader>
           <SketchMetadata sketch={workingSketch} />
           <EditorToolbar onToggleSidebar={() => setShowSidebar((c) => !c)} />
+          <span>{beat()}</span>
         </EditorHeader>
         <CodeMirror editor={editor} sketch={workingSketch} onLoad={setEditor} />
       </div>
@@ -146,21 +147,22 @@ function App() {
   )
 }
 
-function runCode(drome: Drome, code: string) {
-  // const msg = drome.paused ? `◑ Evaluating code...` : `◑ Queuing update...`
-  // console.log(msg, 'input')
+// function runCode(drome: Drome, code: string) {
+//   // const msg = drome.paused ? `◑ Evaluating code...` : `◑ Queuing update...`
+//   // console.log(msg, 'input')
+//   drome.evaluate(code)
 
-  try {
-    const result = new Function('drome, d', `${code}`)(drome, drome)
+//   // try {
+//   //   const result = new Function('drome, d', `${code}`)(drome, drome)
 
-    // console.log(`✓ Code executed successfully`, 'output')
-    if (result !== undefined) {
-      console.log(`← ${result}`, 'output')
-    }
-  } catch (error) {
-    console.log(`✗ ${(error as Error).message}`, 'error')
-  }
-}
+//   //   // console.log(`✓ Code executed successfully`, 'output')
+//   //   if (result !== undefined) {
+//   //     console.log(`← ${result}`, 'output')
+//   //   }
+//   // } catch (error) {
+//   //   console.log(`✗ ${(error as Error).message}`, 'error')
+//   // }
+// }
 
 function onKeyDown(
   e: KeyboardEvent,
@@ -173,7 +175,7 @@ function onKeyDown(
   if (e.altKey && e.key === 'Enter') {
     e.preventDefault()
     const code = editor.state.doc.toString()
-    runCode(drome, code)
+    drome.evaluate(code)
     setSketch((s) => ({ ...s, code }))
     flash(editor)
     if (drome.paused) drome.start()
