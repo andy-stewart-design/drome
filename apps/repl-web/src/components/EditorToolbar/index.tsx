@@ -1,24 +1,23 @@
-import { Show, type Accessor } from 'solid-js'
+import { Show } from 'solid-js'
 import IconPaused20 from '../Icons/IconPause20'
 import IconPlay20 from '../Icons/IconPlay20'
 import IconSidebar20 from '@/components/Icons/IconSidebar20'
 import s from './style.module.css'
+import { usePlayStateContext } from '../providers/playstate'
 
 interface Props {
-  beat: Accessor<number>
-  paused: Accessor<boolean>
   onTogglePlaystate(): void
   onToggleSidebar(): void
   onReevaluate(): void
 }
 
 function EditorToolbar({
-  beat,
-  paused,
   onTogglePlaystate,
   onToggleSidebar,
   onReevaluate,
 }: Props) {
+  const { beat, paused } = usePlayStateContext()
+
   return (
     <div class={s.toolbar}>
       <Show when={!paused()}>

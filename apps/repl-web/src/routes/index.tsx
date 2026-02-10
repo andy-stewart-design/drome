@@ -21,20 +21,26 @@ import SketchManager from '@/components/SketchManager'
 import SidebarResizer from '@/components/SidebarResizer'
 import EditorHeader from '@/components/EditorHeader'
 import EditorToolbar from '@/components/EditorToolbar'
+import { usePlayStateContext } from '@/components/providers/playstate'
 
 export const Route = createFileRoute('/')({ component: App })
 const LS_USER_KEY = 'drome_user'
 
 function App() {
+  // TODO: move to DromeContext
   const [drome, setDrome] = createSignal<Drome | undefined>(undefined)
+
+  // TODO: move to EditorContext
   const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
+
+  // TODO: move to SessionContext
   const [user, setUser] = createSignal<DromeUser>(createUser())
   const [workingSketch, setWorkingSketch] =
     createSignal<WorkingSketch>(createSketch())
   const [savedSketches, setSavedSketches] = createSignal<SavedSketch[]>([])
 
-  const [paused, setPaused] = createSignal(true)
-  const [beat, setBeat] = createSignal(1)
+  const { setPaused, setBeat } = usePlayStateContext()
+  // TODO: move to SidebarContext
   const [showSidebar, setShowSidebar] = createSignal(true)
   const [sidebarSize, setSidebarSize] = createSignal(360)
 
@@ -100,8 +106,6 @@ function App() {
         <EditorHeader>
           <SketchMetadata sketch={workingSketch} />
           <EditorToolbar
-            beat={beat}
-            paused={paused}
             onTogglePlaystate={() => {
               togglePlaystate(setWorkingSketch, drome(), editor())
             }}
