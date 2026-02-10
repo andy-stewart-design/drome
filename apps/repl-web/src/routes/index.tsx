@@ -99,8 +99,17 @@ function App() {
       >
         <EditorHeader>
           <SketchMetadata sketch={workingSketch} />
-          <EditorToolbar onToggleSidebar={() => setShowSidebar((c) => !c)} />
-          <span>{beat()}</span>
+          <EditorToolbar
+            beat={beat}
+            paused={paused}
+            onTogglePlaystate={() => {
+              togglePlaystate(setWorkingSketch, drome(), editor())
+            }}
+            onReevaluate={() => {
+              togglePlaystate(setWorkingSketch, drome(), editor(), true)
+            }}
+            onToggleSidebar={() => setShowSidebar((c) => !c)}
+          />
         </EditorHeader>
         <CodeMirror editor={editor} sketch={workingSketch} onLoad={setEditor} />
       </div>
@@ -164,6 +173,27 @@ function App() {
 //   // }
 // }
 
+function togglePlaystate(
+  setSketch: Setter<WorkingSketch>,
+  drome?: Drome,
+  editor?: EditorView,
+  _paused?: boolean,
+) {
+  if (!drome || !editor) return
+
+  const paused = _paused ?? drome.paused
+
+  if (paused) {
+    const code = editor.state.doc.toString()
+    drome.evaluate(code)
+    flash(editor)
+    if (drome.paused) drome.start()
+    setSketch((s) => ({ ...s, code }))
+  } else {
+    drome.stop()
+  }
+}
+
 function onKeyDown(
   e: KeyboardEvent,
   setSketch: Setter<WorkingSketch>,
@@ -174,14 +204,10 @@ function onKeyDown(
 
   if (e.altKey && e.key === 'Enter') {
     e.preventDefault()
-    const code = editor.state.doc.toString()
-    drome.evaluate(code)
-    setSketch((s) => ({ ...s, code }))
-    flash(editor)
-    if (drome.paused) drome.start()
+    togglePlaystate(setSketch, drome, editor, true)
   } else if (e.altKey && e.key === '≥') {
     e.preventDefault()
-    drome.stop()
+    togglePlaystate(setSketch, drome, editor, false)
   }
 }
 
@@ -192,7 +218,7 @@ function beforeClose(working: WorkingSketch, saved: SavedSketch[], e: Event) {
   }
 
   const savedSketch = saved.find((saved) => saved.id === working.id)
-  if (savedSketch?.code !== working.code) {
+  if (!savedSketch || savedSketch.code !== working.code) {
     e.preventDefault()
   }
 }
