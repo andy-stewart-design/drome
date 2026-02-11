@@ -3,7 +3,7 @@ import IconPaused20 from '../Icons/IconPause20'
 import IconPlay20 from '../Icons/IconPlay20'
 import IconSidebar20 from '@/components/Icons/IconSidebar20'
 import s from './style.module.css'
-import { usePlayStateContext } from '../providers/playstate'
+import { usePlayState } from '../providers/playstate'
 
 interface Props {
   onTogglePlaystate(): void
@@ -16,7 +16,7 @@ function EditorToolbar({
   onToggleSidebar,
   onReevaluate,
 }: Props) {
-  const { beat, paused } = usePlayStateContext()
+  const { beat, paused } = usePlayState()
 
   return (
     <div class={s.toolbar}>

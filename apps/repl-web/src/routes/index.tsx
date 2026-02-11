@@ -21,7 +21,8 @@ import SketchManager from '@/components/SketchManager'
 import SidebarResizer from '@/components/SidebarResizer'
 import EditorHeader from '@/components/EditorHeader'
 import EditorToolbar from '@/components/EditorToolbar'
-import { usePlayStateContext } from '@/components/providers/playstate'
+import { usePlayState } from '@/components/providers/playstate'
+import { useSidebar } from '@/components/providers/sidebar'
 
 export const Route = createFileRoute('/')({ component: App })
 const LS_USER_KEY = 'drome_user'
@@ -39,10 +40,8 @@ function App() {
     createSignal<WorkingSketch>(createSketch())
   const [savedSketches, setSavedSketches] = createSignal<SavedSketch[]>([])
 
-  const { setPaused, setBeat } = usePlayStateContext()
-  // TODO: move to SidebarContext
-  const [showSidebar, setShowSidebar] = createSignal(true)
-  const [sidebarSize, setSidebarSize] = createSignal(360)
+  const { setPaused, setBeat } = usePlayState()
+  const { showSidebar, setShowSidebar, sidebarSize } = useSidebar()
 
   const controller = new AbortController()
 
@@ -154,7 +153,7 @@ function App() {
             if (sketches) setSavedSketches(sketches)
           }}
         />
-        <SidebarResizer onResize={(n) => setSidebarSize(n)} />
+        <SidebarResizer />
       </div>
     </div>
   )
