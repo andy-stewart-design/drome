@@ -1,4 +1,4 @@
-import { SVG, type SVGProps } from './SVG.tsx'
+import { SVG, type SVGProps } from './SVG'
 
 interface Props extends SVGProps {}
 
