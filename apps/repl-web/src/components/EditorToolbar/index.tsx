@@ -1,5 +1,5 @@
 import { Show } from 'solid-js'
-import IconPaused20 from '@/components/icons/IconPause20'
+import IconPause20 from '@/components/icons/IconPause20'
 import IconPlay20 from '@/components/icons/IconPlay20'
 import IconSidebar20 from '@/components/icons/IconSidebar20'
 import { usePlayState } from '@/providers/playstate'
@@ -53,7 +53,7 @@ function EditorToolbar() {
         </button>
       </Show>
       <button aria-label={`Play/pause music`} onClick={() => togglePlaystate()}>
-        {paused() ? <IconPlay20 aria-hidden /> : <IconPaused20 aria-hidden />}
+        {paused() ? <IconPlay20 aria-hidden /> : <IconPause20 aria-hidden />}
       </button>
       <button
         aria-label={`Show/hide sidebar`}

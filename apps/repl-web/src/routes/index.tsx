@@ -1,3 +1,5 @@
+// TODO: where should the togglePlaystate function live?
+
 import { createFileRoute } from '@tanstack/solid-router'
 
 import CodeMirror from '@/components/CodeMirror'
