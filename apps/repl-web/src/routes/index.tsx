@@ -15,6 +15,7 @@ import { usePlayState } from '@/components/providers/playstate'
 import { useSidebar } from '@/components/providers/sidebar'
 import { useSession } from '@/components/providers/session'
 import { useEditor } from '@/components/providers/editor'
+import { useKeyboardEvent } from '@/utils/use-keyboard-event'
 
 export const Route = createFileRoute('/')({ component: App })
 
@@ -26,8 +27,7 @@ function App() {
   const { showSidebar, sidebarSize } = useSidebar()
   const { workingSketch, setWorkingSketch } = useSession()
   const { editor } = useEditor()
-
-  const controller = new AbortController()
+  useKeyboardEvent(drome)
 
   onMount(() => {
     import('drome-live')
@@ -38,19 +38,11 @@ function App() {
         d.clock.on('stop', () => setPaused(true))
         d.clock.on('beat', ({ beat }) => setBeat(beat + 1))
       })
-
-    const { signal } = controller
-
-    const handleKeyDown = (e: KeyboardEvent) =>
-      onKeyDown(e, setWorkingSketch, drome(), editor())
-
-    window.addEventListener('keydown', handleKeyDown, { signal })
   })
 
   onCleanup(() => {
     drome()?.destroy()
     editor()?.destroy()
-    controller.abort()
   })
 
   return (
@@ -135,19 +127,19 @@ function togglePlaystate(
   }
 }
 
-function onKeyDown(
-  e: KeyboardEvent,
-  setSketch: Setter<WorkingSketch>,
-  drome?: Drome,
-  editor?: EditorView,
-) {
-  if (!drome || !editor) return
+// function onKeyDown(
+//   e: KeyboardEvent,
+//   setSketch: Setter<WorkingSketch>,
+//   drome?: Drome,
+//   editor?: EditorView,
+// ) {
+//   if (!drome || !editor) return
 
-  if (e.altKey && e.key === 'Enter') {
-    e.preventDefault()
-    togglePlaystate(setSketch, drome, editor, true)
-  } else if (e.altKey && e.key === '≥') {
-    e.preventDefault()
-    togglePlaystate(setSketch, drome, editor, false)
-  }
-}
+//   if (e.altKey && e.key === 'Enter') {
+//     e.preventDefault()
+//     togglePlaystate(setSketch, drome, editor, true)
+//   } else if (e.altKey && e.key === '≥') {
+//     e.preventDefault()
+//     togglePlaystate(setSketch, drome, editor, false)
+//   }
+// }
