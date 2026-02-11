@@ -5,12 +5,7 @@ import type Drome from 'drome-live'
 
 import CodeMirror from '@/components/CodeMirror'
 import { flash } from '@/codemirror/flash'
-import {
-  deleteSketch,
-  getSketches,
-  saveSketch,
-  type WorkingSketch,
-} from '@/utils/sketch-db'
+import { type WorkingSketch } from '@/utils/sketch-db'
 import SketchMetadata from '@/components/SketchMetadata'
 import SketchManager from '@/components/SketchManager'
 import SidebarResizer from '@/components/SidebarResizer'
@@ -19,6 +14,7 @@ import EditorToolbar from '@/components/EditorToolbar'
 import { usePlayState } from '@/components/providers/playstate'
 import { useSidebar } from '@/components/providers/sidebar'
 import { useSession } from '@/components/providers/session'
+import { useEditor } from '@/components/providers/editor'
 
 export const Route = createFileRoute('/')({ component: App })
 
@@ -26,12 +22,10 @@ function App() {
   // TODO: move to DromeContext
   const [drome, setDrome] = createSignal<Drome | undefined>(undefined)
 
-  // TODO: move to EditorContext
-  const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
-
   const { setPaused, setBeat } = usePlayState()
   const { showSidebar, sidebarSize } = useSidebar()
-  const { setSavedSketches, workingSketch, setWorkingSketch } = useSession()
+  const { workingSketch, setWorkingSketch } = useSession()
+  const { editor } = useEditor()
 
   const controller = new AbortController()
 
@@ -85,7 +79,7 @@ function App() {
             }}
           />
         </EditorHeader>
-        <CodeMirror editor={editor} sketch={workingSketch} onLoad={setEditor} />
+        <CodeMirror />
       </div>
       <div
         style={{
@@ -96,26 +90,7 @@ function App() {
           'border-inline-start': '1px solid rgb(255 255 255 / 0.15);',
         }}
       >
-        <SketchManager
-          onSave={async () => {
-            const ed = editor()
-            if (!ed) return
-            const result = await saveSketch({
-              ...workingSketch(),
-              code: ed.state.doc.toString(),
-            })
-            if (result.success) {
-              setWorkingSketch(result.data)
-              const sketches = await getSketches()
-              if (sketches) setSavedSketches(sketches)
-            }
-          }}
-          onDelete={async (id) => {
-            deleteSketch(id)
-            const sketches = await getSketches()
-            if (sketches) setSavedSketches(sketches)
-          }}
-        />
+        <SketchManager />
         <SidebarResizer />
       </div>
     </div>

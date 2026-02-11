@@ -1,26 +1,49 @@
 import { For } from 'solid-js'
 import { useSession } from '@/components/providers/session'
 import { useUser } from '@/components/providers/user'
-import { createSketch } from '@/utils/sketch-db'
+import {
+  createSketch,
+  deleteSketch,
+  getSketches,
+  saveSketch,
+} from '@/utils/sketch-db'
 import s from './style.module.css'
+import { useEditor } from '../providers/editor'
 
-interface Props {
-  onSave(): Promise<void>
-  onDelete(id: number): Promise<void>
-}
-
-function SketchManager({ onSave, onDelete }: Props) {
-  const { workingSketch, setWorkingSketch, savedSketches } = useSession()
+function SketchManager() {
+  const { editor } = useEditor()
+  const { workingSketch, setWorkingSketch, savedSketches, setSavedSketches } =
+    useSession()
   const { user } = useUser()
 
   function handleCreateNew() {
     setWorkingSketch(createSketch({ author: user().name }))
   }
 
+  async function handleSave() {
+    const ed = editor()
+    if (!ed) return
+    const result = await saveSketch({
+      ...workingSketch(),
+      code: ed.state.doc.toString(),
+    })
+    if (result.success) {
+      setWorkingSketch(result.data)
+      const sketches = await getSketches()
+      if (sketches) setSavedSketches(sketches)
+    }
+  }
+
+  async function handleDelete(id: number) {
+    deleteSketch(id)
+    const sketches = await getSketches()
+    if (sketches) setSavedSketches(sketches)
+  }
+
   return (
     <div>
       <div class={s.toolbar}>
-        <button classList={clst(s.button, s.tool)} onClick={onSave}>
+        <button classList={clst(s.button, s.tool)} onClick={handleSave}>
           <IconArrowDown12 /> Save
         </button>
         <button classList={clst(s.button, s.tool)} onClick={handleCreateNew}>
@@ -42,7 +65,7 @@ function SketchManager({ onSave, onDelete }: Props) {
               </button>
               <button
                 classList={clst(s.button, s.delete)}
-                onClick={() => onDelete(sketch.id)}
+                onClick={() => handleDelete(sketch.id)}
               >
                 <IconClose12 />
               </button>

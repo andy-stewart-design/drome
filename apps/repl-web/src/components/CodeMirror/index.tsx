@@ -1,31 +1,16 @@
 import { createEffect, onMount } from 'solid-js'
-
-import { basicSetup, EditorView } from 'codemirror'
-import { theme } from '@/codemirror/theme'
-import { javascript } from '@/codemirror/language'
-import { flashField } from '@/codemirror/flash'
-
+import { useEditor } from '@/components/providers/editor'
+import { useSession } from '@/components/providers/session'
 import s from './style.module.css'
-import '@/codemirror/theme-default.css'
-import { type WorkingSketch } from '@/utils/sketch-db'
 
-interface Props {
-  editor: () => EditorView | undefined
-  sketch: () => WorkingSketch
-  onLoad: (ed: EditorView) => void
-}
-
-function CodeMirror({ editor, onLoad, sketch }: Props) {
+function CodeMirror() {
+  const { editor, createEditor } = useEditor()
+  const { workingSketch } = useSession()
   let editorContainer: HTMLDivElement | undefined
 
   onMount(() => {
-    const ed = new EditorView({
-      doc: sketch().code,
-      extensions: [basicSetup, theme, javascript(), flashField],
-      parent: editorContainer,
-    })
-
-    onLoad(ed)
+    if (!editorContainer) return
+    createEditor(editorContainer)
   })
 
   createEffect(() => {
@@ -33,7 +18,11 @@ function CodeMirror({ editor, onLoad, sketch }: Props) {
     if (!ed) return
 
     ed.dispatch({
-      changes: { from: 0, to: ed.state.doc.length, insert: sketch().code },
+      changes: {
+        from: 0,
+        to: ed.state.doc.length,
+        insert: workingSketch().code,
+      },
     })
   })
 
