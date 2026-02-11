@@ -1,6 +1,6 @@
 import { createEffect, onMount } from 'solid-js'
-import { useEditor } from '@/components/providers/editor'
-import { useSession } from '@/components/providers/session'
+import { useEditor } from '@/providers/editor'
+import { useSession } from '@/providers/session'
 import s from './style.module.css'
 
 function CodeMirror() {

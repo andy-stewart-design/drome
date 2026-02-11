@@ -1,5 +1,5 @@
 import { createSignal, onMount } from 'solid-js'
-import { useSidebar } from '@/components/providers/sidebar'
+import { useSidebar } from '@/providers/sidebar'
 import s from './style.module.css'
 
 function SidebarResizer() {

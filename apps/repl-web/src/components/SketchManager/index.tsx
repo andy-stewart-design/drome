@@ -1,14 +1,14 @@
 import { For } from 'solid-js'
-import { useSession } from '@/components/providers/session'
-import { useUser } from '@/components/providers/user'
+import { useSession } from '@/providers/session'
+import { useUser } from '@/providers/user'
 import {
   createSketch,
   deleteSketch,
   getSketches,
   saveSketch,
 } from '@/utils/sketch-db'
+import { useEditor } from '@/providers/editor'
 import s from './style.module.css'
-import { useEditor } from '../providers/editor'
 
 function SketchManager() {
   const { editor } = useEditor()

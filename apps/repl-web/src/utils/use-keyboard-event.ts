@@ -1,8 +1,8 @@
 import { onCleanup, onMount } from 'solid-js'
 import { flash } from '@/codemirror/flash'
-import { useEditor } from '@/components/providers/editor'
-import { useSession } from '@/components/providers/session'
-import { useDrome } from '@/components/providers/drome'
+import { useEditor } from '@/providers/editor'
+import { useSession } from '@/providers/session'
+import { useDrome } from '@/providers/drome'
 
 function useKeyboardEvent() {
   let controller = new AbortController()

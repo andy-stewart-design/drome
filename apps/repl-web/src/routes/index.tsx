@@ -6,7 +6,7 @@ import EditorToolbar from '@/components/EditorToolbar'
 import SketchMetadata from '@/components/SketchMetadata'
 import SketchManager from '@/components/SketchManager'
 import SidebarResizer from '@/components/SidebarResizer'
-import { useSidebar } from '@/components/providers/sidebar'
+import { useSidebar } from '@/providers/sidebar'
 import { useKeyboardEvent } from '@/utils/use-keyboard-event'
 
 export const Route = createFileRoute('/')({ component: App })

@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js'
-import { useSession } from '@/components/providers/session'
+import { useSession } from '@/providers/session'
 import s from './style.module.css'
 
 function SketchMetadata() {
