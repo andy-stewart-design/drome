@@ -1,15 +1,21 @@
 import { For } from 'solid-js'
 import { useSession } from '@/components/providers/session'
+import { useUser } from '@/components/providers/user'
+import { createSketch } from '@/utils/sketch-db'
 import s from './style.module.css'
 
 interface Props {
-  onCreateNew(): void
   onSave(): Promise<void>
   onDelete(id: number): Promise<void>
 }
 
-function SketchManager({ onCreateNew, onSave, onDelete }: Props) {
+function SketchManager({ onSave, onDelete }: Props) {
   const { workingSketch, setWorkingSketch, savedSketches } = useSession()
+  const { user } = useUser()
+
+  function handleCreateNew() {
+    setWorkingSketch(createSketch({ author: user().name }))
+  }
 
   return (
     <div>
@@ -17,7 +23,7 @@ function SketchManager({ onCreateNew, onSave, onDelete }: Props) {
         <button classList={clst(s.button, s.tool)} onClick={onSave}>
           <IconArrowDown12 /> Save
         </button>
-        <button classList={clst(s.button, s.tool)} onClick={onCreateNew}>
+        <button classList={clst(s.button, s.tool)} onClick={handleCreateNew}>
           <IconPlus12 /> New
         </button>
       </div>

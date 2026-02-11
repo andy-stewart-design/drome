@@ -1,20 +1,16 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { createSignal, onCleanup, onMount, type Setter } from 'solid-js'
-import { uniqueNamesGenerator, animals } from 'unique-names-generator'
 import type { EditorView } from 'codemirror'
 import type Drome from 'drome-live'
 
 import CodeMirror from '@/components/CodeMirror'
 import { flash } from '@/codemirror/flash'
 import {
-  createSketch,
   deleteSketch,
   getSketches,
   saveSketch,
-  type SavedSketch,
   type WorkingSketch,
 } from '@/utils/sketch-db'
-import { userSchema, type DromeUser } from '@/utils/user'
 import SketchMetadata from '@/components/SketchMetadata'
 import SketchManager from '@/components/SketchManager'
 import SidebarResizer from '@/components/SidebarResizer'
@@ -25,7 +21,6 @@ import { useSidebar } from '@/components/providers/sidebar'
 import { useSession } from '@/components/providers/session'
 
 export const Route = createFileRoute('/')({ component: App })
-const LS_USER_KEY = 'drome_user'
 
 function App() {
   // TODO: move to DromeContext
@@ -33,9 +28,6 @@ function App() {
 
   // TODO: move to EditorContext
   const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
-
-  // TODO: move to SessionContext
-  const [user, setUser] = createSignal<DromeUser>(createUser())
 
   const { setPaused, setBeat } = usePlayState()
   const { showSidebar, sidebarSize } = useSidebar()
@@ -52,14 +44,6 @@ function App() {
         d.clock.on('stop', () => setPaused(true))
         d.clock.on('beat', ({ beat }) => setBeat(beat + 1))
       })
-
-    const cachedUser = getUserData()
-    if (cachedUser) {
-      setUser(cachedUser)
-      // localStorage.setItem(LS_USER_KEY, JSON.stringify(cachedUser))
-    } else {
-      localStorage.setItem(LS_USER_KEY, JSON.stringify(user()))
-    }
 
     const { signal } = controller
 
@@ -113,9 +97,6 @@ function App() {
         }}
       >
         <SketchManager
-          onCreateNew={() => {
-            setWorkingSketch(createSketch({ author: user().name }))
-          }}
           onSave={async () => {
             const ed = editor()
             if (!ed) return
@@ -194,41 +175,4 @@ function onKeyDown(
     e.preventDefault()
     togglePlaystate(setSketch, drome, editor, false)
   }
-}
-
-function beforeClose(working: WorkingSketch, saved: SavedSketch[], e: Event) {
-  if (!('id' in working)) {
-    e.preventDefault()
-    return
-  }
-
-  const savedSketch = saved.find((saved) => saved.id === working.id)
-  if (!savedSketch || savedSketch.code !== working.code) {
-    e.preventDefault()
-  }
-}
-
-function getUserData() {
-  const user = localStorage.getItem(LS_USER_KEY)
-  if (!user) return null
-
-  const parsed = userSchema.safeParse(JSON.parse(user))
-  if (!parsed.success) return null
-
-  return parsed.data
-}
-
-function createUser() {
-  const randomAnimal = uniqueNamesGenerator({
-    dictionaries: [animals],
-    separator: ' ',
-    style: 'capital',
-  })
-
-  const user: DromeUser = {
-    name: `Anonymous ${randomAnimal}`,
-    id: crypto.randomUUID(),
-  }
-
-  return user
 }
