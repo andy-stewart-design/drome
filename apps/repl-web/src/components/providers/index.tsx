@@ -4,6 +4,7 @@ import SidebarProvider from './sidebar'
 import SessionProvider from './session'
 import UserProvider from './user'
 import EditorProvider from './editor'
+import DromeProvider from './drome'
 
 const Providers: ParentComponent = (props) => {
   return (
@@ -11,7 +12,9 @@ const Providers: ParentComponent = (props) => {
       <UserProvider>
         <EditorProvider>
           <SidebarProvider>
-            <PlayStateProvider>{props.children}</PlayStateProvider>
+            <PlayStateProvider>
+              <DromeProvider>{props.children}</DromeProvider>
+            </PlayStateProvider>
           </SidebarProvider>
         </EditorProvider>
       </UserProvider>

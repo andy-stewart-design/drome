@@ -4,6 +4,7 @@ import {
   createSignal,
   type Accessor,
   type ParentProps,
+  onCleanup,
 } from 'solid-js'
 import { basicSetup, EditorView } from 'codemirror'
 import { theme } from '@/codemirror/theme'
@@ -25,6 +26,10 @@ const EditorContext = createContext<EditorContextType>()
 function EditorProvider(props: ParentProps) {
   const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
   const { workingSketch } = useSession()
+
+  onCleanup(() => {
+    editor()?.destroy()
+  })
 
   function createEditor(parent: HTMLElement) {
     const ed = new EditorView({

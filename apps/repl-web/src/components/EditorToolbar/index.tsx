@@ -5,21 +5,44 @@ import IconSidebar20 from '@/components/Icons/IconSidebar20'
 import { usePlayState } from '@/components/providers/playstate'
 import { useSidebar } from '@/components/providers/sidebar'
 import s from './style.module.css'
+import { useSession } from '../providers/session'
+import { useDrome } from '../providers/drome'
+import { useEditor } from '../providers/editor'
+import { flash } from '@/codemirror/flash'
 
-interface Props {
-  onTogglePlaystate(): void
-  onReevaluate(): void
-}
-
-function EditorToolbar({ onTogglePlaystate, onReevaluate }: Props) {
+function EditorToolbar() {
+  const { drome } = useDrome()
+  const { editor } = useEditor()
   const { beat, paused } = usePlayState()
+  const { setWorkingSketch } = useSession()
   const { setShowSidebar } = useSidebar()
+
+  function togglePlaystate(_paused?: boolean) {
+    const d = drome()
+    const ed = editor()
+    if (!d || !ed) return
+
+    const paused = _paused ?? d.paused
+
+    if (paused) {
+      const code = ed.state.doc.toString()
+      d.evaluate(code)
+      flash(ed)
+      if (d.paused) d.start()
+      setWorkingSketch((s) => ({ ...s, code }))
+    } else {
+      d.stop()
+    }
+  }
 
   return (
     <div class={s.toolbar}>
       <Show when={!paused()}>
         <span class={s.beat}>{beat()}</span>
-        <button aria-label={`Play/pause music`} onClick={onReevaluate}>
+        <button
+          aria-label={`Play/pause music`}
+          onClick={() => togglePlaystate(true)}
+        >
           <svg viewBox="0 0 20 20" fill="currentColor" width={20} height={20}>
             <path
               fill-rule="evenodd"
@@ -29,7 +52,7 @@ function EditorToolbar({ onTogglePlaystate, onReevaluate }: Props) {
           </svg>
         </button>
       </Show>
-      <button aria-label={`Play/pause music`} onClick={onTogglePlaystate}>
+      <button aria-label={`Play/pause music`} onClick={() => togglePlaystate()}>
         {paused() ? <IconPlay20 aria-hidden /> : <IconPaused20 aria-hidden />}
       </button>
       <button

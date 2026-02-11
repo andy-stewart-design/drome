@@ -1,11 +1,12 @@
-import { onCleanup, onMount, type Accessor } from 'solid-js'
+import { onCleanup, onMount } from 'solid-js'
 import { flash } from '@/codemirror/flash'
 import { useEditor } from '@/components/providers/editor'
 import { useSession } from '@/components/providers/session'
-import type Drome from 'drome-live'
+import { useDrome } from '@/components/providers/drome'
 
-function useKeyboardEvent(drome: Accessor<Drome | undefined>) {
+function useKeyboardEvent() {
   let controller = new AbortController()
+  const { drome } = useDrome()
   const { editor } = useEditor()
   const { setWorkingSketch } = useSession()
 

@@ -1,8 +1,9 @@
-import type { WorkingSketch } from '@/utils/sketch-db'
-import { createSignal, type Accessor } from 'solid-js'
+import { createSignal } from 'solid-js'
+import { useSession } from '@/components/providers/session'
 import s from './style.module.css'
 
-function SketchMetadata({ sketch }: { sketch: Accessor<WorkingSketch> }) {
+function SketchMetadata() {
+  const { workingSketch } = useSession()
   const [open, setOpen] = createSignal(false)
 
   return (
@@ -14,13 +15,14 @@ function SketchMetadata({ sketch }: { sketch: Accessor<WorkingSketch> }) {
       }}
     >
       <summary>
-        <Chevron /> Sketch Metadata {!open() && <span>{sketch().title}</span>}
+        <Chevron /> Sketch Metadata{' '}
+        {!open() && <span>{workingSketch().title}</span>}
       </summary>
       <div class={s.content}>
-        <p>Title: {sketch().title}</p>
-        <p>Author: {sketch().author}</p>
+        <p>Title: {workingSketch().title}</p>
+        <p>Author: {workingSketch().author}</p>
         <p class={s.date}>
-          Last Saved: {new Date(sketch().updatedAt).toLocaleString()}
+          Last Saved: {new Date(workingSketch().updatedAt).toLocaleString()}
         </p>
       </div>
     </details>
