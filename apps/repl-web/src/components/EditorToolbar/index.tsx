@@ -1,14 +1,14 @@
 import { Show } from 'solid-js'
-import IconPaused20 from '@/components/Icons/IconPause20'
-import IconPlay20 from '@/components/Icons/IconPlay20'
-import IconSidebar20 from '@/components/Icons/IconSidebar20'
+import IconPaused20 from '@/components/icons/IconPause20'
+import IconPlay20 from '@/components/icons/IconPlay20'
+import IconSidebar20 from '@/components/icons/IconSidebar20'
 import { usePlayState } from '@/components/providers/playstate'
 import { useSidebar } from '@/components/providers/sidebar'
-import s from './style.module.css'
-import { useSession } from '../providers/session'
-import { useDrome } from '../providers/drome'
-import { useEditor } from '../providers/editor'
+import { useSession } from '@/components/providers/session'
+import { useDrome } from '@/components/providers/drome'
+import { useEditor } from '@/components/providers/editor'
 import { flash } from '@/codemirror/flash'
+import s from './style.module.css'
 
 function EditorToolbar() {
   const { drome } = useDrome()

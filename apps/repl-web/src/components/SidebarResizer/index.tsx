@@ -12,7 +12,7 @@ function SidebarResizer() {
       'pointermove',
       (e) => {
         if (dragging()) {
-          setSidebarSize(window.innerWidth - e.clientX)
+          setSidebarSize(window.innerWidth - e.clientX + 4)
         }
       },
       {
