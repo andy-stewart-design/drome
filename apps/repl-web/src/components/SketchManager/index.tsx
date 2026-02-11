@@ -1,24 +1,16 @@
-import { For, type Accessor } from 'solid-js'
-import type { SavedSketch, WorkingSketch } from '@/utils/sketch-db'
+import { For } from 'solid-js'
+import { useSession } from '@/components/providers/session'
 import s from './style.module.css'
 
 interface Props {
-  sketches: Accessor<SavedSketch[]>
-  currentSketch: Accessor<WorkingSketch>
   onCreateNew(): void
-  onReplace(sketch: SavedSketch): void
   onSave(): Promise<void>
   onDelete(id: number): Promise<void>
 }
 
-function SketchManager({
-  sketches,
-  currentSketch,
-  onCreateNew,
-  onReplace,
-  onSave,
-  onDelete,
-}: Props) {
+function SketchManager({ onCreateNew, onSave, onDelete }: Props) {
+  const { workingSketch, setWorkingSketch, savedSketches } = useSession()
+
   return (
     <div>
       <div class={s.toolbar}>
@@ -31,13 +23,13 @@ function SketchManager({
       </div>
 
       <ul class={s.list}>
-        <For each={sketches()}>
+        <For each={savedSketches()}>
           {(sketch) => (
             <li class={s.item}>
               <button
                 classList={clst(s.button, s.primary)}
-                onClick={() => onReplace(sketch)}
-                data-current={currentSketch().title === sketch.title}
+                onClick={() => setWorkingSketch(sketch)}
+                data-current={workingSketch().title === sketch.title}
               >
                 <p>{sketch.title}</p>
                 <p>{sketch.author}</p>

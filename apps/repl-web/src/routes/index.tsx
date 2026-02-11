@@ -10,7 +10,6 @@ import {
   createSketch,
   deleteSketch,
   getSketches,
-  getLatestSketch,
   saveSketch,
   type SavedSketch,
   type WorkingSketch,
@@ -23,6 +22,7 @@ import EditorHeader from '@/components/EditorHeader'
 import EditorToolbar from '@/components/EditorToolbar'
 import { usePlayState } from '@/components/providers/playstate'
 import { useSidebar } from '@/components/providers/sidebar'
+import { useSession } from '@/components/providers/session'
 
 export const Route = createFileRoute('/')({ component: App })
 const LS_USER_KEY = 'drome_user'
@@ -36,12 +36,10 @@ function App() {
 
   // TODO: move to SessionContext
   const [user, setUser] = createSignal<DromeUser>(createUser())
-  const [workingSketch, setWorkingSketch] =
-    createSignal<WorkingSketch>(createSketch())
-  const [savedSketches, setSavedSketches] = createSignal<SavedSketch[]>([])
 
   const { setPaused, setBeat } = usePlayState()
-  const { showSidebar, setShowSidebar, sidebarSize } = useSidebar()
+  const { showSidebar, sidebarSize } = useSidebar()
+  const { setSavedSketches, workingSketch, setWorkingSketch } = useSession()
 
   const controller = new AbortController()
 
@@ -54,12 +52,6 @@ function App() {
         d.clock.on('stop', () => setPaused(true))
         d.clock.on('beat', ({ beat }) => setBeat(beat + 1))
       })
-
-    getSketches().then((sketches) => {
-      if (sketches) setSavedSketches(sketches)
-      const sketch = getLatestSketch(sketches)
-      setWorkingSketch(sketch)
-    })
 
     const cachedUser = getUserData()
     if (cachedUser) {
@@ -74,11 +66,7 @@ function App() {
     const handleKeyDown = (e: KeyboardEvent) =>
       onKeyDown(e, setWorkingSketch, drome(), editor())
 
-    const handleUnload = (e: Event) =>
-      beforeClose(workingSketch(), savedSketches(), e)
-
     window.addEventListener('keydown', handleKeyDown, { signal })
-    window.addEventListener('beforeunload', handleUnload, { signal })
   })
 
   onCleanup(() => {
@@ -111,7 +99,6 @@ function App() {
             onReevaluate={() => {
               togglePlaystate(setWorkingSketch, drome(), editor(), true)
             }}
-            onToggleSidebar={() => setShowSidebar((c) => !c)}
           />
         </EditorHeader>
         <CodeMirror editor={editor} sketch={workingSketch} onLoad={setEditor} />
@@ -126,8 +113,6 @@ function App() {
         }}
       >
         <SketchManager
-          sketches={savedSketches}
-          currentSketch={workingSketch}
           onCreateNew={() => {
             setWorkingSketch(createSketch({ author: user().name }))
           }}
@@ -143,9 +128,6 @@ function App() {
               const sketches = await getSketches()
               if (sketches) setSavedSketches(sketches)
             }
-          }}
-          onReplace={(item) => {
-            setWorkingSketch(item)
           }}
           onDelete={async (id) => {
             deleteSketch(id)

@@ -41,9 +41,7 @@ function PlayStateProvider(props: ParentProps) {
 function usePlayState() {
   const context = useContext(PlayStateContext)
   if (context === undefined) {
-    throw new Error(
-      'usePlayStateContext must be used within a PlayStateProvider',
-    )
+    throw new Error('usePlayState must be used within a PlayStateProvider')
   }
   return context
 }

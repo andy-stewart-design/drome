@@ -1,22 +1,19 @@
 import { Show } from 'solid-js'
-import IconPaused20 from '../Icons/IconPause20'
-import IconPlay20 from '../Icons/IconPlay20'
+import IconPaused20 from '@/components/Icons/IconPause20'
+import IconPlay20 from '@/components/Icons/IconPlay20'
 import IconSidebar20 from '@/components/Icons/IconSidebar20'
+import { usePlayState } from '@/components/providers/playstate'
+import { useSidebar } from '@/components/providers/sidebar'
 import s from './style.module.css'
-import { usePlayState } from '../providers/playstate'
 
 interface Props {
   onTogglePlaystate(): void
-  onToggleSidebar(): void
   onReevaluate(): void
 }
 
-function EditorToolbar({
-  onTogglePlaystate,
-  onToggleSidebar,
-  onReevaluate,
-}: Props) {
+function EditorToolbar({ onTogglePlaystate, onReevaluate }: Props) {
   const { beat, paused } = usePlayState()
+  const { setShowSidebar } = useSidebar()
 
   return (
     <div class={s.toolbar}>
@@ -35,7 +32,10 @@ function EditorToolbar({
       <button aria-label={`Play/pause music`} onClick={onTogglePlaystate}>
         {paused() ? <IconPlay20 aria-hidden /> : <IconPaused20 aria-hidden />}
       </button>
-      <button aria-label={`Show/hide sidebar`} onClick={onToggleSidebar}>
+      <button
+        aria-label={`Show/hide sidebar`}
+        onClick={() => setShowSidebar((c) => !c)}
+      >
         <IconSidebar20 aria-hidden />
       </button>
     </div>
