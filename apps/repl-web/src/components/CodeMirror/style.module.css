@@ -1,0 +1,20 @@
+.container {
+  --cm-editor-width: calc(100vw - var(--app-sidebar-width));
+  --cm-editor-width: 100%;
+  --cm-editor-height: 100%;
+  --cm-editor-height: auto;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+
+  :global(.cm-editor) {
+    min-height: 0;
+    flex: 1 0 0;
+  }
+
+  :global(.cm-scroller) {
+    flex: 1 0 0;
+    overscroll-behavior: contain;
+  }
+}

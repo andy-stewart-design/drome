@@ -1,58 +1,38 @@
 import {
-  ClientOnly,
   HeadContent,
+  Outlet,
   Scripts,
-  createRootRoute,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+  createRootRouteWithContext,
+} from '@tanstack/solid-router'
+import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools'
 
-import appCss from '../styles.css?url'
+import { HydrationScript } from 'solid-js/web'
+import { Suspense } from 'solid-js'
 
-export const Route = createRootRoute({
+import Providers from '@/providers'
+import styleCss from '@/styles/global.css?url'
+
+export const Route = createRootRouteWithContext()({
   head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'TanStack Start Starter',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
+    links: [{ rel: 'stylesheet', href: styleCss }],
   }),
-
-  shellComponent: RootDocument,
+  shellComponent: RootComponent,
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootComponent() {
   return (
-    <html lang="en">
+    <html>
       <head>
-        <HeadContent />
+        <HydrationScript />
       </head>
       <body>
-        <ClientOnly>{children}</ClientOnly>
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        <HeadContent />
+        <Suspense>
+          <Providers>
+            <Outlet />
+          </Providers>
+          <TanStackRouterDevtools />
+        </Suspense>
         <Scripts />
       </body>
     </html>

@@ -9,17 +9,19 @@ html {
   color: white;
   color-scheme: dark;
 
-  --color-neutral-50: rgb(248, 249, 250);
-  --color-neutral-100: rgb(191, 206, 222);
-  --color-neutral-200: rgb(163, 184, 208);
-  --color-neutral-300: rgb(137, 163, 192);
-  --color-neutral-400: rgb(113, 142, 174);
-  --color-neutral-500: rgb(92, 118, 154);
-  --color-neutral-600: rgb(75, 100, 128);
-  --color-neutral-700: rgb(57, 77, 105);
-  --color-neutral-800: rgb(36, 58, 81);
-  --color-neutral-900: rgb(23, 34, 49);
-  --color-neutral-950: rgb(0, 4, 8);
+  --color-neutral-50-rgb: 248 249 250;
+  --color-neutral-50: rgb(var(--color-neutral-50-rgb));
+  --color-neutral-100: rgb(191 206 222);
+  --color-neutral-200: rgb(163 184 208);
+  --color-neutral-300: rgb(137 163 192);
+  --color-neutral-400: rgb(113 142 174);
+  --color-neutral-500: rgb(92 118 154);
+  --color-neutral-600: rgb(75 100 128);
+  --color-neutral-700: rgb(57 77 105);
+  --color-neutral-800: rgb(36 58 81);
+  --color-neutral-900: rgb(23 34 49);
+  --color-neutral-950-rgb: 0 4 8;
+  --color-neutral-950: rgb(var(--color-neutral-950-rgb));
 
   --color-cyan-50: oklch(0.92 0.049 235);
   --color-cyan-100: oklch(0.84 0.1 235);
@@ -31,8 +33,17 @@ html {
   --color-neon-cyan: oklch(0.75 0.1625 235);
   --color-neon-yellow: oklch(0.95 0.25 115);
   --color-purple: oklch(0.69 0.17 266);
-  --color-white: rgb(255, 255, 255);
-  --color-black: rgb(0, 0, 0);
+  --color-white: rgb(255 255 255);
+  --color-black: rgb(0 0 0);
+
+  --color-fg-primary: var(--color-neutral-50);
+  --color-fg-secondary: rgb(var(--color-neutral-50-rgb) / 0.8);
+  --color-fg-tertiary: rgb(var(--color-neutral-50-rgb) / 0.6);
+  --color-bg-primary: var(--color-neutral-950);
+  --border-subtle: rgb(var(--color-neutral-50-rgb) / 0.15);
+  --border-strong: var(--color-neutral-50);
+
+  --app-sidebar-width: 360px;
 }
 
 body {
@@ -44,7 +55,7 @@ body {
   margin: 0;
 }
 
-.header {
+/*.header {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -70,4 +81,4 @@ body {
   &:disabled {
     color: inherit;
   }
-}
+}*/

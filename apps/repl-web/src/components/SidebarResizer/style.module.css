@@ -1,0 +1,22 @@
+.resizer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 8px;
+
+  display: grid;
+  background: transparent;
+  padding: 8px 0px 8px 4px;
+  cursor: col-resize;
+
+  &::before {
+    content: '';
+    border-radius: 100vmax;
+    pointer-events: none;
+  }
+
+  &:is(:hover, [data-dragging='true'])::before {
+    background: rgb(var(--color-neutral-50-rgb) / 0.25);
+  }
+}

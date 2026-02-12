@@ -1,108 +1,38 @@
-import Drome from 'drome-live'
-import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from 'react'
-import { basicSetup, EditorView } from 'codemirror'
-import { theme } from '@/codemirror/theme'
-import { javascript } from '@/codemirror/language'
-import { flash, flashField } from '@/codemirror/flash'
-import '@/codemirror/theme-default.css'
+// TODO: where should the togglePlaystate function live?
+
+import { createFileRoute } from '@tanstack/solid-router'
+
+import CodeMirror from '@/components/CodeMirror'
+import EditorHeader from '@/components/EditorHeader'
+import EditorToolbar from '@/components/EditorToolbar'
+import SketchMetadata from '@/components/SketchMetadata'
+import SketchManager from '@/components/SketchManager'
+import SidebarResizer from '@/components/SidebarResizer'
+import { useKeyboardEvent } from '@/utils/use-keyboard-event'
+import MainLayout from '@/components/main-layout'
 
 export const Route = createFileRoute('/')({ component: App })
 
-const LS_KEY = 'drome_sketch'
-
 function App() {
-  const editorContainer = useRef<HTMLDivElement>(null)
-  const [drome, setDrome] = useState<Drome | null>(null)
-  const [editor, setEditor] = useState<EditorView | null>(null)
-  const [midi, setMidi] = useState<boolean>(false)
-
-  useEffect(() => {
-    if (!editorContainer.current) return
-    let controller = new AbortController()
-    let drome: Drome
-
-    Drome.init(120).then((d) => {
-      if (controller.signal.aborted) return
-      drome = d
-      setDrome(d)
-      if (d.midi) setMidi(true)
-    })
-
-    const doc = localStorage.getItem(LS_KEY)
-
-    const editor = new EditorView({
-      doc: doc ?? 'd.sample("bd:3").bank("tr909").euclid([3, 5], 8)',
-      extensions: [basicSetup, theme, javascript(), flashField],
-      parent: editorContainer.current,
-    })
-
-    setEditor(editor)
-
-    return () => {
-      controller.abort()
-      drome?.destroy()
-      editor.destroy()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!drome || !editor) return
-
-    window.addEventListener('keydown', onkeyDown)
-
-    return () => window.removeEventListener('keydown', onkeyDown)
-  }, [drome, editor])
-
-  function onkeyDown(e: KeyboardEvent) {
-    if (!drome || !editor) return
-
-    if (e.altKey && e.key === 'Enter') {
-      e.preventDefault()
-      // drome.clear()
-      runCode(drome, editor.state.doc.toString())
-      localStorage.setItem(LS_KEY, editor.state.doc.toString())
-      flash(editor)
-      if (drome.paused) drome.start()
-    } else if (e.altKey && e.key === '≥') {
-      e.preventDefault()
-      drome.stop()
-    }
-  }
+  useKeyboardEvent()
 
   return (
-    <main>
-      <div className="header">
-        {!!drome && (
-          <button
-            className="midi"
-            disabled={midi}
-            onClick={async () => {
-              const midi = await drome?.createMidiController()
-              if (midi) setMidi(true)
-            }}
-          >
-            {midi ? 'MIDI enabled' : 'Enable MIDI'}
-          </button>
-        )}
-      </div>
-      <div ref={editorContainer} />
-    </main>
+    <MainLayout
+      content={
+        <>
+          <EditorHeader>
+            <SketchMetadata />
+            <EditorToolbar />
+          </EditorHeader>
+          <CodeMirror />
+        </>
+      }
+      sidebar={
+        <>
+          <SketchManager />
+          <SidebarResizer />
+        </>
+      }
+    />
   )
-}
-
-function runCode(drome: Drome, code: string) {
-  // const msg = drome.paused ? `◑ Evaluating code...` : `◑ Queuing update...`
-  // console.log(msg, 'input')
-
-  try {
-    const result = new Function('drome, d', `${code}`)(drome, drome)
-
-    // console.log(`✓ Code executed successfully`, 'output')
-    if (result !== undefined) {
-      console.log(`← ${result}`, 'output')
-    }
-  } catch (error) {
-    console.log(`✗ ${(error as Error).message}`, 'error')
-  }
 }

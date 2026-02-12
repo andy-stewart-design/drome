@@ -1,20 +1,23 @@
-.cm-editor {
+:root {
   --cm-color-fg-primary: var(--color-neutral-50);
   --cm-color-bg-primary: var(--color-neutral-950);
 
-  --cm-editor-width: 100vw;
+  --cm-editor-width: 100%;
   --cm-editor-height: 100vh;
   --cm-editor-color-bg: var(--cm-color-bg-primary);
   --cm-editor-color-fg: var(--cm-color-fg-primary);
   --cm-editor-font-size: 14px;
   --cm-editor-font-family: MDIO, Consolas, monospace;
   --cm-editor-line-height: 1.6;
+  --cm-editor-padding-block-start: 0.75rem;
+  --cm-editor-padding-block-end: 50vh;
+  --cm-editor-padding-inline: 1rem;
 
   --cm-cursor-fg: var(--color-cyan-200);
   --cm-cursor-width: 1.2px;
 
-  --cm-scrollbar-width: 8px;
-  --cm-scrollbar-height: 8px;
+  --cm-scrollbar-width: 5px;
+  --cm-scrollbar-height: 5px;
   --cm-scrollbar-color-bg: var(--color-neutral-900);
   --cm-scrollbar-thumb-color-bg: var(--color-neutral-800);
   --cm-scrollbar-thumb-hover-color-bg: var(--color-neutral-700);
@@ -110,6 +113,21 @@
     --cm-syntax-class-identifier-color-fg: var(--cm-color-fg-primary);
     --cm-syntax-bracket-color-fg: var(--cm-color-fg-primary);
     --cm-syntax-comment-color-fg: var(--cm-color-fg-primary);
+  }
+}
+
+.cm-editor {
+  .cm-scroller {
+    padding-block-start: var(--cm-editor-padding-block-start);
+    padding-block-end: var(--cm-editor-padding-block-end);
+  }
+
+  .cm-lineNumbers .cm-gutterElement {
+    padding-inline-start: var(--cm-editor-padding-inline);
+  }
+
+  .cm-line {
+    padding-inline-end: var(--cm-editor-padding-inline);
   }
 
   .cm-panel.cm-search {

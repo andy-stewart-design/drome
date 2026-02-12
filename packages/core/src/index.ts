@@ -103,6 +103,20 @@ class Drome {
     this._sessionManager.enqueue(input);
   }
 
+  evaluate(code: string) {
+    try {
+      this._sessionManager.clearQueue();
+      const result = new Function("drome, d", `${code}`)(this, this);
+
+      // console.log(`✓ Code executed successfully`, 'output')
+      if (result !== undefined) {
+        console.log(`← ${result}`, "output");
+      }
+    } catch (error) {
+      console.log(`✗ ${(error as Error).message}`, "error");
+    }
+  }
+
   async start() {
     if (!this.clock.paused) return;
     if (this._suspendTimeoutId) clearTimeout(this._suspendTimeoutId);
