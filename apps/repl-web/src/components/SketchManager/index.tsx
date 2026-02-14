@@ -1,19 +1,19 @@
 import { For } from 'solid-js'
 import { useSession } from '@/providers/session'
 import { useUser } from '@/providers/user'
-import {
-  createSketch,
-  deleteSketch,
-  getSketches,
-  saveSketch,
-} from '@/utils/sketch-db'
+import { createSketch, deleteSketch, getSketches } from '@/utils/sketch-db'
 import { useEditor } from '@/providers/editor'
 import s from './style.module.css'
 
 function SketchManager() {
   const { editor } = useEditor()
-  const { workingSketch, setWorkingSketch, savedSketches, setSavedSketches } =
-    useSession()
+  const {
+    workingSketch,
+    setWorkingSketch,
+    savedSketches,
+    setSavedSketches,
+    save,
+  } = useSession()
   const { user } = useUser()
 
   function handleCreateNew() {
@@ -23,15 +23,7 @@ function SketchManager() {
   async function handleSave() {
     const ed = editor()
     if (!ed) return
-    const result = await saveSketch({
-      ...workingSketch(),
-      code: ed.state.doc.toString(),
-    })
-    if (result.success) {
-      setWorkingSketch(result.data)
-      const sketches = await getSketches()
-      if (sketches) setSavedSketches(sketches)
-    }
+    save(ed.state.doc.toString())
   }
 
   async function handleDelete(id: number) {

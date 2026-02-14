@@ -103,10 +103,6 @@ class Drome {
     this._sessionManager.enqueue(input);
   }
 
-  analyser(node: AnalyserNode) {
-    this._analyser = node;
-  }
-
   evaluate(code: string) {
     try {
       this._sessionManager.clearQueue();
@@ -361,6 +357,10 @@ class Drome {
 
   get loadSample() {
     return this._sampleManager.loadSample.bind(this._sampleManager);
+  }
+
+  set analyzer(node: AnalyserNode) {
+    this._analyser = node;
   }
 }
 

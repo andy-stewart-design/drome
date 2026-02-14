@@ -1,6 +1,22 @@
 type VisualizerType = 'bars' | 'curve' | 'waveform' | 'circular'
 // prettier-ignore
-type FftSize = 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 |  32768
+type FftSize = 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 | 32768
+
+const defaultAvData = new Uint8Array([
+  136, 173, 191, 189, 171, 161, 159, 133, 125, 118, 92, 95, 84, 69, 72, 59, 53,
+  53, 39, 39, 38, 25, 28, 26, 17, 22, 16, 13, 12, 1, 11, 12, 1, 5, 6, 0, 0, 0,
+  0, 11, 22, 30, 37, 24, 23, 38, 31, 10, 24, 29, 23, 23, 36, 34, 39, 34, 18, 30,
+  49, 64, 54, 30, 50, 78, 80, 57, 75, 71, 43, 41, 46, 49, 60, 62, 56, 81, 96,
+  80, 73, 75, 70, 77, 77, 60, 65, 64, 50, 52, 60, 60, 65, 63, 59, 63, 57, 46,
+  51, 63, 65, 67, 68, 62, 69, 66, 59, 58, 56, 57, 62, 69, 65, 61, 63, 57, 50,
+  56, 61, 62, 67, 61, 62, 75, 75, 65, 63, 62, 70, 84, 77, 73, 75, 65, 61, 62,
+  64, 75, 73, 63, 56, 69, 62, 56, 62, 57, 56, 69, 71, 59, 67, 67, 71, 74, 67,
+  59, 48, 58, 58, 58, 51, 53, 57, 62, 55, 44, 48, 44, 47, 54, 53, 47, 36, 42,
+  47, 43, 45, 46, 43, 30, 36, 33, 35, 37, 42, 37, 32, 31, 38, 37, 27, 29, 32,
+  28, 24, 19, 19, 24, 21, 25, 27, 25, 22, 12, 22, 22, 9, 7, 4, 8, 11, 16, 9, 1,
+  5, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+])
 
 interface AudioVisualizerConfig {
   audioContext: AudioContext
@@ -11,74 +27,70 @@ interface AudioVisualizerConfig {
 }
 
 class AudioVisualizer {
-  private canvas: HTMLCanvasElement
-  private ctx: CanvasRenderingContext2D
-  private width: number = 0
-  private height: number = 0
-  private controller = new AbortController()
-  private animationId: number | null = null
+  private _canvas: HTMLCanvasElement
+  private _ctx: CanvasRenderingContext2D
+  private _width: number = 0
+  private _height: number = 0
+  private _controller = new AbortController()
+  private _animationId: number | null = null
 
   private _analyser: AnalyserNode
   private _type: VisualizerType
 
-  private dataArray: Uint8Array<ArrayBuffer> | null = null
-  private bufferLength: number = 0
-  private fftSize: FftSize
-  private smoothingTimeConstant: number
+  private _dataArray: Uint8Array<ArrayBuffer>
+  private _fftSize: FftSize
+  private _smoothingTimeConstant: number
 
   constructor(config: AudioVisualizerConfig) {
-    this.canvas = config.canvas
+    this._canvas = config.canvas
 
-    const context = this.canvas.getContext('2d', {
+    const context = this._canvas.getContext('2d', {
       alpha: false,
       colorSpace: 'display-p3',
     })
 
     if (!context) throw new Error('Could not get 2D context from canvas')
 
-    this.ctx = context
-    this.fftSize = config.fftSize ?? 512
-    this.smoothingTimeConstant = config.smoothingTimeConstant ?? 0.8
+    this._ctx = context
+    this._fftSize = config.fftSize ?? 512
+    this._smoothingTimeConstant = config.smoothingTimeConstant ?? 0.8
     this._type = config.type ?? 'bars'
+    this._dataArray = defaultAvData
 
-    // Setup analyser
     this._analyser = new AnalyserNode(config.audioContext, {
-      fftSize: this.fftSize,
-      smoothingTimeConstant: this.smoothingTimeConstant,
+      fftSize: this._fftSize,
+      smoothingTimeConstant: this._smoothingTimeConstant,
     })
-    this.bufferLength = this._analyser.frequencyBinCount
-    this.dataArray = new Uint8Array(this.bufferLength)
     this._analyser.connect(config.audioContext.destination)
 
-    this.resize()
-    const { signal } = this.controller
+    const { signal } = this._controller
     window.addEventListener('resize', () => this.resize(), { signal })
-
-    // Bind methods (so that we can pass them directly to RAF)
-    this.draw = this.draw.bind(this)
+    this.draw = this.draw.bind(this) // Bind methods (so that we can pass them directly to RAF)
+    this.resize()
   }
 
   private resize() {
-    const rect = this.canvas.getBoundingClientRect()
+    const rect = this._canvas.getBoundingClientRect()
     const dpr = window.devicePixelRatio || 1
 
-    this.canvas.width = rect.width * dpr
-    this.canvas.height = rect.height * dpr
+    this._canvas.width = rect.width * dpr
+    this._canvas.height = rect.height * dpr
 
-    this.ctx.scale(dpr, dpr)
+    this._ctx.scale(dpr, dpr)
 
-    this.width = rect.width
-    this.height = rect.height
+    this._width = rect.width
+    this._height = rect.height
+    this.render()
   }
 
   start() {
-    if (!this.animationId) this.draw()
+    if (!this._animationId) this.draw()
   }
 
   stop() {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId)
-      this.animationId = null
+    if (this._animationId) {
+      cancelAnimationFrame(this._animationId)
+      this._animationId = null
     }
   }
 
@@ -86,39 +98,43 @@ class AudioVisualizer {
     this._type = type
   }
 
-  private draw() {
-    this.animationId = requestAnimationFrame(this.draw)
-
-    if (!this._analyser || !this.dataArray) return
-
-    // Get frequency or waveform data
-    if (this._type === 'waveform') {
-      this._analyser.getByteTimeDomainData(this.dataArray)
-    } else {
-      this._analyser.getByteFrequencyData(this.dataArray)
-    }
+  private render() {
+    const data = this._dataArray
 
     // Clear canvas
-    this.ctx.fillStyle = 'color(display-p3 0 0.004 0.008)'
-    this.ctx.fillRect(0, 0, this.width, this.height)
+    this._ctx.fillStyle = 'color(display-p3 0 0.004 0.008)'
+    this._ctx.fillRect(0, 0, this._width, this._height)
 
     // Draw based on type
     switch (this._type) {
       case 'bars':
-        drawSpectrumBars(this.ctx, this.dataArray, this.width, this.height)
+        drawSpectrumBars(this._ctx, data, this._width, this._height)
         break
       case 'curve':
-        drawSpectrumCurve(this.ctx, this.dataArray, this.width, this.height)
+        drawSpectrumCurve(this._ctx, data, this._width, this._height)
         break
       case 'waveform':
-        drawOscilloscope(this.ctx, this.dataArray, this.width, this.height)
+        drawOscilloscope(this._ctx, data, this._width, this._height)
         break
       case 'circular':
-        drawCircular(this.ctx, this.dataArray, this.width, this.height)
+        drawCircular(this._ctx, data, this._width, this._height)
         break
       default:
         console.log(this._type satisfies never)
     }
+  }
+
+  private draw() {
+    if (!this._analyser) return
+    this._animationId = requestAnimationFrame(this.draw)
+
+    if (this._type === 'waveform') {
+      this._analyser.getByteTimeDomainData(this._dataArray)
+    } else {
+      this._analyser.getByteFrequencyData(this._dataArray)
+    }
+
+    this.render()
   }
 
   get node() {
@@ -126,17 +142,17 @@ class AudioVisualizer {
   }
 
   get paused() {
-    return !this.animationId
+    return !this._animationId
   }
 
   destroy() {
-    // Stop animation
     this.stop()
     this._analyser.disconnect()
+    this._controller.abort()
     // @ts-expect-error destroy audioContext
     this._analyser = null
-    this.dataArray = null
-    this.controller.abort()
+    // @ts-expect-error destroy audioContext
+    this._dataArray = null
   }
 }
 

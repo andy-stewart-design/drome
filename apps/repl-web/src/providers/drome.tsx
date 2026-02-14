@@ -26,7 +26,7 @@ const DromeContext = createContext<DromeContextType>()
 
 // Provider component
 function DromeProvider(props: ParentProps) {
-  const [drome, setDrome] = createSignal<Drome | undefined>(undefined)
+  const [drome, setDrome] = createSignal<Drome | null>(null)
   const [canvas, setCanvas] = createSignal<HTMLCanvasElement | null>(null)
   const [visualizer, setVisualizer] = createSignal<AudioVisualizer | null>(null)
   const { setPaused, setBeat } = usePlayState()
@@ -70,18 +70,22 @@ function DromeProvider(props: ParentProps) {
     const c = canvas()
     const d = drome()
     if (!c || !d) return
+
     const visualizer = new AudioVisualizer({
       audioContext: d.context,
       canvas: c,
       type: 'curve',
     })
-    d.analyser(visualizer.node)
+
+    d.analyzer = visualizer.node
     setVisualizer(visualizer)
   })
 
   onCleanup(() => {
     drome()?.destroy()
     visualizer()?.destroy()
+    setDrome(null)
+    setVisualizer(null)
   })
 
   const contextValue = { setCanvas, togglePlaystate } satisfies DromeContextType

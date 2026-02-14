@@ -12,6 +12,7 @@ import {
   createSketch,
   getLatestSketch,
   getSketches,
+  saveSketch,
   type SavedSketch,
   type WorkingSketch,
 } from '@/utils/sketch-db'
@@ -22,6 +23,7 @@ type SessionContextType = {
   setWorkingSketch: Setter<WorkingSketch>
   savedSketches: Accessor<SavedSketch[]>
   setSavedSketches: Setter<SavedSketch[]>
+  save(code: string): Promise<void>
 }
 
 // Create context with undefined as default
@@ -49,6 +51,15 @@ function SessionProvider(props: ParentProps) {
     controller.abort()
   })
 
+  async function save(code: string) {
+    const result = await saveSketch({ ...workingSketch(), code })
+    if (result.success) {
+      setWorkingSketch(result.data)
+      const sketches = await getSketches()
+      if (sketches) setSavedSketches(sketches)
+    }
+  }
+
   function handleUnload(e: Event) {
     const working = workingSketch()
     const saved = savedSketches()
@@ -69,6 +80,7 @@ function SessionProvider(props: ParentProps) {
     setWorkingSketch,
     savedSketches,
     setSavedSketches,
+    save,
   } satisfies SessionContextType
 
   return (
