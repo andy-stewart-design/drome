@@ -1,4 +1,4 @@
-type VisualizerType = "bars" | "waveform" | "circular";
+type VisualizerType = "bars" | "curve" | "waveform" | "circular";
 // prettier-ignore
 type FftSize = 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 |  32768
 
@@ -7,6 +7,7 @@ interface AudioVisualizerConfig {
   canvas: HTMLCanvasElement;
   fftSize?: FftSize;
   smoothingTimeConstant?: number;
+  visualizerType?: VisualizerType;
 }
 
 class AudioVisualizer {
@@ -18,7 +19,7 @@ class AudioVisualizer {
   private animationId: number | null = null;
 
   private analyser: AnalyserNode;
-  private visualizerType: VisualizerType = "bars";
+  private visualizerType: VisualizerType;
 
   private dataArray: Uint8Array<ArrayBuffer> | null = null;
   private bufferLength: number = 0;
@@ -38,6 +39,7 @@ class AudioVisualizer {
     this.ctx = context;
     this.fftSize = config.fftSize ?? 512;
     this.smoothingTimeConstant = config.smoothingTimeConstant ?? 0.8;
+    this.visualizerType = config.visualizerType ?? "bars";
 
     // Setup analyser
     this.analyser = new AnalyserNode(config.audioContext, {
@@ -103,14 +105,19 @@ class AudioVisualizer {
     // Draw based on type
     switch (this.visualizerType) {
       case "bars":
-        drawBars(this.ctx, this.dataArray, this.width, this.height);
+        drawSpectrumBars(this.ctx, this.dataArray, this.width, this.height);
+        break;
+      case "curve":
+        drawSpectrumCurve(this.ctx, this.dataArray, this.width, this.height);
         break;
       case "waveform":
-        drawWaveform(this.ctx, this.dataArray, this.width, this.height);
+        drawOscilloscope(this.ctx, this.dataArray, this.width, this.height);
         break;
       case "circular":
         drawCircular(this.ctx, this.dataArray, this.width, this.height);
         break;
+      default:
+        console.log(this.visualizerType satisfies never);
     }
   }
 
@@ -131,7 +138,7 @@ class AudioVisualizer {
 
 // ---------------------------------------------------------------------------
 // VISUALIZER FUNCTIONS
-function drawBars(
+function drawSpectrumBars(
   ctx: CanvasRenderingContext2D,
   data: Uint8Array<ArrayBuffer> | null,
   width: number,
@@ -143,6 +150,7 @@ function drawBars(
   const barWidth = width / numBars;
   const barGap = 2;
   const samplesPerBar = Math.floor(data.length / numBars);
+  ctx.fillStyle = "color(display-p3 1 0 1)";
 
   for (let i = 0; i < numBars; i++) {
     const startIndex = i * samplesPerBar;
@@ -150,7 +158,6 @@ function drawBars(
     const value = data[Math.floor((startIndex + endIndex) / 2)];
     const barHeight = (value / 255) * height * 0.9 + height * 0.005;
 
-    ctx.fillStyle = "color(display-p3 1 0 1)";
     ctx.fillRect(
       i * barWidth,
       height / 2 - barHeight / 2,
@@ -160,7 +167,81 @@ function drawBars(
   }
 }
 
-function drawWaveform(
+function drawSpectrumCurve(
+  ctx: CanvasRenderingContext2D,
+  data: Uint8Array<ArrayBuffer> | null,
+  width: number,
+  height: number,
+  numPoints = 80,
+) {
+  if (!data) return;
+
+  const samplesPerPoint = Math.floor(data.length / numPoints);
+  const pointSpacing = width / (numPoints - 1);
+
+  // Collect data points
+  const points: { x: number; y: number }[] = [];
+  for (let i = 0; i < numPoints; i++) {
+    const startIndex = i * samplesPerPoint;
+    const endIndex = startIndex + samplesPerPoint;
+    const value = data[Math.floor((startIndex + endIndex) / 2)];
+
+    // Invert so higher values are at top
+    const normalizedValue = value / 255;
+    const y = height - (normalizedValue * height * 0.9 + height * 0.05);
+
+    points.push({
+      x: i * pointSpacing,
+      y: y,
+    });
+  }
+
+  const drawCurve = () => {
+    for (let i = 0; i < points.length - 1; i++) {
+      const currentPoint = points[i];
+      const nextPoint = points[i + 1];
+
+      // Calculate control point for smooth curve (midpoint)
+      const controlX = (currentPoint.x + nextPoint.x) / 2;
+      const controlY = (currentPoint.y + nextPoint.y) / 2;
+
+      ctx.quadraticCurveTo(currentPoint.x, currentPoint.y, controlX, controlY);
+    }
+  };
+
+  // Draw filled area under the curve
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, height); // Start at bottom-left
+  ctx.lineTo(points[0].x, points[0].y); // Go to first data point
+  drawCurve();
+
+  // Connect to last point
+  const lastPoint = points[points.length - 1];
+  ctx.lineTo(lastPoint.x, lastPoint.y);
+
+  // Complete the fill area
+  ctx.lineTo(lastPoint.x, height); // Go to bottom-right
+  ctx.closePath();
+
+  // Fill with gradient
+  const gradient = ctx.createLinearGradient(0, 0, 0, height);
+  gradient.addColorStop(0, "color(display-p3 1 0 1 / 0.5)"); // Blue with opacity
+  gradient.addColorStop(1, "color(display-p3 1 0 1 / 0.1)");
+  ctx.fillStyle = gradient;
+  ctx.fill();
+
+  // Draw the line on top
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  drawCurve();
+
+  ctx.lineTo(lastPoint.x, lastPoint.y);
+  ctx.strokeStyle = "color(display-p3 1 0 1)"; // Solid blue
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function drawOscilloscope(
   ctx: CanvasRenderingContext2D,
   data: Uint8Array<ArrayBuffer> | null,
   width: number,

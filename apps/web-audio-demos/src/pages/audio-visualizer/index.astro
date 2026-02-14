@@ -8,6 +8,7 @@
 
   <select id="visualizerType">
     <option value="bars">Frequency Bars</option>
+    <option value="curve">Frequency Curve</option>
     <option value="waveform">Waveform</option>
     <option value="circular">Circular</option>
   </select>
@@ -28,6 +29,7 @@
   let pauseTime = 0;
   let isPlaying = false;
   let visualizer: AudioVisualizer | undefined;
+  let visualizerType: VisualizerType = "bars";
 
   const canvasElement = document.getElementById("visualizer");
   if (!(canvasElement instanceof HTMLCanvasElement)) {
@@ -49,15 +51,19 @@
     infoText.textContent = `Loading: ${file.name}...`;
 
     try {
-      audioContext = new AudioContext();
-      visualizer = new AudioVisualizer({
-        audioContext,
-        canvas: canvasElement,
-        fftSize: 512,
-        smoothingTimeConstant: 0.8,
-      });
+      if (!audioContext || !visualizer) {
+        audioContext = new AudioContext();
 
-      await initAudio(file);
+        visualizer = new AudioVisualizer({
+          audioContext,
+          canvas: canvasElement,
+          fftSize: 512,
+          smoothingTimeConstant: 0.8,
+          visualizerType,
+        });
+      }
+
+      await processAudioFile(file);
 
       infoText.textContent = `Loaded: ${file.name}`;
       playPauseBtn.disabled = false;
@@ -80,10 +86,11 @@
 
   visualizerTypeSelect.addEventListener("change", (e) => {
     const target = e.target as HTMLSelectElement;
+    visualizerType = target.value as VisualizerType;
     visualizer?.setVisualizerType(target.value as VisualizerType);
   });
 
-  async function initAudio(file: File): Promise<void> {
+  async function processAudioFile(file: File): Promise<void> {
     if (!audioContext) return;
     const arrayBuffer = await file.arrayBuffer();
     audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
@@ -128,6 +135,8 @@
 
     pauseTime = audioContext.currentTime - startTime;
     source.stop();
+    source.disconnect();
+    source = null;
     isPlaying = false;
     visualizer.stop();
   }
