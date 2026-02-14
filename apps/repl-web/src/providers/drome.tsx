@@ -2,17 +2,23 @@ import {
   createContext,
   useContext,
   createSignal,
-  type Accessor,
   type ParentProps,
   onMount,
   onCleanup,
+  type Setter,
+  createEffect,
 } from 'solid-js'
 import type Drome from 'drome-live'
 import { usePlayState } from './playstate'
+import AudioVisualizer from '@/utils/audio-visualizer'
+import { useSession } from './session'
+import { useEditor } from './editor'
+import { flash } from '@/codemirror/flash'
 
 // Define the context type
 type DromeContextType = {
-  drome: Accessor<Drome | undefined>
+  setCanvas: Setter<HTMLCanvasElement | null>
+  togglePlaystate(pause?: boolean): void
 }
 
 // Create context with undefined as default
@@ -21,24 +27,64 @@ const DromeContext = createContext<DromeContextType>()
 // Provider component
 function DromeProvider(props: ParentProps) {
   const [drome, setDrome] = createSignal<Drome | undefined>(undefined)
+  const [canvas, setCanvas] = createSignal<HTMLCanvasElement | null>(null)
+  const [visualizer, setVisualizer] = createSignal<AudioVisualizer | null>(null)
   const { setPaused, setBeat } = usePlayState()
+  const { editor } = useEditor()
+  const { setWorkingSketch } = useSession()
+
+  function togglePlaystate(pause?: boolean) {
+    const ed = editor()
+    const d = drome()
+    const v = visualizer()
+    if (!d || !ed) return
+
+    const shouldPause = pause ?? !d.paused
+
+    if (shouldPause) {
+      d.stop()
+      v?.stop()
+    } else {
+      const code = ed.state.doc.toString()
+      d.evaluate(code)
+      flash(ed)
+      if (d.paused) d.start()
+      if (v?.paused) v?.start()
+      setWorkingSketch((s) => ({ ...s, code }))
+    }
+  }
 
   onMount(() => {
-    import('drome-live')
-      .then(({ default: Drome }) => Drome.init(120))
-      .then((d) => {
-        setDrome(d)
-        d.clock.on('start', () => setPaused(false))
-        d.clock.on('stop', () => setPaused(true))
-        d.clock.on('beat', ({ beat }) => setBeat(beat + 1))
-      })
+    async function init() {
+      const { default: Drome } = await import('drome-live')
+      const d = await Drome.init(120)
+      d.clock.on('start', () => setPaused(false))
+      d.clock.on('stop', () => setPaused(true))
+      d.clock.on('beat', ({ beat }) => setBeat(beat + 1))
+      setDrome(d)
+    }
+    init()
+  })
+
+  createEffect(() => {
+    const c = canvas()
+    const d = drome()
+    if (!c || !d) return
+    const visualizer = new AudioVisualizer({
+      audioContext: d.context,
+      canvas: c,
+      type: 'curve',
+    })
+    d.analyser(visualizer.node)
+    setVisualizer(visualizer)
   })
 
   onCleanup(() => {
     drome()?.destroy()
+    visualizer()?.destroy()
   })
 
-  const contextValue = { drome } satisfies DromeContextType
+  const contextValue = { setCanvas, togglePlaystate } satisfies DromeContextType
 
   return (
     <DromeContext.Provider value={contextValue}>

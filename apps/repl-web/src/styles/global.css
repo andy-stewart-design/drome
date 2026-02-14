@@ -5,10 +5,6 @@
 }
 
 html {
-  background: black;
-  color: white;
-  color-scheme: dark;
-
   --color-neutral-50-rgb: 248 249 250;
   --color-neutral-50: rgb(var(--color-neutral-50-rgb));
   --color-neutral-100: rgb(191 206 222);
@@ -44,6 +40,10 @@ html {
   --border-strong: var(--color-neutral-50);
 
   --app-sidebar-width: 360px;
+
+  background: var(--color-bg-primary);
+  color: white;
+  color-scheme: dark;
 }
 
 body {

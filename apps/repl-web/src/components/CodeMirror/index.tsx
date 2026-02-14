@@ -17,13 +17,15 @@ function CodeMirror() {
     const ed = editor()
     if (!ed) return
 
-    ed.dispatch({
-      changes: {
-        from: 0,
-        to: ed.state.doc.length,
-        insert: workingSketch().code,
-      },
-    })
+    if (ed.state.doc.toString() !== workingSketch().code) {
+      ed.dispatch({
+        changes: {
+          from: 0,
+          to: ed.state.doc.length,
+          insert: workingSketch().code,
+        },
+      })
+    }
   })
 
   return <div ref={editorContainer} class={s.container} />
