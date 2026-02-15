@@ -7,9 +7,10 @@ function useKeyboardEvent() {
   let controller = new AbortController()
   const { togglePlaystate } = useDrome()
   const { editor } = useEditor()
-  const { save } = useSession()
+  const { saveSketch, createSketch } = useSession()
 
   function handleKeyDown(e: KeyboardEvent) {
+    console.log(e.key)
     if (e.altKey && e.key === 'Enter') {
       e.preventDefault()
       togglePlaystate(false)
@@ -17,9 +18,13 @@ function useKeyboardEvent() {
       e.preventDefault()
       togglePlaystate(true)
     } else if (e.metaKey && e.key === 's') {
+      e.preventDefault()
       const ed = editor()
       if (!ed) return
-      save(ed.state.doc.toString())
+      saveSketch(ed.state.doc.toString())
+    } else if (e.altKey && e.key === 'Dead') {
+      e.preventDefault()
+      createSketch()
     }
   }
 

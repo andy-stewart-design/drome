@@ -26,6 +26,8 @@ interface AudioVisualizerConfig {
   type?: VisualizerType
 }
 
+const visualizerTypes = ['bars', 'curve', 'waveform'] as const
+
 class AudioVisualizer {
   private _canvas: HTMLCanvasElement
   private _ctx: CanvasRenderingContext2D
@@ -98,6 +100,14 @@ class AudioVisualizer {
     this._type = type
   }
 
+  nextType() {
+    const i = visualizerTypes.findIndex((t) => t === this._type)
+    if (i < 0) return
+    this._type = visualizerTypes[(i + 1) % visualizerTypes.length]
+    this.getByteData()
+    this.render()
+  }
+
   private render() {
     const data = this._dataArray
 
@@ -124,16 +134,19 @@ class AudioVisualizer {
     }
   }
 
-  private draw() {
-    if (!this._analyser) return
-    this._animationId = requestAnimationFrame(this.draw)
-
+  private getByteData() {
     if (this._type === 'waveform') {
       this._analyser.getByteTimeDomainData(this._dataArray)
     } else {
       this._analyser.getByteFrequencyData(this._dataArray)
     }
+  }
 
+  private draw() {
+    if (!this._analyser) return
+    this._animationId = requestAnimationFrame(this.draw)
+
+    this.getByteData()
     this.render()
   }
 

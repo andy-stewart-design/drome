@@ -1,7 +1,5 @@
 import { For } from 'solid-js'
 import { useSession } from '@/providers/session'
-import { useUser } from '@/providers/user'
-import { createSketch, deleteSketch, getSketches } from '@/utils/sketch-db'
 import { useEditor } from '@/providers/editor'
 import s from './style.module.css'
 
@@ -11,25 +9,23 @@ function SketchManager() {
     workingSketch,
     setWorkingSketch,
     savedSketches,
-    setSavedSketches,
-    save,
+    saveSketch,
+    deleteSketch,
+    createSketch,
   } = useSession()
-  const { user } = useUser()
 
-  function handleCreateNew() {
-    setWorkingSketch(createSketch({ author: user().name }))
+  function handleCreate() {
+    createSketch()
   }
 
-  async function handleSave() {
+  function handleSave() {
     const ed = editor()
     if (!ed) return
-    save(ed.state.doc.toString())
+    saveSketch(ed.state.doc.toString())
   }
 
-  async function handleDelete(id: number) {
+  function handleDelete(id: number) {
     deleteSketch(id)
-    const sketches = await getSketches()
-    if (sketches) setSavedSketches(sketches)
   }
 
   return (
@@ -38,7 +34,7 @@ function SketchManager() {
         <button classList={clst(s.button, s.tool)} onClick={handleSave}>
           <IconArrowDown12 /> Save
         </button>
-        <button classList={clst(s.button, s.tool)} onClick={handleCreateNew}>
+        <button classList={clst(s.button, s.tool)} onClick={handleCreate}>
           <IconPlus12 /> New
         </button>
       </div>

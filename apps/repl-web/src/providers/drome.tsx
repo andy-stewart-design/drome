@@ -19,6 +19,7 @@ import { flash } from '@/codemirror/flash'
 type DromeContextType = {
   setCanvas: Setter<HTMLCanvasElement | null>
   togglePlaystate(pause?: boolean): void
+  setVisualizerType(): void
 }
 
 // Create context with undefined as default
@@ -88,7 +89,15 @@ function DromeProvider(props: ParentProps) {
     setVisualizer(null)
   })
 
-  const contextValue = { setCanvas, togglePlaystate } satisfies DromeContextType
+  function setVisualizerType() {
+    visualizer()?.nextType()
+  }
+
+  const contextValue = {
+    setCanvas,
+    togglePlaystate,
+    setVisualizerType,
+  } satisfies DromeContextType
 
   return (
     <DromeContext.Provider value={contextValue}>
