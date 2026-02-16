@@ -7,6 +7,30 @@
   import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
   import { tags } from "@lezer/highlight";
 
+  const editorTheme = EditorView.theme({
+    "&": {
+      backgroundColor: "var(--cm-background)",
+      color: "var(--cm-text)",
+    },
+    ".cm-content": {
+      caretColor: "var(--cm-caret)",
+    },
+    ".cm-cursor": {
+      borderLeftColor: "var(--cm-caret)",
+    },
+    ".cm-gutters": {
+      backgroundColor: "var(--cm-gutter-background)",
+      color: "var(--cm-gutter-text)",
+      borderRight: "1px solid var(--cm-gutter-border)",
+    },
+    ".cm-activeLineGutter": {
+      backgroundColor: "var(--cm-active-line-gutter-background)",
+    },
+    ".cm-activeLine": {
+      backgroundColor: "var(--cm-active-line-background)",
+    },
+  });
+
   const highlightStyle = HighlightStyle.define([
     { tag: tags.keyword, color: "var(--cm-keyword)" },
     { tag: tags.controlKeyword, color: "var(--cm-control-keyword)" },
@@ -47,12 +71,27 @@ if (doubled.length > 0) {
   const view = new EditorView({
     doc: sampleCode,
     parent: container,
-    extensions: [basicSetup, javascript(), syntaxHighlighting(highlightStyle)],
+    extensions: [
+      basicSetup,
+      javascript(),
+      editorTheme,
+      syntaxHighlighting(highlightStyle),
+    ],
   });
 </script>
 
 <style>
   :root {
+    /* Editor chrome */
+    --cm-background: #ffffff;
+    --cm-text: #1e293b;
+    --cm-caret: #1e293b;
+    --cm-gutter-background: white;
+    --cm-gutter-text: #94a3b8;
+    --cm-gutter-border: #e2e8f0;
+    --cm-active-line-background: rgb(0 0 0 / 0.05);
+    --cm-active-line-gutter-background: #e2e8f0;
+
     /* Syntax highlighting colors */
     --cm-keyword: #7c3aed;
     --cm-control-keyword: #7c3aed;
