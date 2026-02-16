@@ -1,0 +1,30 @@
+<div id="editor-container"></div>
+
+<script>
+  import { basicSetup } from "codemirror";
+  import { EditorView } from "@codemirror/view";
+
+  const container = document.querySelector("#editor-container") ?? undefined;
+
+  const view = new EditorView({
+    doc: "Start document",
+    parent: container,
+    extensions: [basicSetup],
+  });
+</script>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  #editor-container {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    height: 100dvh;
+  }
+</style>
