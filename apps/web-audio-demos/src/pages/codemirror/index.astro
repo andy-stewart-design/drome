@@ -29,6 +29,24 @@
     ".cm-activeLine": {
       backgroundColor: "var(--cm-active-line-background)",
     },
+    ".cm-selectionBackground, &.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground":
+      {
+        backgroundColor: "var(--cm-selection) !important",
+      },
+    "& .cm-line .cm-matchingBracket, & .cm-line .cm-nonmatchingBracket": {
+      outline: "none",
+    },
+    "& .cm-line .cm-matchingBracket": {
+      backgroundColor: "var(--cm-matching-bracket)",
+      color: "var(--cm-matching-bracket-text)",
+    },
+    "& .cm-line .cm-nonmatchingBracket": {
+      backgroundColor: "var(--cm-nonmatching-bracket)",
+      color: "var(--cm-nonmatching-bracket-text)",
+    },
+    ".cm-selectionMatch": {
+      backgroundColor: "var(--cm-selection-match) !important",
+    },
   });
 
   const highlightStyle = HighlightStyle.define([
@@ -86,11 +104,17 @@ if (doubled.length > 0) {
     --cm-background: transparent;
     --cm-text: #fff;
     --cm-caret: #aaa;
-    --cm-gutter-background: transparent;
+    --cm-gutter-background: rgb(0 0 0 / 0.7);
     --cm-gutter-text: #888;
     --cm-gutter-border: rgb(255 255 255 / 0.1);
     --cm-active-line-background: rgb(255 255 255 / 0.075);
     --cm-active-line-gutter-background: rgb(255 255 255 / 0.15);
+    --cm-selection: darkblue;
+    --cm-matching-bracket: rgb(255 255 255 / 0.2);
+    --cm-matching-bracket-text: inherit;
+    --cm-nonmatching-bracket: rgb(255 0 0 / 0.3);
+    --cm-nonmatching-bracket-text: #ff6b6b;
+    --cm-selection-match: rgb(255 255 255 / 0.15);
 
     /* Syntax highlighting colors */
     --cm-keyword: #7c3aed;
