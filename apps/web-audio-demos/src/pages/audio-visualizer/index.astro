@@ -1,0 +1,237 @@
+<canvas id="visualizer"></canvas>
+
+<div class="controls">
+  <label for="audioFile">Load Audio File</label>
+  <input type="file" id="audioFile" accept="audio/*" />
+
+  <button id="playPause" disabled>Play</button>
+
+  <select id="visualizerType">
+    <option value="bars">Frequency Bars</option>
+    <option value="curve">Frequency Curve</option>
+    <option value="waveform">Waveform</option>
+    <option value="circular">Circular</option>
+  </select>
+</div>
+
+<div class="info">
+  <p>Load an audio file to start visualizing</p>
+</div>
+
+<script>
+  import AudioVisualizer, { type VisualizerType } from "./visualizer";
+
+  // Initialize
+  let audioContext: AudioContext | undefined;
+  let source: AudioBufferSourceNode | null = null;
+  let audioBuffer: AudioBuffer | undefined;
+  let startTime = 0;
+  let pauseTime = 0;
+  let isPlaying = false;
+  let visualizer: AudioVisualizer | undefined;
+  let visualizerType: VisualizerType = "bars";
+
+  const canvasElement = document.getElementById("visualizer");
+  if (!(canvasElement instanceof HTMLCanvasElement)) {
+    throw new Error(`Element with id "visualizer" is not a canvas`);
+  }
+
+  // UI Controls
+  const fileInput = document.getElementById("audioFile") as HTMLInputElement;
+  const playPauseBtn = document.querySelector<HTMLButtonElement>("#playPause")!;
+  const visualizerTypeSelect =
+    document.querySelector<HTMLSelectElement>("#visualizerType")!;
+  const infoText = document.querySelector<HTMLParagraphElement>(".info p")!;
+
+  fileInput.addEventListener("change", async (e) => {
+    const target = e.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    infoText.textContent = `Loading: ${file.name}...`;
+
+    try {
+      if (!audioContext || !visualizer) {
+        audioContext = new AudioContext();
+
+        visualizer = new AudioVisualizer({
+          audioContext,
+          canvas: canvasElement,
+          fftSize: 512,
+          smoothingTimeConstant: 0.8,
+          visualizerType,
+        });
+      }
+
+      await processAudioFile(file);
+
+      infoText.textContent = `Loaded: ${file.name}`;
+      playPauseBtn.disabled = false;
+      playPauseBtn.textContent = "Play";
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      infoText.textContent = `Error loading file: ${errorMessage}`;
+    }
+  });
+
+  playPauseBtn.addEventListener("click", () => {
+    if (visualizer && !isPlaying) {
+      play();
+      playPauseBtn.textContent = "Pause";
+    } else if (visualizer) {
+      pause();
+      playPauseBtn.textContent = "Play";
+    }
+  });
+
+  visualizerTypeSelect.addEventListener("change", (e) => {
+    const target = e.target as HTMLSelectElement;
+    visualizerType = target.value as VisualizerType;
+    visualizer?.setVisualizerType(target.value as VisualizerType);
+  });
+
+  async function processAudioFile(file: File): Promise<void> {
+    if (!audioContext) return;
+    const arrayBuffer = await file.arrayBuffer();
+    audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    pauseTime = 0;
+  }
+
+  function play() {
+    if (!audioContext || !visualizer || !audioBuffer) return;
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
+    }
+
+    // Stop current source if exists
+    if (source) source.stop();
+
+    // Create new buffer source
+    source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(visualizer.node);
+
+    // Handle playback end
+    source.onended = () => {
+      if (isPlaying) {
+        isPlaying = false;
+        pauseTime = 0;
+        visualizer?.stop();
+        playPauseBtn.textContent = "Play";
+      }
+    };
+
+    // Start from pause position
+    startTime = audioContext.currentTime - pauseTime;
+    source.start(0, pauseTime);
+    isPlaying = true;
+    visualizer.start();
+  }
+
+  function pause(): void {
+    if (!audioContext || !visualizer || !source || !isPlaying) {
+      return;
+    }
+
+    pauseTime = audioContext.currentTime - startTime;
+    source.stop();
+    source.disconnect();
+    source = null;
+    isPlaying = false;
+    visualizer.stop();
+  }
+</script>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
+    background: #1a1a1a;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  #visualizer {
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 3/2;
+    background: #1a1a1a;
+    border-radius: 8px;
+    /* Performance hint for browser */
+    will-change: transform;
+  }
+
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  button {
+    padding: 10px 20px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+
+  button:hover {
+    background: #1d4ed8;
+  }
+
+  button:disabled {
+    background: #4b5563;
+    cursor: not-allowed;
+  }
+
+  select {
+    padding: 8px 12px;
+    background: #374151;
+    color: white;
+    border: 1px solid #4b5563;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+  label {
+    padding: 10px 20px;
+    background: #059669;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+
+  label:hover {
+    background: #047857;
+  }
+
+  .info {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #9ca3af;
+  }
+</style>

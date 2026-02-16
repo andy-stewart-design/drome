@@ -94,9 +94,6 @@ class AudioClock {
     this.listeners.get("start")?.forEach((cb) => {
       cb(this.metronome, this._nextBeatStart);
     });
-    this.listeners.get("start")?.forEach((cb) => {
-      cb(this.metronome, this._nextBeatStart);
-    });
   }
 
   public pause() {

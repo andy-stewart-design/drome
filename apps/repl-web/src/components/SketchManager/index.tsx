@@ -1,43 +1,31 @@
 import { For } from 'solid-js'
 import { useSession } from '@/providers/session'
-import { useUser } from '@/providers/user'
-import {
-  createSketch,
-  deleteSketch,
-  getSketches,
-  saveSketch,
-} from '@/utils/sketch-db'
 import { useEditor } from '@/providers/editor'
 import s from './style.module.css'
 
 function SketchManager() {
   const { editor } = useEditor()
-  const { workingSketch, setWorkingSketch, savedSketches, setSavedSketches } =
-    useSession()
-  const { user } = useUser()
+  const {
+    workingSketch,
+    setWorkingSketch,
+    savedSketches,
+    saveSketch,
+    deleteSketch,
+    createSketch,
+  } = useSession()
 
-  function handleCreateNew() {
-    setWorkingSketch(createSketch({ author: user().name }))
+  function handleCreate() {
+    createSketch()
   }
 
-  async function handleSave() {
+  function handleSave() {
     const ed = editor()
     if (!ed) return
-    const result = await saveSketch({
-      ...workingSketch(),
-      code: ed.state.doc.toString(),
-    })
-    if (result.success) {
-      setWorkingSketch(result.data)
-      const sketches = await getSketches()
-      if (sketches) setSavedSketches(sketches)
-    }
+    saveSketch(ed.state.doc.toString())
   }
 
-  async function handleDelete(id: number) {
+  function handleDelete(id: number) {
     deleteSketch(id)
-    const sketches = await getSketches()
-    if (sketches) setSavedSketches(sketches)
   }
 
   return (
@@ -46,7 +34,7 @@ function SketchManager() {
         <button classList={clst(s.button, s.tool)} onClick={handleSave}>
           <IconArrowDown12 /> Save
         </button>
-        <button classList={clst(s.button, s.tool)} onClick={handleCreateNew}>
+        <button classList={clst(s.button, s.tool)} onClick={handleCreate}>
           <IconPlus12 /> New
         </button>
       </div>

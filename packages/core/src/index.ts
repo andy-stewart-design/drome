@@ -38,6 +38,8 @@ class Drome {
   private _sampleManager: SampleManager;
   private _suspendTimeoutId: ReturnType<typeof setTimeout> | undefined | null;
   private _logs: string[] = [];
+  private _analyser: AnalyserNode | undefined;
+  private _connected = false;
 
   fil: (type: FilterTypeAlias, frequency: SNELO, q?: number) => DromeFilter;
 
@@ -64,9 +66,7 @@ class Drome {
     this._sessionManager = sesh;
     this._sampleManager = samp;
     this.audioChannels = Array.from({ length: NUM_CHANNELS }, () => {
-      const gain = new GainNode(this.ctx, { gain: BASE_GAIN });
-      gain.connect(this.ctx.destination);
-      return gain;
+      return new GainNode(this.ctx, { gain: BASE_GAIN });
     });
     const prebarCb = this.clock.on("prebar", this.preTick.bind(this));
     const barCb = this.clock.on("bar", this.handleTick.bind(this));
@@ -118,6 +118,17 @@ class Drome {
   }
 
   async start() {
+    if (!this._connected) {
+      this.audioChannels.forEach((chan) => {
+        if (this._analyser) {
+          chan.connect(this._analyser).connect(this.ctx.destination);
+        } else {
+          chan.connect(this.ctx.destination);
+        }
+      });
+      this._connected = true;
+    }
+
     if (!this.clock.paused) return;
     if (this._suspendTimeoutId) clearTimeout(this._suspendTimeoutId);
     await this._sampleManager.preloadSamples(this.instruments);
@@ -346,6 +357,10 @@ class Drome {
 
   get loadSample() {
     return this._sampleManager.loadSample.bind(this._sampleManager);
+  }
+
+  set analyzer(node: AnalyserNode) {
+    this._analyser = node;
   }
 }
 

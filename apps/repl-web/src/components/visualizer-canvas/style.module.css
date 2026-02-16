@@ -1,0 +1,38 @@
+.container {
+  display: grid;
+  place-items: start end;
+
+  & > * {
+    grid-area: 1/-1;
+  }
+}
+
+.canvas {
+  display: block;
+  aspect-ratio: 16/9;
+  width: 100%;
+  max-width: 100%;
+  max-height: 240px;
+  box-shadow: 0 0 0 1px var(--border-subtle);
+}
+
+.toolbar {
+  padding: 1rem;
+  opacity: 0;
+
+  .container:hover &,
+  &:has(:focus-visible) {
+    opacity: 1;
+  }
+
+  button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 100vmax;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--border-subtle);
+  }
+}

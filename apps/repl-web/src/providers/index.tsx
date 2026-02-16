@@ -8,8 +8,8 @@ import DromeProvider from './drome'
 
 const Providers: ParentComponent = (props) => {
   return (
-    <SessionProvider>
-      <UserProvider>
+    <UserProvider>
+      <SessionProvider>
         <EditorProvider>
           <SidebarProvider>
             <PlayStateProvider>
@@ -17,8 +17,8 @@ const Providers: ParentComponent = (props) => {
             </PlayStateProvider>
           </SidebarProvider>
         </EditorProvider>
-      </UserProvider>
-    </SessionProvider>
+      </SessionProvider>
+    </UserProvider>
   )
 }
 
