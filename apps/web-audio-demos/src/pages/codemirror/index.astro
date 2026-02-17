@@ -1,4 +1,4 @@
-<div id="editor-container"></div>
+<div id="editor"></div>
 
 <script>
   import { basicSetup } from "codemirror";
@@ -108,7 +108,8 @@
     { tag: tags.regexp, color: "var(--color-cm-regexp)" },
   ]);
 
-  const container = document.querySelector("#editor-container") ?? undefined;
+  const container =
+    document.querySelector<HTMLDivElement>("#editor") ?? undefined;
 
   const sampleCode = `// Sample JavaScript code
 function greet(name) {
@@ -146,7 +147,7 @@ if (doubled.length > 0) {
   });
 
   function toggleTheme() {
-    if (!(container instanceof HTMLElement)) return;
+    if (!container) return;
 
     let currentTheme = container.dataset.theme;
     if (!currentTheme) {
@@ -160,7 +161,7 @@ if (doubled.length > 0) {
   let timeoutId: ReturnType<typeof setTimeout> | null;
 
   function flash(dur = 200) {
-    if (!(container instanceof HTMLElement)) return;
+    if (!container) return;
     if (timeoutId) clearTimeout(timeoutId);
 
     const cursorPos = view.state.selection.ranges[0].from;
@@ -280,13 +281,13 @@ if (doubled.length > 0) {
     --color-cm-active-line-gutter-bg: oklch(
       var(--color-neutral-50-lch) / 0.125
     );
-    --color-cm-selection-bg: var(--color-blue-900);
+    --color-cm-selection-bg: var(--color-blue-800);
     --color-cm-matching-bracket-bg: var(--color-neutral-700);
     --color-cm-matching-bracket-fg: var(--color-neutral-400);
     --color-cm-nonmatching-bracket-bg: var(--color-red-800);
     --color-cm-nonmatching-bracket-fg: var(--color-red-300);
-    --color-cm-selection-match-bg: var(--color-neutral-700);
-    --color-cm-selection-match-fg: var(--color-neutral-300);
+    --color-cm-selection-match-bg: var(--color-blue-800);
+    --color-cm-selection-match-fg: var(--color-blue-400);
 
     /* Syntax highlighting colors */
     --color-cm-keyword: var(--color-violet-400);
@@ -310,7 +311,7 @@ if (doubled.length > 0) {
     --color-cm-flash-bg: var(--color-fuchsia-600);
   }
 
-  :root:has(body > #editor-container[data-theme="light"]) {
+  :root:has(body > #editor[data-theme="light"]) {
     /* App tokens */
     --color-fg-primary: var(--color-neutral-950);
     --color-bg-primary: var(--color-neutral-100);
@@ -328,8 +329,8 @@ if (doubled.length > 0) {
     --color-cm-matching-bracket-fg: var(--color-neutral-700);
     --color-cm-nonmatching-bracket-bg: var(--color-red-300);
     --color-cm-nonmatching-bracket-fg: var(--color-red-700);
-    --color-cm-selection-match-bg: var(--color-neutral-200);
-    --color-cm-selection-match-fg: var(--color-neutral-700);
+    --color-cm-selection-match-bg: var(--color-blue-200);
+    --color-cm-selection-match-fg: var(--color-blue-700);
 
     /* Syntax highlighting colors */
     --color-cm-keyword: var(--color-violet-600);
@@ -365,13 +366,13 @@ if (doubled.length > 0) {
     margin: 0;
   }
 
-  #editor-container {
+  #editor {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     height: 100dvh;
   }
 
-  #editor-container[data-flash="true"] {
+  #editor[data-flash="true"] {
     --color-cm-line-bg: var(--color-cm-flash-bg);
     --color-cm-active-line-bg: var(--color-cm-flash-bg);
     --color-cm-line-inline-size: fit-content;
