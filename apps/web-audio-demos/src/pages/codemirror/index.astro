@@ -123,7 +123,9 @@ const doubled = numbers.map(n => n * 2);
 
 if (doubled.length > 0) {
   greet("World");
-}`;
+}
+
+d.synth("sine").note([60,64,67,71])`;
 
   const view = new EditorView({
     doc: sampleCode,
@@ -181,7 +183,21 @@ if (doubled.length > 0) {
 <style>
   :root {
     /* Color tokens */
-    --color-neutral-50-lch: 0.984 0.003 247.86;
+    --color-neutral-50-lch: 0.985 0.002 247.84;
+    --color-neutral-50: oklch(var(--color-neutral-50-lch));
+    --color-neutral-100: oklch(0.967 0.003 264.54);
+    --color-neutral-200: oklch(0.928 0.006 264.53);
+    --color-neutral-300: oklch(0.872 0.01 258.34);
+    --color-neutral-400: oklch(0.707 0.022 261.32);
+    --color-neutral-500: oklch(0.551 0.027 264.36);
+    --color-neutral-600: oklch(0.446 0.03 256.8);
+    --color-neutral-700: oklch(0.373 0.034 259.73);
+    --color-neutral-800: oklch(0.278 0.033 256.85);
+    --color-neutral-900: oklch(0.21 0.034 264.67);
+    --color-neutral-950-lch: 0.13 0.028 261.69;
+    --color-neutral-950: oklch(var(--color-neutral-950-lch));
+
+    /*--color-neutral-50-lch: 0.984 0.003 247.86;
     --color-neutral-50: oklch(var(--color-neutral-50-lch));
     --color-neutral-100: oklch(0.968 0.007 247.9);
     --color-neutral-200: oklch(0.929 0.013 255.51);
@@ -193,7 +209,8 @@ if (doubled.length > 0) {
     --color-neutral-800: oklch(0.279 0.041 260.03);
     --color-neutral-900: oklch(0.208 0.042 265.75);
     --color-neutral-950-lch: 0.129 0.042 264.69;
-    --color-neutral-950: oklch(var(--color-neutral-950-lch));
+    --color-neutral-950: oklch(var(--color-neutral-950-lch));*/
+
     --color-blue-50: oklch(0.97 0.014 254.6);
     --color-blue-100: oklch(0.932 0.032 255.59);
     --color-blue-200: oklch(0.882 0.059 254.13);
@@ -260,6 +277,41 @@ if (doubled.length > 0) {
     --color-red-800: oklch(0.455 0.188 13.7);
     --color-red-900: oklch(0.41 0.159 10.27);
     --color-red-950: oklch(0.271 0.105 12.09);
+
+    --color-magenta-50: color(display-p3 1 0.9 1);
+    --color-magenta-100: color(display-p3 1 0.75 1);
+    --color-magenta-200: color(display-p3 1 0.5 1);
+    --color-magenta-300: color(display-p3 1 0 1);
+    --color-magenta-400: color(display-p3 0.7375 0 0.7375);
+    --color-magenta-500: color(display-p3 0.6 0 0.6);
+    --color-magenta-600: color(display-p3 0.475 0 0.475);
+    --color-magenta-700: color(display-p3 0.35 0 0.35);
+    --color-magenta-800: color(display-p3 0.225 0 0.225);
+    --color-magenta-900: color(display-p3 0.117 0 0.117);
+    --color-magenta-950: color(display-p3 0.025 0 0.025);
+    --color-blue-50: color(display-p3 0.939 0.975 1);
+    --color-blue-100: color(display-p3 0.807 0.884 1);
+    --color-blue-200: color(display-p3 0.675 0.79 1);
+    --color-blue-300: color(display-p3 0.487 0.65 1);
+    --color-blue-400: color(display-p3 0.255 0.46 1);
+    --color-blue-500: color(display-p3 0 0.22 1);
+    --color-blue-600: color(display-p3 0 0 0.887);
+    --color-blue-700: color(display-p3 0 0 0.802);
+    --color-blue-800: color(display-p3 0 0 0.492);
+    --color-blue-900: color(display-p3 0 0 0.257);
+    --color-blue-950: color(display-p3 0 0 0.1);
+
+    /*--color-yellow-50: color(display-p3 1 1 0.94);
+    --color-yellow-100: color(display-p3 1 0.99 0.8);
+    --color-yellow-200: color(display-p3 1 0.98 0.6);
+    --color-yellow-300: color(display-p3 1 0.95 0);
+    --color-yellow-400: color(display-p3 0.875 0.825 0);
+    --color-yellow-500: color(display-p3 0.75 0.7 0);
+    --color-yellow-600: color(display-p3 0.58 0.55 0);
+    --color-yellow-700: color(display-p3 0.425 0.4 0);
+    --color-yellow-800: color(display-p3 0.325 0.3 0);
+    --color-yellow-900: color(display-p3 0.16 0.15 0);
+    --color-yellow-950: color(display-p3 0.04 0.03 0);*/
   }
 
   :root {
@@ -281,7 +333,7 @@ if (doubled.length > 0) {
     --color-cm-active-line-gutter-bg: oklch(
       var(--color-neutral-50-lch) / 0.125
     );
-    --color-cm-selection-bg: var(--color-blue-800);
+    --color-cm-selection-bg: var(--color-blue-900);
     --color-cm-matching-bracket-bg: var(--color-neutral-700);
     --color-cm-matching-bracket-fg: var(--color-neutral-400);
     --color-cm-nonmatching-bracket-bg: var(--color-red-800);
@@ -292,23 +344,23 @@ if (doubled.length > 0) {
     /* Syntax highlighting colors */
     --color-cm-keyword: var(--color-violet-400);
     --color-cm-control-keyword: var(--color-violet-400);
-    --color-cm-operator: var(--color-neutral-400);
+    --color-cm-operator: var(--color-blue-400);
     --color-cm-punctuation: var(--color-neutral-400);
-    --color-cm-string: var(--color-green-500);
-    --color-cm-number: var(--color-yellow-500);
+    --color-cm-string: var(--color-magenta-300);
+    --color-cm-number: var(--color-magenta-300);
     --color-cm-bool: var(--color-yellow-500);
     --color-cm-null: var(--color-yellow-500);
     --color-cm-variable: var(--color-neutral-300);
     --color-cm-definition: var(--color-blue-400);
     --color-cm-function: var(--color-blue-400);
-    --color-cm-property: var(--color-blue-400);
+    --color-cm-property: var(--color-fg-primary);
     --color-cm-comment: var(--color-neutral-600);
     --color-cm-type: var(--color-fuchsia-500);
     --color-cm-class: var(--color-fuchsia-500);
     --color-cm-regexp: var(--color-fuchsia-500);
 
     /* Evaluation confirmation */
-    --color-cm-flash-bg: var(--color-fuchsia-600);
+    --color-cm-flash-bg: var(--color-magenta-400);
   }
 
   :root:has(body > #editor[data-theme="light"]) {
@@ -337,7 +389,7 @@ if (doubled.length > 0) {
     --color-cm-control-keyword: var(--color-violet-600);
     --color-cm-operator: var(--color-neutral-600);
     --color-cm-punctuation: var(--color-neutral-600);
-    --color-cm-string: var(--color-green-700);
+    --color-cm-string: var(--color-magenta-400);
     --color-cm-number: var(--color-yellow-700);
     --color-cm-bool: var(--color-yellow-700);
     --color-cm-null: var(--color-yellow-700);
@@ -350,7 +402,7 @@ if (doubled.length > 0) {
     --color-cm-class: var(--color-fuchsia-700);
     --color-cm-regexp: var(--color-fuchsia-700);
 
-    --color-cm-flash-bg: var(--color-fuchsia-400);
+    --color-cm-flash-bg: var(--color-magenta-300);
   }
 
   * {
