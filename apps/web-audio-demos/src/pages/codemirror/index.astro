@@ -7,75 +7,105 @@
   import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
   import { tags } from "@lezer/highlight";
 
+  const ALLOW_FOLD = false;
+
   const editorTheme = EditorView.theme({
     "&": {
-      backgroundColor: "var(--cm-background)",
-      color: "var(--cm-text)",
+      backgroundColor: "var(--color-cm-background)",
+      color: "var(--color-cm-text)",
     },
     ".cm-content": {
-      caretColor: "var(--cm-caret)",
+      caretColor: "var(--color-cm-caret)",
     },
     ".cm-cursor": {
-      borderLeftColor: "var(--cm-caret)",
+      borderLeftColor: "var(--color-cm-caret)",
     },
     ".cm-gutters": {
-      backgroundColor: "var(--cm-gutter-bg)",
-      color: "var(--cm-gutter-fg)",
-      borderRight: "1px solid var(--cm-gutter-border)",
+      backgroundColor: "var(--color-cm-gutter-bg)",
+      color: "var(--color-cm-gutter-fg)",
+      borderRight: "1px solid var(--color-cm-gutter-border)",
     },
     ".cm-activeLineGutter": {
-      backgroundColor: "var(--cm-active-line-gutter-bg)",
-      color: "var(--cm-active-line-gutter-fg)",
+      backgroundColor: "var(--color-cm-active-line-gutter-bg)",
+      color: "var(--color-cm-active-line-gutter-fg)",
     },
-    ".cm-activeLine": {
-      backgroundColor: "var(--cm-active-line-bg)",
+    "& .cm-line": {
+      backgroundColor: "var(--color-cm-line-bg)",
+      inlineSize: "var(--color-cm-line-inline-size)",
+    },
+    "& .cm-line.cm-activeLine": {
+      backgroundColor: "var(--color-cm-active-line-bg)",
     },
     ".cm-selectionBackground, &.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground":
       {
-        backgroundColor: "var(--cm-selection-bg)",
+        backgroundColor: "var(--color-cm-selection-bg)",
       },
     "& .cm-line .cm-matchingBracket, & .cm-line .cm-nonmatchingBracket": {
       outline: "none",
     },
     "& .cm-line .cm-matchingBracket": {
-      backgroundColor: "var(--cm-matching-bracket-bg)",
+      backgroundColor: "var(--color-cm-matching-bracket-bg)",
     },
     "& .cm-line .cm-matchingBracket > span": {
-      color: "var(--cm-matching-bracket-fg)",
+      color: "var(--color-cm-matching-bracket-fg)",
     },
     "& .cm-line .cm-nonmatchingBracket": {
-      backgroundColor: "var(--cm-nonmatching-bracket-bg)",
+      backgroundColor: "var(--color-cm-nonmatching-bracket-bg)",
     },
     "& .cm-line .cm-nonmatchingBracket > span": {
-      color: "var(--cm-nonmatching-bracket-fg)",
+      color: "var(--color-cm-nonmatching-bracket-fg)",
     },
     "& .cm-line .cm-selectionMatch": {
-      backgroundColor: "var(--cm-selection-match-bg)",
+      backgroundColor: "var(--color-cm-selection-match-bg)",
     },
     "& .cm-line .cm-selectionMatch > span": {
-      color: "var(--cm-selection-match-fg)",
+      color: "var(--color-cm-selection-match-fg)",
+    },
+    "& .cm-gutters > .cm-gutter.cm-foldGutter": {
+      pointerEvents: ALLOW_FOLD ? "auto" : "none",
+    },
+    "& .cm-gutters > .cm-gutter.cm-foldGutter > .cm-gutterElement > span": {
+      visibility: ALLOW_FOLD ? "visible" : "hidden",
     },
   });
 
   const highlightStyle = HighlightStyle.define([
-    { tag: tags.keyword, color: "var(--cm-keyword)" },
-    { tag: tags.controlKeyword, color: "var(--cm-control-keyword)" },
-    { tag: tags.operator, color: "var(--cm-operator)" },
-    { tag: tags.punctuation, color: "var(--cm-punctuation)" },
-    { tag: tags.string, color: "var(--cm-string)" },
-    { tag: tags.number, color: "var(--cm-number)" },
-    { tag: tags.bool, color: "var(--cm-bool)" },
-    { tag: tags.null, color: "var(--cm-null)" },
-    { tag: tags.variableName, color: "var(--cm-variable)" },
-    { tag: tags.definition(tags.variableName), color: "var(--cm-definition)" },
-    { tag: tags.function(tags.variableName), color: "var(--cm-function)" },
-    { tag: tags.propertyName, color: "var(--cm-property)" },
-    { tag: tags.comment, color: "var(--cm-comment)", fontStyle: "italic" },
-    { tag: tags.lineComment, color: "var(--cm-comment)", fontStyle: "italic" },
-    { tag: tags.blockComment, color: "var(--cm-comment)", fontStyle: "italic" },
-    { tag: tags.typeName, color: "var(--cm-type)" },
-    { tag: tags.className, color: "var(--cm-class)" },
-    { tag: tags.regexp, color: "var(--cm-regexp)" },
+    { tag: tags.keyword, color: "var(--color-cm-keyword)" },
+    { tag: tags.controlKeyword, color: "var(--color-cm-control-keyword)" },
+    { tag: tags.operator, color: "var(--color-cm-operator)" },
+    { tag: tags.punctuation, color: "var(--color-cm-punctuation)" },
+    { tag: tags.string, color: "var(--color-cm-string)" },
+    { tag: tags.number, color: "var(--color-cm-number)" },
+    { tag: tags.bool, color: "var(--color-cm-bool)" },
+    { tag: tags.null, color: "var(--color-cm-null)" },
+    { tag: tags.variableName, color: "var(--color-cm-variable)" },
+    {
+      tag: tags.definition(tags.variableName),
+      color: "var(--color-cm-definition)",
+    },
+    {
+      tag: tags.function(tags.variableName),
+      color: "var(--color-cm-function)",
+    },
+    { tag: tags.propertyName, color: "var(--color-cm-property)" },
+    {
+      tag: tags.comment,
+      color: "var(--color-cm-comment)",
+      fontStyle: "italic",
+    },
+    {
+      tag: tags.lineComment,
+      color: "var(--color-cm-comment)",
+      fontStyle: "italic",
+    },
+    {
+      tag: tags.blockComment,
+      color: "var(--color-cm-comment)",
+      fontStyle: "italic",
+    },
+    { tag: tags.typeName, color: "var(--color-cm-type)" },
+    { tag: tags.className, color: "var(--color-cm-class)" },
+    { tag: tags.regexp, color: "var(--color-cm-regexp)" },
   ]);
 
   const container = document.querySelector("#editor-container") ?? undefined;
@@ -104,6 +134,47 @@ if (doubled.length > 0) {
       syntaxHighlighting(highlightStyle),
     ],
   });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.altKey && e.key === "†") {
+      e.preventDefault();
+      toggleTheme();
+    } else if (e.altKey && e.key === "Enter") {
+      e.preventDefault();
+      flash(300);
+    }
+  });
+
+  function toggleTheme() {
+    if (!(container instanceof HTMLElement)) return;
+
+    let currentTheme = container.dataset.theme;
+    if (!currentTheme) {
+      currentTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+    container.dataset.theme = currentTheme === "dark" ? "light" : "dark";
+  }
+
+  let timeoutId: ReturnType<typeof setTimeout> | null;
+
+  function flash(dur = 200) {
+    if (!(container instanceof HTMLElement)) return;
+    if (timeoutId) clearTimeout(timeoutId);
+
+    const cursorPos = view.state.selection.ranges[0].from;
+    container.dataset.flash = "true";
+    container.inert = true;
+
+    timeoutId = setTimeout(() => {
+      container.dataset.flash = "false";
+      container.inert = false;
+      view.focus();
+      view.dispatch({ selection: { anchor: cursorPos, head: cursorPos } });
+      timeoutId = null;
+    }, dur);
+  }
 </script>
 
 <style>
@@ -188,42 +259,97 @@ if (doubled.length > 0) {
     --color-red-800: oklch(0.455 0.188 13.7);
     --color-red-900: oklch(0.41 0.159 10.27);
     --color-red-950: oklch(0.271 0.105 12.09);
+  }
+
+  :root {
+    /* App tokens */
+    --color-fg-primary: var(--color-neutral-50);
+    --color-bg-primary: var(--color-neutral-950);
 
     /* Editor chrome */
-    --cm-background: transparent;
-    --cm-text: inherit;
-    --cm-caret: var(--color-neutral-300);
-    --cm-gutter-fg: var(--color-neutral-600);
-    --cm-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.7);
-    --cm-gutter-border: oklch(var(--color-neutral-50-lch) / 0.1);
-    --cm-active-line-bg: oklch(var(--color-neutral-50-lch) / 0.075);
-    --cm-active-line-gutter-fg: var(--color-neutral-400);
-    --cm-active-line-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.125);
-    --cm-selection-bg: var(--color-blue-900);
-    --cm-matching-bracket-bg: var(--color-neutral-700);
-    --cm-matching-bracket-fg: var(--color-neutral-400);
-    --cm-nonmatching-bracket-bg: var(--color-red-800);
-    --cm-nonmatching-bracket-fg: var(--color-red-300);
-    --cm-selection-match-bg: var(--color-neutral-700);
-    --cm-selection-match-fg: var(--color-neutral-300);
+    --color-cm-background: transparent;
+    --color-cm-text: inherit;
+    --color-cm-caret: var(--color-neutral-300);
+    --color-cm-line-bg: none;
+    --color-cm-line-inline-size: auto;
+    --color-cm-gutter-fg: var(--color-neutral-600);
+    --color-cm-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.7);
+    --color-cm-gutter-border: oklch(var(--color-neutral-50-lch) / 0.1);
+    --color-cm-active-line-bg: oklch(var(--color-neutral-50-lch) / 0.075);
+    --color-cm-active-line-gutter-fg: var(--color-neutral-400);
+    --color-cm-active-line-gutter-bg: oklch(
+      var(--color-neutral-50-lch) / 0.125
+    );
+    --color-cm-selection-bg: var(--color-blue-900);
+    --color-cm-matching-bracket-bg: var(--color-neutral-700);
+    --color-cm-matching-bracket-fg: var(--color-neutral-400);
+    --color-cm-nonmatching-bracket-bg: var(--color-red-800);
+    --color-cm-nonmatching-bracket-fg: var(--color-red-300);
+    --color-cm-selection-match-bg: var(--color-neutral-700);
+    --color-cm-selection-match-fg: var(--color-neutral-300);
 
     /* Syntax highlighting colors */
-    --cm-keyword: var(--color-violet-400);
-    --cm-control-keyword: var(--color-violet-400);
-    --cm-operator: var(--color-neutral-400);
-    --cm-punctuation: var(--color-neutral-400);
-    --cm-string: var(--color-green-500);
-    --cm-number: var(--color-yellow-500);
-    --cm-bool: var(--color-yellow-500);
-    --cm-null: var(--color-yellow-500);
-    --cm-variable: var(--color-neutral-300);
-    --cm-definition: var(--color-blue-400);
-    --cm-function: var(--color-blue-400);
-    --cm-property: var(--color-blue-400);
-    --cm-comment: var(--color-neutral-600);
-    --cm-type: var(--color-fuchsia-500);
-    --cm-class: var(--color-fuchsia-500);
-    --cm-regexp: var(--color-fuchsia-500);
+    --color-cm-keyword: var(--color-violet-400);
+    --color-cm-control-keyword: var(--color-violet-400);
+    --color-cm-operator: var(--color-neutral-400);
+    --color-cm-punctuation: var(--color-neutral-400);
+    --color-cm-string: var(--color-green-500);
+    --color-cm-number: var(--color-yellow-500);
+    --color-cm-bool: var(--color-yellow-500);
+    --color-cm-null: var(--color-yellow-500);
+    --color-cm-variable: var(--color-neutral-300);
+    --color-cm-definition: var(--color-blue-400);
+    --color-cm-function: var(--color-blue-400);
+    --color-cm-property: var(--color-blue-400);
+    --color-cm-comment: var(--color-neutral-600);
+    --color-cm-type: var(--color-fuchsia-500);
+    --color-cm-class: var(--color-fuchsia-500);
+    --color-cm-regexp: var(--color-fuchsia-500);
+
+    /* Evaluation confirmation */
+    --color-cm-flash-bg: var(--color-fuchsia-600);
+  }
+
+  :root:has(body > #editor-container[data-theme="light"]) {
+    /* App tokens */
+    --color-fg-primary: var(--color-neutral-950);
+    --color-bg-primary: var(--color-neutral-100);
+
+    /* Editor chrome */
+    --color-cm-caret: var(--color-neutral-700);
+    --color-cm-gutter-fg: var(--color-neutral-400);
+    --color-cm-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.7);
+    --color-cm-gutter-border: oklch(var(--color-neutral-950-lch) / 0.1);
+    --color-cm-active-line-bg: oklch(var(--color-neutral-950-lch) / 0.05);
+    --color-cm-active-line-gutter-fg: var(--color-neutral-700);
+    --color-cm-active-line-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.1);
+    --color-cm-selection-bg: var(--color-blue-200);
+    --color-cm-matching-bracket-bg: var(--color-neutral-300);
+    --color-cm-matching-bracket-fg: var(--color-neutral-700);
+    --color-cm-nonmatching-bracket-bg: var(--color-red-300);
+    --color-cm-nonmatching-bracket-fg: var(--color-red-700);
+    --color-cm-selection-match-bg: var(--color-neutral-200);
+    --color-cm-selection-match-fg: var(--color-neutral-700);
+
+    /* Syntax highlighting colors */
+    --color-cm-keyword: var(--color-violet-600);
+    --color-cm-control-keyword: var(--color-violet-600);
+    --color-cm-operator: var(--color-neutral-600);
+    --color-cm-punctuation: var(--color-neutral-600);
+    --color-cm-string: var(--color-green-700);
+    --color-cm-number: var(--color-yellow-700);
+    --color-cm-bool: var(--color-yellow-700);
+    --color-cm-null: var(--color-yellow-700);
+    --color-cm-variable: var(--color-neutral-500);
+    --color-cm-definition: var(--color-blue-600);
+    --color-cm-function: var(--color-blue-600);
+    --color-cm-property: var(--color-blue-600);
+    --color-cm-comment: var(--color-neutral-400);
+    --color-cm-type: var(--color-fuchsia-700);
+    --color-cm-class: var(--color-fuchsia-700);
+    --color-cm-regexp: var(--color-fuchsia-700);
+
+    --color-cm-flash-bg: var(--color-fuchsia-400);
   }
 
   * {
@@ -231,8 +357,8 @@ if (doubled.length > 0) {
   }
 
   html {
-    background: var(--color-neutral-950);
-    color: var(--color-neutral-50);
+    background: var(--color-bg-primary);
+    color: var(--color-fg-primary);
   }
 
   body {
@@ -243,5 +369,38 @@ if (doubled.length > 0) {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     height: 100dvh;
+  }
+
+  #editor-container[data-flash="true"] {
+    --color-cm-line-bg: var(--color-cm-flash-bg);
+    --color-cm-active-line-bg: var(--color-cm-flash-bg);
+    --color-cm-line-inline-size: fit-content;
+
+    /* Editor chrome */
+    --color-cm-selection-bg: transparent;
+    --color-cm-matching-bracket-bg: transparent;
+    --color-cm-matching-bracket-fg: var(--color-fg-primary);
+    --color-cm-nonmatching-bracket-bg: transparent;
+    --color-cm-nonmatching-bracket-fg: var(--color-fg-primary);
+    --color-cm-selection-match-bg: transparent;
+    --color-cm-selection-match-fg: var(--color-fg-primary);
+
+    /* Syntax highlighting colors */
+    --color-cm-keyword: var(--color-fg-primary);
+    --color-cm-control-keyword: var(--color-fg-primary);
+    --color-cm-operator: var(--color-fg-primary);
+    --color-cm-punctuation: var(--color-fg-primary);
+    --color-cm-string: var(--color-fg-primary);
+    --color-cm-number: var(--color-fg-primary);
+    --color-cm-bool: var(--color-fg-primary);
+    --color-cm-null: var(--color-fg-primary);
+    --color-cm-variable: var(--color-fg-primary);
+    --color-cm-definition: var(--color-fg-primary);
+    --color-cm-function: var(--color-fg-primary);
+    --color-cm-property: var(--color-fg-primary);
+    --color-cm-comment: var(--color-fg-primary);
+    --color-cm-type: var(--color-fg-primary);
+    --color-cm-class: var(--color-fg-primary);
+    --color-cm-regexp: var(--color-fg-primary);
   }
 </style>
