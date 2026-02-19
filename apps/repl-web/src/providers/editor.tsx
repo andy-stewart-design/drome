@@ -9,9 +9,9 @@ import {
 import { basicSetup, EditorView } from 'codemirror'
 
 import { useSession } from '@/providers/session'
-import { javascript } from '@/codemirror-2/language'
-import { theme } from '@/codemirror-2/theme'
-import '@/codemirror-2/theme.css'
+import { javascript } from '@/codemirror/language'
+import { theme } from '@/codemirror/theme'
+import '@/codemirror/theme.css'
 
 // Define the context type
 type EditorContextType = {
