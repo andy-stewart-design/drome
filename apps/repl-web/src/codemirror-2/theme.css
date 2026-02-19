@@ -1,0 +1,128 @@
+:root {
+  /* App tokens */
+  --color-fg-primary: var(--color-neutral-100);
+  --color-bg-primary: var(--color-neutral-950);
+
+  --cm-line-inline-size: auto;
+  --color-cm-background: transparent;
+  --color-cm-text: inherit;
+  --color-cm-line-bg: none;
+
+  /* Editor chrome */
+  --color-cm-caret: var(--color-neutral-300);
+  --color-cm-line-numbers: var(--color-neutral-700);
+  --color-cm-gutter-fg: var(--color-neutral-600);
+  --color-cm-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.85);
+  --color-cm-gutter-border: oklch(var(--color-neutral-50-lch) / 0.1);
+  --color-cm-active-line-bg: oklch(var(--color-neutral-50-lch) / 0.075);
+  --color-cm-active-line-gutter-fg: var(--color-neutral-400);
+  --color-cm-active-line-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.125);
+  --color-cm-selection-bg: var(--color-blue-800);
+  --color-cm-matching-bracket-bg: var(--color-neutral-700);
+  --color-cm-matching-bracket-fg: var(--color-neutral-400);
+  --color-cm-nonmatching-bracket-bg: var(--color-red-800);
+  --color-cm-nonmatching-bracket-fg: var(--color-red-300);
+  --color-cm-selection-match-bg: var(--color-blue-800);
+  --color-cm-selection-match-fg: var(--color-blue-300);
+  --color-cm-scrollbar-thumb: var(--color-neutral-700);
+  --color-cm-scrollbar-track: transparent;
+
+  /* Syntax highlighting colors */
+  --color-cm-keyword: var(--color-violet-300);
+  --color-cm-control-keyword: var(--color-violet-300);
+  --color-cm-operator: var(--color-teal-300);
+  --color-cm-punctuation: var(--color-neutral-400); /* brackets */
+  --color-cm-string: var(--color-magenta-300);
+  --color-cm-number: var(--color-magenta-300);
+  --color-cm-bool: var(--color-yellow-500);
+  --color-cm-null: var(--color-yellow-500);
+  --color-cm-variable: var(--color-fg-primary);
+  --color-cm-definition: var(--color-fg-primary);
+  --color-cm-function: var(--color-fg-primary);
+  --color-cm-property: var(--color-fg-primary);
+  --color-cm-comment: var(--color-neutral-700);
+  --color-cm-type: var(--color-violet-300);
+  --color-cm-class: var(--color-violet-300);
+  --color-cm-regexp: var(--color-violet-300);
+
+  /* Evaluation confirmation */
+  --color-cm-flash-bg: var(--color-magenta-400);
+  --color-cm-flash-fg: var(--color-magenta-100);
+}
+
+:root:has(body > #drome-editor[data-theme='light']) {
+  /* App tokens */
+  --color-fg-primary: var(--color-neutral-900);
+  --color-bg-primary: var(--color-neutral-50);
+
+  /* Editor chrome */
+  --color-cm-caret: var(--color-neutral-700);
+  --color-cm-line-numbers: var(--color-neutral-400);
+  --color-cm-gutter-fg: var(--color-neutral-400);
+  --color-cm-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.9);
+  --color-cm-gutter-border: oklch(var(--color-neutral-950-lch) / 0.1);
+  --color-cm-active-line-bg: oklch(var(--color-neutral-950-lch) / 0.05);
+  --color-cm-active-line-gutter-fg: var(--color-neutral-700);
+  --color-cm-active-line-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.1);
+  --color-cm-selection-bg: var(--color-blue-100);
+  --color-cm-matching-bracket-bg: var(--color-neutral-200);
+  --color-cm-matching-bracket-fg: var(--color-neutral-700);
+  --color-cm-nonmatching-bracket-bg: var(--color-red-300);
+  --color-cm-nonmatching-bracket-fg: var(--color-red-700);
+  --color-cm-selection-match-bg: var(--color-blue-200);
+  --color-cm-selection-match-fg: var(--color-blue-700);
+  --color-cm-scrollbar-thumb: var(--color-neutral-300);
+  --color-cm-scrollbar-track: transparent;
+
+  /* Syntax highlighting colors */
+  --color-cm-keyword: var(--color-violet-400);
+  --color-cm-control-keyword: var(--color-violet-400);
+  --color-cm-operator: var(--color-teal-400);
+  --color-cm-punctuation: var(--color-neutral-400); /* brackets */
+  --color-cm-string: var(--color-magenta-400);
+  --color-cm-number: var(--color-magenta-400);
+  --color-cm-bool: var(--color-yellow-700);
+  --color-cm-null: var(--color-yellow-700);
+  --color-cm-variable: var(--color-fg-primary);
+  --color-cm-definition: var(--color-fg-primary);
+  --color-cm-function: var(--color-fg-primary);
+  --color-cm-property: var(--color-fg-primary);
+  --color-cm-comment: var(--color-neutral-400);
+  --color-cm-type: var(--color-violet-400);
+  --color-cm-class: var(--color-violet-400);
+  --color-cm-regexp: var(--color-violet-400);
+
+  --color-cm-flash-bg: var(--color-magenta-300);
+  --color-cm-flash-fg: var(--color-magenta-700);
+}
+
+#drome-editor[data-flash='true'] {
+  --color-cm-line-bg: var(--color-cm-flash-bg);
+  --color-cm-active-line-bg: var(--color-cm-flash-bg);
+  --cm-line-inline-size: fit-content;
+
+  --color-cm-selection-bg: transparent;
+  --color-cm-matching-bracket-bg: transparent;
+  --color-cm-nonmatching-bracket-bg: transparent;
+  --color-cm-selection-match-bg: transparent;
+
+  --color-cm-matching-bracket-fg: var(--color-cm-flash-fg);
+  --color-cm-nonmatching-bracket-fg: var(--color-cm-flash-fg);
+  --color-cm-selection-match-fg: var(--color-cm-flash-fg);
+  --color-cm-keyword: var(--color-cm-flash-fg);
+  --color-cm-control-keyword: var(--color-cm-flash-fg);
+  --color-cm-operator: var(--color-cm-flash-fg);
+  --color-cm-punctuation: var(--color-cm-flash-fg);
+  --color-cm-string: var(--color-cm-flash-fg);
+  --color-cm-number: var(--color-cm-flash-fg);
+  --color-cm-bool: var(--color-cm-flash-fg);
+  --color-cm-null: var(--color-cm-flash-fg);
+  --color-cm-variable: var(--color-cm-flash-fg);
+  --color-cm-definition: var(--color-cm-flash-fg);
+  --color-cm-function: var(--color-cm-flash-fg);
+  --color-cm-property: var(--color-cm-flash-fg);
+  --color-cm-comment: var(--color-cm-flash-fg);
+  --color-cm-type: var(--color-cm-flash-fg);
+  --color-cm-class: var(--color-cm-flash-fg);
+  --color-cm-regexp: var(--color-cm-flash-fg);
+}

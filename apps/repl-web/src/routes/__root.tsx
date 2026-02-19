@@ -10,11 +10,15 @@ import { HydrationScript } from 'solid-js/web'
 import { Suspense } from 'solid-js'
 
 import Providers from '@/providers'
-import styleCss from '@/styles/global.css?url'
+import globalCss from '@/styles/global.css?url'
+import tokenCss from '@/styles/tokens.css?url'
 
 export const Route = createRootRouteWithContext()({
   head: () => ({
-    links: [{ rel: 'stylesheet', href: styleCss }],
+    links: [
+      { rel: 'stylesheet', href: tokenCss },
+      { rel: 'stylesheet', href: globalCss },
+    ],
   }),
   shellComponent: RootComponent,
 })

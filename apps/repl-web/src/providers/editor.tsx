@@ -7,11 +7,11 @@ import {
   onCleanup,
 } from 'solid-js'
 import { basicSetup, EditorView } from 'codemirror'
-import { theme } from '@/codemirror/theme'
-import { javascript } from '@/codemirror/language'
-import { flashField } from '@/codemirror/flash'
-import { useSession } from './session'
-import '@/codemirror/theme-default.css'
+
+import { useSession } from '@/providers/session'
+import { javascript } from '@/codemirror-2/language'
+import { theme } from '@/codemirror-2/theme'
+import '@/codemirror-2/theme.css'
 
 // Define the context type
 type EditorContextType = {
@@ -34,7 +34,7 @@ function EditorProvider(props: ParentProps) {
   function createEditor(parent: HTMLElement) {
     const ed = new EditorView({
       doc: workingSketch().code,
-      extensions: [basicSetup, theme, javascript(), flashField],
+      extensions: [basicSetup, theme, javascript()],
       parent,
     })
 

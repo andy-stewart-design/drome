@@ -13,7 +13,6 @@ import { usePlayState } from './playstate'
 import AudioVisualizer from '@/utils/audio-visualizer'
 import { useSession } from './session'
 import { useEditor } from './editor'
-import { flash } from '@/codemirror/flash'
 
 // Define the context type
 type DromeContextType = {
@@ -48,7 +47,6 @@ function DromeProvider(props: ParentProps) {
     } else {
       const code = ed.state.doc.toString()
       d.evaluate(code)
-      flash(ed)
       if (d.paused) d.start()
       if (v?.paused) v?.start()
       setWorkingSketch((s) => ({ ...s, code }))

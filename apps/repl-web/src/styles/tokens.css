@@ -1,0 +1,89 @@
+:root {
+  /* Color tokens */
+  --color-neutral-50-lch: 97% 0.005 258;
+  --color-neutral-50: oklch(var(--color-neutral-50-lch));
+  --color-neutral-100: oklch(90% 0.011 258);
+  --color-neutral-200: oklch(80% 0.015 258);
+  --color-neutral-300: oklch(69% 0.019 256);
+  --color-neutral-400: oklch(61% 0.019 256);
+  --color-neutral-500: oklch(53% 0.02 256);
+  --color-neutral-600: oklch(45% 0.019 257);
+  --color-neutral-700: oklch(38% 0.016 255);
+  --color-neutral-800: oklch(29% 0.012 258);
+  --color-neutral-900: oklch(21.2% 0.009 255);
+  --color-neutral-950-lch: 13.81% 0.006 245;
+  --color-neutral-950: oklch(var(--color-neutral-950-lch));
+
+  --color-yellow-50: oklch(0.987 0.026 102.21);
+  --color-yellow-100: oklch(0.973 0.071 103.19);
+  --color-yellow-200: oklch(0.945 0.129 101.54);
+  --color-yellow-300: oklch(0.905 0.182 98.11);
+  --color-yellow-400: oklch(0.852 0.199 91.94);
+  --color-yellow-500: oklch(0.795 0.184 86.05);
+  --color-yellow-600: oklch(0.681 0.162 75.83);
+  --color-yellow-700: oklch(0.554 0.135 66.44);
+  --color-yellow-800: oklch(0.476 0.114 61.91);
+  --color-yellow-900: oklch(0.421 0.095 57.71);
+  --color-yellow-950: oklch(0.286 0.066 53.81);
+  --color-fuchsia-50: oklch(0.977 0.017 320.06);
+
+  --color-red-50: oklch(0.969 0.015 12.42);
+  --color-red-100: oklch(0.941 0.03 12.58);
+  --color-red-200: oklch(0.892 0.058 10);
+  --color-red-300: oklch(0.81 0.117 11.64);
+  --color-red-400: oklch(0.712 0.194 13.43);
+  --color-red-500: oklch(0.645 0.246 16.44);
+  --color-red-600: oklch(0.586 0.253 17.59);
+  --color-red-700: oklch(0.514 0.222 16.93);
+  --color-red-800: oklch(0.455 0.188 13.7);
+  --color-red-900: oklch(0.41 0.159 10.27);
+  --color-red-950: oklch(0.271 0.105 12.09);
+
+  --color-magenta-50: color(display-p3 1 0.9 1);
+  --color-magenta-100: color(display-p3 1 0.75 1);
+  --color-magenta-200: color(display-p3 1 0.5 1);
+  --color-magenta-300: color(display-p3 1 0 1);
+  --color-magenta-400: color(display-p3 0.7375 0 0.7375);
+  --color-magenta-500: color(display-p3 0.6 0 0.6);
+  --color-magenta-600: color(display-p3 0.475 0 0.475);
+  --color-magenta-700: color(display-p3 0.35 0 0.35);
+  --color-magenta-800: color(display-p3 0.225 0 0.225);
+  --color-magenta-900: color(display-p3 0.117 0 0.117);
+  --color-magenta-950: color(display-p3 0.025 0 0.025);
+
+  --color-violet-50: color(display-p3 0.95 0.95 1);
+  --color-violet-100: color(display-p3 0.77 0.75 1);
+  --color-violet-200: color(display-p3 0.63 0.575 1);
+  --color-violet-300: color(display-p3 0.5 0.375 1);
+  --color-violet-400: color(display-p3 0.425 0.25 0.95);
+  --color-violet-500: color(display-p3 0.375 0.189 0.862);
+  --color-violet-600: color(display-p3 0.298 0 0.768);
+  --color-violet-700: color(display-p3 0.22 0 0.6);
+  --color-violet-800: color(display-p3 0.142 0 0.423);
+  --color-violet-900: color(display-p3 0.071 0 0.257);
+  --color-violet-950: color(display-p3 0.014 0 0.108);
+
+  --color-blue-50: color(display-p3 0.939 0.975 1);
+  --color-blue-100: color(display-p3 0.807 0.884 1);
+  --color-blue-200: color(display-p3 0.675 0.79 1);
+  --color-blue-300: color(display-p3 0.487 0.65 1);
+  --color-blue-400: color(display-p3 0.255 0.46 1);
+  --color-blue-500: color(display-p3 0 0.22 1);
+  --color-blue-600: color(display-p3 0 0 0.887);
+  --color-blue-700: color(display-p3 0 0 0.802);
+  --color-blue-800: color(display-p3 0 0 0.492);
+  --color-blue-900: color(display-p3 0 0 0.257);
+  --color-blue-950: color(display-p3 0 0 0.1);
+
+  --color-teal-50: color(display-p3 0.888 0.997 1);
+  --color-teal-100: color(display-p3 0.684 0.929 1);
+  --color-teal-200: color(display-p3 0.446 0.857 1);
+  --color-teal-300: color(display-p3 0 0.75 1);
+  --color-teal-400: color(display-p3 0 0.585 0.813);
+  --color-teal-500: color(display-p3 0 0.434 0.615);
+  --color-teal-600: color(display-p3 0 0.339 0.489);
+  --color-teal-700: color(display-p3 0 0.25 0.375);
+  --color-teal-800: color(display-p3 0 0.162 0.255);
+  --color-teal-900: color(display-p3 0 0.064 0.124);
+  --color-teal-950: color(display-p3 0 0.04 0.07);
+}
