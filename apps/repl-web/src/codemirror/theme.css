@@ -4,6 +4,8 @@
   --color-bg-primary: var(--color-neutral-950);
 
   --cm-line-inline-size: auto;
+  --cm-line-height: 1.6;
+  --cm-editor-font-size: 14px;
   --color-cm-background: transparent;
   --color-cm-text: inherit;
   --color-cm-line-bg: none;
@@ -13,7 +15,7 @@
   --color-cm-line-numbers: var(--color-neutral-700);
   --color-cm-gutter-fg: var(--color-neutral-600);
   --color-cm-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.85);
-  --color-cm-gutter-border: oklch(var(--color-neutral-50-lch) / 0.1);
+  --color-cm-gutter-border: transparent;
   --color-cm-active-line-bg: oklch(var(--color-neutral-50-lch) / 0.075);
   --color-cm-active-line-gutter-fg: var(--color-neutral-400);
   --color-cm-active-line-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.125);

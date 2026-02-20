@@ -20,8 +20,6 @@ type DromeContextType = {
   setCanvas: Setter<HTMLCanvasElement | null>
   togglePlaystate(pause?: boolean): void
   setVisualizerType(): void
-  flash: Accessor<boolean>
-  handleFlash(dur?: number): void
 }
 
 // Create context with undefined as default
@@ -32,11 +30,9 @@ function DromeProvider(props: ParentProps) {
   const [drome, setDrome] = createSignal<Drome | null>(null)
   const [canvas, setCanvas] = createSignal<HTMLCanvasElement | null>(null)
   const [visualizer, setVisualizer] = createSignal<AudioVisualizer | null>(null)
-  const [flash, setFlash] = createSignal(false)
   const { setPaused, setBeat } = usePlayState()
-  const { editor } = useEditor()
+  const { editor, flash } = useEditor()
   const { setWorkingSketch } = useSession()
-  let timeoutId: ReturnType<typeof setTimeout> | null
 
   function togglePlaystate(pause?: boolean) {
     const ed = editor()
@@ -52,26 +48,11 @@ function DromeProvider(props: ParentProps) {
     } else {
       const code = ed.state.doc.toString()
       d.evaluate(code)
+      flash()
       if (d.paused) d.start()
       if (v?.paused) v?.start()
       setWorkingSketch((s) => ({ ...s, code }))
     }
-  }
-
-  function handleFlash(dur = 200) {
-    const ed = editor()
-    if (!ed) return
-    if (timeoutId) clearTimeout(timeoutId)
-
-    const cursorPos = ed.state.selection.ranges[0].from
-    setFlash(true)
-
-    timeoutId = setTimeout(() => {
-      setFlash(false)
-      ed.focus()
-      ed.dispatch({ selection: { anchor: cursorPos, head: cursorPos } })
-      timeoutId = null
-    }, dur)
   }
 
   onMount(() => {
@@ -116,8 +97,6 @@ function DromeProvider(props: ParentProps) {
     setCanvas,
     togglePlaystate,
     setVisualizerType,
-    flash,
-    handleFlash,
   } satisfies DromeContextType
 
   return (

@@ -6,7 +6,7 @@ import { useEditor } from '@/providers/editor'
 function useKeyboardEvent() {
   let controller = new AbortController()
   const { togglePlaystate } = useDrome()
-  const { editor, flash } = useEditor()
+  const { editor } = useEditor()
   const { saveSketch, createSketch } = useSession()
 
   function handleKeyDown(e: KeyboardEvent) {
@@ -14,7 +14,6 @@ function useKeyboardEvent() {
     if (e.altKey && e.key === 'Enter') {
       e.preventDefault()
       togglePlaystate(false)
-      flash()
     } else if (e.altKey && e.key === '≥') {
       e.preventDefault()
       togglePlaystate(true)

@@ -8,9 +8,15 @@ const editorTheme = EditorView.theme({
   '&': {
     backgroundColor: 'var(--color-cm-background)',
     color: 'var(--color-cm-text)',
+    fontSize: 'var(--cm-editor-font-size)',
+  },
+  // Focus outline
+  '&.cm-focused': {
+    outline: 'none',
   },
   '.cm-content': {
     caretColor: 'var(--color-cm-caret)',
+    lineHeight: 'var(--cm-line-height, 1.6)',
   },
   '.cm-cursor': {
     borderLeftColor: 'var(--color-cm-caret)',
@@ -58,8 +64,13 @@ const editorTheme = EditorView.theme({
   '& .cm-line .cm-selectionMatch > span': {
     color: 'var(--color-cm-selection-match-fg)',
   },
-  '& .cm-gutters > .cm-gutter.cm-lineNumbers': {
+  '& .cm-gutters > .cm-gutter.cm-lineNumbers ': {
     color: 'var(--color-cm-line-numbers, coral)',
+  },
+  '& .cm-gutters > .cm-gutter.cm-lineNumbers > .cm-gutterElement': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   '& .cm-gutters > .cm-gutter.cm-foldGutter': {
     pointerEvents: ALLOW_FOLD ? 'auto' : 'none',
