@@ -5,17 +5,8 @@
 }
 
 html {
-  --color-fg-primary: var(--color-neutral-50);
-  --color-fg-secondary: oklch(var(--color-neutral-50-lch) / 0.8);
-  --color-fg-tertiary: oklch(var(--color-neutral-50-lch) / 0.6);
-  --color-bg-primary: var(--color-neutral-950);
-  --border-subtle: oklch(var(--color-neutral-50-lch) / 0.15);
-  --border-strong: var(--color-neutral-50);
-
-  --app-sidebar-width: 360px;
-
   background: var(--color-bg-primary);
-  color: white;
+  color: var(--color-fg-primary);
   color-scheme: dark;
 }
 

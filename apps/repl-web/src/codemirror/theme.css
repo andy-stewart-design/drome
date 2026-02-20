@@ -1,10 +1,6 @@
 :root {
-  /* App tokens */
-  --color-fg-primary: var(--color-neutral-100);
-  --color-bg-primary: var(--color-neutral-950);
-
   --cm-line-inline-size: auto;
-  --cm-line-height: 1.6;
+  --cm-line-height: 1.5;
   --cm-editor-font-size: 14px;
   --color-cm-background: transparent;
   --color-cm-text: inherit;
@@ -53,10 +49,6 @@
 }
 
 :root:has(body > #drome-editor[data-theme='light']) {
-  /* App tokens */
-  --color-fg-primary: var(--color-neutral-900);
-  --color-bg-primary: var(--color-neutral-50);
-
   /* Editor chrome */
   --color-cm-caret: var(--color-neutral-700);
   --color-cm-line-numbers: var(--color-neutral-400);

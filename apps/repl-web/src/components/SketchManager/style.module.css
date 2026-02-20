@@ -13,7 +13,7 @@
   display: flex;
 
   &:not(:last-of-type) {
-    border-block-end: 1px solid var(--border-subtle);
+    border-block-end: 1px solid var(--color-border-subtle);
   }
 
   &:is(:hover, :focus-visible),
@@ -52,7 +52,7 @@
   border-inline-start: 0.125rem solid var(--border-color, transparent);
 
   &[data-current='true'] {
-    --border-color: var(--border-strong);
+    --border-color: var(--color-border-strong);
   }
 
   p {

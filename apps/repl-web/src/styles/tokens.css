@@ -1,5 +1,6 @@
-:root {
-  /* Color tokens */
+/* PRIMITIVE TOKES ------------------------------------ */
+:where(:root) {
+  /* COLOR TOKES */
   --color-neutral-50-lch: 97% 0.005 258;
   --color-neutral-50: oklch(var(--color-neutral-50-lch));
   --color-neutral-100: oklch(90% 0.011 258);
@@ -12,6 +13,20 @@
   --color-neutral-800: oklch(29% 0.012 258);
   --color-neutral-900: oklch(21.2% 0.009 255);
   --color-neutral-950-lch: 13.81% 0.006 245;
+  --color-neutral-950: oklch(var(--color-neutral-950-lch));
+
+  --color-neutral-50-lch: 0.985 0.002 247.84;
+  --color-neutral-50: oklch(var(--color-neutral-50-lch));
+  --color-neutral-100: oklch(0.967 0.003 264.54);
+  --color-neutral-200: oklch(0.928 0.006 264.53);
+  --color-neutral-300: oklch(0.872 0.01 258.34);
+  --color-neutral-400: oklch(0.707 0.022 261.32);
+  --color-neutral-500: oklch(0.551 0.027 264.36);
+  --color-neutral-600: oklch(0.446 0.03 256.8);
+  --color-neutral-700: oklch(0.373 0.034 259.73);
+  --color-neutral-800: oklch(0.278 0.033 256.85);
+  --color-neutral-900: oklch(0.21 0.034 264.67);
+  --color-neutral-950-lch: 0.1 0.028 261.69;
   --color-neutral-950: oklch(var(--color-neutral-950-lch));
 
   --color-yellow-50: oklch(0.987 0.026 102.21);
@@ -86,4 +101,18 @@
   --color-teal-800: color(display-p3 0 0.162 0.255);
   --color-teal-900: color(display-p3 0 0.064 0.124);
   --color-teal-950: color(display-p3 0 0.04 0.07);
+}
+
+/* SEMANTIC TOKES ------------------------------------ */
+:where(:root) {
+  --color-fg-primary: var(--color-neutral-50);
+  --color-fg-secondary: oklch(var(--color-neutral-50-lch) / 0.8);
+  --color-fg-tertiary: oklch(var(--color-neutral-50-lch) / 0.6);
+
+  --color-bg-primary: var(--color-neutral-950);
+
+  --color-border-subtle: oklch(var(--color-neutral-50-lch) / 0.15);
+  --color-border-strong: var(--color-neutral-50);
+
+  --app-sidebar-width: 360px;
 }
