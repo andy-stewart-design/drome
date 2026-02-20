@@ -47,7 +47,7 @@
 
   /* Evaluation confirmation */
   --color-cm-flash-bg: var(--color-magenta-400);
-  --color-cm-flash-fg: var(--color-magenta-100);
+  --color-cm-flash-fg: var(--color-magenta-50);
 }
 
 :root:has(body > #drome-editor[data-theme='light']) {

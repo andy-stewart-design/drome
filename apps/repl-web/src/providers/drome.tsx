@@ -1,24 +1,27 @@
 import {
   createContext,
-  useContext,
+  createEffect,
   createSignal,
-  type ParentProps,
   onMount,
   onCleanup,
+  useContext,
+  type Accessor,
+  type ParentProps,
   type Setter,
-  createEffect,
 } from 'solid-js'
-import type Drome from 'drome-live'
-import { usePlayState } from './playstate'
 import AudioVisualizer from '@/utils/audio-visualizer'
-import { useSession } from './session'
-import { useEditor } from './editor'
+import { usePlayState } from '@/providers/playstate'
+import { useSession } from '@/providers/session'
+import { useEditor } from '@/providers/editor'
+import type Drome from 'drome-live'
 
 // Define the context type
 type DromeContextType = {
   setCanvas: Setter<HTMLCanvasElement | null>
   togglePlaystate(pause?: boolean): void
   setVisualizerType(): void
+  flash: Accessor<boolean>
+  handleFlash(dur?: number): void
 }
 
 // Create context with undefined as default
@@ -29,9 +32,11 @@ function DromeProvider(props: ParentProps) {
   const [drome, setDrome] = createSignal<Drome | null>(null)
   const [canvas, setCanvas] = createSignal<HTMLCanvasElement | null>(null)
   const [visualizer, setVisualizer] = createSignal<AudioVisualizer | null>(null)
+  const [flash, setFlash] = createSignal(false)
   const { setPaused, setBeat } = usePlayState()
   const { editor } = useEditor()
   const { setWorkingSketch } = useSession()
+  let timeoutId: ReturnType<typeof setTimeout> | null
 
   function togglePlaystate(pause?: boolean) {
     const ed = editor()
@@ -51,6 +56,22 @@ function DromeProvider(props: ParentProps) {
       if (v?.paused) v?.start()
       setWorkingSketch((s) => ({ ...s, code }))
     }
+  }
+
+  function handleFlash(dur = 200) {
+    const ed = editor()
+    if (!ed) return
+    if (timeoutId) clearTimeout(timeoutId)
+
+    const cursorPos = ed.state.selection.ranges[0].from
+    setFlash(true)
+
+    timeoutId = setTimeout(() => {
+      setFlash(false)
+      ed.focus()
+      ed.dispatch({ selection: { anchor: cursorPos, head: cursorPos } })
+      timeoutId = null
+    }, dur)
   }
 
   onMount(() => {
@@ -95,6 +116,8 @@ function DromeProvider(props: ParentProps) {
     setCanvas,
     togglePlaystate,
     setVisualizerType,
+    flash,
+    handleFlash,
   } satisfies DromeContextType
 
   return (

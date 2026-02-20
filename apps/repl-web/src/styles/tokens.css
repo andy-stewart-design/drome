@@ -39,7 +39,7 @@
   --color-red-900: oklch(0.41 0.159 10.27);
   --color-red-950: oklch(0.271 0.105 12.09);
 
-  --color-magenta-50: color(display-p3 1 0.9 1);
+  --color-magenta-50: color(display-p3 1 0.95 1);
   --color-magenta-100: color(display-p3 1 0.75 1);
   --color-magenta-200: color(display-p3 1 0.5 1);
   --color-magenta-300: color(display-p3 1 0 1);

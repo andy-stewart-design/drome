@@ -17,6 +17,8 @@ import '@/codemirror/theme.css'
 type EditorContextType = {
   editor: Accessor<EditorView | undefined>
   createEditor(parent: HTMLElement): void
+  isFlashed: Accessor<boolean>
+  flash(dur?: number): void
 }
 
 // Create context with undefined as default
@@ -24,8 +26,10 @@ const EditorContext = createContext<EditorContextType>()
 
 // Provider component
 function EditorProvider(props: ParentProps) {
-  const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
   const { workingSketch } = useSession()
+  const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
+  const [isFlashed, setIsFlash] = createSignal(false)
+  let timeoutId: ReturnType<typeof setTimeout> | null
 
   onCleanup(() => {
     editor()?.destroy()
@@ -41,7 +45,28 @@ function EditorProvider(props: ParentProps) {
     setEditor(ed)
   }
 
-  const contextValue = { editor, createEditor } satisfies EditorContextType
+  function flash(dur = 300) {
+    const ed = editor()
+    if (!ed) return
+    if (timeoutId) clearTimeout(timeoutId)
+
+    const cursorPos = ed.state.selection.ranges[0].from
+    setIsFlash(true)
+
+    timeoutId = setTimeout(() => {
+      setIsFlash(false)
+      ed.focus()
+      ed.dispatch({ selection: { anchor: cursorPos, head: cursorPos } })
+      timeoutId = null
+    }, dur)
+  }
+
+  const contextValue = {
+    editor,
+    createEditor,
+    isFlashed,
+    flash,
+  } satisfies EditorContextType
 
   return (
     <EditorContext.Provider value={contextValue}>
