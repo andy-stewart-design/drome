@@ -17,6 +17,8 @@ const editorTheme = EditorView.theme({
   '.cm-content': {
     caretColor: 'var(--cm-color-caret)',
     lineHeight: 'var(--cm-line-height, 1.6)',
+    paddingBlockStart: 'var(--cm-padding-block-start, 30vw)',
+    paddingBlockEnd: 'var(--cm-padding-block-end, 0px)',
   },
   '.cm-cursor': {
     borderLeft: 'var(--cm-caret-width, 1.5px) solid var(--cm-color-caret)',

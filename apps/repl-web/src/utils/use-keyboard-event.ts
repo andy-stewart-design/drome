@@ -6,11 +6,10 @@ import { useEditor } from '@/providers/editor'
 function useKeyboardEvent() {
   let controller = new AbortController()
   const { togglePlaystate } = useDrome()
-  const { editor } = useEditor()
+  const { editor, setColorTheme } = useEditor()
   const { saveSketch, createSketch } = useSession()
 
   function handleKeyDown(e: KeyboardEvent) {
-    console.log(e.key)
     if (e.altKey && e.key === 'Enter') {
       e.preventDefault()
       togglePlaystate(false)
@@ -22,9 +21,12 @@ function useKeyboardEvent() {
       const ed = editor()
       if (!ed) return
       saveSketch(ed.state.doc.toString())
-    } else if (e.altKey && e.key === 'Dead') {
+    } else if (e.altKey && e.shiftKey && e.key === '˜') {
       e.preventDefault()
       createSketch()
+    } else if (e.altKey && e.key === '†') {
+      e.preventDefault()
+      setColorTheme()
     }
   }
 

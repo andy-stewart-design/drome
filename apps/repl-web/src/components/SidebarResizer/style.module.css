@@ -1,4 +1,6 @@
 .resizer {
+  --border-color: transparent;
+
   position: absolute;
   top: 0;
   left: 0;
@@ -9,14 +11,11 @@
   background: transparent;
   padding: 8px 0px 8px 4px;
   cursor: col-resize;
+  border-inline-start: 1px solid var(--border-color);
+  transition: border-color 200ms ease-out;
 
-  &::before {
-    content: '';
-    border-radius: 100vmax;
-    pointer-events: none;
-  }
-
-  &:is(:hover, [data-dragging='true'])::before {
-    background: rgb(var(--color-neutral-50-rgb) / 0.25);
+  &:is(:hover, [data-dragging='true']) {
+    --border-color: var(--color-magenta-400);
+    transition-delay: 300ms;
   }
 }

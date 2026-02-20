@@ -115,4 +115,15 @@
   --color-border-strong: var(--color-neutral-50);
 
   --app-sidebar-width: 360px;
+
+  &:has(body > div[data-theme='light']) {
+    --color-fg-primary: var(--color-neutral-900);
+    --color-fg-secondary: oklch(var(--color-neutral-950-lch) / 0.8);
+    --color-fg-tertiary: oklch(var(--color-neutral-950-lch) / 0.6);
+
+    --color-bg-primary: var(--color-neutral-100);
+
+    --color-border-subtle: oklch(var(--color-neutral-950-lch) / 0.15);
+    --color-border-strong: var(--color-neutral-950);
+  }
 }

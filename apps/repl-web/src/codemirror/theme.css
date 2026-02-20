@@ -1,6 +1,8 @@
 :root {
   --cm-line-inline-size: auto;
   --cm-line-height: 1.5;
+  --cm-padding-block-start: 0px;
+  --cm-padding-block-end: 30vw;
   --cm-editor-font-size: 14px;
   --cm-color-background: transparent;
   --cm-color-text: inherit;
@@ -53,16 +55,16 @@
   --cm-color-flash-fg: var(--color-magenta-50);
 }
 
-:root:has(body > #drome-editor[data-theme='light']) {
+:root:has(body > div[data-theme='light']) {
   /* Editor chrome */
   --cm-color-caret: var(--color-neutral-700);
   --cm-color-line-numbers: var(--color-neutral-400);
   --cm-color-gutter-fg: var(--color-neutral-400);
-  --cm-color-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.9);
-  --cm-color-gutter-border: oklch(var(--color-neutral-950-lch) / 0.1);
+  --cm-color-gutter-bg: transparent;
+  --cm-color-gutter-border: transparent;
   --cm-color-active-line-bg: oklch(var(--color-neutral-950-lch) / 0.05);
   --cm-color-active-line-gutter-fg: var(--color-neutral-700);
-  --cm-color-active-line-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.1);
+  --cm-color-active-line-gutter-bg: transparent;
   --cm-color-selection-bg: var(--color-blue-100);
   --cm-color-matching-bracket-bg: var(--color-neutral-200);
   --cm-color-matching-bracket-fg: var(--color-neutral-700);

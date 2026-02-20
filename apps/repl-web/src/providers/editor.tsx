@@ -13,12 +13,16 @@ import { javascript } from '@/codemirror/language'
 import { theme } from '@/codemirror/theme'
 import '@/codemirror/theme.css'
 
+type ThemeOption = 'dark' | 'light'
+
 // Define the context type
 type EditorContextType = {
   editor: Accessor<EditorView | undefined>
   createEditor(parent: HTMLElement): void
   isFlashed: Accessor<boolean>
   flash(dur?: number): void
+  colorTheme: Accessor<ThemeOption>
+  setColorTheme(theme?: ThemeOption): void
 }
 
 // Create context with undefined as default
@@ -29,6 +33,7 @@ function EditorProvider(props: ParentProps) {
   const { workingSketch } = useSession()
   const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
   const [isFlashed, setIsFlash] = createSignal(false)
+  const [colorTheme, setColorTheme] = createSignal<ThemeOption>('dark')
   let timeoutId: ReturnType<typeof setTimeout> | null
 
   onCleanup(() => {
@@ -61,11 +66,21 @@ function EditorProvider(props: ParentProps) {
     }, dur)
   }
 
+  function handleSetColorTheme(theme?: ThemeOption) {
+    if (theme) {
+      setColorTheme(theme)
+    } else {
+      setColorTheme((c) => (c === 'light' ? 'dark' : 'light'))
+    }
+  }
+
   const contextValue = {
     editor,
     createEditor,
     isFlashed,
     flash,
+    colorTheme,
+    setColorTheme: handleSetColorTheme,
   } satisfies EditorContextType
 
   return (
