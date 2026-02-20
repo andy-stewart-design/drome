@@ -18,7 +18,7 @@
 
   &:is(:hover, :focus-visible),
   &:has(:hover, :focus-visible) {
-    background: rgb(var(--color-neutral-50-rgb) / 0.1);
+    background: oklch(var(--color-neutral-50-lch) / 0.05);
   }
 }
 
