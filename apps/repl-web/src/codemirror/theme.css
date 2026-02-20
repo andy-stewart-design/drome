@@ -2,121 +2,126 @@
   --cm-line-inline-size: auto;
   --cm-line-height: 1.5;
   --cm-editor-font-size: 14px;
-  --color-cm-background: transparent;
-  --color-cm-text: inherit;
-  --color-cm-line-bg: none;
+  --cm-color-background: transparent;
+  --cm-color-text: inherit;
+  --cm-color-line-bg: none;
 
   /* Editor chrome */
-  --color-cm-caret: var(--color-neutral-300);
-  --color-cm-line-numbers: var(--color-neutral-700);
-  --color-cm-gutter-fg: var(--color-neutral-600);
-  --color-cm-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.85);
-  --color-cm-gutter-border: transparent;
-  --color-cm-active-line-bg: oklch(var(--color-neutral-50-lch) / 0.075);
-  --color-cm-active-line-gutter-fg: var(--color-neutral-400);
-  --color-cm-active-line-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.125);
-  --color-cm-selection-bg: var(--color-blue-800);
-  --color-cm-matching-bracket-bg: var(--color-neutral-700);
-  --color-cm-matching-bracket-fg: var(--color-neutral-400);
-  --color-cm-nonmatching-bracket-bg: var(--color-red-800);
-  --color-cm-nonmatching-bracket-fg: var(--color-red-300);
-  --color-cm-selection-match-bg: var(--color-blue-800);
-  --color-cm-selection-match-fg: var(--color-blue-300);
-  --color-cm-scrollbar-thumb: var(--color-neutral-700);
-  --color-cm-scrollbar-track: transparent;
+  --cm-color-caret: var(--color-neutral-300);
+  --cm-caret-width: 1.5px;
+  --cm-color-line-numbers: var(--color-neutral-700);
+  --cm-color-gutter-fg: var(--color-neutral-600);
+  --cm-color-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.85);
+  --cm-color-gutter-border: transparent;
+  --cm-color-active-line-bg: oklch(var(--color-neutral-50-lch) / 0.075);
+  --cm-color-active-line-gutter-fg: var(--color-neutral-400);
+  --cm-color-active-line-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.125);
+  --cm-color-active-line-gutter-bg: transparent;
+  --cm-active-line-radius: 3px;
+  --cm-color-selection-bg: var(--color-blue-800);
+  --cm-selection-radius: 2px;
+  --cm-selection-outline-width: 2px;
+  --cm-color-matching-bracket-bg: var(--color-neutral-700);
+  --cm-color-matching-bracket-fg: var(--color-neutral-400);
+  --cm-color-nonmatching-bracket-bg: var(--color-red-800);
+  --cm-color-nonmatching-bracket-fg: var(--color-red-300);
+  --cm-color-selection-match-bg: var(--color-blue-800);
+  --cm-color-selection-match-fg: var(--color-blue-300);
+  --cm-color-scrollbar-thumb: var(--color-neutral-700);
+  --cm-color-scrollbar-track: transparent;
 
   /* Syntax highlighting colors */
-  --color-cm-keyword: var(--color-violet-300);
-  --color-cm-control-keyword: var(--color-violet-300);
-  --color-cm-operator: var(--color-teal-300);
-  --color-cm-punctuation: var(--color-neutral-400); /* brackets */
-  --color-cm-string: var(--color-magenta-300);
-  --color-cm-number: var(--color-magenta-300);
-  --color-cm-bool: var(--color-yellow-500);
-  --color-cm-null: var(--color-yellow-500);
-  --color-cm-variable: var(--color-fg-primary);
-  --color-cm-definition: var(--color-fg-primary);
-  --color-cm-function: var(--color-fg-primary);
-  --color-cm-property: var(--color-fg-primary);
-  --color-cm-comment: var(--color-neutral-700);
-  --color-cm-type: var(--color-violet-300);
-  --color-cm-class: var(--color-violet-300);
-  --color-cm-regexp: var(--color-violet-300);
+  --cm-color-keyword: var(--color-violet-300);
+  --cm-color-control-keyword: var(--color-violet-300);
+  --cm-color-operator: var(--color-teal-300);
+  --cm-color-punctuation: var(--color-neutral-400); /* brackets */
+  --cm-color-string: var(--color-magenta-300);
+  --cm-color-number: var(--color-magenta-300);
+  --cm-color-bool: var(--color-yellow-500);
+  --cm-color-null: var(--color-yellow-500);
+  --cm-color-variable: var(--color-fg-primary);
+  --cm-color-definition: var(--color-fg-primary);
+  --cm-color-function: var(--color-fg-primary);
+  --cm-color-property: var(--color-fg-primary);
+  --cm-color-comment: var(--color-neutral-700);
+  --cm-color-type: var(--color-violet-300);
+  --cm-color-class: var(--color-violet-300);
+  --cm-color-regexp: var(--color-violet-300);
 
   /* Evaluation confirmation */
-  --color-cm-flash-bg: var(--color-magenta-400);
-  --color-cm-flash-fg: var(--color-magenta-50);
+  --cm-color-flash-bg: var(--color-magenta-400);
+  --cm-color-flash-fg: var(--color-magenta-50);
 }
 
 :root:has(body > #drome-editor[data-theme='light']) {
   /* Editor chrome */
-  --color-cm-caret: var(--color-neutral-700);
-  --color-cm-line-numbers: var(--color-neutral-400);
-  --color-cm-gutter-fg: var(--color-neutral-400);
-  --color-cm-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.9);
-  --color-cm-gutter-border: oklch(var(--color-neutral-950-lch) / 0.1);
-  --color-cm-active-line-bg: oklch(var(--color-neutral-950-lch) / 0.05);
-  --color-cm-active-line-gutter-fg: var(--color-neutral-700);
-  --color-cm-active-line-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.1);
-  --color-cm-selection-bg: var(--color-blue-100);
-  --color-cm-matching-bracket-bg: var(--color-neutral-200);
-  --color-cm-matching-bracket-fg: var(--color-neutral-700);
-  --color-cm-nonmatching-bracket-bg: var(--color-red-300);
-  --color-cm-nonmatching-bracket-fg: var(--color-red-700);
-  --color-cm-selection-match-bg: var(--color-blue-200);
-  --color-cm-selection-match-fg: var(--color-blue-700);
-  --color-cm-scrollbar-thumb: var(--color-neutral-300);
-  --color-cm-scrollbar-track: transparent;
+  --cm-color-caret: var(--color-neutral-700);
+  --cm-color-line-numbers: var(--color-neutral-400);
+  --cm-color-gutter-fg: var(--color-neutral-400);
+  --cm-color-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.9);
+  --cm-color-gutter-border: oklch(var(--color-neutral-950-lch) / 0.1);
+  --cm-color-active-line-bg: oklch(var(--color-neutral-950-lch) / 0.05);
+  --cm-color-active-line-gutter-fg: var(--color-neutral-700);
+  --cm-color-active-line-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.1);
+  --cm-color-selection-bg: var(--color-blue-100);
+  --cm-color-matching-bracket-bg: var(--color-neutral-200);
+  --cm-color-matching-bracket-fg: var(--color-neutral-700);
+  --cm-color-nonmatching-bracket-bg: var(--color-red-300);
+  --cm-color-nonmatching-bracket-fg: var(--color-red-700);
+  --cm-color-selection-match-bg: var(--color-blue-200);
+  --cm-color-selection-match-fg: var(--color-blue-700);
+  --cm-color-scrollbar-thumb: var(--color-neutral-300);
+  --cm-color-scrollbar-track: transparent;
 
   /* Syntax highlighting colors */
-  --color-cm-keyword: var(--color-violet-400);
-  --color-cm-control-keyword: var(--color-violet-400);
-  --color-cm-operator: var(--color-teal-400);
-  --color-cm-punctuation: var(--color-neutral-400); /* brackets */
-  --color-cm-string: var(--color-magenta-400);
-  --color-cm-number: var(--color-magenta-400);
-  --color-cm-bool: var(--color-yellow-700);
-  --color-cm-null: var(--color-yellow-700);
-  --color-cm-variable: var(--color-fg-primary);
-  --color-cm-definition: var(--color-fg-primary);
-  --color-cm-function: var(--color-fg-primary);
-  --color-cm-property: var(--color-fg-primary);
-  --color-cm-comment: var(--color-neutral-400);
-  --color-cm-type: var(--color-violet-400);
-  --color-cm-class: var(--color-violet-400);
-  --color-cm-regexp: var(--color-violet-400);
+  --cm-color-keyword: var(--color-violet-400);
+  --cm-color-control-keyword: var(--color-violet-400);
+  --cm-color-operator: var(--color-teal-400);
+  --cm-color-punctuation: var(--color-neutral-400); /* brackets */
+  --cm-color-string: var(--color-magenta-400);
+  --cm-color-number: var(--color-magenta-400);
+  --cm-color-bool: var(--color-yellow-700);
+  --cm-color-null: var(--color-yellow-700);
+  --cm-color-variable: var(--color-fg-primary);
+  --cm-color-definition: var(--color-fg-primary);
+  --cm-color-function: var(--color-fg-primary);
+  --cm-color-property: var(--color-fg-primary);
+  --cm-color-comment: var(--color-neutral-400);
+  --cm-color-type: var(--color-violet-400);
+  --cm-color-class: var(--color-violet-400);
+  --cm-color-regexp: var(--color-violet-400);
 
-  --color-cm-flash-bg: var(--color-magenta-300);
-  --color-cm-flash-fg: var(--color-magenta-700);
+  --cm-color-flash-bg: var(--color-magenta-300);
+  --cm-color-flash-fg: var(--color-magenta-700);
 }
 
 #drome-editor[data-flash='true'] {
-  --color-cm-line-bg: var(--color-cm-flash-bg);
-  --color-cm-active-line-bg: var(--color-cm-flash-bg);
+  --cm-color-line-bg: var(--cm-color-flash-bg);
+  --cm-color-active-line-bg: var(--cm-color-flash-bg);
   --cm-line-inline-size: fit-content;
 
-  --color-cm-selection-bg: transparent;
-  --color-cm-matching-bracket-bg: transparent;
-  --color-cm-nonmatching-bracket-bg: transparent;
-  --color-cm-selection-match-bg: transparent;
+  --cm-color-selection-bg: transparent;
+  --cm-color-matching-bracket-bg: transparent;
+  --cm-color-nonmatching-bracket-bg: transparent;
+  --cm-color-selection-match-bg: transparent;
 
-  --color-cm-matching-bracket-fg: var(--color-cm-flash-fg);
-  --color-cm-nonmatching-bracket-fg: var(--color-cm-flash-fg);
-  --color-cm-selection-match-fg: var(--color-cm-flash-fg);
-  --color-cm-keyword: var(--color-cm-flash-fg);
-  --color-cm-control-keyword: var(--color-cm-flash-fg);
-  --color-cm-operator: var(--color-cm-flash-fg);
-  --color-cm-punctuation: var(--color-cm-flash-fg);
-  --color-cm-string: var(--color-cm-flash-fg);
-  --color-cm-number: var(--color-cm-flash-fg);
-  --color-cm-bool: var(--color-cm-flash-fg);
-  --color-cm-null: var(--color-cm-flash-fg);
-  --color-cm-variable: var(--color-cm-flash-fg);
-  --color-cm-definition: var(--color-cm-flash-fg);
-  --color-cm-function: var(--color-cm-flash-fg);
-  --color-cm-property: var(--color-cm-flash-fg);
-  --color-cm-comment: var(--color-cm-flash-fg);
-  --color-cm-type: var(--color-cm-flash-fg);
-  --color-cm-class: var(--color-cm-flash-fg);
-  --color-cm-regexp: var(--color-cm-flash-fg);
+  --cm-color-matching-bracket-fg: var(--cm-color-flash-fg);
+  --cm-color-nonmatching-bracket-fg: var(--cm-color-flash-fg);
+  --cm-color-selection-match-fg: var(--cm-color-flash-fg);
+  --cm-color-keyword: var(--cm-color-flash-fg);
+  --cm-color-control-keyword: var(--cm-color-flash-fg);
+  --cm-color-operator: var(--cm-color-flash-fg);
+  --cm-color-punctuation: var(--cm-color-flash-fg);
+  --cm-color-string: var(--cm-color-flash-fg);
+  --cm-color-number: var(--cm-color-flash-fg);
+  --cm-color-bool: var(--cm-color-flash-fg);
+  --cm-color-null: var(--cm-color-flash-fg);
+  --cm-color-variable: var(--cm-color-flash-fg);
+  --cm-color-definition: var(--cm-color-flash-fg);
+  --cm-color-function: var(--cm-color-flash-fg);
+  --cm-color-property: var(--cm-color-flash-fg);
+  --cm-color-comment: var(--cm-color-flash-fg);
+  --cm-color-type: var(--cm-color-flash-fg);
+  --cm-color-class: var(--cm-color-flash-fg);
+  --cm-color-regexp: var(--cm-color-flash-fg);
 }
