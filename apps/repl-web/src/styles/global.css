@@ -5,8 +5,8 @@
 }
 
 html {
-  background: var(--color-bg-primary);
-  color: var(--color-fg-primary);
+  background: var(--app-color-bg-primary);
+  color: var(--app-color-fg-primary);
   color-scheme: dark;
 }
 
@@ -25,7 +25,7 @@ body {
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-magenta-300);
+    outline: 2px solid var(--app-color-magenta-300);
     outline-offset: 2px;
   }
 }

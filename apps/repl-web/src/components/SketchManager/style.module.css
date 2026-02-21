@@ -13,12 +13,12 @@
   display: flex;
 
   &:not(:last-of-type) {
-    border-block-end: 1px solid var(--color-border-subtle);
+    border-block-end: 1px solid var(--app-color-border-subtle);
   }
 
   &:is(:hover, :focus-visible),
   &:has(:hover, :focus-visible) {
-    background: oklch(var(--color-neutral-50-lch) / 0.05);
+    background: oklch(var(--app-color-neutral-50-lch) / 0.05);
   }
 }
 
@@ -37,7 +37,7 @@
   padding: 0.5rem;
 
   .toolbar:has(:hover, :focus-visible) &:not(:hover, :focus-visible) {
-    color: var(--color-fg-tertiary);
+    color: var(--app-color-fg-tertiary);
   }
 }
 
@@ -53,7 +53,7 @@
   border-inline-start: 0.125rem solid var(--border-color, transparent);
 
   &[data-current='true'] {
-    --border-color: var(--color-border-strong);
+    --border-color: var(--app-color-border-strong);
   }
 
   p {
@@ -65,7 +65,7 @@
   }
 
   &:not(:hover, :focus-visible) p:last-of-type {
-    color: var(--color-fg-tertiary);
+    color: var(--app-color-fg-tertiary);
   }
 }
 
@@ -81,6 +81,6 @@
 
   .item:has(:hover, :focus-visible) &:not(:hover, :focus-visible) {
     opacity: 1;
-    color: var(--color-fg-tertiary);
+    color: var(--app-color-fg-tertiary);
   }
 }

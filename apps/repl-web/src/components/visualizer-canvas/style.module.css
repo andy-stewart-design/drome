@@ -13,7 +13,7 @@
   width: 100%;
   max-width: 100%;
   max-height: 240px;
-  box-shadow: 0 0 0 1px var(--color-border-subtle);
+  box-shadow: 0 0 0 1px var(--app-color-border-subtle);
 }
 
 .toolbar {
@@ -32,7 +32,7 @@
     width: 2rem;
     height: 2rem;
     border-radius: 100vmax;
-    background: var(--color-bg-primary);
-    border: 1px solid var(--color-border-subtle);
+    background: var(--app-color-bg-primary);
+    border: 1px solid var(--app-color-border-subtle);
   }
 }

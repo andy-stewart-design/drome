@@ -9,92 +9,94 @@
   --cm-color-line-bg: none;
 
   /* Editor chrome */
-  --cm-color-caret: var(--color-neutral-300);
+  --cm-color-caret: var(--app-color-neutral-300);
   --cm-caret-width: 1.5px;
-  --cm-color-line-numbers: var(--color-neutral-700);
-  --cm-color-gutter-fg: var(--color-neutral-600);
-  --cm-color-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.85);
+  --cm-color-line-numbers: var(--app-color-neutral-700);
+  --cm-color-gutter-fg: var(--app-color-neutral-600);
+  --cm-color-gutter-bg: oklch(var(--app-color-neutral-950-lch) / 0.85);
   --cm-color-gutter-border: transparent;
-  --cm-color-active-line-bg: oklch(var(--color-neutral-50-lch) / 0.075);
-  --cm-color-active-line-gutter-fg: var(--color-neutral-400);
-  --cm-color-active-line-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.125);
+  --cm-color-active-line-bg: oklch(var(--app-color-neutral-50-lch) / 0.075);
+  --cm-color-active-line-gutter-fg: var(--app-color-neutral-400);
+  --cm-color-active-line-gutter-bg: oklch(
+    var(--app-color-neutral-50-lch) / 0.125
+  );
   --cm-color-active-line-gutter-bg: transparent;
   --cm-active-line-radius: 3px;
-  --cm-color-selection-bg: var(--color-blue-800);
+  --cm-color-selection-bg: var(--app-color-blue-800);
   --cm-selection-radius: 2px;
   --cm-selection-outline-width: 2px;
-  --cm-color-matching-bracket-bg: var(--color-neutral-700);
-  --cm-color-matching-bracket-fg: var(--color-neutral-400);
-  --cm-color-nonmatching-bracket-bg: var(--color-red-800);
-  --cm-color-nonmatching-bracket-fg: var(--color-red-300);
-  --cm-color-selection-match-bg: var(--color-blue-800);
-  --cm-color-selection-match-fg: var(--color-blue-300);
-  --cm-color-scrollbar-thumb: var(--color-neutral-700);
+  --cm-color-matching-bracket-bg: var(--app-color-neutral-700);
+  --cm-color-matching-bracket-fg: var(--app-color-neutral-400);
+  --cm-color-nonmatching-bracket-bg: var(--app-color-red-800);
+  --cm-color-nonmatching-bracket-fg: var(--app-color-red-300);
+  --cm-color-selection-match-bg: var(--app-color-blue-800);
+  --cm-color-selection-match-fg: var(--app-color-blue-300);
+  --cm-color-scrollbar-thumb: var(--app-color-neutral-700);
   --cm-color-scrollbar-track: transparent;
 
   /* Syntax highlighting colors */
-  --cm-color-keyword: var(--color-violet-300);
-  --cm-color-control-keyword: var(--color-violet-300);
-  --cm-color-operator: var(--color-teal-300);
-  --cm-color-punctuation: var(--color-neutral-400); /* brackets */
-  --cm-color-string: var(--color-magenta-300);
-  --cm-color-number: var(--color-magenta-300);
-  --cm-color-bool: var(--color-yellow-500);
-  --cm-color-null: var(--color-yellow-500);
-  --cm-color-variable: var(--color-fg-primary);
-  --cm-color-definition: var(--color-fg-primary);
-  --cm-color-function: var(--color-fg-primary);
-  --cm-color-property: var(--color-fg-primary);
-  --cm-color-comment: var(--color-neutral-700);
-  --cm-color-type: var(--color-violet-300);
-  --cm-color-class: var(--color-violet-300);
-  --cm-color-regexp: var(--color-violet-300);
+  --cm-color-keyword: var(--app-color-violet-300);
+  --cm-color-control-keyword: var(--app-color-violet-300);
+  --cm-color-operator: var(--app-color-teal-300);
+  --cm-color-punctuation: var(--app-color-neutral-400); /* brackets */
+  --cm-color-string: var(--app-color-magenta-300);
+  --cm-color-number: var(--app-color-magenta-300);
+  --cm-color-bool: var(--app-color-yellow-500);
+  --cm-color-null: var(--app-color-yellow-500);
+  --cm-color-variable: var(--app-color-fg-primary);
+  --cm-color-definition: var(--app-color-fg-primary);
+  --cm-color-function: var(--app-color-fg-primary);
+  --cm-color-property: var(--app-color-fg-primary);
+  --cm-color-comment: var(--app-color-neutral-700);
+  --cm-color-type: var(--app-color-violet-300);
+  --cm-color-class: var(--app-color-violet-300);
+  --cm-color-regexp: var(--app-color-violet-300);
 
   /* Evaluation confirmation */
-  --cm-color-flash-bg: var(--color-magenta-400);
-  --cm-color-flash-fg: var(--color-magenta-50);
+  --cm-color-flash-bg: var(--app-color-magenta-400);
+  --cm-color-flash-fg: var(--app-color-magenta-50);
 }
 
 :root:has(body > div[data-theme='light']) {
   /* Editor chrome */
-  --cm-color-caret: var(--color-neutral-700);
-  --cm-color-line-numbers: var(--color-neutral-400);
-  --cm-color-gutter-fg: var(--color-neutral-400);
+  --cm-color-caret: var(--app-color-neutral-700);
+  --cm-color-line-numbers: var(--app-color-neutral-400);
+  --cm-color-gutter-fg: var(--app-color-neutral-400);
   --cm-color-gutter-bg: transparent;
   --cm-color-gutter-border: transparent;
-  --cm-color-active-line-bg: oklch(var(--color-neutral-950-lch) / 0.05);
-  --cm-color-active-line-gutter-fg: var(--color-neutral-700);
+  --cm-color-active-line-bg: oklch(var(--app-color-neutral-950-lch) / 0.05);
+  --cm-color-active-line-gutter-fg: var(--app-color-neutral-700);
   --cm-color-active-line-gutter-bg: transparent;
-  --cm-color-selection-bg: var(--color-blue-100);
-  --cm-color-matching-bracket-bg: var(--color-neutral-200);
-  --cm-color-matching-bracket-fg: var(--color-neutral-700);
-  --cm-color-nonmatching-bracket-bg: var(--color-red-300);
-  --cm-color-nonmatching-bracket-fg: var(--color-red-700);
-  --cm-color-selection-match-bg: var(--color-blue-200);
-  --cm-color-selection-match-fg: var(--color-blue-700);
-  --cm-color-scrollbar-thumb: var(--color-neutral-300);
+  --cm-color-selection-bg: var(--app-color-blue-100);
+  --cm-color-matching-bracket-bg: var(--app-color-neutral-200);
+  --cm-color-matching-bracket-fg: var(--app-color-neutral-700);
+  --cm-color-nonmatching-bracket-bg: var(--app-color-red-300);
+  --cm-color-nonmatching-bracket-fg: var(--app-color-red-700);
+  --cm-color-selection-match-bg: var(--app-color-blue-200);
+  --cm-color-selection-match-fg: var(--app-color-blue-700);
+  --cm-color-scrollbar-thumb: var(--app-color-neutral-300);
   --cm-color-scrollbar-track: transparent;
 
   /* Syntax highlighting colors */
-  --cm-color-keyword: var(--color-violet-400);
-  --cm-color-control-keyword: var(--color-violet-400);
-  --cm-color-operator: var(--color-teal-400);
-  --cm-color-punctuation: var(--color-neutral-400); /* brackets */
-  --cm-color-string: var(--color-magenta-400);
-  --cm-color-number: var(--color-magenta-400);
-  --cm-color-bool: var(--color-yellow-700);
-  --cm-color-null: var(--color-yellow-700);
-  --cm-color-variable: var(--color-fg-primary);
-  --cm-color-definition: var(--color-fg-primary);
-  --cm-color-function: var(--color-fg-primary);
-  --cm-color-property: var(--color-fg-primary);
-  --cm-color-comment: var(--color-neutral-400);
-  --cm-color-type: var(--color-violet-400);
-  --cm-color-class: var(--color-violet-400);
-  --cm-color-regexp: var(--color-violet-400);
+  --cm-color-keyword: var(--app-color-violet-400);
+  --cm-color-control-keyword: var(--app-color-violet-400);
+  --cm-color-operator: var(--app-color-teal-400);
+  --cm-color-punctuation: var(--app-color-neutral-400); /* brackets */
+  --cm-color-string: var(--app-color-magenta-400);
+  --cm-color-number: var(--app-color-magenta-400);
+  --cm-color-bool: var(--app-color-yellow-700);
+  --cm-color-null: var(--app-color-yellow-700);
+  --cm-color-variable: var(--app-color-fg-primary);
+  --cm-color-definition: var(--app-color-fg-primary);
+  --cm-color-function: var(--app-color-fg-primary);
+  --cm-color-property: var(--app-color-fg-primary);
+  --cm-color-comment: var(--app-color-neutral-400);
+  --cm-color-type: var(--app-color-violet-400);
+  --cm-color-class: var(--app-color-violet-400);
+  --cm-color-regexp: var(--app-color-violet-400);
 
-  --cm-color-flash-bg: var(--color-magenta-300);
-  --cm-color-flash-fg: var(--color-magenta-700);
+  --cm-color-flash-bg: var(--app-color-magenta-300);
+  --cm-color-flash-fg: var(--app-color-magenta-700);
 }
 
 #drome-editor[data-flash='true'] {
