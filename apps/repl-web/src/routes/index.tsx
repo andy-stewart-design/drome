@@ -2,13 +2,13 @@
 
 import { createFileRoute } from '@tanstack/solid-router'
 
-import CodeMirror from '@/components/CodeMirror'
-import EditorHeader from '@/components/EditorHeader'
-import EditorToolbar from '@/components/EditorToolbar'
+import CodeMirror from '@/components/codemirror'
+import EditorHeader from '@/components/editor-header'
+import EditorToolbar from '@/components/editor-toolbar'
 import MainLayout from '@/components/main-layout'
-import SketchMetadata from '@/components/SketchMetadata'
-import SketchManager from '@/components/SketchManager'
-import SidebarResizer from '@/components/SidebarResizer'
+import SketchMetadata from '@/components/sketch-metadata'
+import SketchManager from '@/components/sketch-manager'
+import SidebarResizer from '@/components/sidebar-resizer'
 import VisualizerCanvas from '@/components/visualizer-canvas'
 import { useKeyboardEvent } from '@/utils/use-keyboard-event'
 
