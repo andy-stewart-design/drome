@@ -10,6 +10,7 @@
     list-style: none;
     user-select: none;
     padding-block: 0.625rem;
+    height: var(--app-editor-header-height);
 
     &::marker {
       display: none;
