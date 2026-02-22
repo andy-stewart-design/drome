@@ -1,25 +1,27 @@
 import {
   createContext,
-  useContext,
+  createEffect,
   createSignal,
-  type ParentProps,
   onMount,
   onCleanup,
+  useContext,
+  type Accessor,
+  type ParentProps,
   type Setter,
-  createEffect,
 } from 'solid-js'
-import type Drome from 'drome-live'
-import { usePlayState } from './playstate'
 import AudioVisualizer from '@/utils/audio-visualizer'
-import { useSession } from './session'
-import { useEditor } from './editor'
-import { flash } from '@/codemirror/flash'
+import { parseColorCssVars } from '@/utils/parse-color-css-var'
+import { usePlayState } from '@/providers/playstate'
+import { useSession } from '@/providers/session'
+import { useEditor } from '@/providers/editor'
+import type Drome from 'drome-live'
 
 // Define the context type
 type DromeContextType = {
   setCanvas: Setter<HTMLCanvasElement | null>
   togglePlaystate(pause?: boolean): void
   setVisualizerType(): void
+  visualizer: Accessor<AudioVisualizer | null>
 }
 
 // Create context with undefined as default
@@ -31,7 +33,7 @@ function DromeProvider(props: ParentProps) {
   const [canvas, setCanvas] = createSignal<HTMLCanvasElement | null>(null)
   const [visualizer, setVisualizer] = createSignal<AudioVisualizer | null>(null)
   const { setPaused, setBeat } = usePlayState()
-  const { editor } = useEditor()
+  const { editor, flash } = useEditor()
   const { setWorkingSketch } = useSession()
 
   function togglePlaystate(pause?: boolean) {
@@ -48,7 +50,7 @@ function DromeProvider(props: ParentProps) {
     } else {
       const code = ed.state.doc.toString()
       d.evaluate(code)
-      flash(ed)
+      flash()
       if (d.paused) d.start()
       if (v?.paused) v?.start()
       setWorkingSketch((s) => ({ ...s, code }))
@@ -72,10 +74,17 @@ function DromeProvider(props: ParentProps) {
     const d = drome()
     if (!c || !d) return
 
+    const [fgLCH, bgLCH] = parseColorCssVars(
+      '--app-color-magenta-300-lch',
+      '--app-color-neutral-950-lch',
+    )
+
     const visualizer = new AudioVisualizer({
       audioContext: d.context,
       canvas: c,
       type: 'curve',
+      fgLCH,
+      bgLCH,
     })
 
     d.analyzer = visualizer.node
@@ -97,6 +106,7 @@ function DromeProvider(props: ParentProps) {
     setCanvas,
     togglePlaystate,
     setVisualizerType,
+    visualizer,
   } satisfies DromeContextType
 
   return (

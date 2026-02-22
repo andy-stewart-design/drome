@@ -1,0 +1,21 @@
+.resizer {
+  --border-color: transparent;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 8px;
+
+  display: grid;
+  background: transparent;
+  padding: 8px 0px 8px 4px;
+  cursor: col-resize;
+  border-inline-start: 1px solid var(--border-color);
+  transition: border-color 200ms ease-out;
+
+  &:is(:hover, [data-dragging='true']) {
+    --border-color: var(--app-color-magenta-400);
+    transition-delay: 300ms;
+  }
+}

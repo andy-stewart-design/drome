@@ -1,0 +1,134 @@
+/* PRIMITIVE TOKES ------------------------------------ */
+:where(:root) {
+  /* COLOR TOKES */
+  --app-color-neutral-50-lch: 0.97 0.005 258;
+  --app-color-neutral-50: oklch(var(--app-color-neutral-50-lch));
+  --app-color-neutral-100: oklch(0.9 0.011 258);
+  --app-color-neutral-200: oklch(0.8 0.015 258);
+  --app-color-neutral-300: oklch(0.69 0.019 256);
+  --app-color-neutral-400: oklch(0.61 0.019 256);
+  --app-color-neutral-500: oklch(0.53 0.02 256);
+  --app-color-neutral-600: oklch(0.45 0.019 257);
+  --app-color-neutral-700: oklch(0.38 0.016 255);
+  --app-color-neutral-800: oklch(0.29 0.012 258);
+  --app-color-neutral-900: oklch(0.212 0.009 255);
+  --app-color-neutral-950-lch: 0.1381 0.006 245;
+  --app-color-neutral-950: oklch(var(--app-color-neutral-950-lch));
+
+  --app-color-neutral-50-lch: 0.985 0.002 247.84;
+  --app-color-neutral-50: oklch(var(--app-color-neutral-50-lch));
+  --app-color-neutral-100: oklch(0.967 0.003 264.54);
+  --app-color-neutral-200: oklch(0.928 0.006 264.53);
+  --app-color-neutral-300: oklch(0.872 0.01 258.34);
+  --app-color-neutral-400: oklch(0.707 0.022 261.32);
+  --app-color-neutral-500: oklch(0.551 0.027 264.36);
+  --app-color-neutral-600: oklch(0.446 0.03 256.8);
+  --app-color-neutral-700: oklch(0.373 0.034 259.73);
+  --app-color-neutral-800: oklch(0.278 0.033 256.85);
+  --app-color-neutral-900: oklch(0.21 0.034 264.67);
+  --app-color-neutral-950-lch: 0.1 0.028 261.69;
+  --app-color-neutral-950: oklch(var(--app-color-neutral-950-lch));
+
+  --app-color-yellow-50: oklch(0.987 0.026 102.21);
+  --app-color-yellow-100: oklch(0.973 0.071 103.19);
+  --app-color-yellow-200: oklch(0.945 0.129 101.54);
+  --app-color-yellow-300: oklch(0.905 0.182 98.11);
+  --app-color-yellow-400: oklch(0.852 0.199 91.94);
+  --app-color-yellow-500: oklch(0.795 0.184 86.05);
+  --app-color-yellow-600: oklch(0.681 0.162 75.83);
+  --app-color-yellow-700: oklch(0.554 0.135 66.44);
+  --app-color-yellow-800: oklch(0.476 0.114 61.91);
+  --app-color-yellow-900: oklch(0.421 0.095 57.71);
+  --app-color-yellow-950: oklch(0.286 0.066 53.81);
+  --app-color-fuchsia-50: oklch(0.977 0.017 320.06);
+
+  --app-color-red-50: oklch(0.969 0.015 12.42);
+  --app-color-red-100: oklch(0.941 0.03 12.58);
+  --app-color-red-200: oklch(0.892 0.058 10);
+  --app-color-red-300: oklch(0.81 0.117 11.64);
+  --app-color-red-400: oklch(0.712 0.194 13.43);
+  --app-color-red-500: oklch(0.645 0.246 16.44);
+  --app-color-red-600: oklch(0.586 0.253 17.59);
+  --app-color-red-700: oklch(0.514 0.222 16.93);
+  --app-color-red-800: oklch(0.455 0.188 13.7);
+  --app-color-red-900: oklch(0.41 0.159 10.27);
+  --app-color-red-950: oklch(0.271 0.105 12.09);
+
+  --app-color-magenta-50: color(display-p3 1 0.95 1);
+  --app-color-magenta-100: color(display-p3 1 0.75 1);
+  --app-color-magenta-200: color(display-p3 1 0.5 1);
+  --app-color-magenta-300: color(display-p3 1 0 1);
+  --app-color-magenta-300-lch: 0.725 0.36 331.46;
+  --app-color-magenta-300: oklch(var(--app-color-magenta-300-lch));
+  --app-color-magenta-400: color(display-p3 0.7375 0 0.7375);
+  --app-color-magenta-400-lch: 0.58 0.2875 331.46;
+  --app-color-magenta-400: oklch(var(--app-color-magenta-400-lch));
+  --app-color-magenta-500: color(display-p3 0.6 0 0.6);
+  --app-color-magenta-600: color(display-p3 0.475 0 0.475);
+  --app-color-magenta-700: color(display-p3 0.35 0 0.35);
+  --app-color-magenta-800: color(display-p3 0.225 0 0.225);
+  --app-color-magenta-900: color(display-p3 0.117 0 0.117);
+  --app-color-magenta-950: color(display-p3 0.025 0 0.025);
+
+  --app-color-violet-50: color(display-p3 0.95 0.95 1);
+  --app-color-violet-100: color(display-p3 0.77 0.75 1);
+  --app-color-violet-200: color(display-p3 0.63 0.575 1);
+  --app-color-violet-300: color(display-p3 0.5 0.375 1);
+  --app-color-violet-400: color(display-p3 0.425 0.25 0.95);
+  --app-color-violet-500: color(display-p3 0.375 0.189 0.862);
+  --app-color-violet-600: color(display-p3 0.298 0 0.768);
+  --app-color-violet-700: color(display-p3 0.22 0 0.6);
+  --app-color-violet-800: color(display-p3 0.142 0 0.423);
+  --app-color-violet-900: color(display-p3 0.071 0 0.257);
+  --app-color-violet-950: color(display-p3 0.014 0 0.108);
+
+  --app-color-blue-50: color(display-p3 0.939 0.975 1);
+  --app-color-blue-100: color(display-p3 0.807 0.884 1);
+  --app-color-blue-200: color(display-p3 0.675 0.79 1);
+  --app-color-blue-300: color(display-p3 0.487 0.65 1);
+  --app-color-blue-400: color(display-p3 0.255 0.46 1);
+  --app-color-blue-500: color(display-p3 0 0.22 1);
+  --app-color-blue-600: color(display-p3 0 0 0.887);
+  --app-color-blue-700: color(display-p3 0 0 0.802);
+  --app-color-blue-800: color(display-p3 0 0 0.492);
+  --app-color-blue-900: color(display-p3 0 0 0.257);
+  --app-color-blue-950: color(display-p3 0 0 0.1);
+
+  --app-color-teal-50: color(display-p3 0.888 0.997 1);
+  --app-color-teal-100: color(display-p3 0.684 0.929 1);
+  --app-color-teal-200: color(display-p3 0.446 0.857 1);
+  --app-color-teal-300: color(display-p3 0 0.75 1);
+  --app-color-teal-400: color(display-p3 0 0.585 0.813);
+  --app-color-teal-500: color(display-p3 0 0.434 0.615);
+  --app-color-teal-600: color(display-p3 0 0.339 0.489);
+  --app-color-teal-700: color(display-p3 0 0.25 0.375);
+  --app-color-teal-800: color(display-p3 0 0.162 0.255);
+  --app-color-teal-900: color(display-p3 0 0.064 0.124);
+  --app-color-teal-950: color(display-p3 0 0.04 0.07);
+}
+
+/* SEMANTIC TOKES ------------------------------------ */
+:where(:root) {
+  --app-color-fg-primary: var(--app-color-neutral-50);
+  --app-color-fg-secondary: oklch(var(--app-color-neutral-50-lch) / 0.8);
+  --app-color-fg-tertiary: oklch(var(--app-color-neutral-50-lch) / 0.6);
+
+  --app-color-bg-primary: var(--app-color-neutral-950);
+
+  --app-color-border-subtle: oklch(var(--app-color-neutral-50-lch) / 0.15);
+  --app-color-border-strong: var(--app-color-neutral-50);
+
+  --app-editor-header-height: 3rem;
+  --app-sidebar-width: 360px;
+
+  &:has(body > div[data-theme='light']) {
+    --app-color-fg-primary: var(--app-color-neutral-900);
+    --app-color-fg-secondary: oklch(var(--app-color-neutral-950-lch) / 0.8);
+    --app-color-fg-tertiary: oklch(var(--app-color-neutral-950-lch) / 0.6);
+
+    --app-color-bg-primary: var(--app-color-neutral-50);
+
+    --app-color-border-subtle: oklch(var(--app-color-neutral-950-lch) / 0.15);
+    --app-color-border-strong: var(--app-color-neutral-950);
+  }
+}

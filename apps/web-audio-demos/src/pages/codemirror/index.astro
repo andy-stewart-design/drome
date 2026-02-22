@@ -1,0 +1,428 @@
+<div id="editor"></div>
+
+<script>
+  import { basicSetup } from "codemirror";
+  import { EditorView } from "@codemirror/view";
+  import { javascript } from "@codemirror/lang-javascript";
+  import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+  import { tags } from "@lezer/highlight";
+
+  const ALLOW_FOLD = false;
+
+  const editorTheme = EditorView.theme({
+    "&": {
+      backgroundColor: "var(--cm-color-background)",
+      color: "var(--cm-color-text)",
+    },
+    ".cm-content": {
+      caretColor: "var(--cm-color-caret)",
+    },
+    ".cm-cursor": {
+      borderLeftColor: "var(--cm-color-caret)",
+    },
+    ".cm-gutters": {
+      backgroundColor: "var(--cm-color-gutter-bg)",
+      color: "var(--cm-color-gutter-fg)",
+      borderRight: "1px solid var(--cm-color-gutter-border)",
+    },
+    ".cm-activeLineGutter": {
+      backgroundColor: "var(--cm-color-active-line-gutter-bg)",
+      color: "var(--cm-color-active-line-gutter-fg)",
+    },
+    "& .cm-line": {
+      backgroundColor: "var(--cm-color-line-bg)",
+      inlineSize: "var(--cm-color-line-inline-size)",
+    },
+    "& .cm-line.cm-activeLine": {
+      backgroundColor: "var(--cm-color-active-line-bg)",
+    },
+    ".cm-selectionBackground, &.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground":
+      {
+        backgroundColor: "var(--cm-color-selection-bg)",
+        borderRadius: "1px",
+        outline: "4px solid var(--cm-color-selection-bg)",
+      },
+    "& .cm-line .cm-matchingBracket, & .cm-line .cm-nonmatchingBracket": {
+      outline: "none",
+    },
+    "& .cm-line .cm-matchingBracket": {
+      backgroundColor: "var(--cm-color-matching-bracket-bg)",
+    },
+    "& .cm-line .cm-matchingBracket > span": {
+      color: "var(--cm-color-matching-bracket-fg)",
+    },
+    "& .cm-line .cm-nonmatchingBracket": {
+      backgroundColor: "var(--cm-color-nonmatching-bracket-bg)",
+    },
+    "& .cm-line .cm-nonmatchingBracket > span": {
+      color: "var(--cm-color-nonmatching-bracket-fg)",
+    },
+    "& .cm-line .cm-selectionMatch": {
+      backgroundColor: "var(--cm-color-selection-match-bg)",
+    },
+    "& .cm-line .cm-selectionMatch > span": {
+      color: "var(--cm-color-selection-match-fg)",
+    },
+    "& .cm-gutters > .cm-gutter.cm-foldGutter": {
+      pointerEvents: ALLOW_FOLD ? "auto" : "none",
+    },
+    "& .cm-gutters > .cm-gutter.cm-foldGutter > .cm-gutterElement > span": {
+      visibility: ALLOW_FOLD ? "visible" : "hidden",
+    },
+    "& .cm-scroller": {
+      scrollbarWidth: "thin",
+      scrollbarColor:
+        "var(--cm-color-scrollbar-thumb) var(--cm-color-scrollbar-track)",
+    },
+  });
+
+  const highlightStyle = HighlightStyle.define([
+    { tag: tags.keyword, color: "var(--cm-color-keyword)" },
+    { tag: tags.controlKeyword, color: "var(--cm-color-control-keyword)" },
+    { tag: tags.operator, color: "var(--cm-color-operator)" },
+    { tag: tags.punctuation, color: "var(--cm-color-punctuation)" },
+    { tag: tags.string, color: "var(--cm-color-string)" },
+    { tag: tags.number, color: "var(--cm-color-number)" },
+    { tag: tags.bool, color: "var(--cm-color-bool)" },
+    { tag: tags.null, color: "var(--cm-color-null)" },
+    { tag: tags.variableName, color: "var(--cm-color-variable)" },
+    {
+      tag: tags.definition(tags.variableName),
+      color: "var(--cm-color-definition)",
+    },
+    {
+      tag: tags.function(tags.variableName),
+      color: "var(--cm-color-function)",
+    },
+    { tag: tags.propertyName, color: "var(--cm-color-property)" },
+    {
+      tag: tags.comment,
+      color: "var(--cm-color-comment)",
+      fontStyle: "italic",
+    },
+    {
+      tag: tags.lineComment,
+      color: "var(--cm-color-comment)",
+      fontStyle: "italic",
+    },
+    {
+      tag: tags.blockComment,
+      color: "var(--cm-color-comment)",
+      fontStyle: "italic",
+    },
+    { tag: tags.typeName, color: "var(--cm-color-type)" },
+    { tag: tags.className, color: "var(--cm-color-class)" },
+    { tag: tags.regexp, color: "var(--cm-color-regexp)" },
+  ]);
+
+  const container =
+    document.querySelector<HTMLDivElement>("#editor") ?? undefined;
+
+  const sampleCode = `// Sample JavaScript code
+function greet(name) {
+  const message = "Hello, " + name + "!";
+  console.log(message);
+  return message;
+}
+
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map(n => n * 2);
+
+if (doubled.length > 0) {
+  greet("World");
+}
+
+d.synth("sine").note([60,64,67,71])`;
+
+  const view = new EditorView({
+    doc: sampleCode,
+    parent: container,
+    extensions: [
+      basicSetup,
+      javascript(),
+      editorTheme,
+      syntaxHighlighting(highlightStyle),
+    ],
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.altKey && e.key === "†") {
+      e.preventDefault();
+      toggleTheme();
+    } else if (e.altKey && e.key === "Enter") {
+      e.preventDefault();
+      flash(300);
+    }
+  });
+
+  function toggleTheme() {
+    if (!container) return;
+
+    let currentTheme = container.dataset.theme;
+    if (!currentTheme) {
+      currentTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+    container.dataset.theme = currentTheme === "dark" ? "light" : "dark";
+  }
+
+  let timeoutId: ReturnType<typeof setTimeout> | null;
+
+  function flash(dur = 200) {
+    if (!container) return;
+    if (timeoutId) clearTimeout(timeoutId);
+
+    const cursorPos = view.state.selection.ranges[0].from;
+    container.dataset.flash = "true";
+    container.inert = true;
+
+    timeoutId = setTimeout(() => {
+      container.dataset.flash = "false";
+      container.inert = false;
+      view.focus();
+      view.dispatch({ selection: { anchor: cursorPos, head: cursorPos } });
+      timeoutId = null;
+    }, dur);
+  }
+</script>
+
+<style>
+  :root {
+    /* Color tokens */
+    --color-neutral-50-lch: 97% 0.005 258;
+    --color-neutral-50: oklch(var(--color-neutral-50-lch));
+    --color-neutral-100: oklch(90% 0.011 258);
+    --color-neutral-200: oklch(80% 0.015 258);
+    --color-neutral-300: oklch(69% 0.019 256);
+    --color-neutral-400: oklch(61% 0.019 256);
+    --color-neutral-500: oklch(53% 0.02 256);
+    --color-neutral-600: oklch(45% 0.019 257);
+    --color-neutral-700: oklch(38% 0.016 255);
+    --color-neutral-800: oklch(29% 0.012 258);
+    --color-neutral-900: oklch(21.2% 0.009 255);
+    --color-neutral-950-lch: 13.81% 0.006 245;
+    --color-neutral-950: oklch(var(--color-neutral-950-lch));
+
+    --color-yellow-50: oklch(0.987 0.026 102.21);
+    --color-yellow-100: oklch(0.973 0.071 103.19);
+    --color-yellow-200: oklch(0.945 0.129 101.54);
+    --color-yellow-300: oklch(0.905 0.182 98.11);
+    --color-yellow-400: oklch(0.852 0.199 91.94);
+    --color-yellow-500: oklch(0.795 0.184 86.05);
+    --color-yellow-600: oklch(0.681 0.162 75.83);
+    --color-yellow-700: oklch(0.554 0.135 66.44);
+    --color-yellow-800: oklch(0.476 0.114 61.91);
+    --color-yellow-900: oklch(0.421 0.095 57.71);
+    --color-yellow-950: oklch(0.286 0.066 53.81);
+    --color-fuchsia-50: oklch(0.977 0.017 320.06);
+
+    --color-red-50: oklch(0.969 0.015 12.42);
+    --color-red-100: oklch(0.941 0.03 12.58);
+    --color-red-200: oklch(0.892 0.058 10);
+    --color-red-300: oklch(0.81 0.117 11.64);
+    --color-red-400: oklch(0.712 0.194 13.43);
+    --color-red-500: oklch(0.645 0.246 16.44);
+    --color-red-600: oklch(0.586 0.253 17.59);
+    --color-red-700: oklch(0.514 0.222 16.93);
+    --color-red-800: oklch(0.455 0.188 13.7);
+    --color-red-900: oklch(0.41 0.159 10.27);
+    --color-red-950: oklch(0.271 0.105 12.09);
+
+    --color-magenta-50: color(display-p3 1 0.9 1);
+    --color-magenta-100: color(display-p3 1 0.75 1);
+    --color-magenta-200: color(display-p3 1 0.5 1);
+    --color-magenta-300: color(display-p3 1 0 1);
+    --color-magenta-400: color(display-p3 0.7375 0 0.7375);
+    --color-magenta-500: color(display-p3 0.6 0 0.6);
+    --color-magenta-600: color(display-p3 0.475 0 0.475);
+    --color-magenta-700: color(display-p3 0.35 0 0.35);
+    --color-magenta-800: color(display-p3 0.225 0 0.225);
+    --color-magenta-900: color(display-p3 0.117 0 0.117);
+    --color-magenta-950: color(display-p3 0.025 0 0.025);
+
+    --color-violet-50: color(display-p3 0.95 0.95 1);
+    --color-violet-100: color(display-p3 0.77 0.75 1);
+    --color-violet-200: color(display-p3 0.63 0.575 1);
+    --color-violet-300: color(display-p3 0.5 0.375 1);
+    --color-violet-400: color(display-p3 0.425 0.25 0.95);
+    --color-violet-500: color(display-p3 0.375 0.189 0.862);
+    --color-violet-600: color(display-p3 0.298 0 0.768);
+    --color-violet-700: color(display-p3 0.22 0 0.6);
+    --color-violet-800: color(display-p3 0.142 0 0.423);
+    --color-violet-900: color(display-p3 0.071 0 0.257);
+    --color-violet-950: color(display-p3 0.014 0 0.108);
+
+    --color-blue-50: color(display-p3 0.939 0.975 1);
+    --color-blue-100: color(display-p3 0.807 0.884 1);
+    --color-blue-200: color(display-p3 0.675 0.79 1);
+    --color-blue-300: color(display-p3 0.487 0.65 1);
+    --color-blue-400: color(display-p3 0.255 0.46 1);
+    --color-blue-500: color(display-p3 0 0.22 1);
+    --color-blue-600: color(display-p3 0 0 0.887);
+    --color-blue-700: color(display-p3 0 0 0.802);
+    --color-blue-800: color(display-p3 0 0 0.492);
+    --color-blue-900: color(display-p3 0 0 0.257);
+    --color-blue-950: color(display-p3 0 0 0.1);
+
+    --color-teal-50: color(display-p3 0.888 0.997 1);
+    --color-teal-100: color(display-p3 0.684 0.929 1);
+    --color-teal-200: color(display-p3 0.446 0.857 1);
+    --color-teal-300: color(display-p3 0 0.75 1);
+    --color-teal-400: color(display-p3 0 0.585 0.813);
+    --color-teal-500: color(display-p3 0 0.434 0.615);
+    --color-teal-600: color(display-p3 0 0.339 0.489);
+    --color-teal-700: color(display-p3 0 0.25 0.375);
+    --color-teal-800: color(display-p3 0 0.162 0.255);
+    --color-teal-900: color(display-p3 0 0.064 0.124);
+    --color-teal-950: color(display-p3 0 0.04 0.07);
+  }
+
+  :root {
+    /* App tokens */
+    --color-fg-primary: var(--color-neutral-100);
+    --color-bg-primary: var(--color-neutral-950);
+
+    /* Editor chrome */
+    --cm-color-background: transparent;
+    --cm-color-text: inherit;
+    --cm-color-caret: var(--color-neutral-300);
+    --cm-color-line-bg: none;
+    --cm-color-line-inline-size: auto;
+    --cm-color-gutter-fg: var(--color-neutral-600);
+    --cm-color-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.85);
+    --cm-color-gutter-border: oklch(var(--color-neutral-50-lch) / 0.1);
+    --cm-color-active-line-bg: oklch(var(--color-neutral-50-lch) / 0.075);
+    --cm-color-active-line-gutter-fg: var(--color-neutral-400);
+    --cm-color-active-line-gutter-bg: oklch(
+      var(--color-neutral-50-lch) / 0.125
+    );
+    --cm-color-selection-bg: var(--color-blue-800);
+    --cm-color-matching-bracket-bg: var(--color-neutral-700);
+    --cm-color-matching-bracket-fg: var(--color-neutral-400);
+    --cm-color-nonmatching-bracket-bg: var(--color-red-800);
+    --cm-color-nonmatching-bracket-fg: var(--color-red-300);
+    --cm-color-selection-match-bg: var(--color-blue-800);
+    --cm-color-selection-match-fg: var(--color-blue-300);
+    --cm-color-scrollbar-thumb: var(--color-neutral-700);
+    --cm-color-scrollbar-track: transparent;
+
+    /* Syntax highlighting colors */
+    --cm-color-keyword: var(--color-violet-300);
+    --cm-color-control-keyword: var(--color-violet-300);
+    --cm-color-operator: var(--color-teal-300);
+    --cm-color-punctuation: var(--color-neutral-400); /* brackets */
+    --cm-color-string: var(--color-magenta-300);
+    --cm-color-number: var(--color-magenta-300);
+    --cm-color-bool: var(--color-yellow-500);
+    --cm-color-null: var(--color-yellow-500);
+    --cm-color-variable: var(--color-fg-primary);
+    --cm-color-definition: var(--color-fg-primary);
+    --cm-color-function: var(--color-fg-primary);
+    --cm-color-property: var(--color-fg-primary);
+    --cm-color-comment: var(--color-neutral-600);
+    --cm-color-type: var(--color-violet-300);
+    --cm-color-class: var(--color-violet-300);
+    --cm-color-regexp: var(--color-violet-300);
+
+    /* Evaluation confirmation */
+    --cm-color-flash-bg: var(--color-magenta-400);
+    --cm-color-flash-fg: var(--color-magenta-100);
+  }
+
+  :root:has(body > #editor[data-theme="light"]) {
+    /* App tokens */
+    --color-fg-primary: var(--color-neutral-900);
+    --color-bg-primary: var(--color-neutral-50);
+
+    /* Editor chrome */
+    --cm-color-caret: var(--color-neutral-700);
+    --cm-color-gutter-fg: var(--color-neutral-400);
+    --cm-color-gutter-bg: oklch(var(--color-neutral-50-lch) / 0.9);
+    --cm-color-gutter-border: oklch(var(--color-neutral-950-lch) / 0.1);
+    --cm-color-active-line-bg: oklch(var(--color-neutral-950-lch) / 0.05);
+    --cm-color-active-line-gutter-fg: var(--color-neutral-700);
+    --cm-color-active-line-gutter-bg: oklch(var(--color-neutral-950-lch) / 0.1);
+    --cm-color-selection-bg: var(--color-blue-100);
+    --cm-color-matching-bracket-bg: var(--color-neutral-200);
+    --cm-color-matching-bracket-fg: var(--color-neutral-700);
+    --cm-color-nonmatching-bracket-bg: var(--color-red-300);
+    --cm-color-nonmatching-bracket-fg: var(--color-red-700);
+    --cm-color-selection-match-bg: var(--color-blue-200);
+    --cm-color-selection-match-fg: var(--color-blue-700);
+    --cm-color-scrollbar-thumb: var(--color-neutral-300);
+    --cm-color-scrollbar-track: transparent;
+
+    /* Syntax highlighting colors */
+    --cm-color-keyword: var(--color-violet-400);
+    --cm-color-control-keyword: var(--color-violet-400);
+    --cm-color-operator: var(--color-teal-400);
+    --cm-color-punctuation: var(--color-neutral-400); /* brackets */
+    --cm-color-string: var(--color-magenta-400);
+    --cm-color-number: var(--color-magenta-400);
+    --cm-color-bool: var(--color-yellow-700);
+    --cm-color-null: var(--color-yellow-700);
+    --cm-color-variable: var(--color-fg-primary);
+    --cm-color-definition: var(--color-fg-primary);
+    --cm-color-function: var(--color-fg-primary);
+    --cm-color-property: var(--color-fg-primary);
+    --cm-color-comment: var(--color-neutral-400);
+    --cm-color-type: var(--color-violet-400);
+    --cm-color-class: var(--color-violet-400);
+    --cm-color-regexp: var(--color-violet-400);
+
+    --cm-color-flash-bg: var(--color-magenta-300);
+    --cm-color-flash-fg: var(--color-magenta-700);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--color-bg-primary);
+    color: var(--color-fg-primary);
+  }
+
+  body {
+    margin: 0;
+  }
+
+  #editor {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    height: 100dvh;
+  }
+
+  #editor[data-flash="true"] {
+    --cm-color-line-bg: var(--cm-color-flash-bg);
+    --cm-color-active-line-bg: var(--cm-color-flash-bg);
+    --cm-color-line-inline-size: fit-content;
+
+    --cm-color-selection-bg: transparent;
+    --cm-color-matching-bracket-bg: transparent;
+    --cm-color-nonmatching-bracket-bg: transparent;
+    --cm-color-selection-match-bg: transparent;
+
+    --cm-color-matching-bracket-fg: var(--cm-color-flash-fg);
+    --cm-color-nonmatching-bracket-fg: var(--cm-color-flash-fg);
+    --cm-color-selection-match-fg: var(--cm-color-flash-fg);
+    --cm-color-keyword: var(--cm-color-flash-fg);
+    --cm-color-control-keyword: var(--cm-color-flash-fg);
+    --cm-color-operator: var(--cm-color-flash-fg);
+    --cm-color-punctuation: var(--cm-color-flash-fg);
+    --cm-color-string: var(--cm-color-flash-fg);
+    --cm-color-number: var(--cm-color-flash-fg);
+    --cm-color-bool: var(--cm-color-flash-fg);
+    --cm-color-null: var(--cm-color-flash-fg);
+    --cm-color-variable: var(--cm-color-flash-fg);
+    --cm-color-definition: var(--cm-color-flash-fg);
+    --cm-color-function: var(--cm-color-flash-fg);
+    --cm-color-property: var(--cm-color-flash-fg);
+    --cm-color-comment: var(--cm-color-flash-fg);
+    --cm-color-type: var(--cm-color-flash-fg);
+    --cm-color-class: var(--cm-color-flash-fg);
+    --cm-color-regexp: var(--cm-color-flash-fg);
+  }
+</style>

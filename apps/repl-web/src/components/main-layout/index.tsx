@@ -1,4 +1,5 @@
 import { useSidebar } from '@/providers/sidebar'
+import { useTheme } from '@/providers/theme'
 import type { JSXElement } from 'solid-js'
 import s from './style.module.css'
 
@@ -9,10 +10,12 @@ interface Props {
 
 function MainLayout({ content: main, sidebar }: Props) {
   const { showSidebar, sidebarSize } = useSidebar()
+  const { colorScheme } = useTheme()
 
   return (
     <div
       class={s.layout}
+      data-theme={colorScheme()}
       style={{
         'grid-template-columns': `minmax(0,1fr) ${showSidebar() ? sidebarSize() : 0}px`,
       }}

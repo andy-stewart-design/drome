@@ -14,7 +14,7 @@
   position: relative;
   overflow: auto;
   overscroll-behavior: contain;
-  border-inline-start: 1px solid var(--border-subtle);
+  border-inline-start: 1px solid var(--app-color-border-subtle);
 
   &[data-visible='false'] {
     display: none;

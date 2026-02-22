@@ -1,0 +1,131 @@
+:root {
+  --cm-line-inline-size: auto;
+  --cm-line-height: 1.5;
+  --cm-padding-block-start: 0px;
+  --cm-padding-block-end: 30vw;
+  --cm-editor-font-size: 14px;
+  --cm-color-background: transparent;
+  --cm-color-text: inherit;
+  --cm-color-line-bg: none;
+
+  /* Editor chrome */
+  --cm-color-caret: var(--app-color-neutral-300);
+  --cm-caret-width: 1.5px;
+  --cm-color-line-numbers: var(--app-color-neutral-700);
+  --cm-color-gutter-fg: var(--app-color-neutral-600);
+  --cm-color-gutter-bg: oklch(var(--app-color-neutral-950-lch) / 0.85);
+  --cm-color-gutter-border: transparent;
+  --cm-color-active-line-bg: oklch(var(--app-color-neutral-50-lch) / 0.075);
+  --cm-color-active-line-gutter-fg: var(--app-color-neutral-400);
+  --cm-color-active-line-gutter-bg: oklch(
+    var(--app-color-neutral-50-lch) / 0.125
+  );
+  --cm-color-active-line-gutter-bg: transparent;
+  --cm-active-line-radius: 3px;
+  --cm-color-selection-bg: var(--app-color-blue-800);
+  --cm-selection-radius: 2px;
+  --cm-selection-outline-width: 2px;
+  --cm-color-matching-bracket-bg: var(--app-color-neutral-700);
+  --cm-color-matching-bracket-fg: var(--app-color-neutral-400);
+  --cm-color-nonmatching-bracket-bg: var(--app-color-red-800);
+  --cm-color-nonmatching-bracket-fg: var(--app-color-red-300);
+  --cm-color-selection-match-bg: var(--app-color-blue-800);
+  --cm-color-selection-match-fg: var(--app-color-blue-300);
+  --cm-color-scrollbar-thumb: var(--app-color-neutral-700);
+  --cm-color-scrollbar-track: transparent;
+
+  /* Syntax highlighting colors */
+  --cm-color-keyword: var(--app-color-violet-300);
+  --cm-color-control-keyword: var(--app-color-violet-300);
+  --cm-color-operator: var(--app-color-teal-300);
+  --cm-color-punctuation: var(--app-color-neutral-400); /* brackets */
+  --cm-color-string: var(--app-color-magenta-300);
+  --cm-color-number: var(--app-color-magenta-300);
+  --cm-color-bool: var(--app-color-yellow-500);
+  --cm-color-null: var(--app-color-yellow-500);
+  --cm-color-variable: var(--app-color-fg-primary);
+  --cm-color-definition: var(--app-color-fg-primary);
+  --cm-color-function: var(--app-color-fg-primary);
+  --cm-color-property: var(--app-color-fg-primary);
+  --cm-color-comment: var(--app-color-neutral-700);
+  --cm-color-type: var(--app-color-violet-300);
+  --cm-color-class: var(--app-color-violet-300);
+  --cm-color-regexp: var(--app-color-violet-300);
+
+  /* Evaluation confirmation */
+  --cm-color-flash-bg: var(--app-color-magenta-400);
+  --cm-color-flash-fg: var(--app-color-magenta-50);
+}
+
+:root:has(body > div[data-theme='light']) {
+  /* Editor chrome */
+  --cm-color-caret: var(--app-color-neutral-700);
+  --cm-color-line-numbers: var(--app-color-neutral-400);
+  --cm-color-gutter-fg: var(--app-color-neutral-400);
+  --cm-color-gutter-bg: transparent;
+  --cm-color-gutter-border: transparent;
+  --cm-color-active-line-bg: oklch(var(--app-color-neutral-950-lch) / 0.05);
+  --cm-color-active-line-gutter-fg: var(--app-color-neutral-700);
+  --cm-color-active-line-gutter-bg: transparent;
+  --cm-color-selection-bg: var(--app-color-blue-100);
+  --cm-color-matching-bracket-bg: var(--app-color-neutral-200);
+  --cm-color-matching-bracket-fg: var(--app-color-neutral-700);
+  --cm-color-nonmatching-bracket-bg: var(--app-color-red-300);
+  --cm-color-nonmatching-bracket-fg: var(--app-color-red-700);
+  --cm-color-selection-match-bg: var(--app-color-blue-200);
+  --cm-color-selection-match-fg: var(--app-color-blue-700);
+  --cm-color-scrollbar-thumb: var(--app-color-neutral-300);
+  --cm-color-scrollbar-track: transparent;
+
+  /* Syntax highlighting colors */
+  --cm-color-keyword: var(--app-color-violet-400);
+  --cm-color-control-keyword: var(--app-color-violet-400);
+  --cm-color-operator: var(--app-color-teal-400);
+  --cm-color-punctuation: var(--app-color-neutral-400); /* brackets */
+  --cm-color-string: var(--app-color-magenta-400);
+  --cm-color-number: var(--app-color-magenta-400);
+  --cm-color-bool: var(--app-color-yellow-700);
+  --cm-color-null: var(--app-color-yellow-700);
+  --cm-color-variable: var(--app-color-fg-primary);
+  --cm-color-definition: var(--app-color-fg-primary);
+  --cm-color-function: var(--app-color-fg-primary);
+  --cm-color-property: var(--app-color-fg-primary);
+  --cm-color-comment: var(--app-color-neutral-400);
+  --cm-color-type: var(--app-color-violet-400);
+  --cm-color-class: var(--app-color-violet-400);
+  --cm-color-regexp: var(--app-color-violet-400);
+
+  --cm-color-flash-bg: var(--app-color-magenta-300);
+  --cm-color-flash-fg: var(--app-color-magenta-700);
+}
+
+#drome-editor[data-flash='true'] {
+  --cm-color-line-bg: var(--cm-color-flash-bg);
+  --cm-color-active-line-bg: var(--cm-color-flash-bg);
+  --cm-line-inline-size: fit-content;
+
+  --cm-color-selection-bg: transparent;
+  --cm-color-matching-bracket-bg: transparent;
+  --cm-color-nonmatching-bracket-bg: transparent;
+  --cm-color-selection-match-bg: transparent;
+
+  --cm-color-matching-bracket-fg: var(--cm-color-flash-fg);
+  --cm-color-nonmatching-bracket-fg: var(--cm-color-flash-fg);
+  --cm-color-selection-match-fg: var(--cm-color-flash-fg);
+  --cm-color-keyword: var(--cm-color-flash-fg);
+  --cm-color-control-keyword: var(--cm-color-flash-fg);
+  --cm-color-operator: var(--cm-color-flash-fg);
+  --cm-color-punctuation: var(--cm-color-flash-fg);
+  --cm-color-string: var(--cm-color-flash-fg);
+  --cm-color-number: var(--cm-color-flash-fg);
+  --cm-color-bool: var(--cm-color-flash-fg);
+  --cm-color-null: var(--cm-color-flash-fg);
+  --cm-color-variable: var(--cm-color-flash-fg);
+  --cm-color-definition: var(--cm-color-flash-fg);
+  --cm-color-function: var(--cm-color-flash-fg);
+  --cm-color-property: var(--cm-color-flash-fg);
+  --cm-color-comment: var(--cm-color-flash-fg);
+  --cm-color-type: var(--cm-color-flash-fg);
+  --cm-color-class: var(--cm-color-flash-fg);
+  --cm-color-regexp: var(--cm-color-flash-fg);
+}
