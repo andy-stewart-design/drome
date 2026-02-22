@@ -5,11 +5,11 @@ import {
   onMount,
   onCleanup,
   useContext,
-  type Accessor,
   type ParentProps,
   type Setter,
 } from 'solid-js'
 import AudioVisualizer from '@/utils/audio-visualizer'
+import { parseColorCssVars } from '@/utils/parse-color-css-var'
 import { usePlayState } from '@/providers/playstate'
 import { useSession } from '@/providers/session'
 import { useEditor } from '@/providers/editor'
@@ -72,10 +72,17 @@ function DromeProvider(props: ParentProps) {
     const d = drome()
     if (!c || !d) return
 
+    const [fgLCH, bgLCH] = parseColorCssVars(
+      '--app-color-magenta-300-lch',
+      '--app-color-neutral-50-lch',
+    )
+
     const visualizer = new AudioVisualizer({
       audioContext: d.context,
       canvas: c,
       type: 'curve',
+      fgLCH,
+      bgLCH,
     })
 
     d.analyzer = visualizer.node

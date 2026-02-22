@@ -1,6 +1,7 @@
 type VisualizerType = 'bars' | 'curve' | 'waveform' | 'circular'
 // prettier-ignore
 type FftSize = 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 | 32768
+type LCH = [number, number, number]
 
 const defaultAvData = new Uint8Array([
   136, 173, 191, 189, 171, 161, 159, 133, 125, 118, 92, 95, 84, 69, 72, 59, 53,
@@ -24,6 +25,8 @@ interface AudioVisualizerConfig {
   fftSize?: FftSize
   smoothingTimeConstant?: number
   type?: VisualizerType
+  bgLCH?: LCH
+  fgLCH?: LCH
 }
 
 const visualizerTypes = ['bars', 'curve', 'waveform'] as const
@@ -35,6 +38,8 @@ class AudioVisualizer {
   private _height: number = 0
   private _controller = new AbortController()
   private _animationId: number | null = null
+  private _bgLCH: LCH
+  private _fgLCH: LCH
 
   private _analyser: AnalyserNode
   private _type: VisualizerType
@@ -45,6 +50,8 @@ class AudioVisualizer {
 
   constructor(config: AudioVisualizerConfig) {
     this._canvas = config.canvas
+    this._bgLCH = config.bgLCH ?? [0.1381, 0.006, 245]
+    this._fgLCH = config.fgLCH ?? [0.725, 0.36, 331.46]
 
     const context = this._canvas.getContext('2d', {
       alpha: false,
@@ -108,26 +115,36 @@ class AudioVisualizer {
     this.render()
   }
 
+  bgLCH(lch: LCH) {
+    this._bgLCH = lch
+  }
+
+  fgLCH(lch: LCH) {
+    this._bgLCH = lch
+  }
+
   private render() {
     const data = this._dataArray
 
     // Clear canvas
-    this._ctx.fillStyle = 'color(display-p3 0 0.004 0.008)'
+    const [l, c, h] = this._bgLCH
+    this._ctx.fillStyle = `oklch(${l} ${c} ${h})`
     this._ctx.fillRect(0, 0, this._width, this._height)
 
     // Draw based on type
+    const { _ctx, _width, _height, _fgLCH } = this
     switch (this._type) {
       case 'bars':
-        drawSpectrumBars(this._ctx, data, this._width, this._height)
+        drawSpectrumBars(_ctx, data, _width, _height, _fgLCH)
         break
       case 'curve':
-        drawSpectrumCurve(this._ctx, data, this._width, this._height)
+        drawSpectrumCurve(_ctx, data, _width, _height, _fgLCH)
         break
       case 'waveform':
-        drawOscilloscope(this._ctx, data, this._width, this._height)
+        drawOscilloscope(_ctx, data, _width, _height, _fgLCH)
         break
       case 'circular':
-        drawCircular(this._ctx, data, this._width, this._height)
+        drawCircular(_ctx, data, _width, _height, _fgLCH)
         break
       default:
         console.log(this._type satisfies never)
@@ -176,6 +193,7 @@ function drawSpectrumBars(
   data: Uint8Array<ArrayBuffer> | null,
   width: number,
   height: number,
+  fgLch: LCH,
   numBars = 80,
 ) {
   if (!data) return
@@ -183,7 +201,8 @@ function drawSpectrumBars(
   const barWidth = width / numBars
   const barGap = 2
   const samplesPerBar = Math.floor(data.length / numBars)
-  ctx.fillStyle = 'color(display-p3 1 0 1)'
+  const [l, c, h] = fgLch
+  ctx.fillStyle = `oklch(${l} ${c} ${h})`
 
   for (let i = 0; i < numBars; i++) {
     const startIndex = i * samplesPerBar
@@ -205,6 +224,7 @@ function drawSpectrumCurve(
   data: Uint8Array<ArrayBuffer> | null,
   width: number,
   height: number,
+  fgLch: LCH,
   numPoints = 80,
 ) {
   if (!data) return
@@ -258,8 +278,9 @@ function drawSpectrumCurve(
 
   // Fill with gradient
   const gradient = ctx.createLinearGradient(0, 0, 0, height)
-  gradient.addColorStop(0, 'color(display-p3 1 0 1 / 0.5)') // Blue with opacity
-  gradient.addColorStop(1, 'color(display-p3 1 0 1 / 0.1)')
+  const [l, c, h] = fgLch
+  gradient.addColorStop(0, `oklch(${l} ${c} ${h} / 0.5)`)
+  gradient.addColorStop(1, `oklch(${l} ${c} ${h} / 0.1)`)
   ctx.fillStyle = gradient
   ctx.fill()
 
@@ -269,7 +290,7 @@ function drawSpectrumCurve(
   drawCurve()
 
   ctx.lineTo(lastPoint.x, lastPoint.y)
-  ctx.strokeStyle = 'color(display-p3 1 0 1)' // Solid blue
+  ctx.strokeStyle = `oklch(${l} ${c} ${h})`
   ctx.lineWidth = 2
   ctx.stroke()
 }
@@ -279,11 +300,13 @@ function drawOscilloscope(
   data: Uint8Array<ArrayBuffer> | null,
   width: number,
   height: number,
+  fgLch: LCH,
 ) {
   if (!data) return
 
+  const [l, c, h] = fgLch
+  ctx.strokeStyle = `oklch(${l} ${c} ${h})`
   ctx.lineWidth = 2
-  ctx.strokeStyle = 'color(display-p3 1 0 1)'
   ctx.beginPath()
 
   const sliceWidth = width / data.length
@@ -311,6 +334,7 @@ function drawCircular(
   data: Uint8Array<ArrayBuffer> | null,
   width: number,
   height: number,
+  fgLch: LCH,
 ) {
   if (!data) return
 
@@ -329,7 +353,8 @@ function drawCircular(
     const x2 = centerX + Math.cos(angle) * (radius + barHeight)
     const y2 = centerY + Math.sin(angle) * (radius + barHeight)
 
-    ctx.strokeStyle = 'color(display-p3 1 0 1)'
+    const [l, c, h] = fgLch
+    ctx.strokeStyle = `oklch(${l} ${c} ${h})`
     ctx.lineWidth = 2
 
     ctx.beginPath()
