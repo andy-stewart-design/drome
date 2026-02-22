@@ -2,12 +2,14 @@ import { onCleanup, onMount } from 'solid-js'
 import { useDrome } from '@/providers/drome'
 import { useSession } from '@/providers/session'
 import { useEditor } from '@/providers/editor'
+import { useTheme } from '@/providers/theme'
 
 function useKeyboardEvent() {
   let controller = new AbortController()
   const { togglePlaystate } = useDrome()
-  const { editor, setColorTheme } = useEditor()
+  const { editor } = useEditor()
   const { saveSketch, createSketch } = useSession()
+  const { setColorScheme } = useTheme()
 
   function handleKeyDown(e: KeyboardEvent) {
     if (e.altKey && e.key === 'Enter') {
@@ -26,7 +28,7 @@ function useKeyboardEvent() {
       createSketch()
     } else if (e.altKey && e.key === '†') {
       e.preventDefault()
-      setColorTheme()
+      setColorScheme()
     }
   }
 

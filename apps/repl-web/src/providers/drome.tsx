@@ -5,6 +5,7 @@ import {
   onMount,
   onCleanup,
   useContext,
+  type Accessor,
   type ParentProps,
   type Setter,
 } from 'solid-js'
@@ -20,6 +21,7 @@ type DromeContextType = {
   setCanvas: Setter<HTMLCanvasElement | null>
   togglePlaystate(pause?: boolean): void
   setVisualizerType(): void
+  visualizer: Accessor<AudioVisualizer | null>
 }
 
 // Create context with undefined as default
@@ -74,7 +76,7 @@ function DromeProvider(props: ParentProps) {
 
     const [fgLCH, bgLCH] = parseColorCssVars(
       '--app-color-magenta-300-lch',
-      '--app-color-neutral-50-lch',
+      '--app-color-neutral-950-lch',
     )
 
     const visualizer = new AudioVisualizer({
@@ -104,6 +106,7 @@ function DromeProvider(props: ParentProps) {
     setCanvas,
     togglePlaystate,
     setVisualizerType,
+    visualizer,
   } satisfies DromeContextType
 
   return (

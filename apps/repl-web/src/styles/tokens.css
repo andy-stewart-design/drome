@@ -61,6 +61,8 @@
   --app-color-magenta-300-lch: 0.725 0.36 331.46;
   --app-color-magenta-300: oklch(var(--app-color-magenta-300-lch));
   --app-color-magenta-400: color(display-p3 0.7375 0 0.7375);
+  --app-color-magenta-400-lch: 0.58 0.2875 331.46;
+  --app-color-magenta-400: oklch(var(--app-color-magenta-400-lch));
   --app-color-magenta-500: color(display-p3 0.6 0 0.6);
   --app-color-magenta-600: color(display-p3 0.475 0 0.475);
   --app-color-magenta-700: color(display-p3 0.35 0 0.35);

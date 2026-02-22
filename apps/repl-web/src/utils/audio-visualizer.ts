@@ -117,10 +117,12 @@ class AudioVisualizer {
 
   bgLCH(lch: LCH) {
     this._bgLCH = lch
+    if (this.paused) this.render()
   }
 
   fgLCH(lch: LCH) {
-    this._bgLCH = lch
+    this._fgLCH = lch
+    if (this.paused) this.render()
   }
 
   private render() {
