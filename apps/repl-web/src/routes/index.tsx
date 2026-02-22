@@ -2,7 +2,7 @@
 
 import { createFileRoute } from '@tanstack/solid-router'
 
-import CodeMirror from '@/components/codemirror'
+import CodeMirror from '@/components/code-mirror'
 import EditorHeader from '@/components/editor-header'
 import EditorToolbar from '@/components/editor-toolbar'
 import MainLayout from '@/components/main-layout'
