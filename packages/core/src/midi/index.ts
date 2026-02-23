@@ -84,6 +84,7 @@ class MIDIController {
       set.forEach((r) => r.destroy());
       set.clear();
     });
+
     this._routers.clear();
   }
 

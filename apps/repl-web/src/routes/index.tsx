@@ -6,6 +6,7 @@ import CodeMirror from '@/components/code-mirror'
 import EditorHeader from '@/components/editor-header'
 import EditorToolbar from '@/components/editor-toolbar'
 import MainLayout from '@/components/main-layout'
+import MIDIManager from '@/components/midi-manager'
 import SketchMetadata from '@/components/sketch-metadata'
 import SketchManager from '@/components/sketch-manager'
 import SidebarResizer from '@/components/sidebar-resizer'
@@ -42,7 +43,9 @@ function App() {
                 <Tabs.Panel id="sketches">
                   <SketchManager />
                 </Tabs.Panel>
-                <Tabs.Panel id="midi">MIDI goes here</Tabs.Panel>
+                <Tabs.Panel id="midi">
+                  <MIDIManager />
+                </Tabs.Panel>
               </Tabs.Panels>
             </Tabs.Tabs>
           </div>
