@@ -3,7 +3,7 @@
 }
 
 .tab {
-  --border-color: transparent;
+  --border-color: var(--app-color-border-strong);
 
   background: none;
   border: none;
@@ -11,10 +11,13 @@
   border-bottom: 1px solid var(--border-color);
   box-shadow: 0 1px 0px 0px var(--border-color);
 
-  &[aria-selected='true'] {
-    --border-color: var(--app-color-border-strong);
-    /*background: var(--app-color-fg-primary);
-    color: var(--app-color-bg-primary);*/
+  &[aria-selected='false'] {
+    --border-color: transparent;
+    color: var(--app-color-fg-tertiary);
+  }
+
+  &:is(:hover, :focus-visible) {
+    color: var(--app-color-fg-primary);
   }
 
   &:focus {

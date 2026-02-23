@@ -34,6 +34,7 @@ function useTabs(): TabsContextValue {
 
 interface TabsProps extends ParentProps {
   defaultTab?: TabId
+  keyboardActivation?: 'automatic' | 'manual'
 }
 
 function Tabs(props: TabsProps): JSX.Element {
@@ -42,6 +43,7 @@ function Tabs(props: TabsProps): JSX.Element {
   )
   const [tabs, setTabs] = createSignal<TabId[]>([])
   const baseId = createUniqueId()
+  const keyboardActivation = props.keyboardActivation ?? 'automatic'
 
   const registerTab = (id: TabId): void => {
     setTabs((prev) => {
@@ -69,6 +71,10 @@ function Tabs(props: TabsProps): JSX.Element {
     const currentIndex = tabList.indexOf(currentId)
     const nextIndex = (currentIndex + 1) % tabList.length
     focusTab(tabList[nextIndex])
+
+    if (keyboardActivation === 'automatic') {
+      setActiveTab(tabList[nextIndex])
+    }
   }
 
   const focusPrevTab = (currentId: TabId): void => {
@@ -76,12 +82,20 @@ function Tabs(props: TabsProps): JSX.Element {
     const currentIndex = tabList.indexOf(currentId)
     const prevIndex = (currentIndex - 1 + tabList.length) % tabList.length
     focusTab(tabList[prevIndex])
+
+    if (keyboardActivation === 'automatic') {
+      setActiveTab(tabList[prevIndex])
+    }
   }
 
   const focusFirstTab = (): void => {
     const tabList = tabs()
     if (tabList.length > 0) {
       focusTab(tabList[0])
+
+      if (keyboardActivation === 'automatic') {
+        setActiveTab(tabList[0])
+      }
     }
   }
 
@@ -89,6 +103,10 @@ function Tabs(props: TabsProps): JSX.Element {
     const tabList = tabs()
     if (tabList.length > 0) {
       focusTab(tabList[tabList.length - 1])
+
+      if (keyboardActivation === 'automatic') {
+        setActiveTab(tabList[tabList.length - 1])
+      }
     }
   }
 
