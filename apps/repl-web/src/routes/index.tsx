@@ -11,6 +11,7 @@ import SketchManager from '@/components/sketch-manager'
 import SidebarResizer from '@/components/sidebar-resizer'
 import VisualizerCanvas from '@/components/visualizer-canvas'
 import { useKeyboardEvent } from '@/utils/use-keyboard-event'
+import * as Tabs from '@/components/sidebar-tabs'
 
 export const Route = createFileRoute('/')({ component: App })
 
@@ -31,7 +32,21 @@ function App() {
       sidebar={
         <>
           <VisualizerCanvas />
-          <SketchManager />
+          <div>
+            <Tabs.Tabs>
+              <Tabs.List aria-label="Control panel">
+                <Tabs.Tab id="sketches">Sketches</Tabs.Tab>
+                <Tabs.Tab id="midi">MIDI</Tabs.Tab>
+              </Tabs.List>
+              <Tabs.Panels>
+                <Tabs.Panel id="sketches">
+                  <SketchManager />
+                </Tabs.Panel>
+                <Tabs.Panel id="midi">MIDI goes here</Tabs.Panel>
+              </Tabs.Panels>
+            </Tabs.Tabs>
+          </div>
+          {/*<SketchManager />*/}
           <SidebarResizer />
         </>
       }

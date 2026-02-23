@@ -1,0 +1,32 @@
+.tablist {
+  border-bottom: 1px solid var(--app-color-border-subtle);
+}
+
+.tab {
+  --border-color: transparent;
+
+  background: none;
+  border: none;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 0px 0px var(--border-color);
+
+  &[aria-selected='true'] {
+    --border-color: var(--app-color-border-strong);
+    /*background: var(--app-color-fg-primary);
+    color: var(--app-color-bg-primary);*/
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible span {
+    outline: 2px solid var(--app-color-magenta-300);
+    outline-offset: 5px;
+  }
+
+  span {
+    border-radius: 0.5px;
+  }
+}
