@@ -1,5 +1,8 @@
-import { useDrome } from '@/providers/drome'
 import { createEffect, createSignal, For, onCleanup, Show } from 'solid-js'
+import { useDrome } from '@/providers/drome'
+import s from './style.module.css'
+import IconCopy16 from '../icons/icon-copy-16'
+import IconCheck16 from '../icons/icon-check-16'
 
 function MIDIManager() {
   const { drome } = useDrome()
@@ -46,22 +49,55 @@ function MIDIManager() {
   })
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div class={s.container}>
       <Show
         when={hasMIDIAccess()}
         fallback={<button onClick={requestAccess}>Enable MIDI</button>}
       >
-        <p>Inputs</p>
-        <ul>
-          <For each={inputs()}>{(port) => <li>{port.name}</li>}</For>
-        </ul>
-        <p>Outputs</p>
-        <ul>
+        <p class={s.heading}>Inputs</p>
+        <ol class={s.ports}>
+          <For each={inputs()}>
+            {(port) => (
+              <li class={s.port}>
+                <span class={s.label}>{port.name}</span>
+                <CopyButton />
+              </li>
+            )}
+          </For>
+        </ol>
+        <p class={s.heading}>Outputs</p>
+        <ol class={s.ports}>
           <For each={outputs()}>{(port) => <li>{port.name}</li>}</For>
-        </ul>
+        </ol>
       </Show>
     </div>
   )
 }
 
 export default MIDIManager
+
+function CopyButton() {
+  const [success, setSuccess] = createSignal(false)
+  let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+  function handleCopy() {
+    if (timeoutId) clearTimeout(timeoutId)
+
+    setSuccess(true)
+    timeoutId = setTimeout(() => {
+      setSuccess(false)
+      timeoutId = null
+    }, 2000)
+  }
+
+  return (
+    <button aria-label="Copy ID" onClick={handleCopy} data-success={success()}>
+      <Show when={!success()}>
+        <IconCopy16 />
+      </Show>
+      <Show when={success()}>
+        <IconCheck16 />
+      </Show>
+    </button>
+  )
+}

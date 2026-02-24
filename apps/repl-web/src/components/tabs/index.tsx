@@ -221,10 +221,7 @@ interface TabPanelProps extends ParentProps {
 
 function TabPanel(props: TabPanelProps): JSX.Element {
   const { activeTab, getTabId, getPanelId } = useTabs()
-
   const isActive = (): boolean => activeTab() === props.id
-
-  // if (!isActive) return null
 
   return (
     <div

@@ -11,7 +11,6 @@ import DromeFilter from "@/effects/effect-filter";
 import GainEffect from "@/effects/effect-gain";
 import PanEffect from "@/effects/effect-pan";
 import ReverbEffect from "./effects/effect-reverb";
-import { MIDIObserver } from "./midi";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import { isString } from "@/utils/validators";
 import { addWorklets } from "@/utils/worklets";
@@ -198,7 +197,11 @@ class Drome {
 
   midicc(nameOrId: string, defaultValue = 0) {
     if (!this.midiController) return 0;
-    const observer = new MIDIObserver("controlchange", nameOrId, defaultValue);
+    const observer = this.midiController.createObserver(
+      "controlchange",
+      nameOrId,
+      defaultValue,
+    );
     this.queue(observer);
     return observer;
   }
