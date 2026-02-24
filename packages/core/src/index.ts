@@ -197,7 +197,7 @@ class Drome {
   }
 
   midicc(nameOrId: string, defaultValue = 0) {
-    if (!this.midi) return 0;
+    if (!this.midiController) return 0;
     const observer = new MIDIObserver("controlchange", nameOrId, defaultValue);
     this.queue(observer);
     return observer;
@@ -295,7 +295,7 @@ class Drome {
     return this.clock.metronome;
   }
 
-  get midi() {
+  get midiController() {
     return this._sessionManager.midi;
   }
 

@@ -6,6 +6,7 @@ import {
   type JSX,
   type ParentProps,
   type Accessor,
+  Show,
 } from 'solid-js'
 
 type TabId = string
@@ -223,6 +224,8 @@ function TabPanel(props: TabPanelProps): JSX.Element {
 
   const isActive = (): boolean => activeTab() === props.id
 
+  // if (!isActive) return null
+
   return (
     <div
       role="tabpanel"
@@ -231,7 +234,7 @@ function TabPanel(props: TabPanelProps): JSX.Element {
       hidden={!isActive()}
       // tabIndex={0}
     >
-      {props.children}
+      <Show when={isActive()}>{props.children}</Show>
     </div>
   )
 }

@@ -1,10 +1,13 @@
 import { parseMIDIPortChange, parseMIDIMessage } from "./utils";
 import type { MIDIOberserver, MIDIObserverType } from "./midi-observer";
 
+type MIDIObservableType = "portchange" | "midimessage";
+
 class MIDIPortChangeObservable<T extends MIDIObserverType> {
   private _input: MIDIInput | undefined;
   private _controller: AbortController;
   private _subscribers: Set<MIDIOberserver<T>>;
+  readonly type: MIDIObservableType;
 
   constructor(target: MIDIAccess | MIDIInput) {
     this._subscribers = new Set();
@@ -15,11 +18,13 @@ class MIDIPortChangeObservable<T extends MIDIObserverType> {
       target.addEventListener("statechange", this.emitPortChange.bind(this), {
         signal,
       });
+      this.type = "portchange";
     } else {
       this._input = target;
       target.addEventListener("midimessage", this.emitMIDIMessage.bind(this), {
         signal,
       });
+      this.type = "midimessage";
     }
   }
 
@@ -84,3 +89,4 @@ class MIDIPortChangeObservable<T extends MIDIObserverType> {
 }
 
 export default MIDIPortChangeObservable;
+export { type MIDIObservableType };

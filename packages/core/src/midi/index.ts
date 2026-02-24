@@ -1,6 +1,6 @@
-import MIDIObservable from "./midi-observable";
-import MIDIRouter from "./midi-router";
+import MIDIObservable, { type MIDIObservableType } from "./midi-observable";
 import MIDIObserver, { type MIDIObserverType } from "./midi-observer";
+import MIDIRouter from "./midi-router";
 import { getMIDIPort } from "./utils";
 
 class MIDIController {
@@ -23,21 +23,48 @@ class MIDIController {
 
   // ——————————————————————————————————————————————————————————————————
   // Observer (input) methods
-  addObserver<T extends MIDIObserverType>(observer: MIDIObserver<T>) {
-    const { identifier } = observer;
-    const port = getMIDIPort(this.midi.inputs, identifier);
-    const input = observer.type === "portchange" ? this._midi : port;
-    if (!input) return null;
+  createObserver(type: MIDIObserverType, ident?: string, dValue?: number) {
+    return new MIDIObserver(type, ident, dValue);
+  }
 
-    let observable = this._observables.get(identifier);
+  addObserver<T extends MIDIObserverType>(
+    observer: MIDIObserver<T>,
+    signal?: AbortSignal,
+  ) {
+    if (observer.type === "portchange") {
+      const observable = new MIDIObservable<T>(this._midi);
+      const { identifier } = observer;
 
-    if (!observable) {
-      observable = new MIDIObservable<T>(input);
       this._observables.set(identifier, observable);
-    }
+      observable.subscribe(observer);
 
-    observer.controller(this);
-    observable.subscribe(observer);
+      if (signal) {
+        signal.onabort = () => {
+          observable.unsubscribe(observer);
+        };
+      }
+    } else {
+      const { identifier } = observer;
+      const port = getMIDIPort(this.midi.inputs, identifier);
+      const input = observer.type === "portchange" ? this._midi : port;
+      if (!input) return null;
+
+      let observable = this._observables.get(identifier);
+
+      if (!observable) {
+        observable = new MIDIObservable<T>(input);
+        this._observables.set(identifier, observable);
+      }
+
+      observer.controller(this);
+      observable.subscribe(observer);
+
+      if (signal) {
+        signal.onabort = () => {
+          observable.unsubscribe(observer);
+        };
+      }
+    }
 
     return this;
   }
@@ -47,8 +74,16 @@ class MIDIController {
     this._observables.get(identifier)?.unsubscribe(observer);
   }
 
-  clearObservers() {
-    this._observables.forEach((obs) => obs.unsubscribeAll());
+  clearObservers(type?: MIDIObservableType) {
+    console.log("clearObservers", type, this._observables);
+
+    if (type) {
+      this._observables.forEach((obs) => {
+        if (obs.type === type) obs.unsubscribeAll();
+      });
+    } else {
+      this._observables.forEach((obs) => obs.unsubscribeAll());
+    }
   }
 
   cacheValue(id: string, value: number) {
