@@ -2,7 +2,11 @@ import * as BaseTabs from '@/components/tabs'
 import s from './style.module.css'
 
 function Tabs(props: BaseTabs.TabsProps) {
-  return <BaseTabs.Tabs {...props}>{props.children}</BaseTabs.Tabs>
+  return (
+    <BaseTabs.Tabs {...props} class={s.tabs}>
+      {props.children}
+    </BaseTabs.Tabs>
+  )
 }
 
 function TabList(props: BaseTabs.TabListProps) {
@@ -22,7 +26,9 @@ function Tab(props: BaseTabs.TabProps) {
 }
 
 function TabPanels(props: BaseTabs.TabPanelsProps) {
-  return <BaseTabs.TabPanels>{props.children}</BaseTabs.TabPanels>
+  return (
+    <BaseTabs.TabPanels class={s.panels}>{props.children}</BaseTabs.TabPanels>
+  )
 }
 
 function TabPanel(props: BaseTabs.TabPanelProps) {

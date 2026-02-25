@@ -33,7 +33,7 @@ function useTabs(): TabsContextValue {
   return context
 }
 
-interface TabsProps extends ParentProps {
+interface TabsProps extends JSX.HTMLAttributes<HTMLDivElement> {
   defaultTab?: TabId
   keyboardActivation?: 'automatic' | 'manual'
 }
@@ -125,7 +125,7 @@ function Tabs(props: TabsProps): JSX.Element {
 
   return (
     <TabsContext.Provider value={context}>
-      <div>{props.children}</div>
+      <div {...props}>{props.children}</div>
     </TabsContext.Provider>
   )
 }
@@ -209,13 +209,13 @@ function Tab(props: TabProps): JSX.Element {
   )
 }
 
-interface TabPanelsProps extends ParentProps {}
+interface TabPanelsProps extends JSX.HTMLAttributes<HTMLDivElement> {}
 
 function TabPanels(props: TabPanelsProps): JSX.Element {
-  return <div>{props.children}</div>
+  return <div {...props}>{props.children}</div>
 }
 
-interface TabPanelProps extends ParentProps {
+interface TabPanelProps extends JSX.HTMLAttributes<HTMLDivElement> {
   id: TabId
 }
 
@@ -225,6 +225,7 @@ function TabPanel(props: TabPanelProps): JSX.Element {
 
   return (
     <div
+      {...props}
       role="tabpanel"
       id={getPanelId(props.id)}
       aria-labelledby={getTabId(props.id)}

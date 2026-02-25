@@ -12,7 +12,9 @@ function SidebarResizer() {
       'pointermove',
       (e) => {
         if (dragging()) {
-          setSidebarSize(window.innerWidth - e.clientX + 4)
+          const flexSize = window.innerWidth - e.clientX + 4
+          const clampedSize = Math.min(Math.max(240, flexSize), 640)
+          setSidebarSize(clampedSize)
         }
       },
       {

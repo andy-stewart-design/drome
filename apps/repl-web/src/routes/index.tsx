@@ -33,21 +33,23 @@ function App() {
       sidebar={
         <>
           <VisualizerCanvas />
-          <div>
-            <Tabs.Tabs>
-              <Tabs.List aria-label="Control panel">
-                <Tabs.Tab id="sketches">Sketches</Tabs.Tab>
-                <Tabs.Tab id="midi">MIDI</Tabs.Tab>
-              </Tabs.List>
-              <Tabs.Panels>
-                <Tabs.Panel id="sketches">
-                  <SketchManager />
-                </Tabs.Panel>
-                <Tabs.Panel id="midi">
-                  <MIDIManager />
-                </Tabs.Panel>
-              </Tabs.Panels>
-            </Tabs.Tabs>
+          <Tabs.Tabs>
+            <Tabs.List aria-label="Control panel">
+              <Tabs.Tab id="sketches">Sketches</Tabs.Tab>
+              <Tabs.Tab id="midi">MIDI</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panels>
+              <Tabs.Panel id="sketches">
+                <SketchManager />
+              </Tabs.Panel>
+              <Tabs.Panel id="midi">
+                <MIDIManager />
+              </Tabs.Panel>
+            </Tabs.Panels>
+          </Tabs.Tabs>
+          <div style="flex: 0 0 0; padding: 1rem; border-block-start: 1px solid var(--app-color-border-subtle); display: flex; justify-content: flex-end; gap: 0.5rem; font-size: 0.8125rem;">
+            <span>Console</span>
+            <span>Settings</span>
           </div>
           {/*<SketchManager />*/}
           <SidebarResizer />

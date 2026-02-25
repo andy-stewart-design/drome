@@ -1,8 +1,9 @@
 import { createEffect, createSignal, For, onCleanup, Show } from 'solid-js'
 import { useDrome } from '@/providers/drome'
+import IconCopy16 from '@/components/icons/icon-copy-16'
+import IconCheck16 from '@/components/icons/icon-check-16'
+import { copyToClipboard } from '@/utils/copy-to-clipboard'
 import s from './style.module.css'
-import IconCopy16 from '../icons/icon-copy-16'
-import IconCheck16 from '../icons/icon-check-16'
 
 function MIDIManager() {
   const { drome } = useDrome()
@@ -60,14 +61,21 @@ function MIDIManager() {
             {(port) => (
               <li class={s.port}>
                 <span class={s.label}>{port.name}</span>
-                <CopyButton />
+                <CopyButton text={port.name ?? port.id} />
               </li>
             )}
           </For>
         </ol>
         <p class={s.heading}>Outputs</p>
         <ol class={s.ports}>
-          <For each={outputs()}>{(port) => <li>{port.name}</li>}</For>
+          <For each={outputs()}>
+            {(port) => (
+              <li class={s.port}>
+                <span class={s.label}>{port.name}</span>
+                <CopyButton text={port.name ?? port.id} />
+              </li>
+            )}
+          </For>
         </ol>
       </Show>
     </div>
@@ -76,18 +84,24 @@ function MIDIManager() {
 
 export default MIDIManager
 
-function CopyButton() {
+function CopyButton(props: { text: string }) {
   const [success, setSuccess] = createSignal(false)
   let timeoutId: ReturnType<typeof setTimeout> | null = null
 
-  function handleCopy() {
-    if (timeoutId) clearTimeout(timeoutId)
+  async function handleCopy() {
+    const copied = await copyToClipboard(props.text)
 
-    setSuccess(true)
-    timeoutId = setTimeout(() => {
-      setSuccess(false)
-      timeoutId = null
-    }, 2000)
+    if (copied) {
+      if (timeoutId) clearTimeout(timeoutId)
+      setSuccess(true)
+
+      timeoutId = setTimeout(() => {
+        setSuccess(false)
+        timeoutId = null
+      }, 2000)
+    } else {
+      console.warn('Could not write to clipboard')
+    }
   }
 
   return (
