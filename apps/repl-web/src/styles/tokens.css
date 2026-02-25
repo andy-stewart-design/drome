@@ -115,6 +115,8 @@
 
   --app-color-bg-primary: var(--app-color-neutral-950);
 
+  --app-color-accent-primary: var(--app-color-magenta-300);
+
   --app-color-border-subtle: oklch(var(--app-color-neutral-50-lch) / 0.15);
   --app-color-border-strong: var(--app-color-neutral-50);
 
@@ -127,6 +129,8 @@
     --app-color-fg-tertiary: oklch(var(--app-color-neutral-950-lch) / 0.6);
 
     --app-color-bg-primary: var(--app-color-neutral-50);
+
+    --app-color-accent-primary: var(--app-color-magenta-400);
 
     --app-color-border-subtle: oklch(var(--app-color-neutral-950-lch) / 0.15);
     --app-color-border-strong: var(--app-color-neutral-950);

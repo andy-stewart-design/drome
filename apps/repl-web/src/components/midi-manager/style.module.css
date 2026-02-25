@@ -64,7 +64,7 @@
 
     &[data-success='true'] {
       opacity: 1;
-      color: var(--app-color-magenta-300);
+      color: var(--app-color-accent-primary);
     }
 
     svg {
