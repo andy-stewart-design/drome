@@ -19,10 +19,6 @@
     &::-webkit-details-marker {
       display: none;
     }
-
-    span {
-      opacity: 0.6;
-    }
   }
 
   &[open] svg {
