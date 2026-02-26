@@ -3,6 +3,7 @@ import { useDrome } from '@/providers/drome'
 import IconCopy16 from '@/components/icons/icon-copy-16'
 import IconCheck16 from '@/components/icons/icon-check-16'
 import { copyToClipboard } from '@/utils/copy-to-clipboard'
+import type { MIDIController } from 'drome-live'
 import s from './style.module.css'
 
 function MIDIManager() {
@@ -14,35 +15,26 @@ function MIDIManager() {
 
   async function requestAccess() {
     const midiController = await drome()?.createMidiController()
-    if (midiController) {
-      setHasMIDIAccess(true)
-      const observer = midiController
-        .createObserver('portchange')
-        .onUpdate(() => {
-          setInputs(midiController.inputs)
-          setOutputs(midiController.outputs)
-        })
-      midiController.addObserver(observer, controller.signal)
-      setInputs(midiController.inputs)
-      setOutputs(midiController.outputs)
-    }
+    if (midiController) setup(midiController)
+  }
+
+  function setup(midiController: MIDIController) {
+    setHasMIDIAccess(true)
+    const observer = midiController
+      .createObserver('portchange')
+      .onUpdate(() => {
+        setInputs(midiController.inputs)
+        setOutputs(midiController.outputs)
+      })
+    midiController.addObserver(observer, controller.signal)
+    setInputs(midiController.inputs)
+    setOutputs(midiController.outputs)
   }
 
   createEffect(() => {
+    if (hasMIDIAccess()) return
     const midiController = drome()?.midiController
-
-    if (midiController) {
-      setHasMIDIAccess(true)
-      const observer = midiController
-        .createObserver('portchange')
-        .onUpdate(() => {
-          setInputs(midiController.inputs)
-          setOutputs(midiController.outputs)
-        })
-      midiController.addObserver(observer, controller.signal)
-      setInputs(midiController.inputs)
-      setOutputs(midiController.outputs)
-    }
+    if (midiController) setup(midiController)
   })
 
   onCleanup(() => {
@@ -53,7 +45,7 @@ function MIDIManager() {
     <div class={s.container}>
       <Show
         when={hasMIDIAccess()}
-        fallback={<button onClick={requestAccess}>Enable MIDI</button>}
+        fallback={<RequestView requestAccess={requestAccess} />}
       >
         <p class={s.heading}>Inputs</p>
         <ol class={s.ports}>
@@ -83,6 +75,21 @@ function MIDIManager() {
 }
 
 export default MIDIManager
+
+// MARK: Child components --------------------------------------------------
+function RequestView({ requestAccess }: { requestAccess(): Promise<void> }) {
+  return (
+    <div class={s.requestContainer} data-theme="accent">
+      <h3>Enable MIDI Access</h3>
+      <p>
+        We need to ask your browser for permission to connect to your MIDI
+        devices. When the popup appears, click "Allow" to start sending and
+        receiving data.
+      </p>
+      <button onClick={requestAccess}>Request Access</button>
+    </div>
+  )
+}
 
 function CopyButton(props: { text: string }) {
   const [success, setSuccess] = createSignal(false)

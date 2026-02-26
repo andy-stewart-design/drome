@@ -15,7 +15,7 @@ function MainLayout({ content: main, sidebar }: Props) {
   return (
     <div
       class={s.layout}
-      data-theme={colorScheme()}
+      data-color-scheme={colorScheme()}
       style={{
         'grid-template-columns': `minmax(0,1fr) ${showSidebar() ? sidebarSize() : 0}px`,
       }}

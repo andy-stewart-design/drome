@@ -114,6 +114,7 @@
   --app-color-fg-tertiary: oklch(var(--app-color-neutral-50-lch) / 0.6);
 
   --app-color-bg-primary: var(--app-color-neutral-950);
+  --app-color-bg-secondary: var(--app-color-neutral-800);
 
   --app-color-accent-primary: var(--app-color-magenta-300);
 
@@ -123,7 +124,13 @@
   --app-editor-header-height: 3rem;
   --app-sidebar-width: 360px;
 
-  &:has(body > div[data-theme='light']) {
+  [data-theme='accent'] {
+    --app-color-fg-primary: var(--app-color-magenta-50);
+    --app-color-bg-primary: var(--app-color-magenta-800);
+    --app-color-bg-secondary: var(--app-color-magenta-500);
+  }
+
+  &:has(body > div[data-color-scheme='light']) {
     --app-color-fg-primary: var(--app-color-neutral-900);
     --app-color-fg-secondary: oklch(var(--app-color-neutral-950-lch) / 0.8);
     --app-color-fg-tertiary: oklch(var(--app-color-neutral-950-lch) / 0.6);
@@ -134,5 +141,11 @@
 
     --app-color-border-subtle: oklch(var(--app-color-neutral-950-lch) / 0.15);
     --app-color-border-strong: var(--app-color-neutral-950);
+
+    [data-theme='accent'] {
+      --app-color-fg-primary: var(--app-color-magenta-900);
+      --app-color-bg-primary: var(--app-color-magenta-100);
+      --app-color-bg-secondary: var(--app-color-magenta-200);
+    }
   }
 }

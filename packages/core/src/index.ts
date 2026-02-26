@@ -24,6 +24,7 @@ import type {
   WaveformAlias,
 } from "@/types";
 import SampleManager from "./managers/sample-manager";
+import type MIDIController from "./midi";
 
 type LogCallback = (log: string, logs: string[]) => void;
 
@@ -368,3 +369,4 @@ class Drome {
 }
 
 export default Drome;
+export { type MIDIController };
