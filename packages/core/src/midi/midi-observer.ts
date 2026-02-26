@@ -163,4 +163,4 @@ class MIDIOberserver<T extends MIDIObserverType> {
 // const baz = new MIDIOberserver("portchange").onUpdate((data) => {});
 
 export default MIDIOberserver;
-export type { MIDIOberserver, MIDIObserverType };
+export type { MIDIOberserver, MIDIObserverDataMap, MIDIObserverType };

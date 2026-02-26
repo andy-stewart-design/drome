@@ -20,6 +20,9 @@ body {
 }
 
 :is(button, a, input, summary) {
+  color: var(--app-color-fg-primary);
+  text-decoration: none;
+
   &:focus {
     outline: none;
   }

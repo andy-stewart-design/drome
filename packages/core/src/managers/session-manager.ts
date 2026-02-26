@@ -90,7 +90,8 @@ class SessionManager {
       );
       this._instruments.clear();
       this.cleanupLfos(this.clock.nextBarStartTime);
-      this._midi?.clearObservers();
+      this._midi?.clearObservers("midimessage");
+      this._midi?.clearRouters();
       this._listeners.clock.external.forEach((fn) => fn());
       this._listeners.clock.external.clear();
       this._listeners.log.clear();
@@ -138,7 +139,7 @@ class SessionManager {
     // cleanup lfos
     this.cleanupLfos(this.clock.ctx.currentTime + when);
     // cleanup midi
-    this._midi?.clearObservers();
+    this._midi?.clearObservers("midimessage");
     this._midi?.clearRouters();
     // cleanup listeners
     this._listeners.clock.external.forEach((fn) => fn());

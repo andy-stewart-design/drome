@@ -4,15 +4,18 @@
 }
 
 .content {
-  width: 100%;
   height: 100dvh;
   display: flex;
   flex-direction: column;
 }
 
 .sidebar {
-  position: relative;
-  overflow: auto;
+  position: relative; /* Need this to position SidebarResizer */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+  height: 100dvh;
   overscroll-behavior: contain;
   border-inline-start: 1px solid var(--app-color-border-subtle);
 

@@ -1,0 +1,113 @@
+.container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.heading {
+  font-size: 0.8125rem;
+  color: var(--app-color-fg-tertiary);
+  margin: 0;
+
+  &:not(:first-of-type) {
+    margin-top: 0.75rem;
+  }
+}
+
+.ports {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  counter-reset: port-counter;
+}
+
+.port {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  counter-increment: port-counter;
+
+  .label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+
+    &::before {
+      content: counter(port-counter, decimal-leading-zero) ' ';
+      font-size: 0.8125rem;
+      font-variant-numeric: lining-nums;
+      color: var(--app-color-fg-tertiary);
+    }
+  }
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: none;
+    border: none;
+    border-radius: 3px;
+    padding: 0;
+
+    :where(.port:not(:hover) &:not(:focus-visible)) {
+      opacity: 0;
+    }
+
+    &:not(:hover, :focus-visible) {
+      color: var(--app-color-fg-tertiary);
+    }
+
+    &[data-success='true'] {
+      opacity: 1;
+      color: var(--app-color-accent-primary);
+    }
+
+    svg {
+      grid-area: 1/-1;
+      display: inline-block;
+    }
+  }
+}
+
+.requestContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--app-color-bg-primary);
+  padding: 1.75rem 1rem 2rem;
+  border: 1px solid var(--app-color-accent-primary);
+  border-radius: 0.5rem;
+
+  :is(h3, p) {
+    margin: 0;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  p {
+    font-size: 0.875rem;
+    text-align: left;
+    text-wrap: pretty;
+    line-height: 1.5;
+    color: var(--app-color-fg-secondary);
+  }
+
+  button {
+    background: transparent;
+    background: var(--app-color-bg-secondary);
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 100vmax;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+}

@@ -18,6 +18,7 @@ import type Drome from 'drome-live'
 
 // Define the context type
 type DromeContextType = {
+  drome: Accessor<Drome | null>
   setCanvas: Setter<HTMLCanvasElement | null>
   togglePlaystate(pause?: boolean): void
   setVisualizerType(): void
@@ -103,6 +104,7 @@ function DromeProvider(props: ParentProps) {
   }
 
   const contextValue = {
+    drome,
     setCanvas,
     togglePlaystate,
     setVisualizerType,

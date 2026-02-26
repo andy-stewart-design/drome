@@ -15,7 +15,7 @@
   transition: border-color 200ms ease-out;
 
   &:is(:hover, [data-dragging='true']) {
-    --border-color: var(--app-color-magenta-400);
+    --border-color: var(--app-color-accent-primary);
     transition-delay: 300ms;
   }
 }

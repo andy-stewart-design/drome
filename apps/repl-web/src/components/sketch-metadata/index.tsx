@@ -15,8 +15,8 @@ function SketchMetadata() {
       }}
     >
       <summary>
-        <Chevron /> Sketch Metadata{' '}
-        {!open() && <span>{workingSketch().title}</span>}
+        <Chevron />
+        <span>{!open() ? workingSketch().title : 'Sketch Metadata'}</span>
       </summary>
       <div class={s.content}>
         <p>Title: {workingSketch().title}</p>

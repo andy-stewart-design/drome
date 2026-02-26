@@ -1,6 +1,7 @@
 .container {
   display: grid;
   place-items: start end;
+  flex: 0 0 0;
 
   & > * {
     grid-area: 1/-1;

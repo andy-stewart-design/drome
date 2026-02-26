@@ -11,7 +11,6 @@ import DromeFilter from "@/effects/effect-filter";
 import GainEffect from "@/effects/effect-gain";
 import PanEffect from "@/effects/effect-pan";
 import ReverbEffect from "./effects/effect-reverb";
-import { MIDIObserver } from "./midi";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import { isString } from "@/utils/validators";
 import { addWorklets } from "@/utils/worklets";
@@ -25,6 +24,7 @@ import type {
   WaveformAlias,
 } from "@/types";
 import SampleManager from "./managers/sample-manager";
+import type MIDIController from "./midi";
 
 type LogCallback = (log: string, logs: string[]) => void;
 
@@ -197,8 +197,12 @@ class Drome {
   }
 
   midicc(nameOrId: string, defaultValue = 0) {
-    if (!this.midi) return 0;
-    const observer = new MIDIObserver("controlchange", nameOrId, defaultValue);
+    if (!this.midiController) return 0;
+    const observer = this.midiController.createObserver(
+      "controlchange",
+      nameOrId,
+      defaultValue,
+    );
     this.queue(observer);
     return observer;
   }
@@ -295,7 +299,7 @@ class Drome {
     return this.clock.metronome;
   }
 
-  get midi() {
+  get midiController() {
     return this._sessionManager.midi;
   }
 
@@ -365,3 +369,4 @@ class Drome {
 }
 
 export default Drome;
+export { type MIDIController };

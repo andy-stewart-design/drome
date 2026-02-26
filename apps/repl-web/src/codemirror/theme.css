@@ -57,7 +57,7 @@
   --cm-color-flash-fg: var(--app-color-magenta-50);
 }
 
-:root:has(body > div[data-theme='light']) {
+:root:has(body > div[data-color-scheme='light']) {
   /* Editor chrome */
   --cm-color-caret: var(--app-color-neutral-700);
   --cm-color-line-numbers: var(--app-color-neutral-400);
