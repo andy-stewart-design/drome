@@ -20,12 +20,14 @@ function MIDIManager() {
 
   function setup(midiController: MIDIController) {
     setHasMIDIAccess(true)
+
     const observer = midiController
       .createObserver('portchange')
       .onUpdate(() => {
         setInputs(midiController.inputs)
         setOutputs(midiController.outputs)
       })
+
     midiController.addObserver(observer, controller.signal)
     setInputs(midiController.inputs)
     setOutputs(midiController.outputs)
