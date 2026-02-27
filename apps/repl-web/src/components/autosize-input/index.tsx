@@ -29,21 +29,11 @@ function AutosizeInput(props: AutosizeInputProps) {
       Math.ceil(mirrorEl.getBoundingClientRect().width) + 1 + 'px'
   })
 
-  const mirrorStyle: JSX.CSSProperties = {
-    'font-family': 'inherit',
-    'font-size': 'inherit',
-    'font-weight': 'inherit',
-    'letter-spacing': 'inherit',
-    padding: '0',
-    border: 'none',
-  }
-
   return (
     <div class={s.container}>
       <span
         ref={mirrorEl}
-        class={s.mirror}
-        style={mirrorStyle}
+        class={`${s.mirror} ${props.class ?? ''}`}
         aria-hidden="true"
       />
       <input

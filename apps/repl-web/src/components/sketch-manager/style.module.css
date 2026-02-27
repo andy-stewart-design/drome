@@ -115,14 +115,11 @@
   display: flex;
 }
 
-input.label_title {
+.label_title.label_title {
   /*width: fit-content;*/
   font-size: 0.875rem;
-  background: none;
-  padding: 0;
-  border: none;
 
-  &[contenteditable='false'] {
+  &:disabled {
     pointer-events: none;
   }
 }

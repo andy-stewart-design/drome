@@ -90,7 +90,9 @@ function SketchLabel({
       <div class={s.label_content}>
         <div class={s.label_text}>
           <EditableText sketch={sketch} />
-          <p class={s.label_date}>{updatedFormatted}</p>
+          <p class={s.label_date}>
+            {updatedFormatted} · {sketch.author}
+          </p>
         </div>
         <button classList={clst(s.button, s.delete_button)} onClick={onDelete}>
           <IconClose12 />
