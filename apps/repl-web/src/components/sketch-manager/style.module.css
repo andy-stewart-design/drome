@@ -118,6 +118,9 @@
 .label_title {
   width: fit-content;
   font-size: 0.875rem;
+  background: none;
+  padding: 0;
+  border: none;
 
   &[contenteditable='false'] {
     pointer-events: none;

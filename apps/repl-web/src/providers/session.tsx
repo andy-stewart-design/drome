@@ -18,6 +18,7 @@ type SessionContextType = {
   savedSketches: Accessor<db.SavedSketch[]>
   setSavedSketches: Setter<db.SavedSketch[]>
   createSketch(): void
+  updateSketch(sketch: db.SavedSketch): void
   saveSketch(code: string): Promise<void>
   deleteSketch(id: number): Promise<void>
 }
@@ -77,6 +78,14 @@ function SessionProvider(props: ParentProps) {
     }
   }
 
+  async function updateSketch(sketch: db.SavedSketch) {
+    const result = await db.updateSketch(sketch)
+    if (result.success) {
+      const sketches = await db.getSketches()
+      if (sketches) setSavedSketches(sketches)
+    }
+  }
+
   async function deleteSketch(id: number) {
     db.deleteSketch(id)
     const sketches = await db.getSketches()
@@ -90,6 +99,7 @@ function SessionProvider(props: ParentProps) {
     setSavedSketches,
     createSketch,
     saveSketch,
+    updateSketch,
     deleteSketch,
   } satisfies SessionContextType
 

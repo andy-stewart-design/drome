@@ -1,6 +1,7 @@
-import { createSignal, For, Show, type Accessor } from 'solid-js'
+import { createSignal, For, onMount, Show, type Accessor } from 'solid-js'
 import { useSession } from '@/providers/session'
 import { useEditor } from '@/providers/editor'
+import type { SavedSketch } from '@/utils/sketch-db'
 import s from './style.module.css'
 
 function SketchManager() {
@@ -43,8 +44,7 @@ function SketchManager() {
         <For each={savedSketches()}>
           {(sketch) => (
             <SketchLabel
-              title={sketch.title}
-              updated={sketch.updatedAt}
+              sketch={sketch}
               selected={() => workingSketch().title === sketch.title}
               onSelect={() => setWorkingSketch(sketch)}
               onDelete={() => handleDelete(sketch.id)}
@@ -63,22 +63,20 @@ export default SketchManager
 // -----------------------------------------------------------------
 
 interface SketchLabelProps {
-  title: string
-  updated: string
+  sketch: SavedSketch
   selected: Accessor<boolean>
   onSelect(): void
   onDelete(): void
 }
 
 function SketchLabel({
-  title,
-  updated,
+  sketch,
   selected,
   onSelect,
   onDelete,
 }: SketchLabelProps) {
   const updatedFormatted = new Intl.DateTimeFormat('en-US').format(
-    new Date(updated),
+    new Date(sketch.updatedAt),
   )
 
   return (
@@ -90,7 +88,7 @@ function SketchLabel({
       />
       <div class={s.label_content}>
         <div class={s.label_text}>
-          <EditableText text={title} />
+          <EditableText sketch={sketch} />
           <p class={s.label_date}>{updatedFormatted}</p>
         </div>
         <button classList={clst(s.button, s.delete_button)} onClick={onDelete}>
@@ -101,38 +99,63 @@ function SketchLabel({
   )
 }
 
-function EditableText({ text }: { text: string }) {
+function EditableText({ sketch }: { sketch: SavedSketch }) {
+  const [title, setTitle] = createSignal(sketch.title)
   const [editing, setEditing] = createSignal(false)
-  let inputRef: HTMLParagraphElement | undefined
+  let inputRef: HTMLInputElement | undefined
   let triggerRef: HTMLButtonElement | undefined
+  const { updateSketch } = useSession()
+
+  onMount(() => {
+    setInputSize()
+  })
+
+  function setInputSize() {
+    if (!inputRef) return
+    inputRef.size = Math.max(inputRef.value.length, 1)
+  }
 
   function handleKeyDown(e: KeyboardEvent) {
     if (!inputRef) return
 
     if (e.key === 'Enter' || e.key === 'Escape') {
-      handleEditEnd(e)
-      if (e.key === 'Escape') inputRef.innerHTML = text
+      e.preventDefault()
+      setEditing(false)
+      triggerRef?.focus()
+      if (e.key === 'Escape') setTitle(sketch.title)
     }
+
+    setInputSize()
   }
 
-  function handleEditEnd(e: Event) {
-    e.preventDefault()
+  function handleBlur() {
     setEditing(false)
-    triggerRef?.focus()
+    setInputSize()
+    requestAnimationFrame(() => {
+      console.log('saving sketch', title())
+      if (title() !== sketch.title) saveTitle(title())
+    })
+  }
+
+  function saveTitle(title: string) {
+    updateSketch({ ...sketch, title })
   }
 
   return (
     <div class={s.editable_container}>
-      <p
+      <input
         ref={inputRef}
+        id=""
         class={s.label_title}
-        contentEditable={editing()}
-        spellcheck="false"
+        disabled={!editing()}
+        value={title()}
+        onInput={(e) => {
+          setTitle(e.target.value)
+          e.target.size = Math.max(e.target.value.length, 1)
+        }}
         onKeyDown={handleKeyDown}
-        onBlur={handleEditEnd}
-      >
-        {text}
-      </p>
+        onBlur={handleBlur}
+      />
       <Show when={!editing()}>
         <button
           ref={triggerRef}
@@ -166,6 +189,63 @@ function EditableText({ text }: { text: string }) {
     // </>
   )
 }
+
+// interface AutoWidthInputProps {
+//   value?: string
+//   placeholder?: string
+//   onInput?: (value: string) => void
+//   style?: JSX.CSSProperties
+//   class?: string
+//   ref: HTMLInputElement | undefined
+// }
+
+// function AutoWidthInput(props: AutoWidthInputProps): JSX.Element {
+//   let mirrorRef: HTMLSpanElement | undefined
+//   const [value, setValue] = createSignal(props.value ?? '')
+
+//   onMount(() => {
+//     syncWidth()
+//   })
+
+//   const syncWidth = () => {
+//     if (!mirrorRef || !props.ref) return
+//     mirrorRef.textContent = value() || props.placeholder || ''
+//     const width = mirrorRef.offsetWidth
+//     props.ref.style.width = `${width}px`
+//   }
+
+//   return (
+//     <div style={{ display: 'inline-block', position: 'relative' }}>
+//       <span
+//         ref={mirrorRef}
+//         aria-hidden="true"
+//         style={{
+//           position: 'absolute',
+//           visibility: 'hidden',
+//           'white-space': 'pre',
+//           font: 'inherit',
+//           'letter-spacing': 'inherit',
+//           padding: 'inherit',
+//           border: 'inherit',
+//           'box-sizing': 'inherit',
+//         }}
+//       />
+//       <input
+//         ref={props.ref}
+//         type="text"
+//         value={value()}
+//         placeholder={props.placeholder}
+//         class={props.class}
+//         style={{ 'white-space': 'nowrap', 'min-width': '1ch', ...props.style }}
+//         onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+//           setValue(e.currentTarget.value)
+//           syncWidth()
+//           props.onInput?.(e.currentTarget.value)
+//         }}
+//       />
+//     </div>
+//   )
+// }
 
 function clst(...classNames: string[]) {
   return Object.fromEntries(classNames.map((cn) => [cn, true]))
