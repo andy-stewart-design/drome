@@ -115,8 +115,8 @@
   display: flex;
 }
 
-.label_title {
-  width: fit-content;
+input.label_title {
+  /*width: fit-content;*/
   font-size: 0.875rem;
   background: none;
   padding: 0;

@@ -1,0 +1,24 @@
+.container {
+  position: relative;
+  display: inline-block;
+}
+
+.mirror {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  white-space: pre;
+  pointer-events: none;
+}
+
+.input {
+  display: block;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  min-width: 1ch;
+}

@@ -3,6 +3,7 @@ import { useSession } from '@/providers/session'
 import { useEditor } from '@/providers/editor'
 import type { SavedSketch } from '@/utils/sketch-db'
 import s from './style.module.css'
+import AutosizeInput from '../autosize-input'
 
 function SketchManager() {
   const { editor } = useEditor()
@@ -108,6 +109,7 @@ function EditableText({ sketch }: { sketch: SavedSketch }) {
 
   onMount(() => {
     setInputSize()
+    // console.log(inputRef)
   })
 
   function setInputSize() {
@@ -129,6 +131,8 @@ function EditableText({ sketch }: { sketch: SavedSketch }) {
   }
 
   function handleBlur() {
+    console.log('BLURRING')
+
     setEditing(false)
     setInputSize()
     requestAnimationFrame(() => {
@@ -143,15 +147,15 @@ function EditableText({ sketch }: { sketch: SavedSketch }) {
 
   return (
     <div class={s.editable_container}>
-      <input
+      <AutosizeInput
         ref={inputRef}
         id=""
         class={s.label_title}
         disabled={!editing()}
         value={title()}
         onInput={(e) => {
-          setTitle(e.target.value)
-          e.target.size = Math.max(e.target.value.length, 1)
+          setTitle(e.currentTarget.value)
+          e.currentTarget.size = Math.max(e.currentTarget.value.length, 1)
         }}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
@@ -169,83 +173,8 @@ function EditableText({ sketch }: { sketch: SavedSketch }) {
         </button>
       </Show>
     </div>
-    // <>
-    //   <Show when={!editing()}>
-    //     <p>
-    //       {text} <span onClick={() => setEditing(true)}>Edit</span>
-    //     </p>
-    //   </Show>
-    //   <Show when={editing()}>
-    //     <input
-    //       ref={inputRef}
-    //       value={text}
-    //       onKeyDown={(e) => {
-    //         if (e.key === 'Enter' || e.key === 'Escape') {
-    //           setEditing(false)
-    //         }
-    //       }}
-    //     />
-    //   </Show>
-    // </>
   )
 }
-
-// interface AutoWidthInputProps {
-//   value?: string
-//   placeholder?: string
-//   onInput?: (value: string) => void
-//   style?: JSX.CSSProperties
-//   class?: string
-//   ref: HTMLInputElement | undefined
-// }
-
-// function AutoWidthInput(props: AutoWidthInputProps): JSX.Element {
-//   let mirrorRef: HTMLSpanElement | undefined
-//   const [value, setValue] = createSignal(props.value ?? '')
-
-//   onMount(() => {
-//     syncWidth()
-//   })
-
-//   const syncWidth = () => {
-//     if (!mirrorRef || !props.ref) return
-//     mirrorRef.textContent = value() || props.placeholder || ''
-//     const width = mirrorRef.offsetWidth
-//     props.ref.style.width = `${width}px`
-//   }
-
-//   return (
-//     <div style={{ display: 'inline-block', position: 'relative' }}>
-//       <span
-//         ref={mirrorRef}
-//         aria-hidden="true"
-//         style={{
-//           position: 'absolute',
-//           visibility: 'hidden',
-//           'white-space': 'pre',
-//           font: 'inherit',
-//           'letter-spacing': 'inherit',
-//           padding: 'inherit',
-//           border: 'inherit',
-//           'box-sizing': 'inherit',
-//         }}
-//       />
-//       <input
-//         ref={props.ref}
-//         type="text"
-//         value={value()}
-//         placeholder={props.placeholder}
-//         class={props.class}
-//         style={{ 'white-space': 'nowrap', 'min-width': '1ch', ...props.style }}
-//         onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-//           setValue(e.currentTarget.value)
-//           syncWidth()
-//           props.onInput?.(e.currentTarget.value)
-//         }}
-//       />
-//     </div>
-//   )
-// }
 
 function clst(...classNames: string[]) {
   return Object.fromEntries(classNames.map((cn) => [cn, true]))
