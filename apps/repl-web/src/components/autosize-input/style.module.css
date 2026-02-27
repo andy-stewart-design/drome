@@ -1,9 +1,9 @@
-.container {
+:where(.container) {
   position: relative;
   display: inline-block;
 }
 
-.mirror {
+:where(.mirror) {
   position: absolute;
   top: 0;
   left: 0;
@@ -14,7 +14,7 @@
   border: none;
 }
 
-.input {
+:where(.input) {
   display: block;
   background: transparent;
   border: none;

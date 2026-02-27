@@ -113,14 +113,33 @@
 
 .editable_container {
   display: flex;
+  align-items: flex-end;
+  gap: 0.25rem;
 }
 
-.label_title.label_title {
-  /*width: fit-content;*/
+.label_title {
   font-size: 0.875rem;
+  border-radius: 1px;
 
-  &:disabled {
-    pointer-events: none;
+  &:not(:disabled) {
+    pointer-events: all;
+  }
+}
+
+.label_button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--app-color-fg-tertiary);
+  padding: 0.125rem;
+  border-radius: 1px;
+
+  .label:not(:hover) &:not(:focus-visible) {
+    opacity: 0;
+  }
+
+  &:is(:hover, :focus-visible) {
+    color: var(--app-color-fg-primary);
   }
 }
 

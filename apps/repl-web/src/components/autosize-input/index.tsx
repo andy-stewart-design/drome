@@ -43,6 +43,7 @@ function AutosizeInput(props: AutosizeInputProps) {
             props.ref(el)
           }
         }}
+        disabled={props.disabled}
         class={`${s.input} ${props.class ?? ''}`}
         value={props.value}
         placeholder={props.placeholder}
