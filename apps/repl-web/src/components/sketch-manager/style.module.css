@@ -9,24 +9,11 @@
   margin: 0;
 }
 
-.item {
-  display: flex;
-
-  /*&:not(:last-of-type) {
-    border-block-end: 1px solid var(--app-color-border-subtle);
-  }*/
-
-  &:is(:hover, :focus-visible),
-  &:has(:hover, :focus-visible) {
-    background: oklch(var(--app-color-neutral-50-lch) / 0.05);
-  }
-}
-
 /* BUTTONS */
 .button {
   background: none;
   border: none;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: inherit;
 }
 
@@ -69,17 +56,91 @@
   }
 }
 
-.delete {
+/*-------*/
+/*-------*/
+/*-------*/
+
+.list {
+  margin: 0;
+  padding: 0;
+}
+
+.label {
+  display: grid;
+  font-size: 0.75rem;
+  &:is(:hover, :focus-visible),
+  &:has(:hover, :focus-visible) {
+    background: oklch(var(--app-color-neutral-50-lch) / 0.05);
+  }
+
+  & > * {
+    grid-area: 1/-1;
+  }
+
+  button {
+    pointer-events: all;
+  }
+}
+
+.select_button {
+  --border-color: transparent;
+
+  border-inline-start: 0.125rem solid var(--border-color, transparent);
+
+  &[data-current='true'] {
+    --border-color: var(--app-color-border-strong);
+  }
+}
+
+.label_content {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  pointer-events: none;
+}
+
+.label_text {
+  flex: 1 0 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.editable_container {
+  display: flex;
+}
+
+.label_title {
+  width: fit-content;
+  font-size: 0.875rem;
+
+  &[contenteditable='false'] {
+    pointer-events: none;
+  }
+}
+
+.label_date {
+  color: var(--app-color-fg-tertiary);
+}
+
+.delete_button {
+  flex: 0 0 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 0.51rem;
+  border-radius: 100vmax;
 
-  .item:not(:hover, :focus-visible) &:not(:hover, :focus-visible) {
+  .label:not(:hover, :focus-visible) &:not(:hover, :focus-visible) {
     opacity: 0;
   }
 
-  .item:has(:hover, :focus-visible) &:not(:hover, :focus-visible) {
+  .label:has(:hover, :focus-visible) &:not(:hover, :focus-visible) {
     opacity: 1;
     color: var(--app-color-fg-tertiary);
   }
