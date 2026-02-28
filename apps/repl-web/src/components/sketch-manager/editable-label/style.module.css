@@ -1,0 +1,39 @@
+.editable_container {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.label_title {
+  font-size: 0.875rem;
+  border-radius: 1px;
+
+  &:not(:disabled) {
+    pointer-events: all;
+  }
+}
+
+.button {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  color: inherit;
+  pointer-events: all;
+}
+
+.label_button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--app-color-fg-tertiary);
+  padding: 0.125rem;
+  border-radius: 1px;
+
+  li:not(:hover, :has(:focus-visible)) &:not(:focus-visible) {
+    opacity: 0;
+  }
+
+  &:is(:hover, :focus-visible) {
+    color: var(--app-color-fg-primary);
+  }
+}

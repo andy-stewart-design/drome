@@ -1,0 +1,71 @@
+.label {
+  display: grid;
+  font-size: 0.75rem;
+  &:is(:hover, :focus-visible),
+  &:has(:hover, :focus-visible) {
+    background: oklch(var(--app-color-neutral-50-lch) / 0.05);
+  }
+
+  & > * {
+    grid-area: 1/-1;
+  }
+}
+
+.label_content {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  pointer-events: none;
+}
+
+.label_text {
+  flex: 1 0 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.label_meta {
+  color: var(--app-color-fg-tertiary);
+}
+
+.button {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  color: inherit;
+  pointer-events: all;
+}
+
+.select_button {
+  --border-color: transparent;
+
+  border-inline-start: 0.125rem solid var(--border-color, transparent);
+
+  &[data-current='true'] {
+    --border-color: var(--app-color-border-strong);
+  }
+}
+
+.delete_button {
+  flex: 0 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.51rem;
+  border-radius: 100vmax;
+
+  .label:not(:hover, :focus-visible) &:not(:hover, :focus-visible) {
+    opacity: 0;
+  }
+
+  .label:has(:hover, :focus-visible) &:not(:hover, :focus-visible) {
+    opacity: 1;
+    color: var(--app-color-fg-tertiary);
+  }
+}

@@ -1,4 +1,5 @@
 import { createEffect, type JSX } from 'solid-js'
+
 import s from './style.module.css'
 
 /* ─── Types ─── */
