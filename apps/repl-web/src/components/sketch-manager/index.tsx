@@ -1,9 +1,9 @@
 import { createSignal, For, Show, type Accessor } from 'solid-js'
 import { useSession } from '@/providers/session'
 import { useEditor } from '@/providers/editor'
+import AutosizeInput from '@/components/autosize-input'
 import type { SavedSketch } from '@/utils/sketch-db'
 import s from './style.module.css'
-import AutosizeInput from '@/components/autosize-input'
 
 function SketchManager() {
   const { editor } = useEditor()
@@ -76,10 +76,11 @@ function SketchLabel({
   onSelect,
   onDelete,
 }: SketchLabelProps) {
-  const { updateSketch } = useSession()
+  const { updateSketch, setWorkingSketch } = useSession()
 
   function saveTitle(title: string) {
     updateSketch({ ...sketch, title })
+    setWorkingSketch((c) => ({ ...c, title }))
   }
 
   const updatedFormatted = new Intl.DateTimeFormat('en-US').format(

@@ -134,7 +134,7 @@
   padding: 0.125rem;
   border-radius: 1px;
 
-  .label:not(:hover) &:not(:focus-visible) {
+  .label:not(:hover, :has(:focus-visible)) &:not(:focus-visible) {
     opacity: 0;
   }
 
