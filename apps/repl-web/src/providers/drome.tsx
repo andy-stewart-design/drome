@@ -35,7 +35,7 @@ function DromeProvider(props: ParentProps) {
   const [visualizer, setVisualizer] = createSignal<AudioVisualizer | null>(null)
   const { setPaused, setBeat } = usePlayState()
   const { editor, flash } = useEditor()
-  const { setWorkingSketch } = useSession()
+  const { setWorkingSketch, workingScene } = useSession()
 
   function togglePlaystate(pause?: boolean) {
     const ed = editor()
@@ -54,7 +54,10 @@ function DromeProvider(props: ParentProps) {
       flash()
       if (d.paused) d.start()
       if (v?.paused) v?.start()
-      setWorkingSketch((s) => ({ ...s, code }))
+      setWorkingSketch((s) => {
+        s.scenes[workingScene()] = code
+        return { ...s, code }
+      }, false)
     }
   }
 

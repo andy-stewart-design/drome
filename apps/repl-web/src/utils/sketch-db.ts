@@ -12,23 +12,40 @@ const DB_VERSION = 1
 
 const sketchSchema = z.object({
   code: z.string(),
+  scenes: z.array(z.string()).optional(),
   author: z.string(),
   title: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
 })
 
-const savedSketchSchema = sketchSchema.extend({
-  id: z.number(),
+// NOTE: this can likely be removed once all currently saved sketches have scenes
+const newSketchSchema = sketchSchema.transform(({ scenes, ...data }) => {
+  const s = !scenes ? [data.code] : scenes
+  return { ...data, scenes: s }
 })
 
-const workingSketchSchema = sketchSchema.extend({
-  id: z.number().optional(),
-})
+const savedSketchSchema = sketchSchema
+  .extend({
+    id: z.number(),
+  })
+  .transform(({ scenes, ...data }) => {
+    const s = !scenes ? [data.code] : scenes
+    return { ...data, scenes: s }
+  })
+
+const workingSketchSchema = sketchSchema
+  .extend({
+    id: z.number().optional(),
+  })
+  .transform(({ scenes, ...data }) => {
+    const s = !scenes ? [data.code] : scenes
+    return { ...data, scenes: s }
+  })
 
 const savedSketchesSchema = z.array(savedSketchSchema)
 
-type NewSketch = z.infer<typeof sketchSchema>
+type NewSketch = z.infer<typeof newSketchSchema>
 type SavedSketch = z.infer<typeof savedSketchSchema>
 type WorkingSketch = NewSketch | SavedSketch
 
@@ -199,6 +216,7 @@ function createSketch({
     title: t,
     author: a,
     code: c,
+    scenes: [c],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }

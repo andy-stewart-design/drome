@@ -5,7 +5,7 @@ import s from './style.module.css'
 
 function CodeMirror() {
   const { editor, createEditor, isFlashed } = useEditor()
-  const { workingSketch } = useSession()
+  const { workingSketch, workingScene } = useSession()
   let editorContainer: HTMLDivElement | undefined
 
   onMount(() => {
@@ -16,7 +16,7 @@ function CodeMirror() {
   createEffect(() => {
     const ed = editor()
     if (!ed) return
-    const code = workingSketch().code
+    const code = workingSketch().scenes[workingScene()]
 
     if (ed.state.doc.toString() !== code) {
       ed.dispatch({

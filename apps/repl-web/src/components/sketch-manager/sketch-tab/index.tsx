@@ -17,7 +17,7 @@ function SketchTab(props: Props) {
 
   function saveTitle(title: string) {
     updateSketch({ ...props.sketch, title })
-    setWorkingSketch((c) => ({ ...c, title }))
+    setWorkingSketch((c) => ({ ...c, title }), false)
   }
 
   const updatedFormatted = new Intl.DateTimeFormat('en-US').format(
