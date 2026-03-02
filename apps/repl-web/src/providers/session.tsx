@@ -44,11 +44,13 @@ function SessionProvider(props: ParentProps) {
     const working = workingSketch()
     const b = workingSketch().scenes
     const workingCode = b[workingScene()]
+
     if (!workingCode.trim()) return false
     if (!('id' in working)) return true
 
     const allSaved = savedSketches()
     const a = allSaved.find((saved) => saved.id === working.id)?.scenes
+
     return a?.length !== b.length || !a.every((s, i) => s === b[i])
   }
 
