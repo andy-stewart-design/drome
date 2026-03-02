@@ -52,31 +52,38 @@ type WorkingSketch = NewSketch | SavedSketch
 type TransactionType = 'readonly' | 'readwrite'
 
 type IDBReturnValue =
-  | { success: true; data: any }
+  | { success: true; data: unknown }
   | { success: false; error: string }
 
 type CRUDReturnValue =
   | { success: true; data: SavedSketch }
   | { success: false; error: string }
 
-const initDB = async () => {
-  return new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open(DATABASE_NAME, DB_VERSION)
+type DeleteReturnValue = { success: true } | { success: false; error: string }
 
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result
+let dbPromise: Promise<IDBDatabase> | null = null
 
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, {
-          keyPath: 'id',
-          autoIncrement: true,
-        })
+const initDB = () => {
+  if (!dbPromise) {
+    dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open(DATABASE_NAME, DB_VERSION)
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result
+
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, {
+            keyPath: 'id',
+            autoIncrement: true,
+          })
+        }
       }
-    }
 
-    request.onsuccess = () => resolve(request.result)
-    request.onerror = () => reject(request.error)
-  })
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+  }
+  return dbPromise
 }
 
 async function getStore(type: TransactionType) {
@@ -154,11 +161,12 @@ const addSketch = async (sketch: NewSketch) => {
     const request = store.add(sketch)
 
     request.onsuccess = () => {
-      const id =
-        typeof request.result === 'number'
-          ? request.result
-          : Number(request.result)
-      resolve({ success: true, data: { ...sketch, id } })
+      const key = request.result
+      if (typeof key !== 'number') {
+        resolve({ success: false, error: 'Unexpected key type from IDB' })
+        return
+      }
+      resolve({ success: true, data: { ...sketch, id: key } })
     }
 
     request.onerror = () => {
@@ -186,10 +194,13 @@ const updateSketch = async (sketch: SavedSketch) => {
 const deleteSketch = async (id: number) => {
   const store = await getStore('readwrite')
 
-  return new Promise<DOMException | null>((resolve) => {
+  return new Promise<DeleteReturnValue>((resolve) => {
     const request = store.delete(id)
-    request.onsuccess = () => resolve(null)
-    request.onerror = () => resolve(request.error)
+    request.onsuccess = () => resolve({ success: true })
+    request.onerror = () => {
+      const error = request.error?.message ?? 'Unknown error'
+      resolve({ success: false, error })
+    }
   })
 }
 
@@ -235,7 +246,7 @@ async function saveSketch(sketch: WorkingSketch) {
 }
 
 function getLatestSketch(sketches: SavedSketch[] | null) {
-  if (!sketches) return createSketch()
+  if (!sketches?.length) return createSketch()
   return sketches.reduce((latest, current) =>
     new Date(current.updatedAt) > new Date(latest.updatedAt) ? current : latest,
   )

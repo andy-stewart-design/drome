@@ -40,7 +40,7 @@ function SessionProvider(props: ParentProps) {
   )
   const [savedSketches, setSavedSketches] = createSignal<db.SavedSketch[]>([])
 
-  const shouldSave = () => {
+  const scenesAreDirty = () => {
     const working = workingSketch()
     const b = workingSketch().scenes
     const workingCode = b[workingScene()]
@@ -55,7 +55,7 @@ function SessionProvider(props: ParentProps) {
   }
 
   function handleUnload(e: Event) {
-    if (shouldSave()) e.preventDefault()
+    if (scenesAreDirty()) e.preventDefault()
   }
 
   onMount(() => {
@@ -85,26 +85,34 @@ function SessionProvider(props: ParentProps) {
   }
 
   async function saveSketch(code: string) {
-    const result = await db.saveSketch({ ...workingSketch(), code })
+    const s = workingSketch()
+    const updatedScenes = [...s.scenes]
+    updatedScenes[workingScene()] = code
+    const result = await db.saveSketch({ ...s, code, scenes: updatedScenes })
     if (result.success) {
       setWorkingSketch(result.data)
-      const sketches = await db.getSketches()
-      if (sketches) setSavedSketches(sketches)
+      setSavedSketches((prev) => {
+        const filtered = prev.filter((sk) => sk.id !== result.data.id)
+        return [result.data, ...filtered]
+      })
     }
   }
 
   async function updateSketch(sketch: db.SavedSketch) {
     const result = await db.updateSketch(sketch)
     if (result.success) {
-      const sketches = await db.getSketches()
-      if (sketches) setSavedSketches(sketches)
+      setSavedSketches((prev) => {
+        const filtered = prev.filter((sk) => sk.id !== result.data.id)
+        return [result.data, ...filtered]
+      })
     }
   }
 
   async function deleteSketch(id: number) {
-    db.deleteSketch(id)
-    const sketches = await db.getSketches()
-    if (sketches) setSavedSketches(sketches)
+    const result = await db.deleteSketch(id)
+    if (result.success) {
+      setSavedSketches((prev) => prev.filter((sk) => sk.id !== id))
+    }
   }
 
   const contextValue = {

@@ -55,8 +55,9 @@ function DromeProvider(props: ParentProps) {
       if (d.paused) d.start()
       if (v?.paused) v?.start()
       setWorkingSketch((s) => {
-        s.scenes[workingScene()] = code
-        return { ...s, code }
+        const scenes = [...s.scenes]
+        scenes[workingScene()] = code
+        return { ...s, scenes, code }
       }, false)
     }
   }
