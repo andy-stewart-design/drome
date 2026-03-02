@@ -10,8 +10,29 @@ const DATABASE_NAME = 'dromeSketchDB'
 const STORE_NAME = 'sketches'
 const DB_VERSION = 1
 
+const migrateSketchSchema = z.object({
+  code: z.string(),
+  scenes: z.array(z.string()).optional(),
+  author: z.string(),
+  title: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+})
+
+const migrateSavedSketchSchema = migrateSketchSchema
+  .extend({
+    id: z.number(),
+  })
+  .transform(({ scenes, ...data }) => {
+    const s = !scenes ? [data.code] : scenes
+    return { ...data, scenes: s }
+  })
+
+const migrateSavedSketchesSchema = z.array(migrateSavedSketchSchema)
+
 const sketchSchema = z.object({
   code: z.string(),
+  scenes: z.array(z.string()),
   author: z.string(),
   title: z.string(),
   createdAt: z.string(),
@@ -89,7 +110,7 @@ const getSketches = async () => {
     return null
   }
 
-  const parsed = savedSketchesSchema.safeParse(results.data)
+  const parsed = migrateSavedSketchesSchema.safeParse(results.data)
 
   if (!parsed.success) {
     console.error(parsed.error)
@@ -199,6 +220,7 @@ function createSketch({
     title: t,
     author: a,
     code: c,
+    scenes: [c],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }

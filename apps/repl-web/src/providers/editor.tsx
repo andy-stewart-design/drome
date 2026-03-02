@@ -26,7 +26,7 @@ const EditorContext = createContext<EditorContextType>()
 
 // Provider component
 function EditorProvider(props: ParentProps) {
-  const { workingSketch } = useSession()
+  const { workingSketch, workingScene } = useSession()
   const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
   const [isFlashed, setIsFlash] = createSignal(false)
   let timeoutId: ReturnType<typeof setTimeout> | null
@@ -37,7 +37,7 @@ function EditorProvider(props: ParentProps) {
 
   function createEditor(parent: HTMLElement) {
     const ed = new EditorView({
-      doc: workingSketch().code,
+      doc: workingSketch().scenes[workingScene()],
       extensions: [basicSetup, theme, javascript()],
       parent,
     })

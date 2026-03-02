@@ -12,15 +12,21 @@ import * as db from '@/utils/sketch-db'
 import { useUser } from './user'
 
 // Define the context type
+type sketchOrSetter =
+  | db.WorkingSketch
+  | ((s: db.WorkingSketch) => db.WorkingSketch)
+
 type SessionContextType = {
   workingSketch: Accessor<db.WorkingSketch>
-  setWorkingSketch: Setter<db.WorkingSketch>
+  setWorkingSketch(sketch: sketchOrSetter, clone?: boolean): void
   savedSketches: Accessor<db.SavedSketch[]>
   setSavedSketches: Setter<db.SavedSketch[]>
   createSketch(): void
   updateSketch(sketch: db.SavedSketch): void
   saveSketch(code: string): Promise<void>
   deleteSketch(id: number): Promise<void>
+  workingScene: Accessor<number>
+  setWorkingScene: Setter<number>
 }
 
 // Create context with undefined as default
@@ -33,13 +39,15 @@ function SessionProvider(props: ParentProps) {
   const [workingSketch, setWorkingSketch] = createSignal<db.WorkingSketch>(
     db.createSketch(),
   )
+  const [workingScene, setWorkingScene] = createSignal(0)
   const [savedSketches, setSavedSketches] = createSignal<db.SavedSketch[]>([])
 
   function handleUnload(e: Event) {
     const working = workingSketch()
     const saved = savedSketches()
+    const workingCode = workingSketch().scenes[workingScene()]
 
-    if (!workingSketch().code.trim()) return
+    if (!workingCode.trim()) return
 
     if (!('id' in working)) {
       e.preventDefault()
@@ -47,7 +55,8 @@ function SessionProvider(props: ParentProps) {
     }
 
     const savedSketch = saved.find((saved) => saved.id === working.id)
-    if (savedSketch?.code !== working.code) {
+    const savedCode = savedSketch?.scenes[workingScene()]
+    if (savedCode !== workingCode) {
       e.preventDefault()
     }
   }
@@ -56,7 +65,7 @@ function SessionProvider(props: ParentProps) {
     db.getSketches().then((sketches) => {
       if (sketches) setSavedSketches(sketches)
       const sketch = db.getLatestSketch(sketches)
-      setWorkingSketch(sketch)
+      handleSetWorkingSketch(sketch)
     })
 
     const { signal } = controller
@@ -68,7 +77,14 @@ function SessionProvider(props: ParentProps) {
   })
 
   function createSketch() {
+    setWorkingScene(0)
     setWorkingSketch(db.createSketch({ author: user().name }))
+  }
+
+  function handleSetWorkingSketch(sketch: sketchOrSetter, clone = true) {
+    const s = typeof sketch === 'function' ? sketch(workingSketch()) : sketch
+    if (clone) setWorkingSketch(structuredClone(s))
+    else setWorkingSketch(s)
   }
 
   async function saveSketch(code: string) {
@@ -96,7 +112,9 @@ function SessionProvider(props: ParentProps) {
 
   const contextValue = {
     workingSketch,
-    setWorkingSketch,
+    setWorkingSketch: handleSetWorkingSketch,
+    workingScene,
+    setWorkingScene,
     savedSketches,
     setSavedSketches,
     createSketch,
