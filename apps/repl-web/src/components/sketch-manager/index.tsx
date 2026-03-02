@@ -31,7 +31,10 @@ function SketchManager() {
   }
 
   function handleDelete(id: number) {
-    deleteSketch(id)
+    const shouldDelete = confirm(
+      `Are you sure you want to delete ${workingSketch().title}?`,
+    )
+    if (shouldDelete) deleteSketch(id)
   }
 
   return (

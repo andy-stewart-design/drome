@@ -39,13 +39,15 @@ function SessionProvider(props: ParentProps) {
     const working = workingSketch()
     const saved = savedSketches()
 
+    if (!workingSketch().code.trim()) return
+
     if (!('id' in working)) {
       e.preventDefault()
       return
     }
 
     const savedSketch = saved.find((saved) => saved.id === working.id)
-    if (!savedSketch || savedSketch.code !== working.code) {
+    if (savedSketch?.code !== working.code) {
       e.preventDefault()
     }
   }
