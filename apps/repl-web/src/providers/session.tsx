@@ -40,23 +40,20 @@ function SessionProvider(props: ParentProps) {
   )
   const [savedSketches, setSavedSketches] = createSignal<db.SavedSketch[]>([])
 
-  function handleUnload(e: Event) {
+  const shouldSave = () => {
     const working = workingSketch()
-    const saved = savedSketches()
-    const workingCode = workingSketch().scenes[workingScene()]
+    const b = workingSketch().scenes
+    const workingCode = b[workingScene()]
+    if (!workingCode.trim()) return false
+    if (!('id' in working)) return true
 
-    if (!workingCode.trim()) return
+    const allSaved = savedSketches()
+    const a = allSaved.find((saved) => saved.id === working.id)?.scenes
+    return a?.length !== b.length || !a.every((s, i) => s === b[i])
+  }
 
-    if (!('id' in working)) {
-      e.preventDefault()
-      return
-    }
-
-    const savedSketch = saved.find((saved) => saved.id === working.id)
-    const savedCode = savedSketch?.scenes[workingScene()]
-    if (savedCode !== workingCode) {
-      e.preventDefault()
-    }
+  function handleUnload(e: Event) {
+    if (shouldSave()) e.preventDefault()
   }
 
   onMount(() => {
