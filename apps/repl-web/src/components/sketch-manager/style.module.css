@@ -9,24 +9,11 @@
   margin: 0;
 }
 
-.item {
-  display: flex;
-
-  /*&:not(:last-of-type) {
-    border-block-end: 1px solid var(--app-color-border-subtle);
-  }*/
-
-  &:is(:hover, :focus-visible),
-  &:has(:hover, :focus-visible) {
-    background: oklch(var(--app-color-neutral-50-lch) / 0.05);
-  }
-}
-
 /* BUTTONS */
 .button {
   background: none;
   border: none;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: inherit;
 }
 
@@ -37,50 +24,6 @@
   padding: 0.5rem;
 
   .toolbar:has(:hover, :focus-visible) &:not(:hover, :focus-visible) {
-    color: var(--app-color-fg-tertiary);
-  }
-}
-
-.primary {
-  --border-color: transparent;
-
-  flex: 1 0 0;
-  display: grid;
-  gap: 0.25rem;
-  text-align: left;
-  padding-block: 0.625rem;
-  padding-inline: 0.875rem 1rem;
-  border-inline-start: 0.125rem solid var(--border-color, transparent);
-
-  &[data-current='true'] {
-    --border-color: var(--app-color-border-strong);
-  }
-
-  p {
-    margin: 0;
-  }
-
-  p:first-of-type {
-    font-size: 0.875rem;
-  }
-
-  &:not(:hover, :focus-visible) p:last-of-type {
-    color: var(--app-color-fg-tertiary);
-  }
-}
-
-.delete {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-
-  .item:not(:hover, :focus-visible) &:not(:hover, :focus-visible) {
-    opacity: 0;
-  }
-
-  .item:has(:hover, :focus-visible) &:not(:hover, :focus-visible) {
-    opacity: 1;
     color: var(--app-color-fg-tertiary);
   }
 }

@@ -1,6 +1,12 @@
 import { For } from 'solid-js'
+
+import IconArrowDown12 from '@/components/icons/icon-arrow-down-12'
+import IconPlus12 from '@/components/icons/icon-plus-12'
 import { useSession } from '@/providers/session'
 import { useEditor } from '@/providers/editor'
+import { clst } from '@/utils/classlist'
+
+import SketchTab from './sketch-tab'
 import s from './style.module.css'
 
 function SketchManager() {
@@ -25,7 +31,10 @@ function SketchManager() {
   }
 
   function handleDelete(id: number) {
-    deleteSketch(id)
+    const shouldDelete = confirm(
+      `Are you sure you want to delete ${workingSketch().title}?`,
+    )
+    if (shouldDelete) deleteSketch(id)
   }
 
   return (
@@ -42,22 +51,12 @@ function SketchManager() {
       <ul class={s.list}>
         <For each={savedSketches()}>
           {(sketch) => (
-            <li class={s.item}>
-              <button
-                classList={clst(s.button, s.primary)}
-                onClick={() => setWorkingSketch(sketch)}
-                data-current={workingSketch().title === sketch.title}
-              >
-                <p>{sketch.title}</p>
-                <p>{sketch.author}</p>
-              </button>
-              <button
-                classList={clst(s.button, s.delete)}
-                onClick={() => handleDelete(sketch.id)}
-              >
-                <IconClose12 />
-              </button>
-            </li>
+            <SketchTab
+              sketch={sketch}
+              selected={workingSketch().title === sketch.title}
+              onSelect={() => setWorkingSketch(sketch)}
+              onDelete={() => handleDelete(sketch.id)}
+            />
           )}
         </For>
       </ul>
@@ -66,35 +65,3 @@ function SketchManager() {
 }
 
 export default SketchManager
-
-function clst(...classNames: string[]) {
-  return Object.fromEntries(classNames.map((cn) => [cn, true]))
-}
-
-function IconPlus12() {
-  return (
-    <svg viewBox="0 0 12 12" width={12} height={12}>
-      <path d="M 6 2 L 6 10 M 2 6 L 10 6" stroke="currentColor" fill="none" />
-    </svg>
-  )
-}
-
-function IconArrowDown12() {
-  return (
-    <svg viewBox="0 0 12 12" width={12} height={12}>
-      <path
-        d="M 6 1 L 6 10 M 2 6 L 6 10 L 10 6"
-        stroke="currentColor"
-        fill="none"
-      />
-    </svg>
-  )
-}
-
-function IconClose12() {
-  return (
-    <svg viewBox="0 0 12 12" width={12} height={12}>
-      <path d="M 2 2 L 10 10 M 2 10 L 10 2" stroke="currentColor" fill="none" />
-    </svg>
-  )
-}
