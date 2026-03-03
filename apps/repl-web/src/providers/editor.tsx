@@ -8,7 +8,6 @@ import {
 } from 'solid-js'
 import { basicSetup, EditorView } from 'codemirror'
 
-import { useSession } from '@/providers/session'
 import { javascript } from '@/codemirror/language'
 import { theme } from '@/codemirror/theme'
 import '@/codemirror/theme.css'
@@ -16,7 +15,7 @@ import '@/codemirror/theme.css'
 // Define the context type
 type EditorContextType = {
   editor: Accessor<EditorView | undefined>
-  createEditor(parent: HTMLElement): void
+  createEditor(parent: HTMLElement, doc: string): void
   isFlashed: Accessor<boolean>
   flash(dur?: number): void
 }
@@ -26,7 +25,6 @@ const EditorContext = createContext<EditorContextType>()
 
 // Provider component
 function EditorProvider(props: ParentProps) {
-  const { workingSketch, workingScene } = useSession()
   const [editor, setEditor] = createSignal<EditorView | undefined>(undefined)
   const [isFlashed, setIsFlash] = createSignal(false)
   let timeoutId: ReturnType<typeof setTimeout> | null
@@ -35,9 +33,9 @@ function EditorProvider(props: ParentProps) {
     editor()?.destroy()
   })
 
-  function createEditor(parent: HTMLElement) {
+  function createEditor(parent: HTMLElement, doc: string) {
     const ed = new EditorView({
-      doc: workingSketch().scenes[workingScene()],
+      doc,
       extensions: [basicSetup, theme, javascript()],
       parent,
     })

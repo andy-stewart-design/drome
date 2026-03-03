@@ -10,7 +10,7 @@ function CodeMirror() {
 
   onMount(() => {
     if (!editorContainer) return
-    createEditor(editorContainer)
+    createEditor(editorContainer, workingSketch().scenes[workingScene()])
   })
 
   createEffect(() => {
