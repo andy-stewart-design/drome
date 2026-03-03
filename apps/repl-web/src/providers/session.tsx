@@ -117,7 +117,7 @@ function SessionProvider(props: ParentProps) {
   }
 
   // TODO: Maintain mouse position when switching scenes
-  // TODO: Snapshot current working scene before switching scenes
+  // TODO: Snapshot/save current working scene before switching scenes
   // TODO: Add ability to to delete current scene
   function switchScene(dir: 1 | -1 = 1) {
     const max = workingSketch().scenes.length
