@@ -15,7 +15,7 @@ function useKeyboardEvent() {
     if (e.altKey && e.key === 'Enter') {
       e.preventDefault()
       togglePlaystate(false)
-    } else if (e.altKey && e.key === '≥') {
+    } else if (e.altKey && e.key === '÷') {
       e.preventDefault()
       togglePlaystate(true)
     } else if (e.metaKey && e.key === 's') {
@@ -32,10 +32,10 @@ function useKeyboardEvent() {
     } else if (e.altKey && e.metaKey && e.key === 'ß') {
       e.preventDefault()
       addScene()
-    } else if (e.altKey && e.key === 'ArrowRight') {
+    } else if (e.altKey && e.key === '≥') {
       e.preventDefault()
       switchScene(1)
-    } else if (e.altKey && e.key === 'ArrowLeft') {
+    } else if (e.altKey && e.key === '≤') {
       e.preventDefault()
       switchScene(-1)
     }

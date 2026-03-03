@@ -19,8 +19,13 @@ function CodeMirror() {
     const code = workingSketch().scenes[workingScene()]
 
     if (ed.state.doc.toString() !== code) {
+      const cursorPos = ed.state.selection.ranges[0].from
       ed.dispatch({
         changes: { from: 0, to: ed.state.doc.length, insert: code },
+        selection: {
+          anchor: Math.min(cursorPos, code.length),
+          head: Math.min(cursorPos, code.length),
+        },
       })
     }
   })
