@@ -24,8 +24,8 @@ function App() {
       content={
         <>
           <EditorHeader>
-            <SketchMetadata />
-            <EditorToolbar />
+            {/*<SketchMetadata />
+            <EditorToolbar />*/}
           </EditorHeader>
           <CodeMirror />
         </>
