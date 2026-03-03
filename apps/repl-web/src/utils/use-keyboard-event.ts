@@ -8,7 +8,7 @@ function useKeyboardEvent() {
   let controller = new AbortController()
   const { togglePlaystate } = useDrome()
   const { editor } = useEditor()
-  const { saveSketch, createSketch } = useSession()
+  const { saveSketch, createSketch, switchScene, addScene } = useSession()
   const { setColorScheme } = useTheme()
 
   function handleKeyDown(e: KeyboardEvent) {
@@ -29,6 +29,15 @@ function useKeyboardEvent() {
     } else if (e.altKey && e.key === '†') {
       e.preventDefault()
       setColorScheme()
+    } else if (e.altKey && e.metaKey && e.key === 'ß') {
+      e.preventDefault()
+      addScene()
+    } else if (e.altKey && e.key === 'ArrowRight') {
+      e.preventDefault()
+      switchScene(1)
+    } else if (e.altKey && e.key === 'ArrowLeft') {
+      e.preventDefault()
+      switchScene(-1)
     }
   }
 

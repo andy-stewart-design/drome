@@ -10,10 +10,6 @@ import { useDrome } from '@/providers/drome'
 import { clst } from '@/utils/classlist'
 import s from './style.module.css'
 
-// interface Props {
-//   children: JSXElement
-// }
-
 function EditorHeader() {
   const { workingSketch, workingScene } = useSession()
   const { beat, paused } = usePlayState()

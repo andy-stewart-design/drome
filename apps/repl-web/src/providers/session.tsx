@@ -24,7 +24,8 @@ type SessionContextType = {
   saveSketch(code: string): Promise<void>
   deleteSketch(id: number): Promise<void>
   workingScene: Accessor<number>
-  setWorkingScene: Setter<number>
+  switchScene(dir?: 1 | -1): void
+  addScene(): void
 }
 
 // Create context with undefined as default
@@ -115,6 +116,24 @@ function SessionProvider(props: ParentProps) {
     }
   }
 
+  // TODO: Maintain mouse position when switching scenes
+  // TODO: Snapshot current working scene before switching scenes
+  // TODO: Add ability to to delete current scene
+  function switchScene(dir: 1 | -1 = 1) {
+    const max = workingSketch().scenes.length
+    const next = workingScene() + dir
+    if (next < 0 || next >= max) return
+    setWorkingScene(next)
+  }
+
+  function addScene() {
+    const current = workingSketch()
+    const scenes = [...current.scenes]
+    scenes.push(scenes[workingScene()])
+    handleSetWorkingSketch({ ...current, scenes })
+    setWorkingScene(scenes.length - 1)
+  }
+
   const contextValue = {
     workingSketch,
     setWorkingSketch: handleSetWorkingSketch,
@@ -125,7 +144,8 @@ function SessionProvider(props: ParentProps) {
     updateSketch,
     deleteSketch,
     workingScene,
-    setWorkingScene,
+    switchScene,
+    addScene,
   } satisfies SessionContextType
 
   return (
