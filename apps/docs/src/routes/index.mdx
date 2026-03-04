@@ -1,0 +1,32 @@
+import Counter from "@/components/Counter";
+
+# Scenes
+
+A sketch can contain multiple scenes — independent code blocks that share the same playback context. Scenes let you organise variations, sections, or experiments within a single sketch.
+
+## Keyboard Shortcuts
+
+All scene shortcuts use `Alt` (⌥) as the base modifier.
+
+| Shortcut                | Action                                           |
+| ----------------------- | ------------------------------------------------ |
+| `Alt + >`               | Switch to next scene                             |
+| `Alt + <`               | Switch to previous scene                         |
+| `Alt + Cmd + >`         | Duplicate current scene and insert after         |
+| `Alt + Cmd + <`         | Duplicate current scene and insert before        |
+| `Alt + Cmd + S`         | Duplicate current scene and insert after (alias) |
+| `Alt + Cmd + Backspace` | Delete current scene                             |
+
+> `>` = `Shift+.` and `<` = `Shift+,` on a standard keyboard.
+
+<Counter />
+
+## Behaviour
+
+**Switching scenes** snapshots the current editor content into the active scene before navigating. Unsaved edits are preserved in memory — you won't lose changes made between plays when moving between scenes.
+
+**Duplicating a scene** copies the content of the current scene and inserts it immediately before or after, then navigates to the new scene.
+
+**Deleting a scene** removes the current scene. If you are on the last scene in the list, focus moves to the previous one. Deleting is not possible when only one scene remains.
+
+**Cursor position** is preserved when switching scenes. If the target scene is shorter than the current cursor offset, the cursor is clamped to the end of the new scene's content.
