@@ -10,6 +10,7 @@ import {
 } from 'solid-js'
 import * as db from '@/utils/sketch-db'
 import { useUser } from './user'
+import { useEditor } from './editor'
 
 // Define the context type
 type SetterArgs<T> = T | ((i: T) => T)
@@ -35,6 +36,7 @@ const SessionContext = createContext<SessionContextType>()
 function SessionProvider(props: ParentProps) {
   const controller = new AbortController()
   const { user } = useUser()
+  const { editor } = useEditor()
   const [workingScene, setWorkingScene] = createSignal(0)
   const [workingSketch, setWorkingSketch] = createSignal<db.WorkingSketch>(
     db.createSketch(),
@@ -116,12 +118,22 @@ function SessionProvider(props: ParentProps) {
     }
   }
 
-  // TODO: Snapshot/save current working scene before switching scenes
   // TODO: Add ability to to delete current scene
   function switchScene(dir: 1 | -1 = 1) {
     const max = workingSketch().scenes.length
     const next = workingScene() + dir
     if (next < 0 || next >= max) return
+
+    const ed = editor()
+    if (ed) {
+      const currentCode = ed.state.doc.toString()
+      handleSetWorkingSketch((s) => {
+        const scenes = [...s.scenes]
+        scenes[workingScene()] = currentCode
+        return { ...s, scenes }
+      })
+    }
+
     setWorkingScene(next)
   }
 

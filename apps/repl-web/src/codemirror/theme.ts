@@ -78,6 +78,7 @@ const editorTheme = EditorView.theme({
     alignItems: 'center',
     justifyContent: 'flex-end',
     paddingBlockStart: '0.875px',
+    minWidth: '4ch',
   },
   '& .cm-gutters > .cm-gutter.cm-foldGutter': {
     pointerEvents: ALLOW_FOLD ? 'auto' : 'none',
