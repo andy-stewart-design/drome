@@ -10,8 +10,8 @@ import type { ParentComponent } from 'solid-js'
 const Providers: ParentComponent = (props) => {
   return (
     <UserProvider>
-      <SessionProvider>
-        <EditorProvider>
+      <EditorProvider>
+        <SessionProvider>
           <SidebarProvider>
             <PlayStateProvider>
               <DromeProvider>
@@ -19,8 +19,8 @@ const Providers: ParentComponent = (props) => {
               </DromeProvider>
             </PlayStateProvider>
           </SidebarProvider>
-        </EditorProvider>
-      </SessionProvider>
+        </SessionProvider>
+      </EditorProvider>
     </UserProvider>
   )
 }

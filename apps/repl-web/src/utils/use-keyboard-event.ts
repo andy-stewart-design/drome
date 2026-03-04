@@ -8,17 +8,18 @@ function useKeyboardEvent() {
   let controller = new AbortController()
   const { togglePlaystate } = useDrome()
   const { editor } = useEditor()
-  const { saveSketch, createSketch } = useSession()
+  const { saveSketch, createSketch, switchScene, addScene, deleteScene } =
+    useSession()
   const { setColorScheme } = useTheme()
 
   function handleKeyDown(e: KeyboardEvent) {
     if (e.altKey && e.key === 'Enter') {
       e.preventDefault()
       togglePlaystate(false)
-    } else if (e.altKey && e.key === '≥') {
+    } else if (e.altKey && e.key === '÷') {
       e.preventDefault()
       togglePlaystate(true)
-    } else if (e.metaKey && e.key === 's') {
+    } else if (e.altKey && e.key === 'ß') {
       e.preventDefault()
       const ed = editor()
       if (!ed) return
@@ -29,6 +30,20 @@ function useKeyboardEvent() {
     } else if (e.altKey && e.key === '†') {
       e.preventDefault()
       setColorScheme()
+    } else if (e.altKey && e.metaKey && e.key === 'ß') {
+      e.preventDefault()
+      addScene()
+    } else if (e.altKey && e.key === '≥') {
+      e.preventDefault()
+      if (e.metaKey) addScene(1)
+      else switchScene(1)
+    } else if (e.altKey && e.key === '≤') {
+      e.preventDefault()
+      if (e.metaKey) addScene(-1)
+      else switchScene(-1)
+    } else if (e.altKey && e.metaKey && e.key === 'Backspace') {
+      e.preventDefault()
+      deleteScene()
     }
   }
 

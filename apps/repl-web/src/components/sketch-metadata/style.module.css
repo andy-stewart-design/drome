@@ -1,3 +1,11 @@
+.container {
+  display: flex;
+  align-items: center;
+  height: var(--app-editor-header-height);
+  padding-inline: 1.25rem;
+  font-size: 0.8125rem;
+}
+
 .details {
   padding-inline: 1.25rem;
   /*border-block-end: 1px solid rgb(255 255 255 / 0.15);*/

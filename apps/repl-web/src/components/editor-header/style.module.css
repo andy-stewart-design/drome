@@ -1,7 +1,46 @@
 .header {
   display: grid;
+  gap: 2px;
+  grid-template-columns: 200px minmax(0, 1fr) 200px;
+  height: var(--app-editor-header-height);
+  padding-inline: 1.25rem;
+  font-family: monospace;
+  font-size: 0.8125rem;
+  color: var(--app-color-fg-tertiary);
+  user-select: none;
+}
 
-  & > * {
-    grid-area: 1 / -1;
+.col {
+  display: flex;
+  align-items: center;
+  gap: 1.5ch;
+
+  &.start {
+    justify-content: flex-start;
   }
+
+  &.center {
+    justify-content: center;
+  }
+
+  &.end {
+    justify-content: flex-end;
+  }
+}
+
+.digit {
+  color: var(--app-color-fg-primary);
+  padding-inline: 0.125rem;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  background: none;
+  border: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
 }

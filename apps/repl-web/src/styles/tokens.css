@@ -121,7 +121,7 @@
   --app-color-border-subtle: oklch(var(--app-color-neutral-50-lch) / 0.15);
   --app-color-border-strong: var(--app-color-neutral-50);
 
-  --app-editor-header-height: 3rem;
+  --app-editor-header-height: 4rem;
   --app-sidebar-width: 360px;
 
   [data-theme='accent'] {
