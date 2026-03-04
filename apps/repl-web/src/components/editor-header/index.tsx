@@ -16,12 +16,15 @@ function EditorHeader() {
   const { togglePlaystate } = useDrome()
   const { setShowSidebar } = useSidebar()
 
+  const numScenes = () => workingSketch().scenes.length
+
   return (
     <div class={s.header}>
       <div classList={clst(s.col, s.start)}>{workingSketch().title}</div>
       <div classList={clst(s.col, s.center)}>
         <span>
-          Scene [<span class={s.digit}>{workingScene()}</span>]
+          Scene [<span class={s.digit}>{workingScene() + 1}</span>/
+          <span class={s.digit}>{numScenes()}</span>]
         </span>
         <span>
           Beat [<span class={s.digit}>{beat()}</span>]

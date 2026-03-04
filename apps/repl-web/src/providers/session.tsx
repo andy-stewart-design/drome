@@ -26,7 +26,8 @@ type SessionContextType = {
   deleteSketch(id: number): Promise<void>
   workingScene: Accessor<number>
   switchScene(dir?: 1 | -1): void
-  addScene(): void
+  addScene(dir?: 1 | -1): void
+  deleteScene(): void
 }
 
 // Create context with undefined as default
@@ -118,7 +119,6 @@ function SessionProvider(props: ParentProps) {
     }
   }
 
-  // TODO: Add ability to to delete current scene
   function switchScene(dir: 1 | -1 = 1) {
     const max = workingSketch().scenes.length
     const next = workingScene() + dir
@@ -137,12 +137,22 @@ function SessionProvider(props: ParentProps) {
     setWorkingScene(next)
   }
 
-  function addScene() {
+  function addScene(dir: 1 | -1 = 1) {
     const current = workingSketch()
     const scenes = [...current.scenes]
-    scenes.push(scenes[workingScene()])
+    const insertAt = workingScene() + (dir === 1 ? 1 : 0)
+    scenes.splice(insertAt, 0, scenes[workingScene()])
     handleSetWorkingSketch({ ...current, scenes })
-    setWorkingScene(scenes.length - 1)
+    setWorkingScene(insertAt)
+  }
+
+  function deleteScene() {
+    const scenes = workingSketch().scenes
+    if (scenes.length <= 1) return
+    const current = workingScene()
+    const newScenes = scenes.filter((_, i) => i !== current)
+    handleSetWorkingSketch((s) => ({ ...s, scenes: newScenes }))
+    setWorkingScene(Math.min(current, newScenes.length - 1))
   }
 
   const contextValue = {
@@ -157,6 +167,7 @@ function SessionProvider(props: ParentProps) {
     workingScene,
     switchScene,
     addScene,
+    deleteScene,
   } satisfies SessionContextType
 
   return (
