@@ -12,9 +12,9 @@ import * as db from '@/utils/sketch-db'
 import { useUser } from './user'
 import { useEditor } from './editor'
 
-// Define the context type
 type SetterArgs<T> = T | ((i: T) => T)
 type SketchSetter = SetterArgs<db.WorkingSketch>
+
 type SessionContextType = {
   workingSketch: Accessor<db.WorkingSketch>
   setWorkingSketch(sketch: SketchSetter, clone?: boolean): void
@@ -30,37 +30,50 @@ type SessionContextType = {
   deleteScene(): void
 }
 
-// Create context with undefined as default
 const SessionContext = createContext<SessionContextType>()
 
-// Provider component
 function SessionProvider(props: ParentProps) {
   const controller = new AbortController()
   const { user } = useUser()
   const { editor } = useEditor()
+
   const [workingScene, setWorkingScene] = createSignal(0)
   const [workingSketch, setWorkingSketch] = createSignal<db.WorkingSketch>(
     db.createSketch(),
   )
   const [savedSketches, setSavedSketches] = createSignal<db.SavedSketch[]>([])
 
+  // ---- Helpers ----
+
+  // clone=false when the caller already owns the object (e.g. fresh db result)
+  function handleSetWorkingSketch(sketch: SketchSetter, clone = true) {
+    const s = typeof sketch === 'function' ? sketch(workingSketch()) : sketch
+    if (clone) setWorkingSketch(structuredClone(s))
+    else setWorkingSketch(s)
+  }
+
   const scenesAreDirty = () => {
     const working = workingSketch()
-    const b = workingSketch().scenes
-    const workingCode = b[workingScene()]
+    const workingScenes = working.scenes
+    const currentScene = workingScenes[workingScene()]
 
-    if (!workingCode.trim()) return false
+    // Short-circuit: empty scene is never dirty; unsaved sketch is always dirty;
+    if (!currentScene.trim()) return false
     if (!('id' in working)) return true
 
-    const allSaved = savedSketches()
-    const a = allSaved.find((saved) => saved.id === working.id)?.scenes
-
-    return a?.length !== b.length || !a.every((s, i) => s === b[i])
+    // otherwise compare scene arrays to the saved version.
+    const savedScenes = savedSketches().find((s) => s.id === working.id)?.scenes
+    return (
+      savedScenes?.length !== workingScenes.length ||
+      !savedScenes.every((s, i) => s === workingScenes[i])
+    )
   }
 
   function handleUnload(e: Event) {
     if (scenesAreDirty()) e.preventDefault()
   }
+
+  // ---- Lifecycle ----
 
   onMount(() => {
     db.getSketches().then((sketches) => {
@@ -77,15 +90,11 @@ function SessionProvider(props: ParentProps) {
     controller.abort()
   })
 
+  // ---- Sketch operations ----
+
   function createSketch() {
     setWorkingScene(0)
     setWorkingSketch(db.createSketch({ author: user().name }))
-  }
-
-  function handleSetWorkingSketch(sketch: SketchSetter, clone = true) {
-    const s = typeof sketch === 'function' ? sketch(workingSketch()) : sketch
-    if (clone) setWorkingSketch(structuredClone(s))
-    else setWorkingSketch(s)
   }
 
   async function saveSketch(code: string) {
@@ -119,11 +128,14 @@ function SessionProvider(props: ParentProps) {
     }
   }
 
+  // ---- Scene operations ----
+
   function switchScene(dir: 1 | -1 = 1) {
     const max = workingSketch().scenes.length
     const next = workingScene() + dir
     if (next < 0 || next >= max) return
 
+    // Flush editor content into the working sketch before moving away
     const ed = editor()
     if (ed) {
       const currentCode = ed.state.doc.toString()
