@@ -4,181 +4,224 @@ import type { DromeEventCallback, DromeEventType, Metronome } from "@/types.js";
 
 type ListenerMap = Map<DromeEventType, Set<DromeEventCallback>>;
 
-class AudioClock {
-  static lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
-  static scheduleAheadTime = 0.1; // How far ahead to schedule audio (sec)
-  static lookaheadOffset = 0.1;
+export class AudioClock {
+  // Timing Configuration (ms and seconds)
+  static lookahead = 25.0;
+  static scheduleAheadTime = 0.1;
+
+  /**
+   * The "Before" Lead Time.
+   * This ensures "before" callbacks fire at least 100ms early,
+   * giving the main thread plenty of time to process them before
+   * the actual audio-triggering "on" callbacks fire.
+   */
+  static beforeLeadTime = 0.1;
 
   readonly ctx: AudioContext;
   readonly metronome: Metronome = { beat: 0, bar: 0 };
-  private _timeOrigin: number;
-  private _paused = true;
-  private _bpm = 120;
 
-  private _barStart = 0.0;
-  private _nextBeatStart = 0.0;
-  private _preEventFired = false;
-  private timerID: ReturnType<typeof setTimeout> | null = null;
+  private _bpm: number;
+  private _beatsPerBar: number;
+  private _running: boolean = false;
+  private _timerId: any = null;
+
+  // Real-time pointers for "On" events
+  private _nextBeatTime: number = 0;
+  private _currentBeat: number = 0;
+  private _currentBar: number = 0;
+  private _barStart: number = 0;
+
+  // Lookahead pointers for "Before" events
+  private _nextBeforeTime: number = 0;
+  private _beforeBeatCount: number = 0;
+  private _beforeBarCount: number = 0;
+
   private listeners: ListenerMap = new Map();
 
-  constructor(ctx: AudioContext, bpm = 120) {
+  constructor(ctx: AudioContext, bpm = 120, beatsPerBar = 4) {
     this.ctx = ctx;
-    this._timeOrigin = performance.now() - this.ctx.currentTime * 1000;
-    this.bpm(bpm);
+    this._bpm = bpm;
+    this._beatsPerBar = beatsPerBar;
   }
 
-  private schedule() {
-    const { scheduleAheadTime, lookaheadOffset } = AudioClock;
-    const timeUntilNextBeat = this._nextBeatStart - this.ctx.currentTime;
+  private scheduler() {
+    if (!this._running) return;
 
-    if (!this._preEventFired && timeUntilNextBeat <= lookaheadOffset) {
-      const nextBeat = (this.metronome.beat + 1) % 4;
-      const nextBar =
-        nextBeat === 0 ? this.metronome.bar + 1 : this.metronome.bar;
+    const horizon = this.ctx.currentTime + AudioClock.scheduleAheadTime;
 
-      // Fire preBeat
-      this.listeners
-        .get("prebeat")
-        ?.forEach((cb) =>
-          cb({ beat: nextBeat, bar: nextBar }, this._nextBeatStart),
-        );
-
-      // Fire preBar if the next beat is 0
-      if (nextBeat === 0) {
-        this.listeners
-          .get("prebar")
-          ?.forEach((cb) =>
-            cb({ beat: nextBeat, bar: nextBar }, this._nextBeatStart),
-          );
-      }
-
-      this._preEventFired = true;
+    /** * 1. PROCESS "BEFORE" CALLBACKS
+     * We look further into the future (horizon + lead time) for these.
+     */
+    while (this._nextBeforeTime < horizon + AudioClock.beforeLeadTime) {
+      this.fireBeforeCallbacks(
+        this._beforeBeatCount,
+        this._beforeBarCount,
+        this._nextBeforeTime,
+      );
+      this.advanceBefore();
     }
 
-    while (this._nextBeatStart < this.ctx.currentTime + scheduleAheadTime) {
-      this._preEventFired = false;
-      this.metronome.beat = (this.metronome.beat + 1) % 4;
-
-      if (this.metronome.beat === 0) {
-        this.metronome.bar++;
-        this._barStart = this._nextBeatStart;
-
-        this.listeners.get("bar")?.forEach((cb) => {
-          cb({ ...this.metronome }, this._barStart);
-        });
-      }
-
-      this.listeners.get("beat")?.forEach((cb) => {
-        cb({ ...this.metronome }, this._nextBeatStart);
-      });
-
-      this._nextBeatStart += 60.0 / this._bpm;
+    /** * 2. PROCESS "ON" CALLBACKS
+     * These fire exactly when they are supposed to be scheduled.
+     */
+    while (this._nextBeatTime < horizon) {
+      this.fireOnCallbacks(
+        this._currentBeat,
+        this._currentBar,
+        this._nextBeatTime,
+      );
+      this.advanceBeat();
     }
 
-    this.timerID = setTimeout(this.schedule.bind(this), AudioClock.lookahead);
+    this._timerId = setTimeout(() => this.scheduler(), AudioClock.lookahead);
+  }
+
+  private fireBeforeCallbacks(beat: number, bar: number, time: number) {
+    const m = { beat, bar };
+    if (beat === 0) {
+      this.listeners.get("prebar")?.forEach((cb) => cb(m, time));
+    }
+    this.listeners.get("prebeat")?.forEach((cb) => cb(m, time));
+  }
+
+  private fireOnCallbacks(beat: number, bar: number, time: number) {
+    this.metronome.beat = beat;
+    this.metronome.bar = bar;
+    const m = { ...this.metronome };
+    if (beat === 0) {
+      this._barStart = time;
+      this.listeners.get("bar")?.forEach((cb) => cb(m, time));
+    }
+    this.listeners.get("beat")?.forEach((cb) => cb(m, time));
+  }
+
+  private advanceBefore() {
+    this._nextBeforeTime += this.beatDuration;
+    this._beforeBeatCount++;
+    if (this._beforeBeatCount >= this._beatsPerBar) {
+      this._beforeBeatCount = 0;
+      this._beforeBarCount++;
+    }
+  }
+
+  private advanceBeat() {
+    this._nextBeatTime += this.beatDuration;
+    this._currentBeat++;
+    if (this._currentBeat >= this._beatsPerBar) {
+      this._currentBeat = 0;
+      this._currentBar++;
+    }
   }
 
   public async start() {
-    if (!this._paused) return;
+    if (this._running) return;
+
     if (this.ctx.state === "suspended") {
-      console.log("audio context is suspended", this.ctx.state);
       await this.ctx.resume();
     }
-    this.metronome.bar = -1;
-    this.metronome.beat = -1;
-    this._nextBeatStart = this.ctx.currentTime;
-    this._timeOrigin = performance.now() - this.ctx.currentTime * 1000;
-    this.schedule();
-    this._paused = false;
 
-    this.listeners.get("start")?.forEach((cb) => {
-      cb(this.metronome, this._nextBeatStart);
-    });
-  }
+    const startTime = this.ctx.currentTime + 0.05;
 
-  public pause() {
-    if (!this.timerID) return;
-    clearTimeout(this.timerID);
-    this._paused = true;
-    this.listeners.get("pause")?.forEach((cb) => {
-      cb(this.metronome, this.ctx.currentTime);
-    });
+    // Initialize "On" timeline
+    this._currentBeat = 0;
+    this._currentBar = 0;
+    this._nextBeatTime = startTime;
+    this._barStart = startTime;
+
+    // Initialize "Before" timeline to match
+    this._beforeBeatCount = 0;
+    this._beforeBarCount = 0;
+    this._nextBeforeTime = startTime;
+
+    this._running = true;
+    this.scheduler();
+
+    this.listeners
+      .get("start")
+      ?.forEach((cb) => cb({ ...this.metronome }, startTime));
   }
 
   public stop() {
-    this.listeners.get("stop")?.forEach((cb) => {
-      cb(this.metronome, this.ctx.currentTime);
-    });
-
-    this.pause();
-    this.metronome.bar = 0;
-    this.metronome.beat = 0;
-    this._nextBeatStart = 0;
-  }
-
-  public bpm(bpm: number) {
-    if (bpm > 0) this._bpm = bpm;
-  }
-
-  public audioTimeToMIDITime(audioTimeSeconds: number) {
-    return this._timeOrigin + audioTimeSeconds * 1000;
-  }
-
-  public on(type: DromeEventType, fn: DromeEventCallback) {
-    let listenerGroup = this.listeners.get(type);
-    if (!listenerGroup) {
-      listenerGroup = new Set();
-      this.listeners.set(type, listenerGroup);
+    this.listeners
+      .get("stop")
+      ?.forEach((cb) => cb({ ...this.metronome }, this.ctx.currentTime));
+    this._running = false;
+    if (this._timerId) {
+      clearTimeout(this._timerId);
+      this._timerId = null;
     }
-    listenerGroup.add(fn);
-    return () => listenerGroup.delete(fn);
-  }
-
-  public off(type: DromeEventType, fn: DromeEventCallback) {
-    const listenerSet = this.listeners.get(type);
-    if (listenerSet?.has(fn)) listenerSet.delete(fn);
+    this.metronome.beat = 0;
+    this.metronome.bar = 0;
   }
 
   public destroy() {
     this.stop();
-    this.listeners.forEach((map) => map.clear());
+    this.ctx.close();
+    this.listeners.forEach((set) => set.clear());
     this.listeners.clear();
-    if (this.timerID) {
-      clearTimeout(this.timerID);
-      this.timerID = null;
+  }
+
+  // --- Event Registration ---
+
+  public on(type: DromeEventType, fn: DromeEventCallback): () => void {
+    let group = this.listeners.get(type);
+    if (!group) {
+      group = new Set();
+      this.listeners.set(type, group);
     }
+    group.add(fn);
+    return () => group!.delete(fn);
   }
 
-  get paused() {
-    return this._paused;
+  public off(type: DromeEventType, fn: DromeEventCallback) {
+    this.listeners.get(type)?.delete(fn);
   }
 
-  get beatsPerMin() {
+  // --- BPM ---
+
+  public bpm(value: number) {
+    if (value > 0) this._bpm = value;
+  }
+
+  // --- Getters ---
+
+  get paused(): boolean {
+    return !this._running;
+  }
+
+  get beatsPerMin(): number {
     return this._bpm;
   }
 
-  get beatDuration() {
-    return 60.0 / this._bpm;
+  get beatsPerBar(): number {
+    return this._beatsPerBar;
+  }
+  set beatsPerBar(value: number) {
+    this._beatsPerBar = Math.max(1, Math.floor(value));
   }
 
-  get beatStartTime() {
-    return this._nextBeatStart;
+  get beatDuration(): number {
+    return 60 / this._bpm;
   }
 
-  get nextBeatStartTime() {
-    return this._nextBeatStart + this.beatDuration;
+  get beatStartTime(): number {
+    return this._nextBeatTime;
   }
 
-  get barStartTime() {
+  get nextBeatStartTime(): number {
+    return this._nextBeatTime + this.beatDuration;
+  }
+
+  get barStartTime(): number {
     return this._barStart;
   }
 
-  get nextBarStartTime() {
+  get nextBarStartTime(): number {
     return this._barStart + this.barDuration;
   }
 
-  get barDuration() {
-    return this.beatDuration * 4;
+  get barDuration(): number {
+    return this.beatDuration * this._beatsPerBar;
   }
 }
 
