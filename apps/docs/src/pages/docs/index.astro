@@ -5,16 +5,68 @@ import BaseHead from '@/components/BaseHead.astro';
 import Footer from '@/components/Footer.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
 import Header from '@/components/Header.astro';
+import FileTree from '@/components/FileTree.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts';
 
-const posts = (await getCollection('docs')).sort(
+const rawPosts = await getCollection('docs')
+
+const posts = [...rawPosts].sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+type TreeItem =
+  | { type: 'item'; id: string }
+  | { type: 'folder'; id: string; items: TreeItem[] };
+
+  const sortedPosts = rawPosts.sort((a, b) => {
+    const aSegments = a.id.split('/');
+    const bSegments = b.id.split('/');
+
+    // If they are in the same directory (same number of segments)
+    if (aSegments.length === bSegments.length) {
+      return a.id.localeCompare(b.id);
+    }
+
+    // Otherwise, shorter paths (items) come before longer paths (folders)
+    return aSegments.length - bSegments.length;
+  });
+
+const groupedItems = sortedPosts.reduce((tree: TreeItem[], item) => {
+  const segments = item.id.split('/');
+  let currentLevel = tree;
+  let cumulativePath = '';
+
+  segments.forEach((segment, index) => {
+    const isLast = index === segments.length - 1;
+    cumulativePath = cumulativePath ? `${cumulativePath}/${segment}` : segment;
+
+    if (isLast) {
+      // It's a leaf node (the actual item)
+      currentLevel.push({ type: 'item', ...item });
+    } else {
+      // It's a directory/folder level
+      let folder = currentLevel.find(
+        (node): node is Extract<TreeItem, { type: 'folder' }> =>
+          node.type === 'folder' && node.id === cumulativePath
+      );
+
+      if (!folder) {
+        folder = { type: 'folder', id: cumulativePath, items: [] };
+        currentLevel.push(folder);
+      }
+
+      // Move the pointer to the next level's array
+      currentLevel = folder.items;
+    }
+  });
+
+  return tree;
+}, []);
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
+    <head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
 			main {
@@ -89,6 +141,7 @@ const posts = (await getCollection('docs')).sort(
 	<body>
 		<Header />
 		<main>
+  <FileTree tree={groupedItems} />
 			<section>
 				<ul>
 					{

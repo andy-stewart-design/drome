@@ -1,0 +1,50 @@
+---
+// FileTree.astro
+interface Props {
+  tree: any[]; // You can use the TreeItem type from the previous step
+}
+
+const { tree } = Astro.props;
+---
+
+<ul class="file-tree">
+  {tree.map((node) => (
+    <li>
+      {node.type === 'folder' ? (
+        <details open>
+          <summary>
+            <strong>{node.id.split('/').pop()}</strong>
+          </summary>
+          {/* Recursive call: the component renders itself for sub-items */}
+          <Astro.self tree={node.items} />
+        </details>
+      ) : (
+        <span class="file-item">
+          {node.id.split('/').pop()}
+        </span>
+      )}
+    </li>
+  ))}
+</ul>
+
+<style>
+  .file-tree {
+    list-style-type: none;
+    padding-left: 1.5rem;
+  }
+
+  summary {
+    cursor: pointer;
+    padding: 2px 5px;
+  }
+
+  summary:hover {
+    background-color: #f0f0f0;
+  }
+
+  .file-item {
+    display: block;
+    padding: 2px 5px;
+    color: #444;
+  }
+</style>
