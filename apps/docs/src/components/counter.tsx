@@ -1,19 +1,27 @@
 import { createSignal } from "solid-js";
 import { useStore } from "@nanostores/solid";
-import { sharedCount } from "@/stores/test";
+import { drome } from "@/stores/drome";
 
-function Counter() {
+function Counter({ code }: { code?: string }) {
   const [count, setCount] = createSignal(0);
-  const $sharedCount = useStore(sharedCount);
+  const $drome = useStore(drome);
+  const c = code ?? "d.synth().push()";
+
+  function handleClick() {
+    const d = $drome();
+    if (!d) return;
+
+    if (d.paused) {
+      d.evaluate(code ?? "d.synth().push()");
+      d.start();
+    } else {
+      d.stop();
+    }
+  }
 
   return (
     <div>
-      <button onClick={() => setCount((c) => c + 1)}>
-        The isolated count is {count()}
-      </button>
-      <button onClick={() => sharedCount.set($sharedCount() + 1)}>
-        The shared count is {$sharedCount()}
-      </button>
+      <button onClick={handleClick}>Play {c}</button>
     </div>
   );
 }
