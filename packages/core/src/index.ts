@@ -131,7 +131,8 @@ class Drome {
 
     if (!this.clock.paused) return;
     if (this._suspendTimeoutId) clearTimeout(this._suspendTimeoutId);
-    await this._sampleManager.preloadSamples(this.instruments);
+    const queued = this._sessionManager.queue?.instruments ?? new Set();
+    await this._sampleManager.preloadSamples(new Set([...this.instruments, ...queued]));
     this._sessionManager.start();
   }
 
