@@ -380,12 +380,12 @@ abstract class Instrument<T> {
   }
 
   midi(identifier: string, velocity?: number) {
-    if (!this._drome.midi) {
+    if (!this._drome.midiController) {
       console.warn("Must enable MIDI access before using midi commands.");
       return this;
     }
 
-    const router = this._drome.midi?.createRouter(identifier);
+    const router = this._drome.midiController?.createRouter(identifier);
 
     if (!router) {
       console.warn(`Could not find MIDI device for: ${identifier}`);
@@ -463,7 +463,7 @@ abstract class Instrument<T> {
       this._signalChain.clear();
     }
     if (this._midiRouter) {
-      this._drome.midi?.removeRouter(this._midiRouter);
+      this._drome.midiController?.removeRouter(this._midiRouter);
       this._midiRouter.destroy();
     }
     this._connectorNode.disconnect();

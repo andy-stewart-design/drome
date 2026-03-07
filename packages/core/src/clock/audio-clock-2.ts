@@ -2,7 +2,7 @@ import type { DromeEventCallback, DromeEventType, Metronome } from "@/types.js";
 
 type ListenerMap = Map<DromeEventType, Set<DromeEventCallback>>;
 
-class AudioClock {
+export class AudioClock {
   // Timing Configuration (ms and seconds)
   static lookahead = 25.0;
   static scheduleAheadTime = 0.1;
