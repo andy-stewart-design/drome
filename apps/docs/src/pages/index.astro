@@ -2,7 +2,7 @@
 import BaseHead from "@/components/BaseHead.astro";
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
-import Counter from "@/components/counter";
+import CodeEditor from "@/components/code-editor";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/consts";
 ---
 
@@ -15,8 +15,8 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "@/consts";
     <Header />
     <main>
       <h1>🧑‍🚀 Hello, Astronaut!</h1>
-      <Counter code="d.synth().note([60,64,67,71]).push()" client:load />
-      <Counter code="d.sample('bd').hex('f').push()" client:load />
+      <CodeEditor client:load code="d.synth().note([60,64,67,71]).push()" />
+      <CodeEditor client:load code="d.sample('bd').hex('f').push()" />
       <p>
         Welcome to the official <a href="https://astro.build/">Astro</a> blog starter
         template. This template serves as a lightweight, minimally-styled starting
