@@ -18,4 +18,6 @@
   - LFOs
   - MIDI
 - Working with the Editor
+  - Scenes
+  - Keyboard Shortcuts
   - Logging
