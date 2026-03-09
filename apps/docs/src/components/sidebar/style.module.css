@@ -16,4 +16,5 @@
   display: block;
   padding: 2px 5px;
   color: #444;
+  text-transform: lowercase;
 }

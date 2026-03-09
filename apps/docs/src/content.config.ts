@@ -12,6 +12,7 @@ const docs = defineCollection({
       // Transform string to Date object
       pubDate: z.coerce.date(),
       updatedDate: z.coerce.date().optional(),
+      order: z.number().optional(),
       heroImage: image().optional(),
     }),
 });
