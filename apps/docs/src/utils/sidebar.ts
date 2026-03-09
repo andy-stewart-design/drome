@@ -54,4 +54,4 @@ function buildSidebar<T extends { id: string }>(items: T[]): TreeItem<T>[] {
   return groupedItems;
 }
 
-export { buildSidebar };
+export { buildSidebar, type TreeItem };
