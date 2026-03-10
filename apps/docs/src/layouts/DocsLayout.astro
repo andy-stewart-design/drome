@@ -15,7 +15,7 @@ const rawPosts = await getCollection("docs");
 
 const groupedItems = buildSidebar(rawPosts);
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, published, updated, heroImage } = Astro.props;
 ---
 
 <html lang="en">

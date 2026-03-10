@@ -1,7 +1,8 @@
 ---
 title: "Samplers"
 description: "Lorem ipsum dolor sit amet"
-pubDate: "Jul 08 2022"
+published: "Jul 08 2022"
+updated: "Jul 08 2022"
 order: 2
 ---
 

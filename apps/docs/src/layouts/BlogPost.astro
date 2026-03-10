@@ -13,7 +13,7 @@ type Props = CollectionEntry<"docs">["data"];
 const rawPosts = await getCollection("docs");
 const groupedItems = buildSidebar(rawPosts);
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, published, updated, heroImage } = Astro.props;
 ---
 
 <html lang="en">
@@ -64,17 +64,10 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
       <article>
         <div class="prose">
           <div class="title">
-            <div class="date">
-              <FormattedDate date={pubDate} />
-              {
-                updatedDate && (
-                  <div class="last-updated-on">
-                    Last updated on <FormattedDate date={updatedDate} />
-                  </div>
-                )
-              }
-            </div>
             <h1>{title}</h1>
+            <div class="date">
+              Last updated: <FormattedDate date={updated ?? published} />
+            </div>
             <hr />
           </div>
           <slot />
