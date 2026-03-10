@@ -34,35 +34,32 @@ const { title, description, published, updated, heroImage } = Astro.props;
         top: 0;
         height: 100dvh;
         overflow-y: scroll;
-        /*overscroll-behavior-block: contain;*/
         padding-block: 1.5rem;
+      }
+
+      .title {
+        margin-bottom: 2rem;
+        padding: 0;
+        line-height: 1;
+
+        h1 {
+          margin: 0 0 1rem 0;
+        }
+      }
+
+      .date {
+        color: var(--app-color-fg-tertiary);
+        margin-bottom: 2rem;
       }
 
       .prose {
         margin: auto;
         padding-block: 1.5rem;
-        color: rgb(var(--gray-dark));
 
         p {
           max-width: 64ch;
           text-wrap: pretty;
         }
-      }
-      .title {
-        margin-bottom: 1em;
-        padding: 0;
-        /*text-align: center;*/
-        line-height: 1;
-      }
-      .title h1 {
-        margin: 0 0 0.5em 0;
-      }
-      .date {
-        margin-bottom: 0.5em;
-        color: rgb(var(--gray));
-      }
-      .last-updated-on {
-        font-style: italic;
       }
     </style>
   </head>
@@ -71,7 +68,13 @@ const { title, description, published, updated, heroImage } = Astro.props;
     <Header />
     <main>
       <aside class="sidebar">
-        <div class="sticky"><Sidebar tree={groupedItems} client:load /></div>
+        <div class="sticky">
+          <Sidebar
+            tree={groupedItems}
+            currentPath={Astro.url.pathname}
+            client:load
+          />
+        </div>
       </aside>
       <article>
         <div class="prose">

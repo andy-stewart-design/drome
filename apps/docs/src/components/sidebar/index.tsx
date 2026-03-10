@@ -5,6 +5,7 @@ import type { CollectionEntry } from "astro:content";
 
 interface SidebarProps<T extends CollectionEntry<"docs">> {
   tree: TreeItem<T>[];
+  currentPath: string;
 }
 
 function Sidebar<T extends CollectionEntry<"docs">>(props: SidebarProps<T>) {
@@ -18,10 +19,16 @@ function Sidebar<T extends CollectionEntry<"docs">>(props: SidebarProps<T>) {
                 <summary class={s.summary}>
                   {node.id.split("-").join(" ")}
                 </summary>
-                <Sidebar tree={node.items} />
+                <Sidebar tree={node.items} currentPath={props.currentPath} />
               </details>
             ) : (
-              <a href={`/docs/${node.id}`} class={s.fileItem}>
+              <a
+                href={`/docs/${node.id}`}
+                class={`${s.fileItem}${props.currentPath === `/docs/${node.id}` ? ` ${s.active}` : ""}`}
+              >
+                <span class={s.bullet}>
+                  {props.currentPath === `/docs/${node.id}` ? "●" : "○"}
+                </span>
                 {node.data.title}
               </a>
             )}
