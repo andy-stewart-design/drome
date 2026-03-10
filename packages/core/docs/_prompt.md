@@ -1,0 +1,3 @@
+I am working on generating documentation for this live coding music library. I need you to look in src/array and write documentation about working with patterns. Write it in a friendly but straightforward tone that focuses on getting a beginner up to speed on using this language. It may be helpful to look at the docs that have been already created for intruments/synths/samples to get a sense of how these pattern methods are used. Output a mdx file into the docs folder. Feel free to ask if you have any clarifying questions.
+
+One important bit of context: you are in a monorepo, but nothing in this monorepo is relevant to this task outside of the directory you are currently in.

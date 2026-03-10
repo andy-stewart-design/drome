@@ -1,0 +1,291 @@
+# Patterns
+
+Patterns are how you tell Drome *when* sounds happen and how they change over time. Every instrument in Drome — synths, samples, effects — is driven by patterns. Once you understand how patterns work, everything else clicks into place.
+
+## The basics: bars and cycles
+
+Drome is bar-based. Time is divided into bars, and each bar has a fixed number of beats (set by the BPM). On every bar, an instrument plays through one **cycle** — a list of values that are spread evenly across that bar.
+
+```js
+d.sample("bd")
+  .note([0, null, 0, null])  // four steps: hit, rest, hit, rest
+  .push()
+```
+
+Each item in the array is one step. All steps are spread evenly — four steps fill the bar with a hit every quarter note, eight steps fill it with hits every eighth note, and so on.
+
+A **rest** is written as `null`. The instrument stays silent for that step.
+
+## Multiple cycles
+
+When you pass multiple arguments to `.note()`, each one becomes a separate cycle — one per bar. Drome loops through them in order, then starts again.
+
+```js
+d.synth("sine")
+  .note([60, 64, 67], [62, 65, 69])  // two bars, then repeat
+  .push()
+```
+
+This plays the first cycle on bar 1, the second on bar 2, then back to bar 1.
+
+A single value (not an array) is treated as a one-step cycle — the same value every bar:
+
+```js
+.note(60)       // plays MIDI 60 on every bar
+.note(60, 62)   // plays 60 on odd bars, 62 on even bars
+```
+
+Putting it all together: each argument to `.note()` is a bar, and arrays within that argument are the steps within that bar.
+
+```js
+.note(
+  [60, 64, 67],      // bar 1: three notes
+  [60, null, 67],    // bar 2: first note, rest, third note
+  60                 // bar 3: single note
+)
+```
+
+---
+
+## Rhythm patterns
+
+For drum patterns and rhythmic sequences, Drome offers several methods that let you define *when* hits occur without listing every step manually.
+
+### `.xox()`
+
+The most readable way to write a rhythm. Pass a string using `x` for a hit and `.` for a rest. Spaces are ignored, so you can format it however makes sense to you.
+
+```js
+d.sample("bd")
+  .xox("x . . . x . . .")  // kick on beats 1 and 5
+  .push()
+
+d.sample("sd")
+  .xox(". . x . . . x .")  // snare on beats 3 and 7
+  .push()
+```
+
+You can also use `1` and `0` instead of `x` and `.`:
+
+```js
+.xox("1 0 1 0 1 1 0 0")
+```
+
+Pass multiple strings to cycle through different rhythms each bar:
+
+```js
+d.sample("hh")
+  .xox("x x x x x x x x", "x . x . x . x .")  // alternates between bars
+  .push()
+```
+
+---
+
+### `.euclid(pulses, steps, rotation)`
+
+Euclidean rhythms distribute a number of hits as evenly as possible across a total number of steps. They show up everywhere in music — the classic clave, the tresillo, the standard Afro-Cuban patterns — because evenly-spread rhythms tend to feel good.
+
+```js
+d.sample("bd")
+  .euclid(4, 16, 0)   // 4 hits over 16 steps
+  .push()
+```
+
+The three parameters:
+
+| Parameter  | What it does                                           |
+| ---------- | ------------------------------------------------------ |
+| `pulses`   | How many hits                                          |
+| `steps`    | Total number of steps in the pattern                   |
+| `rotation` | Shifts the whole pattern forward by this many steps    |
+
+Some useful ones to start with:
+
+```js
+.euclid(3, 8, 0)   // tresillo — the classic "3 over 8"
+.euclid(5, 8, 0)   // cinquillo
+.euclid(3, 16, 0)  // sparse kick pattern
+.euclid(7, 16, 0)  // dense, driving
+```
+
+**Cycling through different patterns each bar:** pass arrays for `pulses` and `rotation`. Drome will step through them one per bar.
+
+```js
+d.sample("bd")
+  .euclid([3, 5], 8, [0, 2])  // bar 1: 3 pulses, offset 0 / bar 2: 5 pulses, offset 2
+  .push()
+```
+
+---
+
+### `.hex(...values)`
+
+Hex notation packs rhythms into short strings. Each character is a hex digit (0–F), and each hex digit represents 4 steps in binary — so two characters give you 8 steps, four characters give you 16 steps.
+
+```js
+d.sample("hh")
+  .hex("ff")   // "ff" → 1111 1111 → hit every step (all 8)
+  .push()
+
+d.sample("bd")
+  .hex("88")   // "88" → 1000 1000 → hits on steps 1 and 5
+  .push()
+```
+
+How to read it: convert each character to its 4-bit binary value:
+
+| Hex | Binary | Steps           |
+| --- | ------ | --------------- |
+| `0` | `0000` | rest rest rest rest |
+| `8` | `1000` | hit  rest rest rest |
+| `9` | `1001` | hit  rest rest hit  |
+| `a` | `1010` | hit  rest hit  rest |
+| `f` | `1111` | hit  hit  hit  hit  |
+
+So `"89"` gives you the pattern `1000 1001` — hits on steps 1, 5, and 8.
+
+Pass multiple values to cycle through different patterns each bar:
+
+```js
+d.sample("hh")
+  .hex("aa", "ff")  // bar 1: every other step / bar 2: every step
+  .push()
+```
+
+---
+
+### `.sequence(steps, ...pulses)`
+
+Places hits at specific numbered positions within a fixed step grid. The first argument is the total number of steps; the rest are the positions (zero-indexed) where hits should land.
+
+```js
+d.sample("bd")
+  .sequence(8, 0, 4)     // 8-step pattern, hits at positions 0 and 4
+  .push()
+
+d.sample("sd")
+  .sequence(8, 2, 6)     // hits at positions 2 and 6
+  .push()
+```
+
+You can also pass an array for a position to hit multiple steps at once:
+
+```js
+d.sample("hh")
+  .sequence(8, [0, 2, 4, 6])  // four equally spaced hi-hats
+  .push()
+```
+
+---
+
+### `.arrange(...[bars, pattern])`
+
+Repeats patterns for a specific number of bars before moving to the next. Useful for building song structures — verse, chorus, fill, repeat.
+
+```js
+d.sample("bd")
+  .arrange(
+    [3, [0, null, 0, null]],   // standard pattern for 3 bars
+    [1, [0, 0, 0, null]]       // fill on bar 4
+  )
+  .push()
+```
+
+Each pair is `[numberOfBars, pattern]`. The pattern is a single cycle (one bar's worth of steps).
+
+---
+
+## Timing modifiers
+
+These methods reshape how your pattern unfolds in time. They all work on whatever pattern is already set.
+
+### `.fast(n)`
+
+Plays through the pattern `n` times faster. `.fast(2)` means the whole cycle fits into half a bar, so it repeats twice per bar.
+
+```js
+d.sample("hh")
+  .xox("x x x x")
+  .fast(2)   // now it's 8 hi-hats instead of 4
+  .push()
+```
+
+### `.slow(n)`
+
+The opposite of fast — stretches the pattern so it takes `n` bars to complete one full cycle.
+
+```js
+d.sample("bd")
+  .euclid(3, 8, 0)
+  .slow(2)   // the 3-over-8 pattern now takes two bars
+  .push()
+```
+
+### `.stretch(n)`
+
+Like slow, but fills in rests between hits to maintain the total step count. The hits are spaced further apart while the overall pattern stays the same length.
+
+### `.reverse()`
+
+Reverses the order of the pattern — the last cycle becomes the first, and the steps within each cycle are also reversed.
+
+```js
+d.synth("saw")
+  .root("C4").scale("minor")
+  .note([0, 2, 4, 7])
+  .reverse()   // now plays 7, 4, 2, 0
+  .push()
+```
+
+---
+
+## Putting it together
+
+A four-bar drum loop using a mix of pattern methods:
+
+```js
+// Kick: euclidean pattern, repeats every bar
+d.sample("bd")
+  .euclid(4, 16, 0)
+  .push()
+
+// Snare: xox notation
+d.sample("sd")
+  .xox(". . . . x . . . . . . . x . . .")
+  .push()
+
+// Hi-hat: all 16 steps, second bar speeds up
+d.sample("hh")
+  .xox("x x x x x x x x x x x x x x x x")
+  .fast(1)
+  .gain(0.4)
+  .push()
+
+// Bass: 4-bar phrase with an arrange fill
+d.synth("saw")
+  .root("C2")
+  .scale("minor")
+  .arrange(
+    [3, [0, null, 7, null, 5, null, 3, null]],
+    [1, [0, 3, 5, 7, 5, 3, 2, 0]]
+  )
+  .adsr(0.01, 0.1, 0.5, 0.05)
+  .push()
+```
+
+A melody that changes shape each bar using cycling euclid:
+
+```js
+d.synth("triangle")
+  .root("F4")
+  .scale("dorian")
+  .note([0, 2, 4, 5, 7])
+  .euclid([3, 5, 4], 8, [0, 1, 2])  // three different rhythms over three bars
+  .adsr(0.01, 0.2, 0.6, 0.3)
+  .gain(0.5)
+  .push()
+```
+
+---
+
+See [Instruments](./instruments.md) for all shared instrument methods, [Synth](./synth.md) for oscillator-specific options, and [Sample](./sample.md) for sample playback.
