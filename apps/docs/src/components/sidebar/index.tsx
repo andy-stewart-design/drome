@@ -21,7 +21,9 @@ function Sidebar<T extends CollectionEntry<"docs">>(props: SidebarProps<T>) {
                 <Sidebar tree={node.items} />
               </details>
             ) : (
-              <span class={styles.fileItem}>{node.data.title}</span>
+              <a href={`/docs/${node.id}`} class={styles.fileItem}>
+                {node.data.title}
+              </a>
             )}
           </li>
         )}
