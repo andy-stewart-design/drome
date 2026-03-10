@@ -5,12 +5,139 @@ pubDate: "Jul 08 2022"
 order: 2
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+# Sample
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+A sample player loads and plays audio files. Create one with `d.sample()`, passing one or more sample IDs.
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+```js
+d.sample("bd").push(); // bass drum on every bar
+d.sample("bd", "sd").push(); // bass drum and snare layered
+```
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+## Sample IDs and banks
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+Sample IDs are short names for audio files. The default bank is `"tr909"` (a Roland TR-909 drum machine). You can select a specific sample within a bank by appending an index with a colon:
+
+```js
+d.sample("bd"); // first bass drum in tr909
+d.sample("bd:0"); // same thing, explicit index
+d.sample("bd:2"); // third bass drum variant
+d.sample("sd", "hh", "bd"); // snare, hi-hat, and kick simultaneously
+```
+
+#### `.bank(name)`
+
+Switch to a different sample bank.
+
+```js
+d.sample("bd").bank("tr808").push();
+```
+
+## Notes and start positions
+
+For a sample player, note values set where in the sample playback begins. The value is a position from `0` to `1`, where `0` is the very start and `1` is the end.
+
+```js
+d.sample("bd")
+  .note(0) // play from the beginning every bar
+  .push();
+
+d.sample("bd")
+  .note([0, 0.5]) // play from start, then from halfway through
+  .push();
+```
+
+`null` is a rest — no sample plays on that step:
+
+```js
+d.sample("bd")
+  .note([0, null, 0, null]) // kick on beats 1 and 3
+  .push();
+```
+
+## Playback
+
+#### `.rate(n)`
+
+Sets the playback speed. `1` is normal, `2` is double speed (an octave up), `0.5` is half speed (an octave down). A negative value plays the sample in reverse.
+
+```js
+.rate(2)    // double speed
+.rate(-1)   // reverse
+.rate(0.5)  // half speed
+```
+
+#### `.cut()`
+
+Enables cut mode. When active, the sample's duration is determined by the note duration rather than the full sample length — so a note stops when the next note starts, rather than playing out fully. Useful for hi-hats and other sounds where you want tight control over length.
+
+```js
+d.sample("oh").note([0, null, 0, null]).cut().push();
+```
+
+#### `.fit(numBars)`
+
+Stretches the sample to fill the given number of bars, automatically calculating the playback rate. The note pattern is also set to span that many bars. Useful for loops.
+
+```js
+d.sample("loop").fit(2).push(); // fit sample into 2 bars
+```
+
+#### `.begin(...positions)`
+
+Sets the playback start position, as an alternative to `.note()`. Accepts the same cycle format.
+
+```js
+.begin(0, 0.25, 0.5, 0.75)  // step through 4 quarter-positions
+```
+
+#### `.chop(numChops, ...cycles)`
+
+Slices the sample into `numChops` equal chunks and assigns each step a specific chunk. If no `cycles` are given, Drome automatically steps through the chunks in order.
+
+```js
+d.sample("loop")
+  .chop(8) // divide into 8 slices, step through them
+  .push();
+
+d.sample("loop")
+  .chop(4, [0, 2, 1, 3]) // 4 slices, play in custom order
+  .push();
+```
+
+## Examples
+
+A standard four-on-the-floor kick:
+
+```js
+d.sample("bd").note([0, null, 0, null, 0, null, 0, null]).push();
+```
+
+Kick and snare pattern:
+
+```js
+d.sample("bd").euclid(4, 16, 0).push();
+
+d.sample("sd").euclid(2, 16, 4).push();
+```
+
+Hi-hat with varying start positions:
+
+```js
+d.sample("hh")
+  .note([0, 0, 0, 0, 0, 0, 0, 0])
+  .begin("0, 0, 0.1, 0, 0.2, 0, 0.05, 0")
+  .cut()
+  .gain(0.6)
+  .push();
+```
+
+A chopped loop with reverb:
+
+```js
+d.sample("loop").chop(16).gain(0.7).fx(d.reverb(0.3)).push();
+```
+
+---
+
+See [Instruments](./instruments) for all shared methods (gain, ADSR, filter, effects, patterns, etc.).
