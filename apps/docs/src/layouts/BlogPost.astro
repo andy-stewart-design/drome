@@ -22,15 +22,25 @@ const { title, description, published, updated, heroImage } = Astro.props;
     <style>
       main {
         display: grid;
-        grid-template-columns: 320px 1fr;
+        grid-template-columns: 240px 1fr;
         width: calc(100% - 2em);
         max-width: 100%;
         margin: 0;
         padding-block: 0;
       }
+
+      .sticky {
+        position: sticky;
+        top: 0;
+        height: 100dvh;
+        overflow-y: scroll;
+        /*overscroll-behavior-block: contain;*/
+        padding-block: 1.5rem;
+      }
+
       .prose {
         margin: auto;
-        padding: 1em;
+        padding-block: 1.5rem;
         color: rgb(var(--gray-dark));
 
         p {
@@ -40,7 +50,7 @@ const { title, description, published, updated, heroImage } = Astro.props;
       }
       .title {
         margin-bottom: 1em;
-        padding: 1em 0;
+        padding: 0;
         /*text-align: center;*/
         line-height: 1;
       }
@@ -60,7 +70,9 @@ const { title, description, published, updated, heroImage } = Astro.props;
   <body>
     <Header />
     <main>
-      <Sidebar tree={groupedItems} client:load />
+      <aside class="sidebar">
+        <div class="sticky"><Sidebar tree={groupedItems} client:load /></div>
+      </aside>
       <article>
         <div class="prose">
           <div class="title">

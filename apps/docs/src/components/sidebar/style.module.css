@@ -1,20 +1,39 @@
 .fileTree {
   list-style-type: none;
   padding-left: 1.5rem;
+  padding: 0;
+  margin: 0;
+}
+
+.details {
+  line-height: 1;
+  padding-block-start: 0.75lh;
 }
 
 .summary {
+  font-size: 0.875rem;
+  padding-block: 0.25rem;
+  opacity: 0.6;
   cursor: pointer;
-  padding: 2px 5px;
-}
+  padding-block: 0.375rem;
+  list-style: none;
 
-.summary:hover {
-  background-color: #f0f0f0;
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  /*&:hover {
+    background-color: #f0f0f0;
+  }*/
 }
 
 .fileItem {
   display: block;
-  padding: 2px 5px;
+  padding-block: 0.375rem;
   color: #444;
+  font-size: 1rem;
+  line-height: 1;
   text-transform: lowercase;
+  text-decoration: none;
+  width: fit-content;
 }

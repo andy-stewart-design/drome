@@ -16,7 +16,7 @@ import HeaderLink from "./HeaderLink.astro";
 <style>
   header {
     margin: 0;
-    padding: 0 1em;
+    padding: 0 1rem;
   }
   h2 {
     margin: 0;
@@ -30,14 +30,20 @@ import HeaderLink from "./HeaderLink.astro";
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding-block: 1.5rem;
   }
   nav a {
-    padding: 1rem 1rem;
+    padding: 0.5rem 0;
     color: var(--black);
     text-decoration: none;
     line-height: 1;
   }
   nav a.active {
     color: var(--accent);
+  }
+  .internal-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
   }
 </style>
