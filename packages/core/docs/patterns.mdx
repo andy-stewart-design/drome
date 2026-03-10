@@ -1,6 +1,14 @@
+---
+title: "Working with Patterns"
+description: "Lorem ipsum dolor sit amet"
+published: "Jul 08 2022"
+updated: "Jul 08 2022"
+order: 0
+---
+
 # Patterns
 
-Patterns are how you tell Drome *when* sounds happen and how they change over time. Every instrument in Drome — synths, samples, effects — is driven by patterns. Once you understand how patterns work, everything else clicks into place.
+Patterns are how you tell Drome _when_ sounds happen and how they change over time. Every instrument in Drome — synths, samples, effects — is driven by patterns. Once you understand how patterns work, everything else clicks into place.
 
 ## The basics: bars and cycles
 
@@ -8,8 +16,8 @@ Drome is bar-based. Time is divided into bars, and each bar has a fixed number o
 
 ```js
 d.sample("bd")
-  .note([0, null, 0, null])  // four steps: hit, rest, hit, rest
-  .push()
+  .note([0, null, 0, null]) // four steps: hit, rest, hit, rest
+  .push();
 ```
 
 Each item in the array is one step. All steps are spread evenly — four steps fill the bar with a hit every quarter note, eight steps fill it with hits every eighth note, and so on.
@@ -22,8 +30,8 @@ When you pass multiple arguments to `.note()`, each one becomes a separate cycle
 
 ```js
 d.synth("sine")
-  .note([60, 64, 67], [62, 65, 69])  // two bars, then repeat
-  .push()
+  .note([60, 64, 67], [62, 65, 69]) // two bars, then repeat
+  .push();
 ```
 
 This plays the first cycle on bar 1, the second on bar 2, then back to bar 1.
@@ -49,7 +57,7 @@ Putting it all together: each argument to `.note()` is a bar, and arrays within 
 
 ## Rhythm patterns
 
-For drum patterns and rhythmic sequences, Drome offers several methods that let you define *when* hits occur without listing every step manually.
+For drum patterns and rhythmic sequences, Drome offers several methods that let you define _when_ hits occur without listing every step manually.
 
 ### `.xox()`
 
@@ -57,12 +65,12 @@ The most readable way to write a rhythm. Pass a string using `x` for a hit and `
 
 ```js
 d.sample("bd")
-  .xox("x . . . x . . .")  // kick on beats 1 and 5
-  .push()
+  .xox("x . . . x . . .") // kick on beats 1 and 5
+  .push();
 
 d.sample("sd")
-  .xox(". . x . . . x .")  // snare on beats 3 and 7
-  .push()
+  .xox(". . x . . . x .") // snare on beats 3 and 7
+  .push();
 ```
 
 You can also use `1` and `0` instead of `x` and `.`:
@@ -75,8 +83,8 @@ Pass multiple strings to cycle through different rhythms each bar:
 
 ```js
 d.sample("hh")
-  .xox("x x x x x x x x", "x . x . x . x .")  // alternates between bars
-  .push()
+  .xox("x x x x x x x x", "x . x . x . x .") // alternates between bars
+  .push();
 ```
 
 ---
@@ -87,17 +95,17 @@ Euclidean rhythms distribute a number of hits as evenly as possible across a tot
 
 ```js
 d.sample("bd")
-  .euclid(4, 16, 0)   // 4 hits over 16 steps
-  .push()
+  .euclid(4, 16, 0) // 4 hits over 16 steps
+  .push();
 ```
 
 The three parameters:
 
-| Parameter  | What it does                                           |
-| ---------- | ------------------------------------------------------ |
-| `pulses`   | How many hits                                          |
-| `steps`    | Total number of steps in the pattern                   |
-| `rotation` | Shifts the whole pattern forward by this many steps    |
+| Parameter  | What it does                                        |
+| ---------- | --------------------------------------------------- |
+| `pulses`   | How many hits                                       |
+| `steps`    | Total number of steps in the pattern                |
+| `rotation` | Shifts the whole pattern forward by this many steps |
 
 Some useful ones to start with:
 
@@ -112,8 +120,8 @@ Some useful ones to start with:
 
 ```js
 d.sample("bd")
-  .euclid([3, 5], 8, [0, 2])  // bar 1: 3 pulses, offset 0 / bar 2: 5 pulses, offset 2
-  .push()
+  .euclid([3, 5], 8, [0, 2]) // bar 1: 3 pulses, offset 0 / bar 2: 5 pulses, offset 2
+  .push();
 ```
 
 ---
@@ -124,23 +132,23 @@ Hex notation packs rhythms into short strings. Each character is a hex digit (0�
 
 ```js
 d.sample("hh")
-  .hex("ff")   // "ff" → 1111 1111 → hit every step (all 8)
-  .push()
+  .hex("ff") // "ff" → 1111 1111 → hit every step (all 8)
+  .push();
 
 d.sample("bd")
-  .hex("88")   // "88" → 1000 1000 → hits on steps 1 and 5
-  .push()
+  .hex("88") // "88" → 1000 1000 → hits on steps 1 and 5
+  .push();
 ```
 
 How to read it: convert each character to its 4-bit binary value:
 
-| Hex | Binary | Steps           |
-| --- | ------ | --------------- |
+| Hex | Binary | Steps               |
+| --- | ------ | ------------------- |
 | `0` | `0000` | rest rest rest rest |
-| `8` | `1000` | hit  rest rest rest |
-| `9` | `1001` | hit  rest rest hit  |
-| `a` | `1010` | hit  rest hit  rest |
-| `f` | `1111` | hit  hit  hit  hit  |
+| `8` | `1000` | hit rest rest rest  |
+| `9` | `1001` | hit rest rest hit   |
+| `a` | `1010` | hit rest hit rest   |
+| `f` | `1111` | hit hit hit hit     |
 
 So `"89"` gives you the pattern `1000 1001` — hits on steps 1, 5, and 8.
 
@@ -148,8 +156,8 @@ Pass multiple values to cycle through different patterns each bar:
 
 ```js
 d.sample("hh")
-  .hex("aa", "ff")  // bar 1: every other step / bar 2: every step
-  .push()
+  .hex("aa", "ff") // bar 1: every other step / bar 2: every step
+  .push();
 ```
 
 ---
@@ -160,20 +168,20 @@ Places hits at specific numbered positions within a fixed step grid. The first a
 
 ```js
 d.sample("bd")
-  .sequence(8, 0, 4)     // 8-step pattern, hits at positions 0 and 4
-  .push()
+  .sequence(8, 0, 4) // 8-step pattern, hits at positions 0 and 4
+  .push();
 
 d.sample("sd")
-  .sequence(8, 2, 6)     // hits at positions 2 and 6
-  .push()
+  .sequence(8, 2, 6) // hits at positions 2 and 6
+  .push();
 ```
 
 You can also pass an array for a position to hit multiple steps at once:
 
 ```js
 d.sample("hh")
-  .sequence(8, [0, 2, 4, 6])  // four equally spaced hi-hats
-  .push()
+  .sequence(8, [0, 2, 4, 6]) // four equally spaced hi-hats
+  .push();
 ```
 
 ---
@@ -185,10 +193,10 @@ Repeats patterns for a specific number of bars before moving to the next. Useful
 ```js
 d.sample("bd")
   .arrange(
-    [3, [0, null, 0, null]],   // standard pattern for 3 bars
-    [1, [0, 0, 0, null]]       // fill on bar 4
+    [3, [0, null, 0, null]], // standard pattern for 3 bars
+    [1, [0, 0, 0, null]], // fill on bar 4
   )
-  .push()
+  .push();
 ```
 
 Each pair is `[numberOfBars, pattern]`. The pattern is a single cycle (one bar's worth of steps).
@@ -206,8 +214,8 @@ Plays through the pattern `n` times faster. `.fast(2)` means the whole cycle fit
 ```js
 d.sample("hh")
   .xox("x x x x")
-  .fast(2)   // now it's 8 hi-hats instead of 4
-  .push()
+  .fast(2) // now it's 8 hi-hats instead of 4
+  .push();
 ```
 
 ### `.slow(n)`
@@ -217,8 +225,8 @@ The opposite of fast — stretches the pattern so it takes `n` bars to complete 
 ```js
 d.sample("bd")
   .euclid(3, 8, 0)
-  .slow(2)   // the 3-over-8 pattern now takes two bars
-  .push()
+  .slow(2) // the 3-over-8 pattern now takes two bars
+  .push();
 ```
 
 ### `.stretch(n)`
@@ -231,10 +239,11 @@ Reverses the order of the pattern — the last cycle becomes the first, and the 
 
 ```js
 d.synth("saw")
-  .root("C4").scale("minor")
+  .root("C4")
+  .scale("minor")
   .note([0, 2, 4, 7])
-  .reverse()   // now plays 7, 4, 2, 0
-  .push()
+  .reverse() // now plays 7, 4, 2, 0
+  .push();
 ```
 
 ---
@@ -245,21 +254,13 @@ A four-bar drum loop using a mix of pattern methods:
 
 ```js
 // Kick: euclidean pattern, repeats every bar
-d.sample("bd")
-  .euclid(4, 16, 0)
-  .push()
+d.sample("bd").euclid(4, 16, 0).push();
 
 // Snare: xox notation
-d.sample("sd")
-  .xox(". . . . x . . . . . . . x . . .")
-  .push()
+d.sample("sd").xox(". . . . x . . . . . . . x . . .").push();
 
 // Hi-hat: all 16 steps, second bar speeds up
-d.sample("hh")
-  .xox("x x x x x x x x x x x x x x x x")
-  .fast(1)
-  .gain(0.4)
-  .push()
+d.sample("hh").xox("x x x x x x x x x x x x x x x x").fast(1).gain(0.4).push();
 
 // Bass: 4-bar phrase with an arrange fill
 d.synth("saw")
@@ -267,10 +268,10 @@ d.synth("saw")
   .scale("minor")
   .arrange(
     [3, [0, null, 7, null, 5, null, 3, null]],
-    [1, [0, 3, 5, 7, 5, 3, 2, 0]]
+    [1, [0, 3, 5, 7, 5, 3, 2, 0]],
   )
   .adsr(0.01, 0.1, 0.5, 0.05)
-  .push()
+  .push();
 ```
 
 A melody that changes shape each bar using cycling euclid:
@@ -280,10 +281,10 @@ d.synth("triangle")
   .root("F4")
   .scale("dorian")
   .note([0, 2, 4, 5, 7])
-  .euclid([3, 5, 4], 8, [0, 1, 2])  // three different rhythms over three bars
+  .euclid([3, 5, 4], 8, [0, 1, 2]) // three different rhythms over three bars
   .adsr(0.01, 0.2, 0.6, 0.3)
   .gain(0.5)
-  .push()
+  .push();
 ```
 
 ---
