@@ -78,13 +78,14 @@ b {
   font-weight: 700;
 }
 a {
-  color: var(--accent);
+  color: var(--app-color-fg-primary);
 }
 a:hover {
-  color: var(--accent);
+  color: var(--app-color-fg-primary);
 }
 p {
   margin-bottom: 1em;
+  color: var(--app-color-fg-secondary);
 }
 .prose p {
   margin-bottom: 2em;
@@ -124,7 +125,7 @@ blockquote {
 }
 hr {
   border: none;
-  border-top: 1px solid rgb(var(--gray-light));
+  border-top: 1px solid var(--app-color-border-subtle);
 }
 @media (max-width: 720px) {
   body {
