@@ -1,0 +1,136 @@
+---
+title: Samplers
+description: Playing audio samples in Drome
+---
+
+# Samplers
+
+A sampler in Drome plays audio files from a sample bank. You create one with `d.sample()`, passing in one or more sample names.
+
+```js
+d.sample('bd').note(1, null, null, null).push()
+```
+
+## Creating a sampler
+
+```js
+d.sample(...sampleIds)
+```
+
+Pass one or more sample names. Sample names refer to files in the active sample bank. The default bank is `tr909`.
+
+```js
+d.sample('bd')           // bass drum
+d.sample('sd')           // snare
+d.sample('hh')           // hi-hat
+d.sample('bd', 'sd')     // plays both samples together on each hit
+```
+
+To target a specific variation within a sample folder (where the folder contains multiple files), use the colon syntax:
+
+```js
+d.sample('hh:0')   // first hi-hat
+d.sample('hh:3')   // fourth hi-hat
+```
+
+## Switching sample banks
+
+Use `.bank()` to change which sample bank the instrument pulls from.
+
+```js
+d.sample('bd').bank('tr808').note(1, null, null, null).push()
+```
+
+## Triggering samples
+
+The `.note()` method controls when the sample plays. Use `1` (or any truthy number) to trigger, `null` to rest:
+
+```js
+d.sample('bd').note(1, null, null, null).push()    // beat 1 only
+d.sample('sd').note(null, null, 1, null).push()    // beat 3 only
+d.sample('hh').note(1, 1, 1, 1).push()            // every beat
+```
+
+## Playback options
+
+### rate
+
+Sets the playback rate. `1` is normal speed, `2` is double, `0.5` is half. Use a negative value to play the sample in reverse.
+
+```js
+.rate(1)     // normal
+.rate(2)     // double speed (higher pitch)
+.rate(0.5)   // half speed (lower pitch)
+.rate(-1)    // reversed
+```
+
+### begin
+
+Offsets the start point within the sample (0–1 range, where 0 is the beginning and 1 is the end).
+
+```js
+.begin(0)     // start from the beginning (default)
+.begin(0.5)   // start halfway through
+```
+
+Like `.note()`, you can pass multiple values to sweep through the sample:
+
+```js
+d.sample('vocals').begin(0, 0.25, 0.5, 0.75).push()
+```
+
+### chop
+
+Divides the sample into equal slices and plays them in sequence — a classic chopping technique.
+
+```js
+.chop(8)            // chop into 8 slices, play them in order
+.chop(4, 0, 2, 1, 3)  // chop into 4, play slices 0, 2, 1, 3
+```
+
+Without extra arguments, `chop` plays all slices sequentially across the bar. With arguments, you specify which slice plays at each step.
+
+### fit
+
+Stretches the sample to fill a set number of bars, adjusting playback rate automatically.
+
+```js
+.fit()     // fit the sample into 1 bar
+.fit(2)    // fit into 2 bars
+.fit(4)    // fit into 4 bars
+```
+
+### cut
+
+By default, samples play to their natural end even if they're longer than the step they're assigned to. `.cut()` makes the sample stop at the boundary of its step instead.
+
+```js
+d.sample('hh').note(1, 1, 1, 1).cut().push()
+```
+
+## Full example
+
+```js
+d.sample('bd')
+  .note(1, null, null, null, 1, null, 1, null)
+  .gain(0.9)
+  .push()
+
+d.sample('sd')
+  .note(null, null, 1, null)
+  .gain(0.7)
+  .adsr(0, 0, 1, 0.05)
+  .push()
+
+d.sample('hh:2')
+  .note(1, 1, 1, 1, 1, 1, 1, 1)
+  .gain(0.4)
+  .fx(d.pan(-0.3))
+  .push()
+
+d.sample('bass')
+  .bank('custom')
+  .begin(0, 0.25, 0.5, 0.75)
+  .gain(0.8)
+  .push()
+```

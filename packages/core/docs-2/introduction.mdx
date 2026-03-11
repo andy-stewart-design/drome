@@ -1,0 +1,40 @@
+---
+title: Introduction
+description: Drome is a minimalist live coding language for the web
+---
+
+# Introduction
+
+Drome is a live coding language for making music in the browser. You write JavaScript, hit run, and sound comes out — no compilation step, no build tools, no boilerplate.
+
+It's designed around the idea of a **bar**: a repeating unit of time that you fill with notes, samples, and patterns. Every time the bar loops, Drome replays whatever you've set up. Change your code and hit run again — your changes take effect at the start of the next bar, so the music never stumbles.
+
+## What you get
+
+- **A synthesizer** — oscillator-based with waveform control, scales, and voices
+- **A sampler** — play audio files with pattern-based triggering
+- **Effects** — reverb, delay, distortion, bitcrusher, filter, gain, pan
+- **Automation** — ADSR envelopes and LFOs to modulate any parameter over time
+- **Pattern sequencing** — a flexible system for expressing rhythmic and melodic patterns in plain JavaScript
+- **MIDI I/O** — send notes to external instruments or use CC values to control parameters
+
+Drome runs entirely in the browser using the Web Audio API. There's no server, no plugins, nothing to install.
+
+## How it's structured
+
+Everything in Drome flows through a single object — conventionally called `d` or `drome`. You use it to create instruments and effects, then describe what those instruments should play using pattern methods.
+
+```js
+const d = await Drome.init(120) // 120 BPM
+await d.start()
+
+d.synth('sine')
+  .root('C4')
+  .scale('minor')
+  .note(0, 2, 4, 5)
+  .push()
+```
+
+That's it. A sine wave synth, rooted at C4, playing the first four degrees of a minor scale, one per beat. The `.push()` at the end registers the instrument for the next bar.
+
+Every evaluation is **stateless by default** — each time you run your code, Drome starts fresh with only what you've defined in that block.

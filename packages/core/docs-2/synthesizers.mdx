@@ -1,0 +1,113 @@
+---
+title: Synthesizers
+description: Oscillator-based synthesis with Drome
+---
+
+# Synthesizers
+
+A synth in Drome is an oscillator-based instrument. You create one with `d.synth()`, passing in one or more waveform types.
+
+```js
+d.synth('sine').root('C4').note(0).push()
+```
+
+## Creating a synth
+
+```js
+d.synth(...waveforms)
+```
+
+Pass one or more waveform types. Multiple waveforms layer on top of each other (useful for thick sounds).
+
+```js
+d.synth('sine')                  // single waveform
+d.synth('saw', 'sine')           // layered waveforms
+d.synth('supersaw')              // supersaw (multiple detuned saws)
+```
+
+### Available waveforms
+
+| Alias | Waveform |
+|-------|----------|
+| `'sine'`, `'sin'` | Sine wave |
+| `'sawtooth'`, `'saw'` | Sawtooth wave |
+| `'square'`, `'sq'` | Square wave |
+| `'triangle'`, `'tri'` | Triangle wave |
+| `'supersaw'`, `'ssaw'`, `'sup'` | Supersaw (multiple detuned saws) |
+
+## Notes and pitch
+
+The synth's `.note()` method accepts MIDI note numbers (integers) or scale degrees if a root and scale are set.
+
+### Root note
+
+Sets the root note for scale-relative playback. Accepts a MIDI number or a note name with octave.
+
+```js
+.root(60)      // MIDI 60 = C4
+.root('C4')    // same thing
+.root('F#3')   // F sharp in octave 3
+```
+
+### Scale
+
+Sets the scale for interpreting note values. Without a scale, `.note()` values are treated as raw MIDI numbers.
+
+```js
+.scale('major')        // C major (relative to root)
+.scale('minor')        // natural minor
+.scale('dorian')       // dorian mode
+.scale('phrygian')
+.scale('lydian')
+.scale('mixolydian')
+.scale('locrian')
+```
+
+Short aliases also work: `'maj'`, `'min'`, `'dor'`, `'phr'`, `'lyd'`, `'mix'`, `'loc'`.
+
+With a root of `'C4'` and a `'major'` scale:
+
+```js
+.note(0, 2, 4, 7)   // C4, E4, G4, C5
+.note(0, 1, 2, 3, 4, 5, 6)  // full scale ascending
+```
+
+Negative values go below the root; values above 6 go up to the next octave.
+
+### Raw MIDI notes (no scale)
+
+Without `.scale()`, note values are treated as MIDI note numbers directly:
+
+```js
+d.synth('sine').note(60, 64, 67).push()  // C, E, G — a C major chord
+```
+
+## Voices (unison)
+
+The `.voices()` method sets how many oscillators play in unison, slightly detuned from each other. This thickens the sound.
+
+```js
+.voices(1)   // no unison (default)
+.voices(4)   // four oscillators slightly detuned
+.voices(7)   // seven oscillators (very thick)
+```
+
+Like `.note()`, you can pass multiple values to change the voice count per bar:
+
+```js
+.voices(1, 4, 7, 4)   // varies each bar
+```
+
+## Full example
+
+```js
+d.synth('saw', 'sine')
+  .root('A3')
+  .scale('minor')
+  .note(0, 2, 3, 5, 7)
+  .voices(3)
+  .gain(0.4)
+  .adsr(0.05, 0.1, 0.7, 0.3)
+  .fx(d.reverb(0.25), d.filter('lp', 1200))
+  .push()
+```

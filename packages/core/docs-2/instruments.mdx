@@ -1,0 +1,121 @@
+---
+title: Instruments
+description: Overview of instruments in Drome
+---
+
+# Instruments
+
+Instruments are the sound-making objects in Drome. There are three kinds:
+
+- **Synth** — oscillator-based synthesis
+- **Sample** — audio file playback
+- **Stack** — multiple instruments grouped together
+
+All instruments share a common set of methods for controlling gain, envelopes, filters, detune, effects routing, and MIDI output. The pattern methods (`.note()`, `.euclid()`, `.xox()`, etc.) are also available on all instruments.
+
+## The instrument lifecycle
+
+1. **Create** — call `d.synth()`, `d.sample()`, or `d.stack()`
+2. **Configure** — chain methods to set up sound, pattern, and effects
+3. **Register** — call `.push()` to add the instrument to the next bar
+
+```js
+d.synth('sine')          // 1. create
+  .root('C4')            // 2. configure
+  .note(0, 2, 4)
+  .gain(0.7)
+  .push()                // 3. register
+```
+
+Instruments that aren't `.push()`ed when you re-evaluate your code will stop playing at the end of the current bar.
+
+## Shared methods
+
+These methods are available on `Synth`, `Sample`, and `Stack`.
+
+### gain
+
+Sets the volume. Accepts a number between 0 and 1, or a pattern string.
+
+```js
+.gain(0.5)          // constant gain
+.gain('0.5 0.8')    // alternates between 0.5 and 0.8 each bar
+```
+
+### adsr / env
+
+Sets the ADSR envelope for the gain. Times are in seconds; sustain is a ratio (0–1).
+
+```js
+.adsr(attack, decay, sustain, release)
+.adsr(0.01, 0.1, 0.8, 0.2)
+
+// Short alias:
+.env(0.01, 0.1, 0.8, 0.2)
+```
+
+You can also set individual stages:
+
+```js
+.att(0.01)   // attack
+.dec(0.1)    // decay
+.sus(0.8)    // sustain
+.rel(0.2)    // release
+```
+
+### filter / fil
+
+Adds a filter to the instrument's signal. Type can be `'lp'` (lowpass), `'hp'` (highpass), or `'bp'` (bandpass). Frequency is in Hz.
+
+```js
+.filter('lp', 800)           // lowpass at 800 Hz
+.filter('hp', 200, 2)        // highpass at 200 Hz, Q of 2
+.fil('lp', 800)              // short alias
+```
+
+The frequency can also be an envelope or LFO — see the Envelopes and LFOs pages.
+
+### detune / dt
+
+Detunes the instrument in cents (100 cents = 1 semitone). Accepts a number, a pattern string, an envelope, or an LFO.
+
+```js
+.detune(50)          // detune by 50 cents
+.dt(50)              // short alias
+.detune('0 100')     // alternate 0 and 100 cents each bar
+```
+
+### effects / fx
+
+Routes the instrument's signal through one or more effects. Effects are applied in the order you provide them.
+
+```js
+.effects(d.reverb(0.3), d.delay(0.25, 0.4))
+.fx(d.reverb(0.3))   // short alias
+```
+
+### mute
+
+Silences the instrument without removing it.
+
+```js
+.mute()         // mute
+.mute(false)    // unmute
+```
+
+### legato / leg
+
+See the Pattern Methods page.
+
+### reverse / rev
+
+See the Pattern Methods page.
+
+### midi
+
+Routes the instrument's notes to a MIDI output device.
+
+```js
+.midi('My Synth')
+.midi('My Synth').midichan(1)   // send on channel 1
+```

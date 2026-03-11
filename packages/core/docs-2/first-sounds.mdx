@@ -1,0 +1,72 @@
+---
+title: First Sounds
+description: Making your first sounds with Drome
+---
+
+# First Sounds
+
+## Initialization
+
+Before you can make any sound, you need to create a Drome instance and start the clock.
+
+```js
+const d = await Drome.init(120) // 120 BPM
+await d.start()
+```
+
+`Drome.init()` sets up the Web Audio context and the internal clock. `d.start()` begins playback. You only need to do this once — after that, every time you re-run your code, the bar restarts with your new setup.
+
+## A simple synth
+
+The fastest way to hear something is a synth with a note:
+
+```js
+d.synth('sine').note(60).push()
+```
+
+This plays MIDI note 60 (middle C) once per bar, using a sine wave oscillator. `.push()` registers the instrument — without it, nothing plays.
+
+## A simple drum beat
+
+The `sample` instrument plays audio files. Drome ships with a default sample bank (`tr909`):
+
+```js
+d.sample('bd').note(1, null, null, null).push()   // kick on beat 1
+d.sample('sd').note(null, null, 1, null).push()   // snare on beat 3
+d.sample('hh').note(1, 1, 1, 1).push()            // hi-hats every beat
+```
+
+`null` means silence for that step. `1` means play.
+
+## Combining the two
+
+Synths and samples work independently — just `.push()` both:
+
+```js
+d.synth('saw')
+  .root('C3')
+  .scale('minor')
+  .note(0, 4, 7, 4)
+  .push()
+
+d.sample('bd').note(1, null, null, null).push()
+d.sample('hh').note(1, 1, 1, 1).push()
+```
+
+## Stopping
+
+Call `d.stop()` to stop playback. It fades everything out gracefully.
+
+```js
+d.stop()
+```
+
+To change the BPM at any time:
+
+```js
+d.bpm(140)
+```
+
+## What happens when you re-run
+
+Every time you evaluate your code, Drome clears the current instrument queue and rebuilds it from what's in your code. Instruments that aren't `.push()`ed in the new evaluation disappear on the next bar. This makes it easy to remove a part — just delete the line.

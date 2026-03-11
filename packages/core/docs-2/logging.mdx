@@ -1,0 +1,122 @@
+---
+title: Logging
+description: Using events and logging to observe what's happening in Drome
+---
+
+# Logging
+
+Drome fires events on a clock that you can listen to. These are useful for debugging, displaying information in your editor, or syncing visuals to the music.
+
+## d.on
+
+```js
+d.on(eventType, callback)
+```
+
+Registers a callback for a clock event. Like everything else in Drome, this takes effect at the start of the next bar.
+
+### Event types
+
+| Event | Fires when |
+|-------|-----------|
+| `'beat'` | Every beat (4 times per bar at 4/4) |
+| `'bar'` | At the start of every bar |
+| `'prebeat'` | Just before each beat (slightly early, for preparation) |
+| `'prebar'` | Just before each bar |
+| `'start'` | When the clock starts |
+| `'stop'` | When the clock stops |
+| `'pause'` | When the clock pauses |
+
+The callback receives a metronome object and the Web Audio timestamp:
+
+```js
+d.on('beat', ({ beat, bar }, time) => {
+  d.log(`beat ${beat}, bar ${bar}`)
+})
+```
+
+- `beat` — the current beat number within the bar (0-indexed)
+- `bar` — the current bar number since the clock started (0-indexed)
+- `time` — the Web Audio API timestamp for this event (useful for scheduling precise actions)
+
+## d.log
+
+```js
+d.log(message)
+```
+
+Sends a string to the editor's log panel. Useful for printing values without cluttering the browser console.
+
+```js
+d.on('bar', ({ bar }) => {
+  d.log(`Bar: ${bar}`)
+})
+```
+
+## Examples
+
+### Beat counter
+
+```js
+d.on('beat', ({ beat, bar }) => {
+  d.log(`${bar}:${beat}`)
+})
+```
+
+### Log every bar
+
+```js
+d.on('bar', ({ bar }) => {
+  d.log(`— bar ${bar} —`)
+})
+```
+
+### Print a value that changes over time
+
+```js
+let counter = 0
+
+d.on('bar', () => {
+  counter++
+  d.log(`Loop ${counter}`)
+})
+
+d.synth('sine').root('C4').note(0, 2, 4).push()
+```
+
+### Trigger something on specific bars
+
+```js
+d.on('bar', ({ bar }) => {
+  if (bar % 8 === 0) d.log('Every 8 bars!')
+})
+```
+
+### Log event for debugging
+
+```js
+d.on('log', (message, allLogs) => {
+  // Called whenever d.log() is used
+  // allLogs contains the full history
+  console.log('[drome]', message)
+})
+```
+
+## prebar and prebeat
+
+The `'prebar'` and `'prebeat'` events fire slightly before the actual bar/beat. They're mainly used internally by Drome to prepare the next cycle, but they're available if you need to do something in advance of the beat — like pre-calculating values or queuing actions.
+
+```js
+d.on('prebar', ({ bar }) => {
+  // fires slightly before bar starts
+  // useful for scheduling or preparation
+})
+```
+
+## Clearing logs
+
+```js
+d.clearLogs()
+```
+
+Clears the log history. Useful if your log panel is filling up.

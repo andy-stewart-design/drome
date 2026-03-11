@@ -1,0 +1,75 @@
+---
+title: Intro to Patterns
+description: How patterns work in Drome
+---
+
+# Intro to Patterns
+
+Patterns are how you tell an instrument what to play and when to play it. In Drome, a **bar** is divided into steps, and you assign a value to each step. Steps with a value play; steps with `null` are silent.
+
+## The note method
+
+The core pattern method is `.note()`. You pass it a list of values — one per step in the bar:
+
+```js
+d.synth('sine').root('C4').scale('major').note(0, 2, 4, 5).push()
+```
+
+This plays four notes per bar: scale degrees 0, 2, 4, and 5 (the first four notes of C major).
+
+For samples, pass `1` to trigger and `null` to skip:
+
+```js
+d.sample('bd').note(1, null, null, null).push() // kick on beat 1 only
+```
+
+## Multiple bars (cycles)
+
+You can define different patterns for consecutive bars by passing arrays as individual arguments. Each array is one bar:
+
+```js
+d.sample('bd')
+  .note([1, null, null, null], [1, null, 1, null])
+  .push()
+```
+
+Bar 1: kick on beat 1. Bar 2: kick on beats 1 and 3. Then it loops.
+
+## Subdivisions (chords / dense rhythms)
+
+Pass an array as a step to trigger multiple events at the same time, or to subdivide that step:
+
+```js
+d.synth('sine').root('C4').note([0, 4, 7]).push() // C major chord
+```
+
+For samples, a nested array subdivides that beat into equal parts:
+
+```js
+d.sample('hh').note([1, 1], null, [1, 1, 1], null).push()
+// beat 1: two hits, beat 2: rest, beat 3: three hits, beat 4: rest
+```
+
+## Null as silence
+
+`null` is how you express rests. An instrument skips any step where the value is `null`.
+
+```js
+d.synth('tri').root('A3').note(0, null, 2, null, 4, null).push()
+// plays on steps 1, 3, and 5
+```
+
+## How timing works
+
+The bar duration is set by your BPM. At 120 BPM with 4 beats per bar, each bar is 2 seconds. If you put 4 values in `.note()`, each plays for 0.5 seconds. If you put 8 values, each plays for 0.25 seconds. The timing is always relative to the number of steps you define.
+
+```js
+// 4 steps → quarter notes
+d.sample('hh').note(1, 1, 1, 1).push()
+
+// 8 steps → eighth notes
+d.sample('hh').note(1, 1, 1, 1, 1, 1, 1, 1).push()
+
+// 16 steps → sixteenth notes
+d.sample('hh').note(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1).push()
+```

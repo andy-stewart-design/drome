@@ -1,0 +1,53 @@
+---
+title: Why Drome?
+description: How Drome differs from other browser-based live coding tools
+---
+
+# Why Drome?
+
+There are other live coding tools for the web — [Strudel](https://strudel.cc/) in particular is excellent and worth knowing about. Drome takes a different set of tradeoffs.
+
+## Launch quantization
+
+In Drome, your code changes take effect at the **start of the next bar**. When you hit run mid-bar, Drome finishes the current bar, then applies your new code. This means the music never glitches or stutters when you make a change — which matters a lot in a performance context.
+
+## Simple, flat API
+
+Drome's API is designed to be readable at a glance. Instruments are created with one call, configured with chained methods, and registered with `.push()`. There's no mini-language to learn, no operator precedence to remember.
+
+```js
+d.synth('saw')
+  .note(60, 64, 67)
+  .gain(0.5)
+  .fx(d.reverb(0.3))
+  .push()
+```
+
+That's a sawtooth synth playing a chord, with gain and reverb applied. Everything is a regular method call.
+
+## Modular audio chain
+
+Effects in Drome are first-class objects. You create them separately and pass them into instruments (or other effects) via `.fx()`. This means you can share an effect across multiple instruments, reuse it, or inspect it independently.
+
+```js
+const verb = d.reverb(0.4)
+const dly = d.delay(0.25, 0.5)
+
+d.synth('sine').note(60).fx(verb, dly).push()
+d.sample('hh').note(1).fx(verb).push()
+```
+
+Both instruments share the same reverb instance.
+
+## Actually just JavaScript
+
+Drome doesn't redefine JavaScript syntax or override how the language behaves. Your code runs as-is in a function scope. You can use variables, conditionals, loops, `Math`, and anything else available in a browser JS environment.
+
+```js
+const notes = [60, 62, 64, 65, 67]
+const shuffled = notes.sort(() => Math.random() - 0.5)
+
+d.synth('tri').note(...shuffled).push()
+```
+
+No special parsing, no custom DSL. It's just JavaScript.

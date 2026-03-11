@@ -1,0 +1,133 @@
+---
+title: LFOs
+description: Using low-frequency oscillators to modulate parameters
+---
+
+# LFOs
+
+An LFO (low-frequency oscillator) modulates a parameter continuously at a set rate. Where an envelope fires once per note, an LFO cycles on its own timeline — making it great for vibrato, filter sweeps, tremolo, and other continuous motion.
+
+## Creating an LFO
+
+```js
+d.lfo(baseValue, scale, rate)
+```
+
+- `baseValue` — the center value around which the LFO oscillates
+- `scale` — how far the LFO swings above and below the base (default: 1)
+- `rate` — cycles per bar (default: 1)
+
+```js
+const lfo = d.lfo(440, 100, 2)  // oscillates 440 ± 100 Hz, twice per bar
+```
+
+## Using an LFO
+
+Pass the LFO to any parameter that accepts automation:
+
+```js
+const vibrato = d.lfo(0, 30, 4)   // base 0, ±30 cents, 4 cycles per bar
+
+d.synth('sine')
+  .root('C4')
+  .note(0, 2, 4)
+  .detune(vibrato)
+  .push()
+```
+
+Filter sweep:
+
+```js
+const sweep = d.lfo(800, 400, 1)   // 800 Hz ± 400, 1 cycle per bar
+
+d.synth('saw')
+  .root('C3')
+  .note(0)
+  .fil('lp', sweep)
+  .push()
+```
+
+Tremolo (gain modulation):
+
+```js
+const tremolo = d.lfo(0.5, 0.5, 8).normalize()   // normalized: 0 to 1
+
+d.synth('sine')
+  .root('A4')
+  .note(0)
+  .gain(tremolo)
+  .push()
+```
+
+## LFO methods
+
+All methods are chainable.
+
+### rate
+
+Sets how many cycles the LFO completes per bar.
+
+```js
+lfo.rate(4)     // 4 cycles per bar (synced to bar length)
+lfo.rate(0.5)   // half cycle per bar (very slow)
+```
+
+### scale
+
+Sets the amplitude of the oscillation around the base value.
+
+```js
+lfo.scale(200)   // oscillates ±200 from base
+```
+
+### type
+
+Sets the LFO waveform shape. Default is `'sine'`.
+
+```js
+lfo.type('sine')      // smooth and round
+lfo.type('triangle')  // linear ramp up and down
+lfo.type('square')    // alternates between two values
+lfo.type('sawtooth')  // ramps up, snaps back
+```
+
+### normalize
+
+When enabled, the LFO output is scaled to a 0–1 range rather than oscillating symmetrically around the base value. Useful for driving gain or other parameters that need to stay non-negative.
+
+```js
+lfo.normalize()         // enable normalization
+lfo.norm()              // short alias
+lfo.normalize(false)    // disable
+```
+
+### offset
+
+Shifts the starting phase of the LFO.
+
+```js
+lfo.offset(0.5)   // start the LFO halfway through its cycle
+lfo.off(0.5)      // short alias
+```
+
+## LFO timing
+
+LFOs in Drome are bar-synced. They start at the beginning of the bar and complete a full cycle in `barDuration / rate` seconds. At 120 BPM (2-second bars) with `rate(4)`, the LFO cycles every 0.5 seconds.
+
+## Full example
+
+```js
+const filterLfo = d.lfo(1200, 800, 2)   // filter sweeps 400–2000 Hz, twice per bar
+const detuneWobble = d.lfo(0, 15, 0.5)  // slow detune wobble
+
+d.synth('saw', 'sine')
+  .root('D3')
+  .scale('dorian')
+  .note(0, 2, 4, 5, 7)
+  .voices(2)
+  .fil('lp', filterLfo)
+  .detune(detuneWobble)
+  .gain(0.4)
+  .fx(d.reverb(0.2))
+  .push()
+```
