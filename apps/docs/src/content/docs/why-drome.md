@@ -1,216 +1,71 @@
 ---
-title: "Why Drome?"
-description: "Here is a sample of some basic Markdown syntax that can be used when writing Markdown content in Astro."
-published: "Jun 19 2024"
-updated: "Jun 19 2024"
-heroImage: "../../assets/blog-placeholder-1.jpg"
+title: Why Drome?
+description: How Drome differs from other browser-based live coding tools
+published: "Mar 11 2026"
+updated: "Mar 11 2026"
 order: 1
 ---
 
-Here is a sample of some basic Markdown syntax that can be used when writing Markdown content in Astro.
+There are other live coding tools for the web — [Strudel](https://strudel.cc/) in particular is excellent and worth checking out. If you've used one of these other tools, Drome will feel familiar in some ways and deliberately different in others. The features it prioritizes and the tradeoffs it makes are worth understanding before you decide if it's the right fit for your work.
 
-## Headings
+## Timing and Quantization
 
-The following HTML `<h1>`—`<h6>` elements represent six levels of section headings. `<h1>` is the highest section level while `<h6>` is the lowest.
+In Drome, your code changes audibly take effect at the **start of the next bar** (similar to Session Mode in Ableton Live). When you evaluate your code, Drome processes the changes immediately. It loads new samples and preemptively completes other setup work, but it waits until the next bar before applying your changes.
 
-# H1
+This means the music never hits out of step with the beat — which matters a lot in a live performance context.
 
-## H2
+## Simple API
 
-### H3
+As a language, Drome focuses on pattern, precedence, and simplicity. Drome’s API is designed to be familiar and readable at a glance, and to maintain an approachable scope and surface area.
 
-#### H4
+Instruments are created with one call, configured with chained methods, and registered with `.push()`. There's no mini-language to learn, no operator precedence to remember.
 
-##### H5
-
-###### H6
-
-## Paragraph
-
-Xerum, quo qui aut unt expliquam qui dolut labo. Aque venitatiusda cum, voluptionse latur sitiae dolessi aut parist aut dollo enim qui voluptate ma dolestendit peritin re plis aut quas inctum laceat est volestemque commosa as cus endigna tectur, offic to cor sequas etum rerum idem sintibus eiur? Quianimin porecus evelectur, cum que nis nust voloribus ratem aut omnimi, sitatur? Quiatem. Nam, omnis sum am facea corem alique molestrunt et eos evelece arcillit ut aut eos eos nus, sin conecerem erum fuga. Ri oditatquam, ad quibus unda veliamenimin cusam et facea ipsamus es exerum sitate dolores editium rerore eost, temped molorro ratiae volorro te reribus dolorer sperchicium faceata tiustia prat.
-
-Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sapicia is sinveli squiatum, core et que aut hariosam ex eat.
-
-## Images
-
-### Syntax
-
-```markdown
-![Alt text](./full/or/relative/path/of/image)
+```js
+d.synth("saw")
+  .note([[60, 64, 67]])
+  .gain(d.env(0, 0.5).adsr(0.9, 0.1, 0.1, 0.1))
+  .fx(d.reverb(0.3))
+  .push();
 ```
 
-### Output
+That's a sawtooth synthesizer playing a C major chord, with a gain envelope and reverb applied. Everything is a regular method call.
 
-![blog placeholder](../../assets/blog-placeholder-about.jpg)
+## Modular audio chain
 
-## Blockquotes
+Effects in Drome are first-class objects. You create them separately and pass them into instruments via the `effects()` (or `.fx()`) method.
+This come with two main benefits.
 
-The blockquote element represents content that is quoted from another source, optionally with a citation which must be within a `footer` or `cite` element, and optionally with in-line changes such as annotations and abbreviations.
+First, the audio chain for a given instrument is constructed just in time and its order will reflect the order of the effects in your code. The allows for flexibility in the way the audio for an instrument is processed and how multiple effects interact.
 
-### Blockquote without attribution
+```js
+// lowpass filter affects only the sawtooth wave
+d.synth("saw").note(60).fx(d.filter("lp", 800), d.crush(4)).push();
 
-#### Syntax
-
-```markdown
-> Tiam, ad mint andaepu dandae nostion secatur sequo quae.  
-> **Note** that you can use _Markdown syntax_ within a blockquote.
+// lowpass filter affects both the sawtooth wave and the bitcrush effect
+d.synth("saw").note(60).fx(d.crush(4), d.filter("lp", 800)).push();
 ```
 
-#### Output
+Second, this allows you to share an effect across multiple instruments, reuse it, and inspect it independently.
 
-> Tiam, ad mint andaepu dandae nostion secatur sequo quae.  
-> **Note** that you can use _Markdown syntax_ within a blockquote.
+```js
+const verb = d.reverb(0.4);
+const dly = d.delay(0.25, 0.5);
 
-### Blockquote with attribution
-
-#### Syntax
-
-```markdown
-> Don't communicate by sharing memory, share memory by communicating.<br>
-> — <cite>Rob Pike[^1]</cite>
+d.synth("saw").note(60).adsr(0.01, 0.5, 0.1, 0.1).fx(verb, dly).push();
+d.sample("hh").fx(verb, dly).push();
 ```
 
-#### Output
+## Just JavaScript™
 
-> Don't communicate by sharing memory, share memory by communicating.<br>
-> — <cite>Rob Pike[^1]</cite>
+Drome doesn't redefine JavaScript syntax or override how the language behaves. We don't modify global prototypes or silently augment your code during evalutaion code — your code runs as-is in a function scope. You can use variables, conditionals, loops, `Math`, and anything else available in a browser environment.
 
-[^1]: The above quote is excerpted from Rob Pike's [talk](https://www.youtube.com/watch?v=PAAkCSZUG1c) during Gopherfest, November 18, 2015.
+```js
+const notes = [60, 62, 64, 65, 67];
+const shuffled = notes.sort(() => Math.random() - 0.5);
 
-## Tables
-
-### Syntax
-
-```markdown
-| Italics   | Bold     | Code   |
-| --------- | -------- | ------ |
-| _italics_ | **bold** | `code` |
+d.synth("tri")
+  .note(...shuffled)
+  .push();
 ```
 
-### Output
-
-| Italics   | Bold     | Code   |
-| --------- | -------- | ------ |
-| _italics_ | **bold** | `code` |
-
-## Code Blocks
-
-### Syntax
-
-we can use 3 backticks ``` in new line and write snippet and close with 3 backticks on new line and to highlight language specific syntax, write one word of language name after first 3 backticks, for eg. html, javascript, css, markdown, typescript, txt, bash
-
-````markdown
-```html
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Example HTML5 Document</title>
-  </head>
-  <body>
-    <p>Test</p>
-  </body>
-</html>
-```
-````
-
-### Output
-
-```html
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Example HTML5 Document</title>
-  </head>
-  <body>
-    <p>Test</p>
-  </body>
-</html>
-```
-
-## List Types
-
-### Ordered List
-
-#### Syntax
-
-```markdown
-1. First item
-2. Second item
-3. Third item
-```
-
-#### Output
-
-1. First item
-2. Second item
-3. Third item
-
-### Unordered List
-
-#### Syntax
-
-```markdown
-- List item
-- Another item
-- And another item
-```
-
-#### Output
-
-- List item
-- Another item
-- And another item
-
-### Nested list
-
-#### Syntax
-
-```markdown
-- Fruit
-  - Apple
-  - Orange
-  - Banana
-- Dairy
-  - Milk
-  - Cheese
-```
-
-#### Output
-
-- Fruit
-  - Apple
-  - Orange
-  - Banana
-- Dairy
-  - Milk
-  - Cheese
-
-## Other Elements — abbr, sub, sup, kbd, mark
-
-### Syntax
-
-```markdown
-<abbr title="Graphics Interchange Format">GIF</abbr> is a bitmap image format.
-
-H<sub>2</sub>O
-
-X<sup>n</sup> + Y<sup>n</sup> = Z<sup>n</sup>
-
-Press <kbd>CTRL</kbd> + <kbd>ALT</kbd> + <kbd>Delete</kbd> to end the session.
-
-Most <mark>salamanders</mark> are nocturnal, and hunt for insects, worms, and other small creatures.
-```
-
-### Output
-
-<abbr title="Graphics Interchange Format">GIF</abbr> is a bitmap image format.
-
-H<sub>2</sub>O
-
-X<sup>n</sup> + Y<sup>n</sup> = Z<sup>n</sup>
-
-Press <kbd>CTRL</kbd> + <kbd>ALT</kbd> + <kbd>Delete</kbd> to end the session.
-
-Most <mark>salamanders</mark> are nocturnal, and hunt for insects, worms, and other small creatures.
+It's JavaScript all the way down (for better or for worse).

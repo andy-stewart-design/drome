@@ -1,17 +1,42 @@
 ---
-title: "Introduction"
-description: "Lorem ipsum dolor sit amet"
-published: "Jul 08 2022"
-updated: "Jul 08 2022"
+title: Intro
+description: Drome is a minimalist live coding language for the web
+published: "Mar 11 2026"
+updated: "Mar 11 2026"
 order: 0
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+Drome is a live coding language for making music in the browser. You write JavaScript, hit play, and hear the results — no compilation step, no build tools, no boilerplate.
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+It's designed around the idea of a **bar**: a repeating unit of time that you fill with notes, samples, and patterns. Every time the bar loops, Drome replays whatever you've expressed in your code. Change your code and evaluate again — your changes take effect at the start of the next bar, so the music always stays in sync.
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+## What you get
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+- **Synthesizers**: oscillator-based with waveform control, scales, and voices
+- **Samplers**: play audio files with pattern-based triggering
+- **Effects**: A growing list of audio effects like reverb, delay, distortion, bitcrusher, filter, gain, and pan
+- **Automations**: ADSR envelopes and LFOs to modulate parameters over time
+- **Sequencing**: a flexible system for expressing rhythmic and melodic patterns in plain JavaScript
+- **MIDI I/O**: send notes to external instruments or use CC values to control parameters
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+Drome runs entirely in the browser using the [Web Audio](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) and [Web MIDI](https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API) APIs. There's no server, no plugins, nothing to install.
+
+## How it's structured
+
+Everything in Drome flows through a single object — conventionally called `drome`, or `d` for short. You use it to create instruments, then describe what those instruments should play and how they should sound.
+
+```js
+d.bpm(120); // 120 BPM
+
+d.synth("sine").root("C4").scale("minor").note(0, 2, 4, 5).push();
+```
+
+That's it. A sine wave synth, rooted at C4, playing the first four degrees of a minor scale, one per beat. The `.push()` at the end registers the instrument for the next bar.
+
+Every evaluation is **stateless by default** — each time you run your code, Drome starts fresh with only what you've defined in that block.
+
+## What‘s with the name?
+
+Live coding environments have a thing for names that nod to repetition — Tidal Cycles, Strudel, and so on. Drome continues that tradition.
+
+The suffix "-drome" comes from the Greek "drómos," meaning a course for running or racing — a hippodrome, a velodrome, a palindrome. Something that doubles back on itself. Music made through live coding tends to work the same way: you set something in motion, let it loop, and adjust as it goes. The name felt like a natural fit.
