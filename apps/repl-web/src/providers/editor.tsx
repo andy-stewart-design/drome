@@ -6,10 +6,9 @@ import {
   type ParentProps,
   onCleanup,
 } from 'solid-js'
-import { basicSetup, EditorView } from 'codemirror'
+import type { EditorView } from 'codemirror'
 
-import { javascript } from '@/codemirror/language'
-import { theme } from '@/codemirror/theme'
+import { createCodeMirror } from '@/codemirror'
 import '@/codemirror/theme.css'
 
 // Define the context type
@@ -34,13 +33,7 @@ function EditorProvider(props: ParentProps) {
   })
 
   function createEditor(parent: HTMLElement, doc: string) {
-    const ed = new EditorView({
-      doc,
-      extensions: [basicSetup, theme, javascript()],
-      parent,
-    })
-
-    setEditor(ed)
+    setEditor(createCodeMirror(parent, doc))
   }
 
   function flash(dur = 300) {

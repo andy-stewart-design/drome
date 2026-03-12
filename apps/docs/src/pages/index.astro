@@ -1,6 +1,5 @@
 ---
 import BaseHead from "@/components/BaseHead.astro";
-import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
 import CodeEditor from "@/components/code-editor";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/consts";
@@ -14,11 +13,11 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "@/consts";
   <body>
     <Header />
     <main>
-      <h1>Drome</h1>
-      <p>A minimalist live coding language for the web</p>
+      <h1 style="text-align: center;">Drome</h1>
+      <p style="text-align: center;">
+        A minimalist live coding language for the web
+      </p>
       <CodeEditor client:load code="d.synth().note([60,64,67,71]).push()" />
-      <CodeEditor client:load code="d.sample('bd').hex('f').push()" />
     </main>
-    <Footer />
   </body>
 </html>

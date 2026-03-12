@@ -120,14 +120,14 @@ code {
 pre {
   padding: var(--spacing-5) var(--spacing-6);
   border-radius: var(--spacing-1_5);
-  line-height: 1.3;
+  line-height: 1.4;
 }
 pre > code {
   all: unset;
   font-size: 0.875rem;
 
   @media (min-width: 960px) {
-    font-size: 1rem;
+    font-size: 0.9125rem;
   }
 }
 blockquote {
