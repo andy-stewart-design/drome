@@ -31,8 +31,11 @@ body {
 
   word-wrap: break-word;
   overflow-wrap: break-word;
-  font-size: 20px;
   line-height: 1.7;
+
+  @media (min-width: 960px) {
+    font-size: 1.125rem;
+  }
 }
 
 *,
@@ -76,6 +79,7 @@ h5 {
 strong,
 b {
   font-weight: 700;
+  color: var(--app-color-fg-primary);
 }
 a {
   color: var(--app-color-fg-primary);
@@ -85,6 +89,9 @@ a:hover {
 }
 p {
   margin-bottom: 1em;
+  color: var(--app-color-fg-secondary);
+}
+li {
   color: var(--app-color-fg-secondary);
 }
 .prose p {
@@ -111,17 +118,30 @@ code {
   border-radius: 2px;
 }
 pre {
-  padding: 1.5em;
-  border-radius: 8px;
+  padding: var(--spacing-5) var(--spacing-6);
+  border-radius: var(--spacing-1_5);
+  line-height: 1.3;
 }
 pre > code {
   all: unset;
+  font-size: 0.875rem;
+
+  @media (min-width: 960px) {
+    font-size: 1rem;
+  }
 }
 blockquote {
-  border-left: 4px solid var(--accent);
-  padding: 0 0 0 20px;
+  /*border-left: 4px solid var(--accent);*/
+  background: var(--app-color-bg-secondary);
+  padding: var(--spacing-5) var(--spacing-6);
   margin: 0;
-  font-size: 1.333em;
+  font-size: 1rem;
+  border-radius: var(--spacing-1_5);
+
+  p {
+    margin: 0 !important;
+    max-width: none !important;
+  }
 }
 hr {
   border: none;

@@ -7,68 +7,26 @@ import Header from "@/components/Header.astro";
 import Sidebar from "@/components/sidebar";
 import { getCollection } from "astro:content";
 import { buildSidebar } from "@/utils/sidebar";
+import s from "./style.module.css";
 
 type Props = CollectionEntry<"docs">["data"];
 
 const rawPosts = await getCollection("docs");
 const groupedItems = buildSidebar(rawPosts);
 
-const { title, description, published, updated, heroImage } = Astro.props;
+const { title, description, published, updated } = Astro.props;
 ---
 
 <html lang="en">
   <head>
     <BaseHead title={title} description={description} />
-    <style>
-      main {
-        display: grid;
-        grid-template-columns: 240px 1fr;
-        width: calc(100% - 2em);
-        max-width: 100%;
-        margin: 0;
-        padding-block: 0;
-      }
-
-      .sticky {
-        position: sticky;
-        top: 0;
-        height: 100dvh;
-        overflow-y: scroll;
-        padding-block: 1.5rem;
-      }
-
-      .title {
-        margin-bottom: 2rem;
-        padding: 0;
-        line-height: 1;
-
-        h1 {
-          margin: 0 0 1rem 0;
-        }
-      }
-
-      .date {
-        color: var(--app-color-fg-tertiary);
-        margin-bottom: 2rem;
-      }
-
-      .prose {
-        margin: auto;
-        padding-block: 1.5rem;
-        max-width: 64ch;
-
-        p {
-          text-wrap: pretty;
-        }
-      }
-    </style>
   </head>
 
   <body>
     <Header />
-    <main>
-      <aside class="sidebar">
-        <div class="sticky">
+    <main class={s.main}>
+      <aside class={s.sidebar}>
+        <div class={s.sticky}>
           <Sidebar
             tree={groupedItems}
             currentPath={Astro.url.pathname}
@@ -77,13 +35,12 @@ const { title, description, published, updated, heroImage } = Astro.props;
         </div>
       </aside>
       <article>
-        <div class="prose">
-          <div class="title">
+        <div class={s.prose}>
+          <div class={s.title}>
             <h1>{title}</h1>
-            <div class="date">
+            <div class={s.date}>
               Last updated: <FormattedDate date={updated ?? published} />
             </div>
-            <hr />
           </div>
           <slot />
         </div>
