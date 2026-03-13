@@ -1,0 +1,14 @@
+import { SVG, type SVGProps } from "./svg";
+
+interface Props extends SVGProps {}
+
+function IconPause20(props: Props) {
+  return (
+    <SVG {...props} type="solid" size={20}>
+      <rect x="4" y="3" width="4" height="14" rx="1" />
+      <rect x="12" y="3" width="4" height="14" rx="1" />
+    </SVG>
+  );
+}
+
+export default IconPause20;
