@@ -6,38 +6,33 @@ updated: "Jul 08 2022"
 order: 0
 ---
 
-# Instruments
+import CodeEditor from "@/components/code-editor";
 
-Instruments are the sound sources in Drome — the things that actually make noise. There are two kinds: a **synthesizer** (`synth`) that generates tones from oscillators, and a [**sample player**](./samplers) (`sample`) that plays audio files. Both are created through the main `d` object and share a common set of methods for controlling when and how they play.
+Instruments are the primary sound sources in Drome — the things that actually make noise. There are two kinds: [**synthesizers**](./synthesizers) (`synth`) that generates tones from oscillators, and [**samplers**](./samplers) (`sample`) that plays audio files. Both are created through the main `d` object and share a common set of methods for controlling when and how they play.
 
 ## Creating an instrument
 
-```js
-const s = d.synth("sine");
-const dr = d.sample("bd", "sd");
-```
-
-Both return an instrument object. Nothing plays until you call `.push()`, which registers the instrument to begin playing on the next bar.
+Both return an instrument object. Nothing plays until you call `.push()`, which registers the instrument to begin playing on the next bar. You can chain all of the pattern and effect methods that we will discuss next before calling `.push()`.
 
 ```js
 d.synth("sine").note(60).push();
+d.sample("bd").hex(0xf).push();
 ```
-
-You can chain all configuration methods before calling `.push()`.
 
 ## Bars and cycles
 
-Drome is bar-based. On every bar, each instrument plays through one "cycle" — a list of notes that are evenly spaced across the duration of that bar. If you provide multiple cycles, Drome steps through them one per bar, looping back to the start.
+Drome is bar-based. On every bar, each instrument plays through one "pattern" — a list of notes that are evenly spaced across the duration of that bar. If you provide multiple patterns, Drome steps through them one per bar, looping back to the start.
 
 ```js
 // One cycle: plays 60, 62, 64 in order within a single bar
-.note(60, 62, 64)
+.note([60, 62, 64])
 
 // Two cycles: plays 60 on bar 1, then 64 on bar 2, then repeats
 .note(60, 64)
 
-// Silence a step by passing null
-.note([60, null, 62, null])
+// Silence a step by passing null or undefined
+.note([60, null, 64, 67])
+.note([60, , 64, 67])
 ```
 
 Each argument to `.note()` is one cycle (one bar's worth of events). To play multiple notes within a cycle, pass an array: `.note([60, 64, 67])` plays three notes spread evenly across the bar.
@@ -46,7 +41,7 @@ Each argument to `.note()` is one cycle (one bar's worth of events). To play mul
 
 All instruments — synths and samples — share these methods. They all return the instrument so you can chain them.
 
-### Note patterns
+### Pattern methods
 
 #### `.note(...cycles)`
 
@@ -80,13 +75,21 @@ Repeats patterns for a set number of bars. Takes pairs of `[numBars, cycle]`.
 
 Generates a Euclidean rhythm — an algorithm that evenly distributes a number of pulses across a number of steps. Classic for polyrhythmic patterns.
 
-```js
-// 3 hits over 8 steps, no rotation
-.euclid(3, 8, 0)
+| Argument | Type                 | Required |
+| -------- | -------------------- | -------- |
+| pulses   | `number \| number[]` | `true`   |
+| steps    | `number`             | `true`   |
+| rotation | `number \| number[]` | `false`  |
 
-// Vary rotation across cycles
-.euclid([3, 5], 8, [0, 2])
-```
+<CodeEditor
+  client:load
+  code={`// 3 hits over 8 steps, rotate 3 to the left
+d.sample("bd:3").euclid(3,8,3).push();
+// 2 hits over 8 steps, rotate 2 to the left 
+d.sample("sd").euclid(2,8,2).gain(0.625).push(); 
+// 11 hits over 16 steps, rotate 5 to the right
+d.sample("hh").euclid(11,16,-5).gain([0.5,0.25]).push();`}
+/>
 
 #### `.xox(...cycles)`
 
