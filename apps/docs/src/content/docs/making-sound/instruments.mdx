@@ -47,19 +47,24 @@ All instruments — synths and samples — share these methods. They all return 
 
 Sets the note pattern. Each argument is one bar cycle. Arrays within a cycle divide that bar into equal steps.
 
+| Argument  | Type                               | Required |
+| --------- | ---------------------------------- | -------- |
+| ...cycles | `number \| number[] \| number[][]` | `true`   |
+
 ```js
-.note(60)                   // same note every bar
-.note(60, 62, 64, 65)       // cycles through 4 different bars
-.note([60, 62], [64, 65])   // two bars, each with two notes
-.note([60, null, 62, null]) // alternating notes and rests
+.note(60, 64)              // two bars, one note each
+.note([60, 64])            // one bar, two notes
+.note(60, 64, 67, 71)      // four bars, one note each
+.note([60, 64], [67, 71])  // two bars, two notes each
+.note([[60, 64, 67, 71]])  // one bar, one chord
 ```
 
-#### `.note()` with a string
+##### `.note()` with a string
 
 You can write patterns as a comma-separated string, which gets parsed the same way:
 
 ```js
-.note("60, 62, 64")
+.note("60, 62, 64")  // equivalent to .note(60, 62, 64)
 ```
 
 #### `.arrange(...[bars, pattern])`
@@ -83,12 +88,12 @@ Generates a Euclidean rhythm — an algorithm that evenly distributes a number o
 
 <CodeEditor
   client:load
-  code={`// 3 hits over 8 steps, rotate 3 to the left
+  code={`// 3 hits over 8 steps, rotate 3 steps to the left
 d.sample("bd:3").euclid(3,8,3).push();
 // 2 hits over 8 steps, rotate 2 to the left 
 d.sample("sd").euclid(2,8,2).gain(0.625).push(); 
-// 11 hits over 16 steps, rotate 5 to the right
-d.sample("hh").euclid(11,16,-5).gain([0.5,0.25]).push();`}
+// 11 or 13 hits over 16 steps, rotate 5 steps to the right
+d.sample("hh").euclid([11,13],16,-5).gain([0.5,0.25]).push();`}
 />
 
 #### `.xox(...cycles)`

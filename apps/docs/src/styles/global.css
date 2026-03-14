@@ -147,6 +147,40 @@ hr {
   border: none;
   border-top: 1px solid var(--app-color-border-subtle);
 }
+
+table {
+  border-collapse: collapse;
+
+  th {
+    font-size: 0.875rem;
+    background: var(--app-color-bg-secondary);
+    padding-inline: var(--spacing-2);
+
+    &:first-of-type {
+      border-start-start-radius: var(--spacing-1);
+      border-end-start-radius: var(--spacing-1);
+    }
+
+    &:last-of-type {
+      border-start-end-radius: var(--spacing-1);
+      border-end-end-radius: var(--spacing-1);
+    }
+  }
+
+  tbody > tr:not(:first-of-type) {
+    border-block-start: 1px solid var(--app-color-border-subtle);
+  }
+
+  td {
+    font-size: 1rem;
+    padding: var(--spacing-2);
+  }
+
+  code {
+    font-size: 0.9125rem;
+  }
+}
+
 @media (max-width: 720px) {
   body {
     font-size: 18px;
