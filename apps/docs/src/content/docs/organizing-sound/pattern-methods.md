@@ -1,17 +1,143 @@
 ---
 title: "Pattern Methods"
-description: "Lorem ipsum dolor sit amet"
+description: "Methods for shaping and transforming patterns"
 published: "Jul 08 2022"
 updated: "Jul 08 2022"
 heroImage: "../../../assets/blog-placeholder-3.jpg"
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+Beyond `.note()`, instruments have a set of methods for defining and transforming patterns. All of these are chainable.
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+## note
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+Sets the pattern directly. Each argument is a bar; within a bar, pass values or arrays of values.
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+```js
+.note(1, null, 1, null)              // 4-step pattern
+.note([1, null], [null, 1])          // 2 bars, 2 steps each
+.note([1, 1], null, [1, 1, 1], null) // subdivisions within steps
+```
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+## xox
+
+Define a pattern using `x` for hits and spaces or any other character for rests. Useful for drum patterns.
+
+```js
+d.sample("bd").xox("x . . . x . . .").push();
+d.sample("hh").xox("x x x x x x x x").push();
+d.sample("sd").xox(". . x . . . x .").push();
+```
+
+You can also pass numbers — `1` for hit, `0` for rest:
+
+```js
+d.sample("bd").xox([1, 0, 0, 0], [1, 0, 1, 0]).push();
+```
+
+## euclid
+
+Distributes a number of pulses evenly across a number of steps — a classic technique for generating polyrhythmic patterns.
+
+```js
+.euclid(pulses, steps, rotation)
+```
+
+```js
+d.sample("bd").euclid(3, 8, 0).push(); // 3 hits in 8 steps
+d.sample("hh").euclid(5, 8, 2).push(); // 5 hits in 8 steps, rotated by 2
+```
+
+The rotation shifts the pattern left by that many steps. Multiple values create multiple bars:
+
+```js
+d.sample("sd").euclid([2, 3], 8, 0).push(); // bar 1: 2 hits, bar 2: 3 hits
+```
+
+## hex
+
+Express a pattern as a hexadecimal string or number. Each hex digit encodes 4 steps as a bitmask.
+
+```js
+d.sample("bd").hex("8888").push(); // "1000 1000 1000 1000" → kick on beats 1&3
+d.sample("hh").hex("ffff").push(); // all 16 steps active
+d.sample("sd").hex("0808").push(); // snare on beats 2&4
+```
+
+You can also pass numbers:
+
+```js
+d.sample("bd").hex(0x8080).push();
+```
+
+## sequence
+
+Place specific pulses within a fixed number of steps.
+
+```js
+.sequence(steps, ...pulsePositions)
+```
+
+```js
+d.sample("bd").sequence(8, 0, 4).push(); // 8 steps, hits at positions 0 and 4
+d.sample("sd").sequence(8, [2, 6]).push(); // hits at positions 2 and 6
+```
+
+## arrange
+
+Define a multi-bar pattern by specifying how many bars each sub-pattern repeats.
+
+```js
+.arrange([numBars, pattern], [numBars, pattern], ...)
+```
+
+```js
+d.sample("bd")
+  .arrange(
+    [2, [1, null, null, null]], // play this for 2 bars
+    [2, [1, null, 1, null]], // then this for 2 bars
+  )
+  .push();
+```
+
+## fast / slow
+
+Speed up or slow down the pattern by a multiplier.
+
+```js
+d.sample("hh").note(1, 1, 1, 1).fast(2).push(); // plays twice as fast (8 hits per bar)
+d.sample("bd").note(1, null, 1, null).slow(2).push(); // plays half as fast (spans 2 bars)
+```
+
+## stretch
+
+Stretches the pattern across more steps, inserting silences between hits.
+
+```js
+d.sample("bd").note(1, null, 1, null).stretch(2).push();
+// original: hit, rest, hit, rest
+// stretched: hit, rest, rest, rest, hit, rest, rest, rest
+```
+
+## reverse
+
+Reverses the pattern.
+
+```js
+d.synth("sine").root("C4").scale("major").note(0, 2, 4, 7).reverse().push();
+// plays 7, 4, 2, 0
+```
+
+## legato
+
+Sustains each note until the next one starts, instead of stopping at the end of its step.
+
+```js
+d.synth("sine").root("C4").note(0, null, 2, null).legato().push();
+// the 0 sustains through the rest until the 2 plays
+```
+
+Pass `false` to turn legato off:
+
+```js
+.legato(false)
+```
