@@ -28,7 +28,7 @@ function CodeEditor(props: { code: string }) {
   onMount(() => {
     if (!containerRef) return;
 
-    setEditor(createCodeMirror(containerRef, props.code));
+    setEditor(createCodeMirror(containerRef, props.code.trim()));
   });
 
   function play() {

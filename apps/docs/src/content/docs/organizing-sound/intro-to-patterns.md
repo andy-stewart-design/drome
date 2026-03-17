@@ -6,9 +6,11 @@ updated: "Jul 08 2022"
 heroImage: "../../../assets/blog-placeholder-3.jpg"
 ---
 
-Patterns are how you tell an instrument what to play and when. More concretely: a pattern describes the sequence of notes or sounds across one **bar** of time. This page covers how that sequencing works in code.
+// TODO: add documentation about string patterns, and make sure the codebase supports them in note, etc.
 
-At present, Drome doesn't have a dedicated pattern language like Strudel or Tidal Cycles — patterns are instead built with plain JavaScript arrays. Steps are spread evenly across a bar, and a set of helper methods lets you build more complex arrangements on top of that.
+Patterns are how you tell an instrument what to play and when. More concretely: a pattern describes the sequence of notes or sounds across one **bar** of time. This page covers how to express that sequencing logic in code.
+
+At present, Drome doesn't have a dedicated pattern language like Strudel or Tidal Cycles. Patterns are instead built using plain JavaScript arrays. Steps are spread evenly across a bar, and a set of helper methods lets you build more complex arrangements on top of that.
 
 Whether a pattern language gets added down the road is an open question, but the goal from the start was to see how far plain JS could take us before reaching for a more heavy-handed approach. Addmitedly, this design decision can create some verbosity for longer sequences — but the upside is that everything is explicit, composable, and easy to reason about.
 
