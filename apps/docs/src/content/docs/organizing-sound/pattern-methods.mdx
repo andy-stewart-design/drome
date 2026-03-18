@@ -6,6 +6,8 @@ updated: "Jul 08 2022"
 heroImage: "../../../assets/blog-placeholder-3.jpg"
 ---
 
+// TODO: Diagnose issues with stretch and slow
+
 import CodeEditor from "@/components/code-editor";
 
 Beyond `.note()` and `.offset()`, which we discussed in the previous section, instruments have a variety of methods for manipulating and transforming patterns.
@@ -213,17 +215,18 @@ Flips the entire pattern back-to-front — reversing both the order of bars and 
   client:load
   code={`
 d.synth("sine").root("c4").scale("maj")
-  .note([0, 2, 4, 7]).reverse().push();
+\ \ .note([0, 2, 4, 7]).reverse().push();
+
 d.sample("hh").hex(0xd9).reverse().push();`}
 />
 
-### `legato(v?)`
+### `legato(should?)`
 
 Ties each note into the next one, extending its duration until the following non-null step rather than cutting off at the end of its allocated step. Rests become connective tissue rather than silence — the note just keeps sounding through them. Essential for smooth melodic lines, sustained pads, and any passage where you want phrasing instead of staccato chops.
 
 | Argument | Type      | Required | Default |
 | -------- | --------- | -------- | ------- |
-| v        | `boolean` | `false`  | `true`  |
+| should   | `boolean` | `false`  | `true`  |
 
 <CodeEditor
   client:load
