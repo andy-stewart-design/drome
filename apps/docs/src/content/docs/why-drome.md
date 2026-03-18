@@ -1,7 +1,7 @@
 ---
 title: Why Drome?
 description: How Drome differs from other browser-based live coding tools
-published: "Mar 11 2026"
+created: "Mar 11 2026"
 updated: "Mar 11 2026"
 order: 1
 ---

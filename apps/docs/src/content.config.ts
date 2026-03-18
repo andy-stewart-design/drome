@@ -10,8 +10,9 @@ const docs = defineCollection({
       title: z.string(),
       description: z.string(),
       // Transform string to Date object
-      published: z.coerce.date(),
+      created: z.coerce.date(),
       updated: z.coerce.date().optional(),
+      published: z.boolean().default(true),
       order: z.number().optional(),
       heroImage: image().optional(),
     }),

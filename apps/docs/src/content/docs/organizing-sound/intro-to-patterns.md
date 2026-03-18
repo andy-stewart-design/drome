@@ -1,7 +1,7 @@
 ---
 title: "Working with Patterns"
 description: "Sequencing sound in Drome"
-published: "Jul 08 2022"
+created: "Jul 08 2022"
 updated: "Jul 08 2022"
 heroImage: "../../../assets/blog-placeholder-3.jpg"
 ---

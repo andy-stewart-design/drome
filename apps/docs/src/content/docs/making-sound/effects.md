@@ -1,7 +1,7 @@
 ---
 title: "Effects"
 description: "Lorem ipsum dolor sit amet"
-published: "Jul 08 2022"
+created: "Jul 08 2022"
 updated: "Jul 08 2022"
 ---
 

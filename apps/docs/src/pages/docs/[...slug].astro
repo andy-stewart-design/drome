@@ -4,10 +4,12 @@ import Layout from "@/layouts/docs/index.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("docs");
-  return posts.map((post) => ({
-    params: { slug: post.id },
-    props: post,
-  }));
+  return posts
+    .filter((post) => post.data.published !== false)
+    .map((post) => ({
+      params: { slug: post.id },
+      props: post,
+    }));
 }
 type Props = CollectionEntry<"docs">;
 

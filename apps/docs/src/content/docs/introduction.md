@@ -1,7 +1,7 @@
 ---
 title: Intro
 description: Drome is a minimalist live coding language for the web
-published: "Mar 11 2026"
+created: "Mar 11 2026"
 updated: "Mar 11 2026"
 order: 0
 ---
