@@ -187,9 +187,10 @@ Spreads the pattern across more bars, stretching it out in time. Passing `2` hal
 <CodeEditor
   client:load
   code={`
-d.synth("sine").root("c4").scale("maj")
-  .note([0, 2, 4, 5, 7]).slow(2).push();
-d.sample("bd").hex(0xf).slow(4).push();`}
+d.synth("sine").root("c5").scale("maj")
+\ \ .note([0,2,4,5,7,9]).push();
+d.synth("saw").root("c3").scale("maj")
+\ \ .note([0,2,4,5,7,9]).fil("lp",2000).slow(2).push();`}
 />
 
 ### `stretch(multiplier)`
