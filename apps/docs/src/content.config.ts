@@ -7,10 +7,10 @@ const docs = defineCollection({
   // Type-check frontmatter using a schema
   schema: ({ image }) =>
     z.object({
-      title: z.string(),
-      description: z.string(),
+      title: z.string().optional(),
+      description: z.string().optional(),
       // Transform string to Date object
-      created: z.coerce.date(),
+      created: z.coerce.date().optional(),
       updated: z.coerce.date().optional(),
       published: z.boolean().default(true),
       order: z.number().optional(),

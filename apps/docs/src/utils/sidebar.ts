@@ -9,7 +9,20 @@ type TreeFolder<T extends BaseItem> = {
 };
 
 function buildSidebar<T extends { id: string; data?: { order?: number } }>(items: T[]): TreeItem<T>[] {
-  const sortedPosts = items.sort((a, b) => {
+  const isIndex = (id: string) => id === "_index" || id.endsWith("/_index");
+
+  // Build folder order map from _index items
+  const folderOrder: Record<string, number> = {};
+  for (const item of items) {
+    if (isIndex(item.id) && item.data?.order !== undefined) {
+      const folder = item.id.replace(/\/_index$/, "");
+      folderOrder[folder] = item.data.order;
+    }
+  }
+
+  const visibleItems = items.filter((item) => !isIndex(item.id));
+
+  const sortedPosts = visibleItems.sort((a, b) => {
     const aSegments = a.id.split("/");
     const bSegments = b.id.split("/");
 
@@ -20,6 +33,15 @@ function buildSidebar<T extends { id: string; data?: { order?: number } }>(items
     const aParent = aSegments.slice(0, -1).join("/");
     const bParent = bSegments.slice(0, -1).join("/");
     if (aParent !== bParent) {
+      const aFolderOrder = folderOrder[aParent];
+      const bFolderOrder = folderOrder[bParent];
+      if (aFolderOrder !== undefined && bFolderOrder !== undefined) {
+        return aFolderOrder - bFolderOrder;
+      } else if (aFolderOrder !== undefined) {
+        return -1;
+      } else if (bFolderOrder !== undefined) {
+        return 1;
+      }
       return aParent.localeCompare(bParent);
     }
 
