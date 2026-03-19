@@ -150,6 +150,9 @@ hr {
 
 table {
   border-collapse: collapse;
+  border-spacing: 0;
+  /*outline: 1px solid var(--app-color-border-subtle);
+  border-radius: var(--spacing-1);*/
 
   th {
     font-size: 0.875rem;
@@ -167,8 +170,8 @@ table {
     }
   }
 
-  tbody > tr:not(:first-of-type) {
-    border-block-start: 1px solid var(--app-color-border-subtle);
+  tbody > tr {
+    border-block-end: 1px solid var(--app-color-border-subtle);
   }
 
   td {
