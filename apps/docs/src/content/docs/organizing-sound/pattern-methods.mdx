@@ -6,8 +6,6 @@ updated: "Jul 08 2022"
 heroImage: "../../../assets/blog-placeholder-3.jpg"
 ---
 
-// TODO: Diagnose issues with stretch and slow
-
 import CodeEditor from "@/components/code-editor";
 
 Beyond `.note()` and `.offset()`, which we discussed in the previous section, instruments have a variety of methods for manipulating and transforming patterns.
@@ -190,7 +188,7 @@ Spreads the pattern across more bars, stretching it out in time. Passing `2` hal
 d.synth("sine").root("c5").scale("maj")
 \ \ .note([0,2,4,5,7,9]).push();
 d.synth("saw").root("c3").scale("maj")
-\ \ .note([0,2,4,5,7,9]).fil("lp",2000).slow(2).push();`}
+\ \ .note([0,2,4,5,7,9]).fil("lp",1200).slow(2).push();`}
 />
 
 ### `stretch(bars, steps?)`
@@ -222,19 +220,20 @@ d.synth("sine").root("c4").scale("maj")
 d.sample("hh").hex(0xd9).reverse().push();`}
 />
 
-### `legato(should?)`
+### `legato(v?)`
 
-Ties each note into the next one, extending its duration until the following non-null step rather than cutting off at the end of its allocated step. Rests become connective tissue rather than silence — the note just keeps sounding through them. Essential for smooth melodic lines, sustained pads, and any passage where you want phrasing instead of staccato chops.
+Extends each note into the next one, stretching its duration until the following non-null step rather than cutting off at the end of its allocated step. Rests become connective tissue rather than silence — the note just keeps sounding through them. Essential for smooth melodic lines, sustained pads, and any passage where you want phrasing instead of staccato chops.
 
-| Argument | Type      | Required | Default |
-| -------- | --------- | -------- | ------- |
-| should   | `boolean` | `false`  | `true`  |
+Pass a boolean to enable or disable legato across all bars. Pass a single bar index or an array of bar indices (0-indexed) to apply legato only to specific bars.
+
+| Argument | Type                            | Required | Default |
+| -------- | ------------------------------- | -------- | ------- |
+| v        | `boolean \| number \| number[]` | `false`  | `true`  |
 
 <CodeEditor
   client:load
   code={`
-// Without legato: short stabs
-d.synth("sine").root("c4").scale("maj").note([0, null, 4, null]).push();
-// With legato: each note sustains into the rest
-d.synth("sine").root("c4").scale("maj").note([0, null, 4, null]).legato().push();`}
+// Only the second bar legato in a two-bar pattern
+d.synth("sine").root("c4").scale("maj")
+\ \ .note([0, 2, 4]).euclid(3,8).stretch(2).legato(1).push();`}
 />

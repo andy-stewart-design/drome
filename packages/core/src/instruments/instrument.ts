@@ -53,7 +53,7 @@ abstract class Instrument<T> {
   protected _filter: FrequencyParams = {};
   private _connected = false;
   protected _stopTime: number | null = null;
-  protected _legato = false;
+  protected _legato: boolean | number[] = false;
   public onDestroy: (() => void) | undefined;
 
   // Method Aliases
@@ -265,8 +265,8 @@ abstract class Instrument<T> {
     return this;
   }
 
-  legato(v = true) {
-    this._legato = v;
+  legato(v: boolean | number | number[] = true) {
+    this._legato = typeof v === "number" ? [v] : v;
     return this;
   }
 
@@ -417,7 +417,11 @@ abstract class Instrument<T> {
       const start = barStart + i * (barDuration / cycle.length);
       const baseDuration = barDuration / cycle.length;
 
-      if (!this._legato) {
+      const isLegato = Array.isArray(this._legato)
+        ? this._legato.includes(cycleIndex)
+        : this._legato;
+
+      if (!isLegato) {
         return { value, start, baseDuration, duration: baseDuration };
       } else {
         const nextNonNull = cycle.findIndex((v, j) => j > i && v !== null);

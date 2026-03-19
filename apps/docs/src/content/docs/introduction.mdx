@@ -6,6 +6,8 @@ updated: "Mar 11 2026"
 order: 0
 ---
 
+import CodeEditor from "@/components/code-editor";
+
 Drome is a live coding language for making music in the browser. You write JavaScript, hit play, and hear the results — no compilation step, no build tools, no boilerplate.
 
 It's designed around the idea of a **bar**: a repeating unit of time that you fill with notes, samples, and patterns. Every time the bar loops, Drome replays whatever you've expressed in your code. Change your code and evaluate again — your changes take effect at the start of the next bar, so the music always stays in sync.
@@ -27,13 +29,15 @@ Drome runs entirely in the browser using the [Web Audio](https://developer.mozil
 
 Everything in Drome flows through a single object — conventionally called `drome`, or `d` for short. You use it to create instruments, then describe what those instruments should play and how they should sound.
 
-```js
+<CodeEditor
+  client:load
+  code={`
 d.bpm(120); // 120 BPM
 
-d.synth("sine").root("C4").scale("minor").note(0, 2, 4, 5).push();
-```
+d.synth("sine").root("C4").scale("minor").note([0,1,2,3,4,5,6,7]).push();`}
+/>
 
-That's it. A sine wave synth, rooted at C4, playing the first four degrees of a minor scale, one per beat. The `.push()` at the end registers the instrument for the next bar.
+The above code creates a sine wave synth playing a run of a minor scale rooted at C4. The `.push()` at the end registers the instrument for the next bar.
 
 Every evaluation is **stateless by default** — each time you run your code, Drome starts fresh with only what you've defined in that block.
 
