@@ -100,7 +100,7 @@ d.sample("hh").euclid([11,13],16,-5).gain([0.5,0.25]).push();`}
 
 ### `hex(...patterns)`
 
-Express a pattern as a hexadecimal, which can be passed as a [hexadecimal integer literal](https://www.ibm.com/docs/en/i/7.4.0?topic=literals-hexadecimal-integer) or a string. Each base 16 hex digit encodes 4 steps as a [base 2 binary number](https://mathmonks.com/number-system/hexadecimal-to-binary).
+Express a pattern as a hexadecimal, which can be expressed either as a [hexadecimal integer literal](https://www.ibm.com/docs/en/i/7.4.0?topic=literals-hexadecimal-integer) or a string. Each base 16 hex digit encodes 4 steps as a [base 2 binary number](https://mathmonks.com/number-system/hexadecimal-to-binary). You can pass multiple, comma-separated hexes to create multiple patterns.
 
 ```js
 d.sample("bd").hex("f").push(); // string: 4 on the floor kick
@@ -122,7 +122,7 @@ d.sample("sd").hex(0x5).push();`}
 
 ### `sequence(steps, ...pulses)`
 
-Think of this as placing pins on a grid. You declare the total number of steps, then list the positions where hits should land — either as individual positions (one per bar) or as arrays of positions (multiple hits in a single bar). Where `euclid` distributes hits mathematically, `sequence` puts you in full spatial control.
+Think of this as the imperative sibling of the `euclid` method, where you manually specify hits and rests. The first argument declares the total number of steps. All subsequent arguments specify the indices where hits should land within a bar, and can be formatted as either a number or an array of numbers. Where `euclid` distributes hits mathematically, `sequence` puts you in full control.
 
 | Argument  | Type                 | Required |
 | --------- | -------------------- | -------- |
@@ -193,19 +193,20 @@ d.synth("saw").root("c3").scale("maj")
 \ \ .note([0,2,4,5,7,9]).fil("lp",2000).slow(2).push();`}
 />
 
-### `stretch(multiplier)`
+### `stretch(bars, steps?)`
 
-Inserts rests between each existing hit, expanding the rhythmic spacing while keeping the pattern within the same number of bars. Unlike `slow()`, which stretches across bar boundaries, `stretch()` operates within the current bar — hits stay in place relative to the bar length and silence fills in between them. Great for sparse, spacious grooves.
+Duplicates bars and steps within a pattern. The first argument repeats each bar a number of times; the optional second argument repeats each step within a bar. Both can be combined to build up dense, layered repetitions from a compact pattern. Non-integer values are rounded to the nearest integer. Values of `1` or less are treated as no-ops.
 
-| Argument   | Type     | Required |
-| ---------- | -------- | -------- |
-| multiplier | `number` | `true`   |
+| Argument | Type     | Required | Default |
+| -------- | -------- | -------- | ------- |
+| bars     | `number` | `true`   |         |
+| steps    | `number` | `false`  | `1`     |
 
 <CodeEditor
   client:load
   code={`
-d.sample("bd").hex(0xf).stretch(4).push();
-d.sample("sd").euclid(2, 8).stretch(2).push();`}
+d.synth("tri").root("c4").scale("maj").adsr(0.01,0.5,0.1,0.1)
+\ \ .note([0,2],[4,6]).stretch(2,4).push();`}
 />
 
 ### `reverse()`

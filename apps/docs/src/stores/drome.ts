@@ -8,7 +8,6 @@ export const activeEditor = atom<string | null>(null);
 
 effect([drome], (drome) => {
   if (!drome) return;
-  console.log(drome);
 
   drome.clock.on("start", () => paused.set(false));
   drome.clock.on("stop", () => {

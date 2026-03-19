@@ -260,8 +260,8 @@ abstract class Instrument<T> {
     return this;
   }
 
-  stretch(multiplier: number) {
-    this._cycles.stretch(multiplier);
+  stretch(bars: number, steps?: number) {
+    this._cycles.stretch(bars, steps);
     return this;
   }
 

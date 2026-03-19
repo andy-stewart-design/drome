@@ -191,19 +191,22 @@ d.synth("sine").root("c4").scale("maj")
 d.sample("bd").hex(0xf).slow(4).push();`}
 />
 
-### `stretch(multiplier)`
+### `stretch(bars, steps?)`
 
-Inserts rests between each existing hit, expanding the rhythmic spacing while keeping the pattern within the same number of bars. Unlike `slow()`, which stretches across bar boundaries, `stretch()` operates within the current bar — hits stay in place relative to the bar length and silence fills in between them. Great for sparse, spacious grooves.
+Duplicates bars and steps within a pattern. The first argument repeats each bar a number of times; the optional second argument repeats each step within a bar. Both can be combined to build up dense, layered repetitions from a compact pattern. Non-integer values are rounded to the nearest integer. Values of `1` or less are treated as no-ops.
 
-| Argument   | Type     | Required |
-| ---------- | -------- | -------- |
-| multiplier | `number` | `true`   |
+| Argument | Type     | Required | Default |
+| -------- | -------- | -------- | ------- |
+| bars     | `number` | `true`   |         |
+| steps    | `number` | `false`  | `1`     |
 
 <CodeEditor
   client:load
   code={`
-d.sample("bd").hex(0xf).stretch(4).push();
-d.sample("sd").euclid(2, 8).stretch(2).push();`}
+d.synth("sine").root("c4").scale("maj")
+  .note([0, 2, 4, 5]).stretch(2).push();
+d.synth("sine").root("c4").scale("maj")
+  .note([0, 2, 4, 5]).stretch(2, 2).push();`}
 />
 
 ### `reverse()`
