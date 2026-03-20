@@ -18,6 +18,8 @@ These methods simply spread steps evenly in time across a bar, but the pattern m
 
 ### `note(...patterns)`
 
+_Synthesizers only_
+
 Used with **synthesizers** to set the frequency of pitches that should be played during a bar. By default, this method expects [MIDI note numbers](https://inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies). However, it is often used with the `root` and `scale` methods to normalize and clamp the notes to a specific range.
 
 ```js
@@ -42,6 +44,8 @@ Depending on whether a value, an array of values, or a nested array of values is
 />
 
 ### `offset(...patterns)`
+
+_Samples only_
 
 Conceptually, this mathod functions similarly to the `note` method described above. Instead of expecting MIDI notes, though, it expects numbers between `0` and `1`, which defines the point in the sample where playback should begin. For example, passing in `0.5` will begin playing halfway through the duration of the sample.
 
@@ -119,6 +123,8 @@ d.sample("sd").hex(0x5).push();`}
 />
 
 ### `sequence(steps, ...pulses)`
+
+_alias: `seq()`_
 
 Think of this as the imperative sibling of the `euclid` method, where you manually specify hits and rests. The first argument declares the total number of steps. All subsequent arguments specify the indices where hits should land within a bar, and can be formatted as either a number or an array of numbers. Where `euclid` distributes hits mathematically, `sequence` puts you in full control.
 
@@ -209,6 +215,8 @@ d.synth("tri").root("c4").scale("maj").adsr(0.01,0.5,0.1,0.1)
 
 ### `reverse()`
 
+_alias: `rev()`_
+
 Flips the entire pattern back-to-front — reversing both the order of bars and the steps within each bar. A melodic run becomes a descent, a forward-driving groove becomes its mirror image. Simple but surprisingly effective for creating variation without writing new material.
 
 <CodeEditor
@@ -221,6 +229,8 @@ d.sample("hh").hex(0xd9).reverse().push();`}
 />
 
 ### `legato(v?)`
+
+_Synthesizers only · alias: `leg()`_
 
 Extends each note into the next one, stretching its duration until the following non-null step rather than cutting off at the end of its allocated step. Rests become connective tissue rather than silence — the note just keeps sounding through them. Essential for smooth melodic lines, sustained pads, and any passage where you want phrasing instead of staccato chops.
 

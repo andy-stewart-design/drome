@@ -8,142 +8,24 @@ order: 0
 
 import CodeEditor from "@/components/code-editor";
 
-Instruments are the primary sound sources in Drome — the things that actually make noise. There are two kinds: [**synthesizers**](./synthesizers) (`synth`) that generates tones from oscillators, and [**samplers**](./samplers) (`sample`) that plays audio files. Both are created through the main `d` object and share a common set of methods for controlling when and how they play.
-
-## Creating an instrument
-
-Both return an instrument object. Nothing plays until you call `.push()`, which registers the instrument to begin playing on the next bar. You can chain all of the pattern and effect methods that we will discuss next before calling `.push()`.
+Instruments are the primary sound sources in Drome. There are two types: [**synthesizers**](./synthesizers) (`synth()`), which generate tones from oscillators, and [**samplers**](./samplers) (`sample()`), which play audio files. Both are created through the main `d` object and share a common set of methods for controlling when and how they play.
 
 ```js
+// basic synthesizer
 d.synth("sine").note(60).push();
+// basic sampler
 d.sample("bd").hex(0xf).push();
 ```
 
-## Bars and cycles
+All instruments share a set of common, chainable methods that you can use to shape their output. We’ll talk in depth about each of these methods below, but I want to highlight one in particular at the top. In order to register an instrument to begin playing, you must call `push()` at the end of your audio chain. This creates the opportunity for more control and composability in how you structure your code than if instruments were automatically registered upon creation.
 
-Drome is bar-based. On every bar, each instrument plays through one "pattern" — a list of notes that are evenly spaced across the duration of that bar. If you provide multiple patterns, Drome steps through them one per bar, looping back to the start.
+## Pattern methods
 
-```js
-// One cycle: plays 60, 62, 64 in order within a single bar
-.note([60, 62, 64])
+Patterns are how you tell an instrument what to play and when. More concretely: a pattern describes the sequence of notes or sounds that should be arranged across one **bar** of time. You can learn more about [patterns in general here](../organizing-sound/intro-to-patterns), and reference [specific pattern methods here](../organizing-sound/pattern-methods).
 
-// Two cycles: plays 60 on bar 1, then 64 on bar 2, then repeats
-.note(60, 64)
+## Volume and envelope
 
-// Silence a step by passing null or undefined
-.note([60, null, 64, 67])
-.note([60, , 64, 67])
-```
-
-Each argument to `.note()` is one cycle (one bar's worth of events). To play multiple notes within a cycle, pass an array: `.note([60, 64, 67])` plays three notes spread evenly across the bar.
-
-## Shared methods
-
-All instruments — synths and samples — share these methods. They all return the instrument so you can chain them.
-
-### Pattern methods
-
-#### `.note(...cycles)`
-
-Sets the note pattern. Each argument is one bar cycle. Arrays within a cycle divide that bar into equal steps.
-
-| Argument  | Type                               | Required |
-| --------- | ---------------------------------- | -------- |
-| ...cycles | `number \| number[] \| number[][]` | `true`   |
-
-```js
-.note(60, 64)              // two bars, one note each
-.note([60, 64])            // one bar, two notes
-.note(60, 64, 67, 71)      // four bars, one note each
-.note([60, 64], [67, 71])  // two bars, two notes each
-.note([[60, 64, 67, 71]])  // one bar, one chord
-```
-
-##### `.note()` with a string
-
-You can write patterns as a comma-separated string, which gets parsed the same way:
-
-```js
-.note("60, 62, 64")  // equivalent to .note(60, 62, 64)
-```
-
-#### `.arrange(...[bars, pattern])`
-
-Repeats patterns for a set number of bars. Takes pairs of `[numBars, cycle]`.
-
-```js
-// Play [60, 62] for 3 bars, then [64, 65] for 1 bar
-.arrange([3, [60, 62]], [1, [64, 65]])
-```
-
-#### `.euclid(pulses, steps, rotation)`
-
-Generates a Euclidean rhythm — an algorithm that evenly distributes a number of pulses across a number of steps. Classic for polyrhythmic patterns.
-
-| Argument | Type                 | Required |
-| -------- | -------------------- | -------- |
-| pulses   | `number \| number[]` | `true`   |
-| steps    | `number`             | `true`   |
-| rotation | `number \| number[]` | `false`  |
-
-<CodeEditor
-  client:load
-  code={`// 3 hits over 8 steps, rotate 3 steps to the left
-d.sample("bd:3").euclid(3,8,3).push();
-// 2 hits over 8 steps, rotate 2 to the left 
-d.sample("sd").euclid(2,8,2).gain(0.625).push(); 
-// 11 or 13 hits over 16 steps, rotate 5 steps to the right
-d.sample("hh").euclid([11,13],16,-5).gain([0.5,0.25]).push();`}
-/>
-
-#### `.xox(...cycles)`
-
-Defines a rhythm using `x` and `.` (or `0` and `1`) notation. Each string is one cycle.
-
-```js
-.xox("x . x x . x . .")
-.xox("x x . .", "x . . .")
-```
-
-#### `.hex(...values)`
-
-Defines rhythm using hexadecimal values — each bit in the binary representation of the hex digit becomes a step.
-
-```js
-.hex(0x89) // 10001001 in binary → hits on steps 1, 5, 8
-```
-
-#### `.sequence(steps, ...pulses)`
-
-Places hits at specific step positions within a fixed number of steps.
-
-```js
-// 8 steps, hits on step 0 and step 4
-.sequence(8, 0, 4)
-```
-
-### Timing modifiers
-
-#### `.fast(n)`
-
-Compresses cycles so they repeat `n` times faster. `.fast(2)` plays through the pattern twice as quickly.
-
-#### `.slow(n)`
-
-Spreads cycles out so they take `n` times longer.
-
-#### `.stretch(n)`
-
-Stretches cycles by filling in rests to maintain the total pattern length.
-
-#### `.reverse()`
-
-Alias: `.rev()`
-Reverses the order of cycles.
-
-### Volume and envelope
-
-#### `.gain(amount)`
+### `.gain(amount)`
 
 Sets the volume of the instrument. `1` is full volume, `0` is silent. Accepts a number, pattern string, or `Envelope`.
 
@@ -152,9 +34,10 @@ Sets the volume of the instrument. `1` is full volume, `0` is silent. Accepts a 
 .gain("0.5, 0.8, 0.3")  // pattern across cycles
 ```
 
-#### `.adsr(attack, decay, sustain, release)`
+### `.adsr(attack, decay, sustain, release)`
 
-Alias: `.env(a, d, s, r)`
+_Alias: `.env(a, d, s, r)`_
+
 Sets the ADSR envelope. All values are in seconds, except `sustain` which is a level (0–1). Any argument can be omitted to leave it unchanged.
 
 ```js
@@ -171,24 +54,26 @@ You can also set each stage individually:
 .rel(0.3)    // release
 ```
 
-#### `.adsrMode(mode)`
+### `.adsrMode(mode)`
 
-Alias: `.envMode(mode)`
+_Alias: `.envMode(mode)`_
+
 Controls how the envelope behaves relative to note duration:
 
 - `"fit"` — envelope scales to fit the note duration (default)
 - `"clip"` — envelope is clipped at the note boundary
 - `"free"` — envelope runs freely regardless of note duration
 
-#### `.mute()`
+### `.mute()`
 
 Silences the instrument (sets gain to 0).
 
-### Pitch and timbre
+## Pitch and timbre
 
-#### `.detune(amount)`
+### `.detune(amount)`
 
-Alias: `.dt(amount)`
+_Alias: `.dt(amount)`_
+
 Detunes the instrument in cents (100 cents = 1 semitone). Accepts a number, pattern string, `Envelope`, `LfoNode`, or `MIDIObserver`.
 
 ```js
@@ -197,9 +82,10 @@ Detunes the instrument in cents (100 cents = 1 semitone). Accepts a number, patt
 .detune(d.lfo(0, 10)) // LFO-modulated detune
 ```
 
-#### `.filter(type, frequency, q)`
+### `.filter(type, frequency, q)`
 
-Alias: `.fil(type, frequency, q)`
+_Alias: `.fil(type, frequency, q)`_
+
 Applies a filter to this instrument's output. `type` is `"lp"` (lowpass), `"hp"` (highpass), or `"bp"` (bandpass). `frequency` is in Hz. `q` controls the resonance.
 
 ```js
@@ -208,16 +94,12 @@ Applies a filter to this instrument's output. `type` is `"lp"` (lowpass), `"hp"`
 .filter("lp", d.env(8000))  // filter frequency from envelope
 ```
 
-#### `.legato()`
+## Effects
 
-Alias: `.leg()`
-Enables legato mode — a note extends through any immediately following rests rather than stopping at its end boundary.
+### `.effects(...effects)`
 
-### Effects
+_alias: `.fx(...effects)`_
 
-#### `.effects(...effects)`
-
-Alias: `.fx(...effects)`
 Routes the instrument through one or more effects. Effects are created using `d.reverb()`, `d.delay()`, `d.distort()`, `d.gain()`, `d.pan()`, etc. (see the Effects documentation).
 
 ```js
@@ -225,13 +107,13 @@ Routes the instrument through one or more effects. Effects are created using `d.
 .fx(d.delay(0.25, 0.5), d.reverb(0.3))
 ```
 
-### MIDI output
+## MIDI output
 
-#### `.midi(deviceName)`
+### `.midi(deviceName)`
 
 Routes notes to a MIDI output device with the given name. The name is matched against connected MIDI devices.
 
-#### `.midichannel(n)`
+### `.midichannel(n)`
 
 Alias: `.midichan(n)`
 Sets the MIDI channel (1–16) for MIDI output. Must be called after `.midi()`.
@@ -248,8 +130,3 @@ d.stack(bass, lead).gain(0.6).adsr(0.01, 0.2, 0.5, 0.1).push();
 ```
 
 Stacks support `.gain()`, `.adsr()` / `.env()`, `.att()`, `.dec()`, `.sus()`, `.rel()`, `.adsrMode()`, `.detune()` / `.dt()`, `.filter()` / `.fil()`, and `.effects()` / `.fx()`.
-
----
-
-- [Synth](./synth.md) — oscillator-based synthesis
-- [Sample](./sample.md) — audio sample playback
