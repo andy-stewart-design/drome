@@ -12,14 +12,16 @@ import s from "./style.module.css";
 type Props = CollectionEntry<"docs">["data"];
 
 const rawPosts = await getCollection("docs");
-const groupedItems = buildSidebar(rawPosts.filter((p) => p.data.published !== false));
+const groupedItems = buildSidebar(
+  rawPosts.filter((p) => p.data.published !== false),
+);
 
 const { title, description, created, updated } = Astro.props;
 ---
 
 <html lang="en">
   <head>
-    <BaseHead title={title} description={description} />
+    <BaseHead title={title ?? ""} description={description ?? ""} />
   </head>
 
   <body>
@@ -34,12 +36,12 @@ const { title, description, created, updated } = Astro.props;
           />
         </div>
       </aside>
-      <article>
+      <article class={s.article}>
         <div class={s.prose}>
           <div class={s.title}>
             <h1>{title}</h1>
             <div class={s.date}>
-              Last updated: <FormattedDate date={updated ?? created} />
+              Last updated: <FormattedDate date={updated ?? created!} />
             </div>
           </div>
           <slot />

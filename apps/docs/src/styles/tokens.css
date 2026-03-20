@@ -83,7 +83,9 @@
   --app-color-border-strong: var(--app-color-neutral-50);
 
   --app-editor-header-height: 4rem;
-  --app-sidebar-width: 360px;
+  --app-max-width: 1440px;
+  --app-sidebar-width: 320px;
+  --app-padding-inline: 1rem;
 
   [data-theme="accent"] {
     --app-color-fg-primary: var(--app-color-magenta-50);

@@ -46,12 +46,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-main {
-  width: 720px;
-  max-width: calc(100% - 2em);
-  margin: auto;
-  padding: 3em 1em;
-}
 h1,
 h2,
 h3,
@@ -187,9 +181,6 @@ table {
 @media (max-width: 720px) {
   body {
     font-size: 18px;
-  }
-  main {
-    padding: 1em;
   }
 }
 

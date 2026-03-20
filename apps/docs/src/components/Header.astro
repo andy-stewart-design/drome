@@ -16,7 +16,6 @@ import HeaderLink from "./HeaderLink.astro";
 <style>
   header {
     margin: 0;
-    padding: 0 1rem;
   }
   h2 {
     margin: 0;
@@ -31,6 +30,9 @@ import HeaderLink from "./HeaderLink.astro";
     align-items: center;
     justify-content: space-between;
     padding-block: 1.5rem;
+    padding-inline: var(--app-padding-inline);
+    max-width: var(--app-max-width);
+    margin-inline: auto;
   }
   nav a {
     padding: 0.5rem 0;
