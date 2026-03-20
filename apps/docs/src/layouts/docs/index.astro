@@ -7,6 +7,7 @@ import FormattedDate from "@/components/FormattedDate.astro";
 import Header from "@/components/Header.astro";
 import Sidebar from "@/components/sidebar";
 import TableOfContents from "@/components/table-of-contents";
+import TableOfContentsMobile from "@/components/table-of-contents-mobile";
 import { getCollection } from "astro:content";
 import { buildSidebar } from "@/utils/sidebar";
 import s from "./style.module.css";
@@ -39,6 +40,7 @@ const { title, description, created, updated, headings = [] } = Astro.props;
         </div>
       </aside>
       <article class={s.article}>
+        <TableOfContentsMobile headings={headings} client:load />
         <div class={s.prose}>
           <div class={s.title}>
             <h1>{title}</h1>

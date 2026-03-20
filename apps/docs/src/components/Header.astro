@@ -15,7 +15,11 @@ import HeaderLink from "./HeaderLink.astro";
 </header>
 <style>
   header {
+    position: sticky;
+    top: 0;
     margin: 0;
+    background: var(--app-color-bg-primary);
+    z-index: 2;
   }
   h2 {
     margin: 0;
@@ -29,7 +33,7 @@ import HeaderLink from "./HeaderLink.astro";
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-block: 1.5rem;
+    block-size: var(--app-editor-header-height);
     padding-inline: var(--app-padding-inline);
     max-width: var(--app-max-width);
     margin-inline: auto;
