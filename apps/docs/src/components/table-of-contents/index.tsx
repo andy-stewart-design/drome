@@ -11,7 +11,7 @@ function TableOfContents(props: { headings: Heading[] }) {
   const filtered = () =>
     props.headings.filter((h) => h.depth >= 2 && h.depth <= 3);
   const [activeId, setActiveId] = createSignal<string | null>(
-    filtered()[0].slug,
+    filtered()[0]?.slug ?? null,
   );
 
   onMount(() => {
