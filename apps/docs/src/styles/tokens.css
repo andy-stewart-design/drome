@@ -85,6 +85,7 @@
   --app-editor-header-height: 4rem;
   --app-max-width: 1440px;
   --app-sidebar-width: 320px;
+  --app-toc-width: 220px;
   --app-padding-inline: 1rem;
 
   [data-theme="accent"] {
