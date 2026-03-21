@@ -1,6 +1,6 @@
 <script>
-  import { browser } from "$app/environment";
   import Header from "$components/Header.svelte";
+  import CodeEditor from "$components/code-editor/CodeEditor.svelte";
   import { SITE_TITLE, SITE_DESCRIPTION } from "$lib/consts.js";
 </script>
 
@@ -15,11 +15,7 @@
   <p style="text-align: center;">
     A minimalist live coding language for the web
   </p>
-  {#if browser}
-    {#await import("$components/code-editor/CodeEditor.svelte") then { default: CodeEditor }}
-      <CodeEditor code="d.synth().note([60,64,67,71]).push()" />
-    {/await}
-  {/if}
+  <CodeEditor code="d.synth().note([60,64,67,71]).push()" />
 </main>
 
 <style>
