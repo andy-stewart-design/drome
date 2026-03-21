@@ -12,7 +12,7 @@
 </script>
 
 <ul class="fileTree">
-  {#each tree as node}
+  {#each tree as node (node.id)}
     <li>
       {#if node.type === "folder"}
         <details class="details" open>

@@ -19,7 +19,7 @@ const config = {
       $components: "src/components",
     },
     prerender: {
-      handleHttpError: ({ path, referrer, message }) => {
+      handleHttpError: ({ path, message }) => {
         if (path === "/favicon.ico") return;
         throw new Error(message);
       },

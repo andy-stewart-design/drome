@@ -8,13 +8,15 @@
 
   let { data, children } = $props();
 
-  const pageData = $derived($page.data as {
-    title?: string;
-    description?: string;
-    headings?: { depth: number; slug: string; text: string }[];
-    updated?: Date;
-    created?: Date;
-  });
+  const pageData = $derived(
+    $page.data as {
+      title?: string;
+      description?: string;
+      headings?: { depth: number; slug: string; text: string }[];
+      updated?: Date;
+      created?: Date;
+    },
+  );
 </script>
 
 <svelte:head>
@@ -38,7 +40,9 @@
         <div class="title">
           <h1>{pageData.title}</h1>
           <div class="date">
-            Last updated: {(pageData.updated ?? pageData.created)?.toLocaleDateString()}
+            Last updated: {(
+              pageData.updated ?? pageData.created
+            )?.toLocaleDateString()}
           </div>
         </div>
       {/if}

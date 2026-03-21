@@ -13,7 +13,9 @@
 
   const Y_OFF = 8;
 
-  const filtered = $derived(headings.filter((h) => h.depth >= 2 && h.depth <= 3));
+  const filtered = $derived(
+    headings.filter((h) => h.depth >= 2 && h.depth <= 3),
+  );
   let current = $state<Heading | undefined>(undefined);
   let position = $state({ x: 0, y: 0 });
   let open = $state(false);
@@ -24,7 +26,9 @@
     current = headings[0];
 
     const headingEls = [
-      ...document.querySelectorAll<HTMLElement>("article h2[id], article h3[id]"),
+      ...document.querySelectorAll<HTMLElement>(
+        "article h2[id], article h3[id]",
+      ),
     ];
 
     const observer = new IntersectionObserver(
@@ -69,12 +73,14 @@
     <nav
       popover="auto"
       bind:this={popoverRef}
-      ontoggle={(e) => { open = (e as ToggleEvent).newState === "open"; }}
+      ontoggle={(e) => {
+        open = (e as ToggleEvent).newState === "open";
+      }}
       class="popover"
       style="left: {position.x}px; top: {position.y}px;"
     >
       <ul class="list">
-        {#each filtered as heading}
+        {#each filtered as heading (heading.slug)}
           <li class:depth3={heading.depth === 3}>
             <a
               href="#{heading.slug}"

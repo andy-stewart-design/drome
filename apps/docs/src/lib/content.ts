@@ -36,9 +36,7 @@ const modules = import.meta.glob<{
 }>("/src/content/docs/**/*.{md,mdx}", { eager: true });
 
 function pathToId(path: string): string {
-  return path
-    .replace("/src/content/docs/", "")
-    .replace(/\.(md|mdx)$/, "");
+  return path.replace("/src/content/docs/", "").replace(/\.(md|mdx)$/, "");
 }
 
 export function getAllDocs(): DocEntry[] {

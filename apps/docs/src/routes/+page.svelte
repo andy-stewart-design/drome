@@ -12,7 +12,9 @@
 <Header />
 <main>
   <h1 style="text-align: center;">Drome</h1>
-  <p style="text-align: center;">A minimalist live coding language for the web</p>
+  <p style="text-align: center;">
+    A minimalist live coding language for the web
+  </p>
   {#if browser}
     {#await import("$components/code-editor/CodeEditor.svelte") then { default: CodeEditor }}
       <CodeEditor code="d.synth().note([60,64,67,71]).push()" />

@@ -11,7 +11,9 @@
 
   let { headings }: Props = $props();
 
-  const filtered = $derived(headings.filter((h) => h.depth >= 2 && h.depth <= 3));
+  const filtered = $derived(
+    headings.filter((h) => h.depth >= 2 && h.depth <= 3),
+  );
   let activeId = $state<string | null>(null);
 
   $effect(() => {
@@ -19,7 +21,9 @@
     activeId = headings[0]?.slug ?? null;
 
     const headingEls = [
-      ...document.querySelectorAll<HTMLElement>("article h2[id], article h3[id]"),
+      ...document.querySelectorAll<HTMLElement>(
+        "article h2[id], article h3[id]",
+      ),
     ];
 
     const observer = new IntersectionObserver(
@@ -49,7 +53,7 @@
   <nav>
     <p class="label">On this page</p>
     <ul class="list">
-      {#each filtered as heading}
+      {#each filtered as heading (heading.slug)}
         <li class:depth3={heading.depth === 3}>
           <a
             href="#{heading.slug}"

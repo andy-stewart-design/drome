@@ -7,8 +7,7 @@ export const prerender = true;
 export function entries() {
   return getAllDocs()
     .filter(
-      (doc) =>
-        doc.data.published !== false && !doc.id.endsWith("/_index"),
+      (doc) => doc.data.published !== false && !doc.id.endsWith("/_index"),
     )
     .map((doc) => ({ slug: doc.slug }));
 }

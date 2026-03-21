@@ -8,7 +8,9 @@
   <nav>
     <h2><a href="/">{SITE_TITLE}</a></h2>
     <div class="internal-links">
-      <a href="/docs" class:active={$page.url.pathname.startsWith("/docs")}>Docs</a>
+      <a href="/docs" class:active={$page.url.pathname.startsWith("/docs")}
+        >Docs</a
+      >
       <a href="https://drome-repl-web.vercel.app/" target="_blank">REPL ↗</a>
     </div>
   </nav>

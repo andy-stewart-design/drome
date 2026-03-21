@@ -15,7 +15,11 @@ export function extractHeadings() {
 
     visit(tree, "element", (node) => {
       if (/^h[2-3]$/.test((node as { tagName: string }).tagName)) {
-        const el = node as { tagName: string; properties?: Record<string, unknown>; children: unknown[] };
+        const el = node as {
+          tagName: string;
+          properties?: Record<string, unknown>;
+          children: unknown[];
+        };
         const depth = parseInt(el.tagName[1], 10);
         const slug = (el.properties?.id as string) ?? "";
         const text = toString(node as Parameters<typeof toString>[0]);

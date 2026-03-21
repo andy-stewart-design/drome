@@ -7,11 +7,9 @@ order: 0
 ---
 
 <script>
-  import CodeEditor from "$components/code-editor/CodeEditor.svelte";
-
-  const introCode = `d.bpm(120); // 120 BPM
-
-d.synth("sine").root("C4").scale("minor").note([0,1,2,3,4,5,6,7]).push();`;
+  import CodeEditor from "$components/code-editor/CodeEditor.svelte"; const
+  introCode = `d.bpm(120); // 120 BPM
+  d.synth("sine").root("C4").scale("minor").note([0,1,2,3,4,5,6,7]).push();`;
 </script>
 
 Drome is a live coding language for making music in the browser. You write JavaScript, hit play, and hear the results — no compilation step, no build tools, no boilerplate.

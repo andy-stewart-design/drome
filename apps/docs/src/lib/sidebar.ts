@@ -8,7 +8,9 @@ type TreeFolder<T extends BaseItem> = {
   items: TreeItem<T>[];
 };
 
-function buildSidebar<T extends { id: string; data?: { order?: number } }>(items: T[]): TreeItem<T>[] {
+function buildSidebar<T extends { id: string; data?: { order?: number } }>(
+  items: T[],
+): TreeItem<T>[] {
   const isIndex = (id: string) => id === "_index" || id.endsWith("/_index");
 
   // Build folder order map from _index items

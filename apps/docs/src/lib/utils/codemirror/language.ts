@@ -22,7 +22,7 @@ export const javascriptLanguage = LRLanguage.define({
         TryStatement: continuedIndent({ except: /^\s*({|catch\b|finally\b)/ }),
         LabeledStatement: flatIndent,
         SwitchBody: (context) => {
-          let after = context.textAfter,
+          const after = context.textAfter,
             closed = /^\s*\}/.test(after),
             isCase = /^\s*(case|default)\b/.test(after);
           return (
@@ -34,13 +34,13 @@ export const javascriptLanguage = LRLanguage.define({
         "TemplateString BlockComment": () => null,
         "Statement Property": continuedIndent({ except: /^\s*{/ }),
         JSXElement(context) {
-          let closed = /^\s*<\//.test(context.textAfter);
+          const closed = /^\s*<\//.test(context.textAfter);
           return (
             context.lineIndent(context.node.from) + (closed ? 0 : context.unit)
           );
         },
         JSXEscape(context) {
-          let closed = /\s*\}/.test(context.textAfter);
+          const closed = /\s*\}/.test(context.textAfter);
           return (
             context.lineIndent(context.node.from) + (closed ? 0 : context.unit)
           );
@@ -67,6 +67,6 @@ export const javascriptLanguage = LRLanguage.define({
 });
 
 export function javascript() {
-  let lang = javascriptLanguage;
+  const lang = javascriptLanguage;
   return new LanguageSupport(lang);
 }
