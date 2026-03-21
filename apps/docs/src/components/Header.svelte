@@ -29,8 +29,7 @@
     margin: 0;
     font-size: 1em;
   }
-  h2 a,
-  h2 a.active {
+  h2 a {
     text-decoration: none;
   }
   nav {

@@ -1,5 +1,5 @@
 import rehypeSlug from "rehype-slug";
-import { remarkExtractHeadings } from "./src/lib/remark-extract-headings.js";
+import { remarkExtractHeadings } from "./src/lib/remark-extract-headings.ts";
 
 /** @type {import('mdsvex').MdsvexOptions} */
 const config = {
