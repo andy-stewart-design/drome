@@ -11,7 +11,8 @@
 
   let { headings }: Props = $props();
 
-  const Y_OFF = 8;
+  const POPOVER_Y_OFF = 8;
+  const SCROLL_Y_OFF = 40;
 
   const filtered = $derived(
     headings.filter((h) => h.depth >= 2 && h.depth <= 3),
@@ -51,14 +52,29 @@
     else popoverRef?.showPopover();
 
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    position = { x: rect.left, y: rect.top + rect.height + Y_OFF };
+    position = { x: rect.left, y: rect.top + rect.height + POPOVER_Y_OFF };
   }
 
   function scrollTo(e: MouseEvent, slug: string) {
     e.preventDefault();
     const target = document.getElementById(slug);
     if (!target) return;
-    const top = target.getBoundingClientRect().top + window.scrollY - 48;
+    const root = document.documentElement;
+    const rem = parseFloat(getComputedStyle(root).fontSize);
+    const headerHeight =
+      parseFloat(
+        getComputedStyle(root).getPropertyValue("--app-editor-header-height"),
+      ) * rem;
+    const tocHeight =
+      parseFloat(
+        getComputedStyle(root).getPropertyValue("--app-toc-mobile-height"),
+      ) * rem;
+    const top =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      headerHeight -
+      tocHeight -
+      SCROLL_Y_OFF;
     window.scrollTo({ top, behavior: "smooth" });
     history.pushState(null, "", `#${slug}`);
   }
@@ -100,8 +116,10 @@
   .container {
     position: sticky;
     top: var(--app-editor-header-height);
+    block-size: var(--app-toc-mobile-height);
+    display: flex;
+    align-items: center;
     background: var(--app-color-bg-primary);
-    padding-block: var(--spacing-3);
     padding-inline: var(--app-padding-inline);
     border-block-end: 1px solid var(--app-color-border-subtle);
     z-index: 2;

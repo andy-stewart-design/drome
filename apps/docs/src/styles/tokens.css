@@ -83,6 +83,7 @@
   --app-color-border-strong: var(--app-color-neutral-50);
 
   --app-editor-header-height: 4rem;
+  --app-toc-mobile-height: 2.5rem;
   --app-max-width: 1440px;
   --app-sidebar-width: 320px;
   --app-toc-width: 220px;

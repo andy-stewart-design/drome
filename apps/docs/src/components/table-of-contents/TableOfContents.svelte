@@ -9,6 +9,8 @@
     headings: Heading[];
   }
 
+  const SCROLL_Y_OFF = 40;
+
   let { headings }: Props = $props();
 
   const filtered = $derived(
@@ -43,7 +45,17 @@
     e.preventDefault();
     const target = document.getElementById(slug);
     if (!target) return;
-    const top = target.getBoundingClientRect().top + window.scrollY - 48;
+    const root = document.documentElement;
+    const rem = parseFloat(getComputedStyle(root).fontSize);
+    const headerHeight =
+      parseFloat(
+        getComputedStyle(root).getPropertyValue("--app-editor-header-height"),
+      ) * rem;
+    const top =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      headerHeight -
+      SCROLL_Y_OFF;
     window.scrollTo({ top, behavior: "smooth" });
     history.pushState(null, "", `#${slug}`);
   }
