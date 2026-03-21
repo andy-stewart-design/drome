@@ -1,0 +1,57 @@
+<script>
+  import { page } from "$app/stores";
+
+  const SITE_TITLE = "Drome Docs";
+</script>
+
+<header>
+  <nav>
+    <h2><a href="/">{SITE_TITLE}</a></h2>
+    <div class="internal-links">
+      <a href="/docs" class:active={$page.url.pathname.startsWith("/docs")}>Docs</a>
+      <a href="https://drome-repl-web.vercel.app/" target="_blank">REPL ↗</a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  header {
+    position: sticky;
+    top: 0;
+    margin: 0;
+    background: var(--app-color-bg-primary);
+    border-block-end: 1px solid var(--app-color-border-subtle);
+    z-index: 3;
+  }
+  h2 {
+    margin: 0;
+    font-size: 1em;
+  }
+  h2 a,
+  h2 a.active {
+    text-decoration: none;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    block-size: var(--app-editor-header-height);
+    padding-inline: var(--app-padding-inline);
+    max-width: var(--app-max-width);
+    margin-inline: auto;
+  }
+  nav a {
+    padding: 0.5rem 0;
+    color: var(--app-color-fg-secondary);
+    text-decoration: none;
+    line-height: 1;
+  }
+  nav a.active {
+    color: var(--app-color-fg-primary);
+  }
+  .internal-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+</style>

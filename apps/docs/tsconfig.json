@@ -1,20 +1,14 @@
 {
-  "extends": "astro/tsconfigs/strict",
-  "include": [
-    ".astro/types.d.ts",
-    "**/*"
-  ],
-  "exclude": [
-    "dist"
-  ],
+  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
-    "strictNullChecks": true,
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js"
+    "allowJs": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "moduleResolution": "bundler"
   }
 }

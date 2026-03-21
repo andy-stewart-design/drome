@@ -6,7 +6,13 @@ updated: "Mar 11 2026"
 order: 0
 ---
 
-import CodeEditor from "@/components/code-editor";
+<script>
+  import CodeEditor from "$components/code-editor/CodeEditor.svelte";
+
+  const introCode = `d.bpm(120); // 120 BPM
+
+d.synth("sine").root("C4").scale("minor").note([0,1,2,3,4,5,6,7]).push();`;
+</script>
 
 Drome is a live coding language for making music in the browser. You write JavaScript, hit play, and hear the results — no compilation step, no build tools, no boilerplate.
 
@@ -23,25 +29,19 @@ It's designed around the idea of a **bar**: a repeating unit of time that you fi
 
 Drome runs entirely in the browser using the [Web Audio](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) and [Web MIDI](https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API) APIs. There's no server, no plugins, nothing to install.
 
-> Please note that if you’re using Drome in Safari (or any other WebKit-based browser), you will not have access to MIDI functionality. Apple independently decided [not to support the Web MIDI API in Safari](https://webkit.org/tracking-prevention/) because of fingerprinting concerns.
+> Please note that if you're using Drome in Safari (or any other WebKit-based browser), you will not have access to MIDI functionality. Apple independently decided [not to support the Web MIDI API in Safari](https://webkit.org/tracking-prevention/) because of fingerprinting concerns.
 
 ## How it's structured
 
 Everything in Drome flows through a single object — conventionally called `drome`, or `d` for short. You use it to create instruments, then describe what those instruments should play and how they should sound.
 
-<CodeEditor
-  client:load
-  code={`
-d.bpm(120); // 120 BPM
-
-d.synth("sine").root("C4").scale("minor").note([0,1,2,3,4,5,6,7]).push();`}
-/>
+<CodeEditor code={introCode} />
 
 The above code creates a sine wave synth playing a run of a minor scale rooted at C4. The `.push()` at the end registers the instrument for the next bar.
 
 Every evaluation is **stateless by default** — each time you run your code, Drome starts fresh with only what you've defined in that block.
 
-## What‘s with the name?
+## What's with the name?
 
 Live coding environments have a thing for names that nod to repetition — Tidal Cycles, Strudel, and so on. Drome continues that tradition.
 

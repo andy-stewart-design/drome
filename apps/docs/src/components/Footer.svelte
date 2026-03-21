@@ -1,0 +1,11 @@
+<footer>
+  &copy; {new Date().getFullYear()} Andy Stewart. All rights reserved.
+</footer>
+
+<style>
+  footer {
+    padding: 2em 1em 6em 1em;
+    color: rgb(var(--gray));
+    text-align: center;
+  }
+</style>
