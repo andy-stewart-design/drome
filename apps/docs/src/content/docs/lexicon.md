@@ -35,7 +35,7 @@ A single subdivision of a pattern. Each step holds one note, one chord, or silen
 
 A sequence of steps that plays over exactly one bar. `.note([0, 3, 5])` defines one pattern with three steps. Patterns can contain note values, chords, or silence, and can be written directly or via shorthand methods like `.euclid()`, `.xox()`, and `.hex()`.
 
-Patterns can be expressed as either an array or a string. In Drome, `[0, 3, 5]` and `"[0, 3, 5]"` are equivalent. The string form is useful when a method accepts multiple arguments and a pattern is one of them — it keeps the pattern self-contained without ambiguity.
+Patterns can be expressed as either an array of numbers or a string. In Drome, `[0, 3, 5]` and `"[0, 3, 5]"` are functionally equivalent. The string form is most useful when a method accepts multiple arguments, one of which can be a pattern. This allows the pattern definition to be self-contained and unambiguous.
 
 #### Cycle
 
