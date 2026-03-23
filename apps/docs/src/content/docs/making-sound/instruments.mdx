@@ -1,42 +1,69 @@
 ---
 title: "Instruments"
-description: "Lorem ipsum dolor sit amet"
+description: "Sound sources in Drome and their shared methods"
 created: "Jul 08 2022"
-updated: "Jul 08 2022"
+updated: "Mar 23 2026"
 order: 0
 ---
 
 Instruments are the primary sound sources in Drome. There are two types: [**synthesizers**](./synthesizers) (`synth()`), which generate tones from oscillators, and [**samplers**](./samplers) (`sample()`), which play audio files. Both are created through the main `d` object and share a common set of methods for controlling when and how they play.
 
 ```js
-// basic synthesizer
 d.synth("sine").note(60).push();
-// basic sampler
 d.sample("bd").hex(0xf).push();
 ```
 
-All instruments share a set of common, chainable methods that you can use to shape their output. We’ll talk in depth about each of these methods below, but I want to highlight one in particular at the top. In order to register an instrument to begin playing, you must call `push()` at the end of your audio chain. This creates the opportunity for more control and composability in how you structure your code than if instruments were automatically registered upon creation.
+## Registering an instrument
 
-## Pattern methods
+### `.push()`
 
-Patterns are how you tell an instrument what to play and when. More concretely: a pattern describes the sequence of notes or sounds that should be arranged across one **bar** of time. You can learn more about [patterns in general here](../organizing-sound/intro-to-patterns), and reference [specific pattern methods here](../organizing-sound/pattern-methods).
+Queues the instrument to begin playing on the next bar. **Nothing plays until you call `.push()`.** It should always be the final call in your chain.
+
+```js
+d.synth("sine").note([0, 3, 5]).push();
+```
+
+This design gives you explicit control over when an instrument enters the mix, and makes it possible to define instruments across multiple lines before committing them all at once:
+
+```js
+const bass = d.synth("saw").root("C2").note(0);
+const lead = d.synth("sine").root("C4").note([0, 3, 5]);
+
+bass.push();
+lead.push();
+```
+
+## Patterns
+
+Patterns are how you tell an instrument what to play and when. You can learn more about [working with patterns](../organizing-sound/intro-to-patterns) and reference [specific pattern methods](../organizing-sound/pattern-methods) in the sequencing section.
 
 ## Volume and envelope
 
 ### `.gain(amount)`
 
-Sets the volume of the instrument. `1` is full volume, `0` is silent. Accepts a number, pattern string, or `Envelope`.
+Sets the volume of the instrument. `1` is full volume, `0` is silent. Accepts a number, pattern, `Envelope`, or `LfoNode`.
+
+| Argument | Type                                            | Required |
+| -------- | ----------------------------------------------- | -------- |
+| amount   | `number` \| `string` \| `Envelope` \| `LfoNode` | `true`   |
 
 ```js
 .gain(0.5)
-.gain("0.5, 0.8, 0.3")  // pattern across cycles
+.gain(d.lfo(0.5, 0.3))   // LFO-modulated volume
 ```
 
 ### `.adsr(attack, decay, sustain, release)`
 
 _Alias: `.env(a, d, s, r)`_
 
-Sets the ADSR envelope. All values are in seconds, except `sustain` which is a level (0–1). Any argument can be omitted to leave it unchanged.
+Sets the ADSR envelope. `attack`, `decay`, and `release` are times in seconds. `sustain` is a level from 0 to 1. Any argument can be omitted to leave that stage unchanged.
+
+| Argument | Type     | Required |
+| -------- | -------- | -------- |
+| attack   | `number` | `false`  |
+| decay    | `number` | `false`  |
+| sustain  | `number` | `false`  |
+| release  | `number` | `false`  |
 
 ```js
 .adsr(0.01, 0.1, 0.7, 0.3)
@@ -56,65 +83,92 @@ You can also set each stage individually:
 
 _Alias: `.envMode(mode)`_
 
-Controls how the envelope behaves relative to note duration:
+Controls how the envelope's stages map to the note's duration in the pattern:
 
-- `"fit"` — envelope scales to fit the note duration (default)
-- `"clip"` — envelope is clipped at the note boundary
-- `"free"` — envelope runs freely regardless of note duration
+- `"fit"` — attack and decay fit within the note duration; release extends after it ends (default)
+- `"clip"` — all stages are scaled to fit entirely within the note duration
+- `"free"` — stages are absolute durations in seconds, independent of the pattern's timing
+
+| Argument | Type                        | Required | Default |
+| -------- | --------------------------- | -------- | ------- |
+| mode     | `"fit"` \| `"clip"` \| `"free"` | `true`   | `"fit"` |
 
 ### `.mute()`
 
-Silences the instrument (sets gain to 0).
+Silences the instrument without removing it from the mix.
 
-## Pitch and timbre
+## Pitch
 
 ### `.detune(amount)`
 
 _Alias: `.dt(amount)`_
 
-Detunes the instrument in cents (100 cents = 1 semitone). Accepts a number, pattern string, `Envelope`, `LfoNode`, or `MIDIObserver`.
+Detunes the instrument in cents. 100 cents equals one semitone. Accepts a number, pattern, `Envelope`, or `LfoNode`.
+
+| Argument | Type                                      | Required |
+| -------- | ----------------------------------------- | -------- |
+| amount   | `number` \| `string` \| `Envelope` \| `LfoNode` | `true`   |
 
 ```js
-.detune(50)           // 50 cents sharp
-.detune("0, 50, -50") // cycle through detune values
-.detune(d.lfo(0, 10)) // LFO-modulated detune
+.detune(50)                // 50 cents sharp
+.detune("0, 50, -50")      // cycle through detune values per bar
+.detune(d.lfo(0, 10))      // LFO-modulated detune
 ```
 
 ### `.filter(type, frequency, q)`
 
 _Alias: `.fil(type, frequency, q)`_
 
-Applies a filter to this instrument's output. `type` is `"lp"` (lowpass), `"hp"` (highpass), or `"bp"` (bandpass). `frequency` is in Hz. `q` controls the resonance.
+Applies a filter to the instrument's output. `type` accepts `"lp"` (lowpass), `"hp"` (highpass), or `"bp"` (bandpass). `frequency` and `q` accept a number, pattern, `Envelope`, or `LfoNode`.
+
+| Argument  | Type                                      | Required |
+| --------- | ----------------------------------------- | -------- |
+| type      | `"lp"` \| `"hp"` \| `"bp"`                                 | `true`   |
+| frequency | `number` \| `string` \| `Envelope` \| `LfoNode` | `true`   |
+| q         | `number`                                  | `false`  |
 
 ```js
-.filter("lp", 800)          // lowpass at 800 Hz
-.filter("hp", 200, 2)       // highpass with resonance
-.filter("lp", d.env(8000))  // filter frequency from envelope
+.filter("lp", 800)           // lowpass at 800 Hz
+.filter("hp", 200, 2)        // highpass with resonance
+.filter("lp", d.env(8000))   // envelope-modulated cutoff
 ```
 
 ## Effects
 
 ### `.effects(...effects)`
 
-_alias: `.fx(...effects)`_
+_Alias: `.fx(...effects)`_
 
-Routes the instrument through one or more effects. Effects are created using `d.reverb()`, `d.delay()`, `d.distort()`, `d.gain()`, `d.pan()`, etc. (see the Effects documentation).
+Routes the instrument through one or more effects. Effects are created using `d.reverb()`, `d.delay()`, `d.distort()`, `d.gain()`, `d.pan()`, and so on. See the [Effects](../effects) documentation.
+
+| Argument   | Type       | Required |
+| ---------- | ---------- | -------- |
+| ...effects | `Effect[]` | `true`   |
 
 ```js
 .fx(d.reverb(0.4))
 .fx(d.delay(0.25, 0.5), d.reverb(0.3))
 ```
 
-## MIDI output
+## MIDI
 
 ### `.midi(deviceName)`
 
-Routes notes to a MIDI output device with the given name. The name is matched against connected MIDI devices.
+Routes notes to a MIDI output device. The device name is matched against connected MIDI outputs.
+
+| Argument   | Type     | Required |
+| ---------- | -------- | -------- |
+| deviceName | `string` | `true`   |
 
 ### `.midichannel(n)`
 
-Alias: `.midichan(n)`
-Sets the MIDI channel (1–16) for MIDI output. Must be called after `.midi()`.
+_Alias: `.midichan(n)`_
+
+Sets the MIDI channel for MIDI output.
+
+| Argument | Type     | Required |
+| -------- | -------- | -------- |
+| n        | `number` | `true`   |
 
 ## Stacks
 
