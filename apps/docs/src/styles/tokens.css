@@ -113,4 +113,10 @@
       --app-color-bg-secondary: var(--app-color-magenta-200);
     }
   }
+
+  /* Shiki syntax highlighting — values are overridden by inline styles at build time */
+  --shiki-dark: inherit;
+  --shiki-dark-bg: transparent;
+  --shiki-light: inherit;
+  --shiki-light-bg: transparent;
 }

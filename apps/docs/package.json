@@ -16,7 +16,8 @@
     "@lezer/highlight": "^1.2.3",
     "@lezer/javascript": "^1.5.4",
     "codemirror": "^6.0.2",
-    "drome-live": "workspace:*"
+    "drome-live": "workspace:*",
+    "shiki": "^4.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

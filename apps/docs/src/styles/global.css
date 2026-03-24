@@ -114,9 +114,25 @@ code {
 pre {
   padding: var(--spacing-5) var(--spacing-6);
   border-radius: var(--spacing-1_5);
-  background-color: var(--app-color-bg-secondary);
-  background-color: var(--app-color-neutral-900);
   line-height: 1.4;
+}
+pre:not(.shiki) {
+  background-color: var(--app-color-neutral-900);
+}
+pre.shiki {
+  overflow-x: auto;
+  background-color: var(--shiki-dark-bg);
+}
+:root:has(body > div[data-color-scheme="light"]) pre.shiki {
+  background-color: var(--shiki-light-bg);
+}
+.shiki span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+:root:has(body > div[data-color-scheme="light"]) .shiki span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
 }
 pre > code {
   all: unset;
