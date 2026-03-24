@@ -41,7 +41,7 @@ Patterns are how you tell an instrument what to play and when. You can learn mor
 
 ### `.gain(amount)`
 
-Sets the volume of the instrument. `1` is full volume, `0` is silent. Accepts a number, pattern, `Envelope`, or `LfoNode`.
+Sets the volume of the instrument. `1` is the default, `0` is silent. Accepts a number, pattern, `Envelope`, or `LfoNode`.
 
 | Argument | Type                                            | Required |
 | -------- | ----------------------------------------------- | -------- |
@@ -89,8 +89,8 @@ Controls how the envelope's stages map to the note's duration in the pattern:
 - `"clip"` — all stages are scaled to fit entirely within the note duration
 - `"free"` — stages are absolute durations in seconds, independent of the pattern's timing
 
-| Argument | Type                        | Required | Default |
-| -------- | --------------------------- | -------- | ------- |
+| Argument | Type                            | Required | Default |
+| -------- | ------------------------------- | -------- | ------- |
 | mode     | `"fit"` \| `"clip"` \| `"free"` | `true`   | `"fit"` |
 
 ### `.mute()`
@@ -105,8 +105,8 @@ _Alias: `.dt(amount)`_
 
 Detunes the instrument in cents. 100 cents equals one semitone. Accepts a number, pattern, `Envelope`, or `LfoNode`.
 
-| Argument | Type                                      | Required |
-| -------- | ----------------------------------------- | -------- |
+| Argument | Type                                            | Required |
+| -------- | ----------------------------------------------- | -------- |
 | amount   | `number` \| `string` \| `Envelope` \| `LfoNode` | `true`   |
 
 ```js
@@ -121,11 +121,11 @@ _Alias: `.fil(type, frequency, q)`_
 
 Applies a filter to the instrument's output. `type` accepts `"lp"` (lowpass), `"hp"` (highpass), or `"bp"` (bandpass). `frequency` and `q` accept a number, pattern, `Envelope`, or `LfoNode`.
 
-| Argument  | Type                                      | Required |
-| --------- | ----------------------------------------- | -------- |
-| type      | `"lp"` \| `"hp"` \| `"bp"`                                 | `true`   |
+| Argument  | Type                                            | Required |
+| --------- | ----------------------------------------------- | -------- |
+| type      | `"lp"` \| `"hp"` \| `"bp"`                      | `true`   |
 | frequency | `number` \| `string` \| `Envelope` \| `LfoNode` | `true`   |
-| q         | `number`                                  | `false`  |
+| q         | `number`                                        | `false`  |
 
 ```js
 .filter("lp", 800)           // lowpass at 800 Hz
@@ -139,7 +139,7 @@ Applies a filter to the instrument's output. `type` accepts `"lp"` (lowpass), `"
 
 _Alias: `.fx(...effects)`_
 
-Routes the instrument through one or more effects. Effects are created using `d.reverb()`, `d.delay()`, `d.distort()`, `d.gain()`, `d.pan()`, and so on. See the [Effects](../effects) documentation.
+Routes the instrument through one or more effects. Effects are created using `d.reverb()`, `d.delay()`, `d.distort()`, `d.gain()`, `d.pan()`, and so on. See the [Effects](./effects) documentation.
 
 | Argument   | Type       | Required |
 | ---------- | ---------- | -------- |

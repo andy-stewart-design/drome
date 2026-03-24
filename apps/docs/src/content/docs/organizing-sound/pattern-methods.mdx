@@ -103,11 +103,11 @@ Generates a [Euclidean rhythm](https://en.wikipedia.org/wiki/Euclidean_rhythm) u
 
 Passing an optional rotation argument shifts the pattern to the left (positive) or right (negative) by that many steps. Passing an array of values for either the pulses or rotation arguments creates multiple bars.
 
-| Argument | Type                 | Required |
-| -------- | -------------------- | -------- |
-| pulses   | `number \| number[]` | `true`   |
-| steps    | `number`             | `true`   |
-| rotation | `number \| number[]` | `false`  |
+| Argument | Type                   | Required |
+| -------- | ---------------------- | -------- |
+| pulses   | `number` \| `number[]` | `true`   |
+| steps    | `number`               | `true`   |
+| rotation | `number` \| `number[]` | `false`  |
 
 <CodeEditor code={euclidEx} />
 
@@ -132,10 +132,10 @@ _alias: `seq()`_
 
 Think of this as the imperative sibling of the `euclid` method, where you manually specify hits and rests. The first argument declares the total number of steps. All subsequent arguments specify the indices where hits should land within a bar, and can be formatted as either a number or an array of numbers. Where `euclid` distributes hits mathematically, `sequence` puts you in full control.
 
-| Argument  | Type                 | Required |
-| --------- | -------------------- | -------- |
-| steps     | `number`             | `true`   |
-| ...pulses | `number \| number[]` | `true`   |
+| Argument  | Type                   | Required |
+| --------- | ---------------------- | -------- |
+| steps     | `number`               | `true`   |
+| ...pulses | `number` \| `number[]` | `true`   |
 
 <CodeEditor code={sequenceEx} />
 
@@ -188,7 +188,7 @@ Flips the entire pattern back-to-front — reversing both the order of bars and 
 
 <CodeEditor code={reverseEx} />
 
-### `legato(v?)`
+### `legato(enable?)`
 
 _Synthesizers only · alias: `leg()`_
 
@@ -196,8 +196,8 @@ Extends each note into the next one, stretching its duration until the following
 
 Pass a boolean to enable or disable legato across all bars. Pass a single bar index or an array of bar indices (0-indexed) to apply legato only to specific bars.
 
-| Argument | Type                            | Required | Default |
-| -------- | ------------------------------- | -------- | ------- |
-| v        | `boolean \| number \| number[]` | `false`  | `true`  |
+| Argument | Type                                | Required | Default |
+| -------- | ----------------------------------- | -------- | ------- |
+| enable   | `boolean` \| `number` \| `number[]` | `false`  | `true`  |
 
 <CodeEditor code={legatoEx} />

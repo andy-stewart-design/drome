@@ -6,8 +6,6 @@ updated: "Jul 08 2022"
 order: 2
 ---
 
-# Sample
-
 A sample player loads and plays audio files. Create one with `d.sample()`, passing one or more sample IDs.
 
 ```js

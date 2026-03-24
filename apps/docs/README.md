@@ -21,3 +21,11 @@
   - Scenes
   - Keyboard Shortcuts
   - Logging
+
+## TODO
+
+- Make sure I'm not using `.offset` when I mean `.begin` when talking about Samples
+- Add other supersaw methods
+- Make sure all Pattern inputs can be either array or string format
+- update stretch() method to accept patterns (not just numbers)
+- fix pattern methods > arrange argument table rendering
