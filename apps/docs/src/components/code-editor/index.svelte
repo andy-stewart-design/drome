@@ -1,10 +1,10 @@
 <script lang="ts">
   import { browser } from "$app/environment";
-  import { dromeState } from "../../stores/drome.svelte.js";
+  import { dromeState } from "$stores/drome.svelte.js";
   import { createCodeMirror } from "$lib/utils/codemirror/index.js";
-  import IconPause20 from "../icons/IconPause20.svelte";
-  import IconPlay20 from "../icons/IconPlay20.svelte";
-  import IconRefresh20 from "../icons/IconRefresh20.svelte";
+  import IconPause20 from "$icons/icon-pause-20.svelte";
+  import IconPlay20 from "$icons/icon-play-20.svelte";
+  import IconRefresh20 from "$icons/icon-refresh-20.svelte";
   import type { EditorView } from "codemirror";
   import "$lib/utils/codemirror/theme.css";
 

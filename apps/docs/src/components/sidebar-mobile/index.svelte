@@ -2,6 +2,8 @@
   import type { TreeItem } from "$lib/sidebar.js";
   import type { DocEntry } from "$lib/content.js";
   import Sidebar from "$components/sidebar/index.svelte";
+  import IconHamburger from "$components/icons/icon-hamburger-16.svelte";
+  import { afterNavigate } from "$app/navigation";
 
   interface Props {
     tree: TreeItem<DocEntry>[];
@@ -10,55 +12,17 @@
 
   let { tree, currentPath }: Props = $props();
 
-  let dialog = $state<HTMLDialogElement | null>(null);
+  let dialog: HTMLDialogElement;
 
-  function open() {
-    dialog?.showModal();
-  }
+  const open = () => dialog?.showModal();
+  const close = () => dialog?.close();
+  const onDialogClick = (e: MouseEvent) => e.target === dialog && close();
 
-  function close() {
-    dialog?.close();
-  }
-
-  function onDialogClick(e: MouseEvent) {
-    if (e.target === dialog) {
-      close();
-    }
-  }
-
-  function onNavClick(e: MouseEvent) {
-    if ((e.target as HTMLElement).closest("a")) {
-      close();
-    }
-  }
+  afterNavigate(() => close());
 </script>
 
 <button class="trigger" onclick={open} aria-label="Open navigation">
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    aria-hidden="true"
-  >
-    <rect x="2" y="3" width="12" height="1.5" rx="0.75" fill="currentColor" />
-    <rect
-      x="2"
-      y="7.25"
-      width="12"
-      height="1.5"
-      rx="0.75"
-      fill="currentColor"
-    />
-    <rect
-      x="2"
-      y="11.5"
-      width="12"
-      height="1.5"
-      rx="0.75"
-      fill="currentColor"
-    />
-  </svg>
+  <IconHamburger />
 </button>
 
 <dialog bind:this={dialog} onclick={onDialogClick}>
@@ -68,8 +32,7 @@
         ×
       </button>
     </div>
-    <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
-    <nav onclick={onNavClick}>
+    <nav>
       <Sidebar {tree} {currentPath} />
     </nav>
   </div>
@@ -82,11 +45,11 @@
     padding: var(--spacing-1) var(--app-padding-inline);
     background: none;
     border: none;
-    color: var(--app-color-fg-tertiary);
+    /*color: var(--app-color-fg-tertiary);
 
     &:hover {
       color: var(--app-color-fg-primary);
-    }
+    }*/
 
     @media (width > 768px) {
       display: none;

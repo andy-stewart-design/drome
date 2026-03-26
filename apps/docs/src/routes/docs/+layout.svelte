@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import Header from "$components/header/index.svelte";
   import Footer from "$components/footer/index.svelte";
   import Sidebar from "$components/sidebar/index.svelte";
@@ -9,7 +9,7 @@
   let { data, children } = $props();
 
   const pageData = $derived(
-    $page.data as {
+    page.data as {
       title?: string;
       description?: string;
       headings?: { depth: number; slug: string; text: string }[];
@@ -30,14 +30,14 @@
 <main class="main">
   <aside class="sidebar">
     <div class="sticky">
-      <Sidebar tree={data.sidebarTree} currentPath={$page.url.pathname} />
+      <Sidebar tree={data.sidebarTree} currentPath={page.url.pathname} />
     </div>
   </aside>
   <article class="article">
     <TableOfContentsMobile
       headings={pageData.headings ?? []}
       tree={data.sidebarTree}
-      currentPath={$page.url.pathname}
+      currentPath={page.url.pathname}
     />
     <div class="prose">
       {#if pageData.title}

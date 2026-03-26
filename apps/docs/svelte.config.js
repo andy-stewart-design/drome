@@ -17,6 +17,8 @@ const config = {
     }),
     alias: {
       $components: "src/components",
+      $icons: "src/components/icons",
+      $stores: "src/stores",
     },
     prerender: {
       handleHttpError: ({ path, message }) => {
