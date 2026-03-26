@@ -27,6 +27,7 @@
   let width = $state(0);
   let open = $state(false);
   let popoverRef = $state<HTMLElement | null>(null);
+  let buttonRef = $state<HTMLElement | null>(null);
 
   const filtered = $derived(
     headings.filter((h) => h.depth >= 2 && h.depth <= 3),
@@ -72,6 +73,14 @@
     }
   }
 
+  function reposition() {
+    if (!open || !buttonRef) return;
+    const rect = buttonRef.getBoundingClientRect();
+    const pRect = buttonRef.parentElement?.getBoundingClientRect() ?? rect;
+    position = { x: rect.left, y: rect.top + rect.height + POPOVER_Y_OFF };
+    width = pRect.width;
+  }
+
   function scrollTo(e: MouseEvent, slug: string) {
     e.preventDefault();
     const target = document.getElementById(slug);
@@ -100,9 +109,15 @@
   }
 </script>
 
+<svelte:window onresize={reposition} />
+
 <div class="container">
   {#if filtered.length > 0}
-    <button onclick={togglePopover} data-state={open ? "open" : "closed"}>
+    <button
+      bind:this={buttonRef}
+      onclick={togglePopover}
+      data-state={open ? "open" : "closed"}
+    >
       <IconChevronRight16 />
       <span>{current?.text ?? filtered[0]?.text}</span>
     </button>
