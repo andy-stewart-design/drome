@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { TreeItem } from "$lib/sidebar.js";
   import type { DocEntry } from "$lib/content.js";
-  import Sidebar from "$components/sidebar/Sidebar.svelte";
+  import Sidebar from "$components/sidebar/index.svelte";
 
   interface Props {
     tree: TreeItem<DocEntry>[];
@@ -34,10 +34,30 @@
 </script>
 
 <button class="trigger" onclick={open} aria-label="Open navigation">
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    aria-hidden="true"
+  >
     <rect x="2" y="3" width="12" height="1.5" rx="0.75" fill="currentColor" />
-    <rect x="2" y="7.25" width="12" height="1.5" rx="0.75" fill="currentColor" />
-    <rect x="2" y="11.5" width="12" height="1.5" rx="0.75" fill="currentColor" />
+    <rect
+      x="2"
+      y="7.25"
+      width="12"
+      height="1.5"
+      rx="0.75"
+      fill="currentColor"
+    />
+    <rect
+      x="2"
+      y="11.5"
+      width="12"
+      height="1.5"
+      rx="0.75"
+      fill="currentColor"
+    />
   </svg>
 </button>
 

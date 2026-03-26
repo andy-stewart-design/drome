@@ -6,8 +6,8 @@ updated: "Jun 01 2024"
 ---
 
 <script>
-  import CodeEditor from "$components/code-editor/CodeEditor.svelte"; const
-  drumLoop = `d.sample("bd").xox("x-x-").push(); // kick on the downbeat
+  import CodeEditor from "$components/code-editor/index.svelte"; const drumLoop
+  = `d.sample("bd").xox("x-x-").push(); // kick on the downbeat
   d.sample("sd").xox("-x-x").push(); // snare on the backbeat
   d.sample("hh").xox("xxxx").push(); // hi-hats every beat`; const fullBeat =
   `d.synth("saw").root("C3").scale("minor").note(0, 4, 7, 4).push()

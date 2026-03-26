@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import Header from "$components/Header.svelte";
-  import Footer from "$components/Footer.svelte";
-  import Sidebar from "$components/sidebar/Sidebar.svelte";
-  import TableOfContents from "$components/table-of-contents/TableOfContents.svelte";
-  import TableOfContentsMobile from "$components/table-of-contents-mobile/TableOfContentsMobile.svelte";
+  import Header from "$components/header/index.svelte";
+  import Footer from "$components/footer/index.svelte";
+  import Sidebar from "$components/sidebar/index.svelte";
+  import TableOfContents from "$components/table-of-contents/index.svelte";
+  import TableOfContentsMobile from "$components/table-of-contents-mobile/index.svelte";
 
   let { data, children } = $props();
 

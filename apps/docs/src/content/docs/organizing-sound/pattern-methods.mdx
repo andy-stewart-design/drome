@@ -6,8 +6,7 @@ updated: "Jul 08 2022"
 ---
 
 <script>
-  import CodeEditor from "$components/code-editor/CodeEditor.svelte"; const
-  noteEx =
+  import CodeEditor from "$components/code-editor/index.svelte"; const noteEx =
   `d.synth("sine").root("c4").scale("maj").note([[0,3,5]],[[4,6,-1]]).push();
   d.synth("tri").root("c5").scale("maj").note([,0,,3,,5,,7],[4,6,8,10]).fil("lp",
   1600).push();`; const xoxEx = `d.sample("bd").xox("x . . . x . . .").push();

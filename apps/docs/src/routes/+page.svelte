@@ -1,6 +1,6 @@
 <script>
-  import Header from "$components/Header.svelte";
-  import CodeEditor from "$components/code-editor/CodeEditor.svelte";
+  import Header from "$components/header/index.svelte";
+  import CodeEditor from "$components/code-editor/index.svelte";
   import { SITE_TITLE, SITE_DESCRIPTION } from "$lib/consts.js";
 </script>
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { TreeItem } from "$lib/sidebar.js";
   import type { DocEntry } from "$lib/content.js";
-  import Sidebar from "./Sidebar.svelte";
+  import Sidebar from "./index.svelte";
 
   interface Props {
     tree: TreeItem<DocEntry>[];

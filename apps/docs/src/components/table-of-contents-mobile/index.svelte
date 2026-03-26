@@ -1,7 +1,7 @@
 <script lang="ts">
   import { replaceState } from "$app/navigation";
   import IconChevronRight16 from "$components/icons/IconChevronRight16.svelte";
-  import SidebarMobile from "$components/sidebar-mobile/SidebarMobile.svelte";
+  import SidebarMobile from "$components/sidebar-mobile/index.svelte";
   import type { TreeItem } from "$lib/sidebar.js";
   import type { DocEntry } from "$lib/content.js";
 
