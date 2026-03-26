@@ -1,6 +1,6 @@
 <svg viewBox="0 0 16 16" width={16} height={16}>
   <path
-    d="M 6 3 L 11 8 L 6 13"
+    d="M 6 4 L 10 8 L 6 12"
     fill="none"
     stroke="currentColor"
     stroke-width={1.5}

@@ -1,6 +1,9 @@
 <script lang="ts">
   import { replaceState } from "$app/navigation";
   import IconChevronRight16 from "$components/icons/IconChevronRight16.svelte";
+  import SidebarMobile from "$components/sidebar-mobile/SidebarMobile.svelte";
+  import type { TreeItem } from "$lib/sidebar.js";
+  import type { DocEntry } from "$lib/content.js";
 
   interface Heading {
     depth: number;
@@ -10,9 +13,11 @@
 
   interface Props {
     headings: Heading[];
+    tree: TreeItem<DocEntry>[];
+    currentPath: string;
   }
 
-  let { headings }: Props = $props();
+  let { headings, tree, currentPath }: Props = $props();
 
   const POPOVER_Y_OFF = 0;
   const SCROLL_Y_OFF = 40;
@@ -95,8 +100,8 @@
   }
 </script>
 
-{#if filtered.length > 0}
-  <div class="container">
+<div class="container">
+  {#if filtered.length > 0}
     <button onclick={togglePopover} data-state={open ? "open" : "closed"}>
       <IconChevronRight16 />
       {current?.text ?? filtered[0]?.text}
@@ -124,8 +129,9 @@
         {/each}
       </ul>
     </nav>
-  </div>
-{/if}
+  {/if}
+  <SidebarMobile {tree} {currentPath} />
+</div>
 
 <style>
   .container {
@@ -133,6 +139,7 @@
     top: var(--app-editor-header-height);
     block-size: var(--app-toc-mobile-height);
     display: flex;
+    justify-content: space-between;
     background: var(--app-color-bg-primary);
     border-block-end: 1px solid var(--app-color-border-subtle);
     z-index: 2;

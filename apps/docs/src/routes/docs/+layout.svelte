@@ -34,7 +34,11 @@
     </div>
   </aside>
   <article class="article">
-    <TableOfContentsMobile headings={pageData.headings ?? []} />
+    <TableOfContentsMobile
+      headings={pageData.headings ?? []}
+      tree={data.sidebarTree}
+      currentPath={$page.url.pathname}
+    />
     <div class="prose">
       {#if pageData.title}
         <div class="title">
