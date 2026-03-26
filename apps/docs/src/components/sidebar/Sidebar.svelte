@@ -37,7 +37,7 @@
 <style>
   .fileTree {
     --padding-inline: calc(var(--app-padding-inline) / 2);
-    --item-border-width: 3px;
+    --item-border-width: 2px;
 
     list-style-type: none;
     padding-inline: var(--padding-inline);
@@ -95,6 +95,7 @@
       height: 1.25lh;
       width: var(--item-border-width);
       background: var(--border-color);
+      border-radius: 100vmax;
     }
 
     &:hover {

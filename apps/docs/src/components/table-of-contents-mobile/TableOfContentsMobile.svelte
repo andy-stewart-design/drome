@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { replaceState } from "$app/navigation";
+
   interface Heading {
     depth: number;
     slug: string;
@@ -11,7 +13,7 @@
 
   let { headings }: Props = $props();
 
-  const POPOVER_Y_OFF = 8;
+  const POPOVER_Y_OFF = 0;
   const SCROLL_Y_OFF = 40;
 
   const filtered = $derived(
@@ -19,6 +21,7 @@
   );
   let current = $state<Heading | undefined>(undefined);
   let position = $state({ x: 0, y: 0 });
+  let width = $state(0);
   let open = $state(false);
   let popoverRef = $state<HTMLElement | null>(null);
 
@@ -48,11 +51,18 @@
   });
 
   function togglePopover(e: MouseEvent) {
-    if (open) popoverRef?.hidePopover();
-    else popoverRef?.showPopover();
-
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    position = { x: rect.left, y: rect.top + rect.height + POPOVER_Y_OFF };
+    const pRect =
+      (e.currentTarget as HTMLElement).parentElement?.getBoundingClientRect() ??
+      rect;
+
+    if (open) {
+      popoverRef?.hidePopover();
+    } else {
+      position = { x: rect.left, y: rect.top + rect.height + POPOVER_Y_OFF };
+      width = pRect.width;
+      popoverRef?.showPopover();
+    }
   }
 
   function scrollTo(e: MouseEvent, slug: string) {
@@ -76,16 +86,15 @@
       tocHeight -
       SCROLL_Y_OFF;
     window.scrollTo({ top, behavior: "smooth" });
-    history.pushState(null, "", `#${slug}`);
+    replaceState(`#${slug}`, {});
   }
 </script>
 
 {#if filtered.length > 0}
   <div class="container">
-    <div class="main">
-      <button onclick={togglePopover}>On this page</button>
+    <button onclick={togglePopover}>
       {current?.text ?? filtered[0]?.text}
-    </div>
+    </button>
     <nav
       popover="auto"
       bind:this={popoverRef}
@@ -93,11 +102,11 @@
         open = (e as ToggleEvent).newState === "open";
       }}
       class="popover"
-      style="left: {position.x}px; top: {position.y}px;"
+      style="left: {position.x}px; top: {position.y}px; width: {width}px"
     >
       <ul class="list">
         {#each filtered as heading (heading.slug)}
-          <li class:depth3={heading.depth === 3}>
+          <li class="item" data-depth={heading.depth}>
             <a
               href="#{heading.slug}"
               class:active={(current ?? filtered[0])?.slug === heading.slug}
@@ -118,58 +127,54 @@
     top: var(--app-editor-header-height);
     block-size: var(--app-toc-mobile-height);
     display: flex;
-    align-items: center;
     background: var(--app-color-bg-primary);
-    padding-inline: var(--app-padding-inline);
     border-block-end: 1px solid var(--app-color-border-subtle);
     z-index: 2;
 
     @media (width > 1280px) {
       display: none;
     }
-  }
 
-  .main {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-3);
-    font-size: 13px;
-  }
-
-  .main button {
-    font-size: inherit;
-    background: var(--app-color-bg-secondary);
-    padding: var(--spacing-1) var(--spacing-2);
-    border: none;
+    button {
+      font-size: var(--font-size-xs);
+      padding: var(--spacing-1) var(--app-padding-inline);
+      background: none;
+      border: none;
+    }
   }
 
   .popover {
     margin: 0;
-    background: var(--app-color-bg-secondary);
-    padding: var(--spacing-3) var(--spacing-4);
-    border: none;
-    border-radius: var(--spacing-1);
-  }
-
-  .popover ul {
-    list-style: none;
-    margin: 0;
+    background: var(--app-color-bg-primary);
     padding: 0;
+    border: none;
+    width: 100%;
+    border-block: 1px solid var(--app-color-border-subtle);
   }
 
   .popover a {
+    display: block;
     text-decoration: none;
+    font-size: var(--font-size-xs);
+    padding-block: var(--spacing-2);
+    width: 100%;
   }
 
   .list {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding-block: var(--spacing-1);
+    padding-inline: var(--app-padding-inline) 0;
   }
 
-  .depth3 a {
-    padding-inline-start: var(--spacing-3);
-    font-size: 0.8125rem;
+  .item:not(:last-of-type) {
+    &[data-depth="3"] {
+      padding-inline-start: 2ch;
+    }
+
+    a {
+      border-block-end: 1px solid var(--app-color-border-subtle);
+    }
   }
 
   .active {

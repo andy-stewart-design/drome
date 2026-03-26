@@ -45,9 +45,9 @@
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.625rem;
+  --font-size-2xl: 1.75rem;
   --font-size-3xl: 2rem;
-  --font-size-4xl: 2.5rem;
+  --font-size-4xl: 2.375rem;
   --font-size-5xl: 3rem;
   --font-size-6xl: 3.5rem;
 
@@ -100,19 +100,23 @@
   --app-color-fg-tertiary: oklch(var(--app-color-neutral-50-lch) / 0.6);
 
   --app-color-bg-primary: var(--app-color-neutral-950);
-  --app-color-bg-secondary: var(--app-color-neutral-800);
+  --app-color-bg-secondary: var(--app-color-neutral-900);
 
   --app-color-accent-primary: var(--app-color-magenta-300);
 
   --app-color-border-subtle: oklch(var(--app-color-neutral-50-lch) / 0.15);
   --app-color-border-strong: var(--app-color-neutral-50);
 
-  --app-editor-header-height: 4rem;
-  --app-toc-mobile-height: 2.5rem;
+  --app-editor-header-height: 3rem;
+  --app-toc-mobile-height: 3rem;
   --app-max-width: 1440px;
   --app-sidebar-width: 320px;
   --app-toc-width: 220px;
   --app-padding-inline: 1rem;
+
+  @media (min-width: 960px) {
+    --app-padding-inline: 2rem;
+  }
 
   [data-theme="accent"] {
     --app-color-fg-primary: var(--app-color-magenta-50);

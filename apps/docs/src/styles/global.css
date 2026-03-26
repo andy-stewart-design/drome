@@ -22,9 +22,9 @@ body {
   font-size: var(--font-size-base);
   line-height: 1.6;
 
-  @media (min-width: 960px) {
+  /*@media (min-width: 960px) {
     font-size: var(--font-size-lg);
-  }
+  }*/
 }
 
 :where(h1, h2) {
@@ -52,10 +52,10 @@ h2 {
 }
 
 h3 {
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-2xl);
 
   code {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
   }
 }
 

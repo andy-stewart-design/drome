@@ -101,7 +101,6 @@
     gap: 1lh;
     padding-block: var(--spacing-6);
     padding-inline: var(--app-padding-inline);
-    max-width: 64ch;
   }
 
   .prose > :global(*) {
@@ -137,7 +136,7 @@
   }
 
   .date {
-    font-size: 1rem;
+    font-size: var(--font-size-xs);
     color: var(--app-color-fg-tertiary);
   }
 </style>

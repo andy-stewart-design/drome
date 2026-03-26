@@ -1,7 +1,7 @@
 <script>
   import { page } from "$app/stores";
 
-  const SITE_TITLE = "Drome Docs";
+  const SITE_TITLE = "Drome";
 </script>
 
 <header>
@@ -31,6 +31,7 @@
   }
   h2 a {
     text-decoration: none;
+    font-size: var(--font-size-xl);
   }
   nav {
     display: flex;
@@ -41,11 +42,12 @@
     max-width: var(--app-max-width);
     margin-inline: auto;
   }
-  nav a {
+  :where(nav a) {
     padding: 0.5rem 0;
     color: var(--app-color-fg-secondary);
     text-decoration: none;
     line-height: 1;
+    font-size: var(--font-size-xs);
   }
   nav a.active {
     color: var(--app-color-fg-primary);
