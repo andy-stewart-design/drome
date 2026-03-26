@@ -1,5 +1,6 @@
 <script lang="ts">
   import { replaceState } from "$app/navigation";
+  import IconChevronRight16 from "$components/icons/IconChevronRight16.svelte";
 
   interface Heading {
     depth: number;
@@ -16,14 +17,15 @@
   const POPOVER_Y_OFF = 0;
   const SCROLL_Y_OFF = 40;
 
-  const filtered = $derived(
-    headings.filter((h) => h.depth >= 2 && h.depth <= 3),
-  );
   let current = $state<Heading | undefined>(undefined);
   let position = $state({ x: 0, y: 0 });
   let width = $state(0);
   let open = $state(false);
   let popoverRef = $state<HTMLElement | null>(null);
+
+  const filtered = $derived(
+    headings.filter((h) => h.depth >= 2 && h.depth <= 3),
+  );
 
   $effect(() => {
     const headings = filtered; // reactive dependency — re-runs on navigation
@@ -69,6 +71,7 @@
     e.preventDefault();
     const target = document.getElementById(slug);
     if (!target) return;
+
     const root = document.documentElement;
     const rem = parseFloat(getComputedStyle(root).fontSize);
     const headerHeight =
@@ -79,12 +82,14 @@
       parseFloat(
         getComputedStyle(root).getPropertyValue("--app-toc-mobile-height"),
       ) * rem;
+
     const top =
       target.getBoundingClientRect().top +
       window.scrollY -
       headerHeight -
       tocHeight -
       SCROLL_Y_OFF;
+
     window.scrollTo({ top, behavior: "smooth" });
     replaceState(`#${slug}`, {});
   }
@@ -92,7 +97,8 @@
 
 {#if filtered.length > 0}
   <div class="container">
-    <button onclick={togglePopover}>
+    <button onclick={togglePopover} data-state={open ? "open" : "closed"}>
+      <IconChevronRight16 />
       {current?.text ?? filtered[0]?.text}
     </button>
     <nav
@@ -136,10 +142,18 @@
     }
 
     button {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-2);
       font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-5);
       padding: var(--spacing-1) var(--app-padding-inline);
       background: none;
       border: none;
+
+      &[data-state="open"] :global(svg) {
+        rotate: 90deg;
+      }
     }
   }
 

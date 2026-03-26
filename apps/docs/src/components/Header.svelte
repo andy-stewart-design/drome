@@ -48,6 +48,7 @@
     text-decoration: none;
     line-height: 1;
     font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-5);
   }
   nav a.active {
     color: var(--app-color-fg-primary);

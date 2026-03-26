@@ -58,8 +58,9 @@
   }
 
   .summary {
+    font-family: monospace;
     font-size: var(--font-size-4xs);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
     padding-block: var(--spacing-3);
     padding-inline: var(--padding-inline);
     color: var(--app-color-fg-tertiary);
@@ -79,7 +80,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: var(--spacing-2);
+    gap: var(--padding-inline);
     padding-block: var(--spacing-2);
     padding-inline-end: var(--padding-inline);
     color: var(--app-color-fg-tertiary);

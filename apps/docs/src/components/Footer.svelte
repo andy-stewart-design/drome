@@ -4,8 +4,12 @@
 
 <style>
   footer {
-    padding: 2em 1em 6em 1em;
+    padding-block: var(--spacing-20);
+    padding-inline: var(--app-padding-inline);
     color: rgb(var(--gray));
     text-align: center;
+    border-block-start: 1px solid var(--app-color-border-subtle);
+    font-size: var(--font-size-sm);
+    color: var(--app-color-fg-tertiary);
   }
 </style>
