@@ -82,10 +82,10 @@
 
 <style>
   .label {
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-family: monospace;
+    font-size: var(--font-size-4xs);
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
     color: var(--app-color-fg-tertiary);
     margin-block-end: var(--spacing-3);
   }
@@ -101,8 +101,8 @@
 
   .list a {
     display: block;
-    font-size: 0.875rem;
-    color: var(--app-color-fg-secondary);
+    font-size: var(--font-size-xs);
+    color: var(--app-color-fg-tertiary);
     text-decoration: none;
     line-height: 1.4;
     padding-block: var(--spacing-0_5);
@@ -118,7 +118,5 @@
 
   .depth3 a {
     padding-inline-start: var(--spacing-3);
-    font-size: 0.8125rem;
-    color: var(--app-color-fg-tertiary);
   }
 </style>

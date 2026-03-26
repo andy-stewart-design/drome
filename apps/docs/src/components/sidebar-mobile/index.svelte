@@ -45,11 +45,6 @@
     padding: var(--spacing-1) var(--app-padding-inline);
     background: none;
     border: none;
-    /*color: var(--app-color-fg-tertiary);
-
-    &:hover {
-      color: var(--app-color-fg-primary);
-    }*/
 
     @media (width > 768px) {
       display: none;

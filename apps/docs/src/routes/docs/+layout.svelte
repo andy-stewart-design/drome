@@ -44,9 +44,9 @@
         <div class="title">
           <h1>{pageData.title}</h1>
           <div class="date">
-            Last updated: {(
-              pageData.updated ?? pageData.created
-            )?.toLocaleDateString()}
+            Last updated: {(pageData.updated ?? pageData.created)
+              ?.toLocaleDateString()
+              .replaceAll("/", ".")}
           </div>
         </div>
       {/if}
@@ -140,7 +140,8 @@
   }
 
   .date {
-    font-size: var(--font-size-xs);
+    font-family: monospace;
+    font-size: var(--font-size-2xs);
     color: var(--app-color-fg-tertiary);
   }
 </style>

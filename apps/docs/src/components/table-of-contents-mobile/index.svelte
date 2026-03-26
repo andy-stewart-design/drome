@@ -104,7 +104,7 @@
   {#if filtered.length > 0}
     <button onclick={togglePopover} data-state={open ? "open" : "closed"}>
       <IconChevronRight16 />
-      {current?.text ?? filtered[0]?.text}
+      <span>{current?.text ?? filtered[0]?.text}</span>
     </button>
     <nav
       popover="auto"
