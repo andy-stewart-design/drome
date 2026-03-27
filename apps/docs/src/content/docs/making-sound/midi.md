@@ -94,4 +94,4 @@ d.on("bar", () => {
 });
 ```
 
-See the [Logging](/logging) page for more on how `d.on` and `d.log` work.
+See the [Logging](../working-with-the-editor/logging) page for more on how `d.on` and `d.log` work.
