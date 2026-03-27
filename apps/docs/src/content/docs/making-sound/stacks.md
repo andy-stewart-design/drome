@@ -1,17 +1,70 @@
 ---
-title: "Stacks"
-description: "Lorem ipsum dolor sit amet"
+title: Stacks
+description: Grouping multiple instruments together
 created: "Jul 08 2022"
 updated: "Jul 08 2022"
 order: 3
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+A stack groups multiple instruments so you can configure them together. Any method you call on a stack is applied to all instruments inside it.
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+```js
+const kick = d.sample("bd").note(1, null, null, null);
+const snare = d.sample("sd").note(null, null, 1, null);
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+d.stack(kick, snare).gain(0.8).fx(d.reverb(0.1)).push();
+```
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+## Creating a stack
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+```js
+d.stack(...instruments);
+```
+
+Pass any number of `Synth` or `Sample` instances. Note that you don't call `.push()` on the individual instruments — only on the stack.
+
+```js
+const bass = d.synth("saw").root("C2").note(0, null, 0, null);
+const lead = d.synth("sine").root("C4").note(0, 2, 4, 7);
+
+d.stack(bass, lead).gain(0.5).push();
+```
+
+## What you can do with a stack
+
+All shared instrument methods work on a stack and are forwarded to every instrument inside:
+
+| Method                                 | Description                    |
+| -------------------------------------- | ------------------------------ |
+| `.gain(n)`                             | Set volume for all instruments |
+| `.adsr(a, d, s, r)` / `.env()`         | Set ADSR envelope              |
+| `.att()`, `.dec()`, `.sus()`, `.rel()` | Set individual ADSR stages     |
+| `.filter()` / `.fil()`                 | Apply a filter                 |
+| `.detune()` / `.dt()`                  | Detune all instruments         |
+| `.effects()` / `.fx()`                 | Route through effects          |
+| `.adsrMode()` / `.envMode()`           | Change envelope mode           |
+
+## When to use a stack
+
+Stacks are useful when you want a group of instruments to share processing. For example, running a whole drum kit through the same reverb:
+
+```js
+const bd = d.sample("bd").note(1, null, null, null);
+const sd = d.sample("sd").note(null, null, 1, null);
+const hh = d.sample("hh").note(1, 1, 1, 1);
+
+d.stack(bd, sd, hh)
+  .fx(d.reverb(0.15, "room", "fx"))
+  .push();
+```
+
+Or applying a shared envelope shape to a layered synth sound:
+
+```js
+const osc1 = d.synth("saw").root("C3").note(0, 2, 4);
+const osc2 = d.synth("sine").root("C3").note(0, 2, 4);
+
+d.stack(osc1, osc2).env(0.02, 0.15, 0.6, 0.3).gain(0.4).push();
+```
+
+Note that pattern methods (`.note()`, `.xox()`, `.euclid()`, etc.) are **not** available on stacks — configure those on the individual instruments before passing them in.

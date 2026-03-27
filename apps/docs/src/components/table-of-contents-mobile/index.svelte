@@ -25,8 +25,10 @@
   let width = $state(0);
   let open = $state(false);
 
-  let popoverRef = $state<HTMLElement | null>(null);
-  let buttonRef = $state<HTMLElement | null>(null);
+  // svelte-ignore non_reactive_update
+  let popoverRef: HTMLElement;
+  // svelte-ignore non_reactive_update
+  let buttonRef: HTMLElement;
 
   const filtered = $derived(
     headings.filter((h) => h.depth >= 2 && h.depth <= 3),

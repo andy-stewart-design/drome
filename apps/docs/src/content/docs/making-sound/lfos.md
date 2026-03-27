@@ -1,16 +1,121 @@
 ---
-title: "LFOs"
-description: "Lorem ipsum dolor sit amet"
+title: LFOs
+description: Using low-frequency oscillators to modulate parameters
 created: "Jul 08 2022"
 updated: "Jul 08 2022"
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+An LFO (low-frequency oscillator) modulates a parameter continuously at a set rate. Where an envelope fires once per note, an LFO cycles on its own timeline — making it great for vibrato, filter sweeps, tremolo, and other continuous motion.
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+## Creating an LFO
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+```js
+d.lfo(baseValue, scale, rate);
+```
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+- `baseValue` — the center value around which the LFO oscillates
+- `scale` — how far the LFO swings above and below the base (default: 1)
+- `rate` — cycles per bar (default: 1)
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+```js
+const lfo = d.lfo(440, 100, 2); // oscillates 440 ± 100 Hz, twice per bar
+```
+
+## Using an LFO
+
+Pass the LFO to any parameter that accepts automation:
+
+```js
+const vibrato = d.lfo(0, 30, 4); // base 0, ±30 cents, 4 cycles per bar
+
+d.synth("sine").root("C4").note(0, 2, 4).detune(vibrato).push();
+```
+
+Filter sweep:
+
+```js
+const sweep = d.lfo(800, 400, 1); // 800 Hz ± 400, 1 cycle per bar
+
+d.synth("saw").root("C3").note(0).fil("lp", sweep).push();
+```
+
+Tremolo (gain modulation):
+
+```js
+const tremolo = d.lfo(0.5, 0.5, 8).normalize(); // normalized: 0 to 1
+
+d.synth("sine").root("A4").note(0).gain(tremolo).push();
+```
+
+## LFO methods
+
+All methods are chainable.
+
+### rate
+
+Sets how many cycles the LFO completes per bar.
+
+```js
+lfo.rate(4); // 4 cycles per bar (synced to bar length)
+lfo.rate(0.5); // half cycle per bar (very slow)
+```
+
+### scale
+
+Sets the amplitude of the oscillation around the base value.
+
+```js
+lfo.scale(200); // oscillates ±200 from base
+```
+
+### type
+
+Sets the LFO waveform shape. Default is `'sine'`.
+
+```js
+lfo.type("sine"); // smooth and round
+lfo.type("triangle"); // linear ramp up and down
+lfo.type("square"); // alternates between two values
+lfo.type("sawtooth"); // ramps up, snaps back
+```
+
+### normalize
+
+When enabled, the LFO output is scaled to a 0–1 range rather than oscillating symmetrically around the base value. Useful for driving gain or other parameters that need to stay non-negative.
+
+```js
+lfo.normalize(); // enable normalization
+lfo.norm(); // short alias
+lfo.normalize(false); // disable
+```
+
+### offset
+
+Shifts the starting phase of the LFO.
+
+```js
+lfo.offset(0.5); // start the LFO halfway through its cycle
+lfo.off(0.5); // short alias
+```
+
+## LFO timing
+
+LFOs in Drome are bar-synced. They start at the beginning of the bar and complete a full cycle in `barDuration / rate` seconds. At 120 BPM (2-second bars) with `rate(4)`, the LFO cycles every 0.5 seconds.
+
+## Full example
+
+```js
+const filterLfo = d.lfo(1200, 800, 2); // filter sweeps 400–2000 Hz, twice per bar
+const detuneWobble = d.lfo(0, 15, 0.5); // slow detune wobble
+
+d.synth("saw", "sine")
+  .root("D3")
+  .scale("dorian")
+  .note(0, 2, 4, 5, 7)
+  .voices(2)
+  .fil("lp", filterLfo)
+  .detune(detuneWobble)
+  .gain(0.4)
+  .fx(d.reverb(0.2))
+  .push();
+```

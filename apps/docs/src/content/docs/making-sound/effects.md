@@ -1,16 +1,172 @@
 ---
-title: "Effects"
-description: "Lorem ipsum dolor sit amet"
+title: Effects
+description: Audio effects in Drome
 created: "Jul 08 2022"
 updated: "Jul 08 2022"
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+Effects process an instrument's audio signal. You create effect objects using `d.*` methods, then attach them to instruments via `.fx()`.
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+```js
+d.synth("saw")
+  .root("C3")
+  .note(0, 2, 4)
+  .fx(d.reverb(0.3), d.delay(0.25, 0.4))
+  .push();
+```
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+Effects can be shared across multiple instruments — create the effect once and pass it to each:
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+```js
+const verb = d.reverb(0.4);
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+d.sample("bd").note(1, null, null, null).fx(verb).push();
+d.sample("sd").note(null, null, 1, null).fx(verb).push();
+```
+
+## reverb
+
+Adds room ambience using convolution reverb.
+
+**Algorithmic reverb (generated internally):**
+
+```js
+d.reverb(mix, decay, lpfStart, lpfEnd);
+```
+
+```js
+d.reverb(0.3); // mix: 30%, default decay
+d.reverb(0.5, 2); // mix: 50%, 2-second decay
+d.reverb(0.4, 1.5, 2000, 500); // with low-pass filter sweep
+```
+
+- `mix` — wet/dry mix (0–1)
+- `decay` — reverb tail length in seconds (default: 1)
+- `lpfStart` — starting frequency for a low-pass filter on the IR (optional)
+- `lpfEnd` — ending frequency for the LPF sweep (optional)
+
+**IR from a sample bank:**
+
+```js
+d.reverb(mix, sampleName, bankName);
+d.reverb(0.4, "hall", "impulses"); // use 'hall' from the 'impulses' bank
+```
+
+**IR from a URL:**
+
+```js
+d.reverb(0.4, "https://example.com/reverb.wav");
+```
+
+---
+
+## delay
+
+Adds a repeating echo.
+
+```js
+d.delay(delayTime, feedback);
+```
+
+```js
+d.delay(0.25, 0.4); // quarter-second delay, 40% feedback
+d.delay(0.5, 0.6); // half-second delay, 60% feedback
+```
+
+- `delayTime` — delay time in seconds (can be a pattern string for per-bar variation)
+- `feedback` — how much of the delayed signal feeds back (0–1)
+
+---
+
+## filter / fil
+
+A biquad filter. Can be used as a standalone effect on an instrument.
+
+```js
+d.filter(type, frequency, q);
+d.fil(type, frequency, q); // short alias
+```
+
+```js
+d.filter("lp", 800); // lowpass at 800 Hz
+d.filter("hp", 300, 2); // highpass at 300 Hz, Q of 2
+d.filter("bp", 1000, 3); // bandpass at 1 kHz
+```
+
+Filter types: `'lp'` / `'lowpass'`, `'hp'` / `'highpass'`, `'bp'` / `'bandpass'`
+
+The frequency parameter accepts a number, a pattern string, an envelope, or an LFO.
+
+---
+
+## distort
+
+Waveshaping distortion.
+
+```js
+d.distort(amount, postgain, type);
+```
+
+```js
+d.distort(0.5); // moderate distortion
+d.distort(0.9, 0.5); // heavy distortion, post-gain at 0.5
+```
+
+- `amount` — distortion intensity (0–1, can be an envelope or LFO)
+- `postgain` — gain applied after distortion (default: 1)
+- `type` — distortion algorithm (optional, uses default if omitted)
+
+---
+
+## crush
+
+Bitcrusher — reduces bit depth and sample rate for a lo-fi effect.
+
+```js
+d.crush(bitDepth, rateReduction);
+```
+
+```js
+d.crush(8); // 8-bit depth
+d.crush(4, 2); // 4-bit depth, 2x rate reduction
+```
+
+- `bitDepth` — number of bits (1–16), can be an envelope or LFO
+- `rateReduction` — downsampling factor (default: 1)
+
+---
+
+## gain
+
+A simple gain stage. Useful for precise volume control in a signal chain.
+
+```js
+d.gain(amount);
+d.gain(0.5); // reduce signal by half
+```
+
+- `amount` — gain multiplier (can be an envelope or LFO)
+
+---
+
+## pan
+
+Stereo panning.
+
+```js
+d.pan(position);
+d.pan(-1); // hard left
+d.pan(0); // center
+d.pan(1); // hard right
+d.pan(0.5); // slightly right
+```
+
+- `position` — stereo position from -1 (left) to 1 (right), can be an envelope or LFO
+
+## Chaining effects
+
+Pass multiple effects to `.fx()` — they're applied in order:
+
+```js
+.fx(d.distort(0.6), d.filter('lp', 1000), d.reverb(0.2))
+```

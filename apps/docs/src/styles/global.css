@@ -201,10 +201,16 @@ blockquote {
 }
 
 .callout {
+  --border-width: 3px;
+
   padding: var(--spacing-4) var(--spacing-5);
   border-radius: var(--spacing-1_5);
-  border-left: 3px solid var(--callout-color);
   background: var(--callout-bg);
+  background: linear-gradient(
+    to right,
+    var(--callout-color) var(--border-width),
+    var(--callout-bg) var(--border-width)
+  );
 
   p {
     margin: 0 !important;

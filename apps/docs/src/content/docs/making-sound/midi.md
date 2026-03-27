@@ -1,16 +1,97 @@
 ---
-title: "MIDI"
-description: "Lorem ipsum dolor sit amet"
+title: MIDI
+description: Sending and receiving MIDI in Drome
 created: "Jul 08 2022"
 updated: "Jul 08 2022"
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+Drome supports MIDI in both directions: you can send notes from instruments to external hardware or software, and you can receive CC (control change) values from knobs and sliders to modulate parameters in real time.
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+> [!NOTE]
+> MIDI requires the browser's Web MIDI API, which prompts for permission on first use.
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+## Setup
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+MIDI access must be initialized before you can use any MIDI features. This is done through the editor or your host application — the `Drome` instance will have a `midiController` attached once access has been granted.
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+## MIDI output
+
+Use `.midi()` on any instrument to route its notes to a MIDI output device. The instrument continues to play audio internally and also sends MIDI note on/off messages.
+
+```js
+.midi(deviceName)
+```
+
+```js
+d.synth("sine")
+  .root("C4")
+  .scale("minor")
+  .note(0, 2, 4, 7)
+  .midi("My Synth")
+  .push();
+```
+
+The `deviceName` is matched against available MIDI output ports. It's a partial, case-insensitive match, so `'Synth'` will match a device named `'My Synth 1'`.
+
+### MIDI channel
+
+After calling `.midi()`, you can specify a MIDI channel with `.midichan()` (or its alias `.midichan()`):
+
+```js
+.midi('Bassline').midichan(2)    // send on channel 2
+```
+
+Pass an array to rotate through channels per step:
+
+```js
+.midichan([1, 2, 3, 4])    // cycles through channels 1–4
+```
+
+## MIDI input
+
+`d.midicc()` creates an observer that tracks a MIDI CC value from a connected controller. The returned value can be used anywhere a number, envelope, or LFO would be accepted.
+
+```js
+d.midicc(nameOrControlNumber, defaultValue);
+```
+
+- `nameOrControlNumber` — the MIDI device name or CC number as a string (e.g. `'Knob 1'`, `'CC 74'`)
+- `defaultValue` — the value to use before any MIDI input is received (default: 0)
+
+```js
+const filterCC = d.midicc("CC 74", 800); // CC 74, default 800 Hz
+
+d.synth("saw").root("C3").note(0, 2, 4).fil("lp", filterCC).push();
+```
+
+Now turning the knob mapped to CC 74 on your controller will sweep the filter cutoff in real time.
+
+### Using CC for gain
+
+```js
+const volumeCC = d.midicc("Knob 1", 0.5);
+
+d.synth("sine").root("A3").note(0).gain(volumeCC).push();
+```
+
+### Using CC for detune
+
+```js
+const detuneCC = d.midicc("Mod Wheel", 0);
+
+d.synth("saw").root("C4").note(0, 2, 4).detune(detuneCC).push();
+```
+
+## Inspecting available devices
+
+If you're not sure what your devices are named, you can log available inputs and outputs:
+
+```js
+d.on("bar", () => {
+  d.log(
+    d.midiController?.inputs.map((i) => i.name).join(", ") ?? "No MIDI inputs",
+  );
+});
+```
+
+See the [Logging](/logging) page for more on how `d.on` and `d.log` work.
