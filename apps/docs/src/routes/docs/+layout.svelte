@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { page } from "$app/state";
   import Header from "$components/header/index.svelte";
   import Footer from "$components/footer/index.svelte";
@@ -7,6 +8,26 @@
   import TableOfContentsMobile from "$components/table-of-contents-mobile/index.svelte";
 
   let { data, children } = $props();
+
+  let showDesktopToc = $state<boolean | null>(null);
+  let showSidebar = $state<boolean | null>(null);
+
+  onMount(() => {
+    const tocMql = window.matchMedia("(width > 1280px)");
+    showDesktopToc = tocMql.matches;
+    const onTocChange = (e: MediaQueryListEvent) => { showDesktopToc = e.matches; };
+    tocMql.addEventListener("change", onTocChange);
+
+    const sidebarMql = window.matchMedia("(width > 768px)");
+    showSidebar = sidebarMql.matches;
+    const onSidebarChange = (e: MediaQueryListEvent) => { showSidebar = e.matches; };
+    sidebarMql.addEventListener("change", onSidebarChange);
+
+    return () => {
+      tocMql.removeEventListener("change", onTocChange);
+      sidebarMql.removeEventListener("change", onSidebarChange);
+    };
+  });
 
   const pageData = $derived(
     page.data as {
@@ -29,16 +50,20 @@
 <Header />
 <main class="main">
   <aside class="sidebar">
-    <div class="sticky">
-      <Sidebar tree={data.sidebarTree} currentPath={page.url.pathname} />
-    </div>
+    {#if showSidebar !== false}
+      <div class="sticky">
+        <Sidebar tree={data.sidebarTree} currentPath={page.url.pathname} />
+      </div>
+    {/if}
   </aside>
   <article class="article">
-    <TableOfContentsMobile
-      headings={pageData.headings ?? []}
-      tree={data.sidebarTree}
-      currentPath={page.url.pathname}
-    />
+    {#if showDesktopToc !== true}
+      <TableOfContentsMobile
+        headings={pageData.headings ?? []}
+        tree={data.sidebarTree}
+        currentPath={page.url.pathname}
+      />
+    {/if}
     <div class="prose">
       {#if pageData.title}
         <div class="title">
@@ -54,9 +79,11 @@
     </div>
   </article>
   <aside class="toc">
-    <div class="sticky">
-      <TableOfContents headings={pageData.headings ?? []} />
-    </div>
+    {#if showDesktopToc !== false}
+      <div class="sticky">
+        <TableOfContents headings={pageData.headings ?? []} />
+      </div>
+    {/if}
   </aside>
 </main>
 <Footer />
