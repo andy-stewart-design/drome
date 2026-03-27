@@ -59,8 +59,7 @@
     max-block-size: 100dvh;
     block-size: 100dvh;
     inline-size: min(320px, 85vw);
-    inset-inline-start: 0;
-    inset-block-start: 0;
+    margin-inline-start: auto;
 
     &::backdrop {
       background: oklch(0% 0 0 / 40%);
@@ -70,7 +69,7 @@
   .panel {
     block-size: 100%;
     background: var(--app-color-bg-primary);
-    border-inline-end: 1px solid var(--app-color-border-subtle);
+    border-inline-start: 1px solid var(--app-color-border-subtle);
     display: flex;
     flex-direction: column;
     overflow: hidden;

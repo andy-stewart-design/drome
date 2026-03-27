@@ -2,6 +2,7 @@
   import { replaceState } from "$app/navigation";
   import IconChevronRight16 from "$components/icons/icon-chevron-right-16.svelte";
   import SidebarMobile from "$components/sidebar-mobile/index.svelte";
+  import { scrollTo } from "$lib/utils/scroll-to";
   import type { TreeItem } from "$lib/sidebar.js";
   import type { DocEntry } from "$lib/content.js";
 
@@ -19,13 +20,11 @@
 
   let { headings, tree, currentPath }: Props = $props();
 
-  const POPOVER_Y_OFF = 0;
-  const SCROLL_Y_OFF = 40;
-
   let current = $state<Heading | undefined>(undefined);
   let position = $state({ x: 0, y: 0 });
   let width = $state(0);
   let open = $state(false);
+
   let popoverRef = $state<HTMLElement | null>(null);
   let buttonRef = $state<HTMLElement | null>(null);
 
@@ -67,7 +66,7 @@
     if (open) {
       popoverRef?.hidePopover();
     } else {
-      position = { x: rect.left, y: rect.top + rect.height + POPOVER_Y_OFF };
+      position = { x: rect.left, y: rect.top + rect.height };
       width = pRect.width;
       popoverRef?.showPopover();
     }
@@ -77,35 +76,8 @@
     if (!open || !buttonRef) return;
     const rect = buttonRef.getBoundingClientRect();
     const pRect = buttonRef.parentElement?.getBoundingClientRect() ?? rect;
-    position = { x: rect.left, y: rect.top + rect.height + POPOVER_Y_OFF };
+    position = { x: rect.left, y: rect.top + rect.height };
     width = pRect.width;
-  }
-
-  function scrollTo(e: MouseEvent, slug: string) {
-    e.preventDefault();
-    const target = document.getElementById(slug);
-    if (!target) return;
-
-    const root = document.documentElement;
-    const rem = parseFloat(getComputedStyle(root).fontSize);
-    const headerHeight =
-      parseFloat(
-        getComputedStyle(root).getPropertyValue("--app-editor-header-height"),
-      ) * rem;
-    const tocHeight =
-      parseFloat(
-        getComputedStyle(root).getPropertyValue("--app-toc-mobile-height"),
-      ) * rem;
-
-    const top =
-      target.getBoundingClientRect().top +
-      window.scrollY -
-      headerHeight -
-      tocHeight -
-      SCROLL_Y_OFF;
-
-    window.scrollTo({ top, behavior: "smooth" });
-    replaceState(`#${slug}`, {});
   }
 </script>
 
