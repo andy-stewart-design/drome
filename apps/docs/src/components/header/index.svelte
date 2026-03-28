@@ -56,6 +56,6 @@
   .internal-links {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: var(--app-padding-inline);
   }
 </style>

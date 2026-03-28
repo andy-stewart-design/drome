@@ -15,12 +15,16 @@
   onMount(() => {
     const tocMql = window.matchMedia("(width > 1280px)");
     showDesktopToc = tocMql.matches;
-    const onTocChange = (e: MediaQueryListEvent) => { showDesktopToc = e.matches; };
+    const onTocChange = (e: MediaQueryListEvent) => {
+      showDesktopToc = e.matches;
+    };
     tocMql.addEventListener("change", onTocChange);
 
     const sidebarMql = window.matchMedia("(width > 768px)");
     showSidebar = sidebarMql.matches;
-    const onSidebarChange = (e: MediaQueryListEvent) => { showSidebar = e.matches; };
+    const onSidebarChange = (e: MediaQueryListEvent) => {
+      showSidebar = e.matches;
+    };
     sidebarMql.addEventListener("change", onSidebarChange);
 
     return () => {
@@ -123,7 +127,9 @@
   }
 
   .article {
-    border-inline-start: 1px solid var(--app-color-border-subtle);
+    @media (width > 768px) {
+      border-inline-start: 1px solid var(--app-color-border-subtle);
+    }
   }
 
   .prose {

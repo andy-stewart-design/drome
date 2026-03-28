@@ -34,6 +34,19 @@
     headings.filter((h) => h.depth >= 2 && h.depth <= 3),
   );
 
+  function lightDismissOnClick(e: PointerEvent) {
+    if (!(e.target instanceof HTMLElement)) return;
+    const isClickInside = buttonRef.contains(e.target);
+    if (open && !isClickInside) popoverRef?.hidePopover();
+  }
+
+  function lightDismissOnKey(e: KeyboardEvent) {
+    if (open && e.key === "Escape") {
+      popoverRef?.hidePopover();
+      buttonRef?.focus();
+    }
+  }
+
   $effect(() => {
     const headings = filtered; // reactive dependency — re-runs on navigation
     current = headings[0];
@@ -55,21 +68,29 @@
       { rootMargin: "0px 0px -66% 0px" },
     );
 
+    document.addEventListener("click", lightDismissOnClick);
+    document.addEventListener("keydown", lightDismissOnKey);
     headingEls.forEach((h) => observer.observe(h));
-    return () => observer.disconnect();
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("click", lightDismissOnClick);
+      document.removeEventListener("keydown", lightDismissOnKey);
+    };
   });
 
   function togglePopover(e: MouseEvent) {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const pRect =
-      (e.currentTarget as HTMLElement).parentElement?.getBoundingClientRect() ??
-      rect;
+    const button = e.currentTarget;
+    if (!(button instanceof HTMLButtonElement)) return;
+
+    const rect = button.getBoundingClientRect();
+    const parentRect = button.parentElement?.getBoundingClientRect() ?? rect;
 
     if (open) {
       popoverRef?.hidePopover();
     } else {
       position = { x: rect.left, y: rect.top + rect.height };
-      width = pRect.width;
+      width = parentRect.width;
       popoverRef?.showPopover();
     }
   }
@@ -96,7 +117,7 @@
       <span>{current?.text ?? filtered[0]?.text}</span>
     </button>
     <nav
-      popover="auto"
+      popover="manual"
       bind:this={popoverRef}
       ontoggle={(e) => {
         open = (e as ToggleEvent).newState === "open";
@@ -140,7 +161,7 @@
     button {
       display: flex;
       align-items: center;
-      gap: var(--spacing-2);
+      gap: var(--spacing-1);
       font-size: var(--font-size-xs);
       font-weight: var(--font-weight-5);
       padding: var(--spacing-1) var(--app-padding-inline);

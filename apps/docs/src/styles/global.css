@@ -81,6 +81,8 @@ a {
 
 button {
   font-family: inherit;
+  touch-action: manipulation;
+  color: inherit;
 }
 
 p {
