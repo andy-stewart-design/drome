@@ -28,6 +28,9 @@
   "files": [
     "dist"
   ],
+  "dependencies": {
+    "@drome/clock": "workspace:*"
+  },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "esbuild": "^0.27.0",

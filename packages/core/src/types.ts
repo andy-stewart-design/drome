@@ -9,17 +9,8 @@ import type {
 import type { scaleAliasMap } from "./utils/get-scale";
 import type { MIDIObserver } from "./midi";
 
-// AUDIO CLOCK
-type Metronome = { beat: number; bar: number };
-type DromeEventType =
-  | "start"
-  | "pause"
-  | "stop"
-  | "prebeat"
-  | "prebar"
-  | "beat"
-  | "bar";
-type DromeEventCallback = (m: Metronome, time: number) => void;
+// AUDIO CLOCK (types owned by @drome/clock)
+export type { DromeEventCallback, DromeEventType, Metronome } from "@drome/clock";
 
 // NOTES + SCALES
 type NaturalNote = "A" | "B" | "C" | "D" | "E" | "F" | "G";
@@ -71,12 +62,9 @@ export type {
   DistortionAlgorithm,
   DistortionFunction,
   DromeCycleValue,
-  DromeEventCallback,
-  DromeEventType,
   FilterType,
   FilterOptions,
   InstrumentType,
-  Metronome,
   NoteName,
   NoteValue,
   Note,
