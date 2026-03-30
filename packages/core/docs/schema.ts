@@ -33,6 +33,17 @@ type DistortionAlgorithm =
   | "chebyshev";
 
 // ============================================================
+// NOTE
+// Translation of the instrument cycles into a contract
+// ============================================================
+
+interface Note {
+  value: number;
+  startOffset: number;
+  duration: number;
+}
+
+// ============================================================
 // AutomationDescriptor
 // Serializable replacement for: Pattern | Envelope | LfoNode | MIDIObserver
 // ============================================================
@@ -41,9 +52,22 @@ type AutomationDescriptor =
   // A stepped sequence of values, one per cycle step. Values can be chords (number[]).
   | { kind: "pattern"; values: (number | number[])[] }
   // ADSR envelope applied over the duration of each note.
-  | { kind: "envelope"; a: number; d: number; s: number; r: number; mode?: AdsrMode }
+  | {
+      kind: "envelope";
+      a: number;
+      d: number;
+      s: number;
+      r: number;
+      mode?: AdsrMode;
+    }
   // LFO that modulates a parameter at a given rate (Hz or BPM-relative).
-  | { kind: "lfo"; rate: number; depth: number; shape: BasicWaveform; phase?: number }
+  | {
+      kind: "lfo";
+      rate: number;
+      depth: number;
+      shape: BasicWaveform;
+      phase?: number;
+    }
   // MIDI CC binding — value driven by incoming MIDI controller.
   | { kind: "midi"; cc: number; channel?: number };
 
@@ -146,6 +170,8 @@ interface InstrumentSchema {
     velocity?: AutomationDescriptor;
     channel?: number;
   };
+
+  notes: Note[];
 }
 
 // ============================================================
@@ -168,10 +194,6 @@ interface SynthSchema extends InstrumentSchema {
   // Scale intervals as semitone offsets from root.
   // null = chromatic (no mapping, note values used as-is).
   scale: number[] | null;
-
-  // Cycle data. Outer array = bar arrangement, inner = steps.
-  // Values are MIDI note numbers; arrays represent chords.
-  cycles: (number | number[] | null)[][];
 }
 
 // ============================================================
@@ -201,8 +223,4 @@ interface SamplerSchema extends InstrumentSchema {
   // When true, note duration controls how long the sample plays
   // instead of the sample's natural length.
   cut: boolean;
-
-  // Cycle data. Outer array = bar arrangement, inner = steps.
-  // Values are zero-based indices into sampleIds.
-  cycles: (number | null)[][];
 }
