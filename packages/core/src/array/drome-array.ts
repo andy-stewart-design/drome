@@ -37,6 +37,7 @@ class DromeArray<T> {
   }
 
   fast(n: number) {
+    n = Math.round(n);
     if (n === 1) return this;
     else if (n < 1) {
       this.slow(1 / n);
@@ -57,29 +58,18 @@ class DromeArray<T> {
   }
 
   slow(n: number) {
-    if (n === 1) return this;
-    else if (n < 1) {
-      this.fast(1 / n);
-      return this;
-    }
+    n = Math.round(n);
+    if (n <= 1) return this;
 
     const nextCycles: T[][] = [];
 
     for (const cycle of this._value) {
-      const chunkSize = Math.ceil((cycle.length * n) / n);
-
+      const expanded: T[] = [];
+      for (let i = 0; i < cycle.length * n; i++) {
+        expanded.push(i % n === 0 ? cycle[i / n] : this._nullValue);
+      }
       for (let k = 0; k < n; k++) {
-        const chunk: T[] = [];
-        const startPos = k * chunkSize;
-        const endPos = Math.min((k + 1) * chunkSize, cycle.length * n);
-
-        for (let pos = startPos; pos < endPos; pos++) {
-          const v = cycle[pos / n];
-          if (v && pos % n === 0) chunk.push(v);
-          else chunk.push(this._nullValue);
-        }
-
-        nextCycles.push(chunk);
+        nextCycles.push(expanded.slice(k * cycle.length, (k + 1) * cycle.length));
       }
     }
 
@@ -87,20 +77,20 @@ class DromeArray<T> {
     return this;
   }
 
-  stretch(n: number) {
-    const foo = this._value.map((cycle) => {
-      const length = Math.ceil(n * cycle.length) / cycle.length;
-      const nextCyles: T[][] = Array.from({ length }, () => []);
+  stretch(bars: number, steps = 1) {
+    bars = Math.round(bars);
+    steps = Math.round(steps);
 
-      for (let i = 0; i < cycle.length * length; i++) {
-        const beat = cycle[Math.floor(i / n)];
-        if (beat) nextCyles[Math.floor(i / cycle.length)]?.push(beat);
+    const nextCycles: T[][] = [];
+
+    for (const cycle of this._value) {
+      const expanded = steps > 1 ? cycle.flatMap((step) => Array(steps).fill(step)) : cycle;
+      for (let k = 0; k < Math.max(bars, 1); k++) {
+        nextCycles.push([...expanded]);
       }
+    }
 
-      return nextCyles;
-    });
-
-    this._value = foo.flat();
+    this._value = nextCycles;
     return this;
   }
 

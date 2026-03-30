@@ -7,6 +7,7 @@ import type { DromeCycleValue, Nullable, Pattern } from "@/types";
 class DromeArrayNullable<T> extends DromeArray<Nullable<T>> {
   constructor(...input: (T | T[])[]) {
     super(...input);
+    this._nullValue = null;
   }
 
   /* ----------------------------------------------------------------

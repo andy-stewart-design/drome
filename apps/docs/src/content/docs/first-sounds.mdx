@@ -1,0 +1,63 @@
+---
+title: "First Sounds"
+description: "Making your first sounds with Drome"
+created: "Jun 01 2024"
+updated: "Jun 01 2024"
+---
+
+<script>
+  import CodeEditor from "$components/code-editor/index.svelte"; const drumLoop
+  = `d.sample("bd").xox("x-x-").push(); // kick on the downbeat
+  d.sample("sd").xox("-x-x").push(); // snare on the backbeat
+  d.sample("hh").xox("xxxx").push(); // hi-hats every beat`; const fullBeat =
+  `d.synth("saw").root("C3").scale("minor").note(0, 4, 7, 4).push()
+  d.sample("bd").xox("x-x-").push(); // kick on the downbeat
+  d.sample("sd").xox("-x-x").push(); // snare on the backbeat
+  d.sample("hh").xox("xxxx").push(); // hi-hats every beat`;
+</script>
+
+[Instruments](./making-sound/instruments) are the starting point for everything you will make in Drome. Let's begin by taking a look at a few basic examples of using Drome's two primary sound sources: [synthesizers](./making-sound/synthesizers) and [samplers](./making-sound/samplers).
+
+## Synthesizers: sound from scratch
+
+Synthesizers allow you to make sound without needing a pre-recorded audio file. Like a guitar or piano, they are great for constructing melodies, chord progressions, and bass lines.
+
+To use a synthesizer, create one using `d.synth`, select a waveform type (more on that later), and register it with `push`. The code below plays MIDI note 60 (middle C) once per bar, using a sine wave oscillator
+
+```js
+// There are five types of synthesizer waveforms:
+// "sine", "sawtooth", "square", "triangle", "supersaw"
+// the default value is "sine"
+d.synth("sine").push();
+```
+
+There's a lot you can do to manipulate the sound coming from a synthesizer. But for now, one other thing to note is, well, `note`. You can use this method to change the exact notes being played by your synthesizer. Click the play button below to hear a sine wave playing a C major 7 arpeggio (expressed as [MIDI note numbers](https://inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies)):
+
+<CodeEditor code='d.synth("sine").note([60,64,67,71]).push()' />
+
+## Samplers: flip and reverse it
+
+The `sample` instrument allows for playback of pre-recorded audio files. Most often, samples come in the form of "loops" (repeating, rhythmic, or melodic audio phrases) and one-shots (single, isolated sounds like drum hits or vocal snippets). We'll discuss all of this in depth later, but for now, let's look at how to use some of the default one-shot samples included in Drome.
+
+To use a sample, create one using `d.sample`, specify the name of a sample (i.e., "bd" for bass drum, "sd" for snare, "hh" for hihat, and so on), and register it with `push`.
+
+```js
+// There are many types of samples included by default:
+// try "bd" (kick drum), "sd" (snare), "hh" (hihat)
+// the default value is "bd"
+d.sample("bd").push();
+```
+
+There are many different pattern methods in Drome that you can use to structure your samples in time. To keep things simple, though, let's first look at the `xox` pattern method, which enables [X0X-style step sequencing](https://www.youtube.com/watch?v=YvOWB2UsbJs&t=55s). In the editor below, try using `x` to denote a hit and `-` to denote a rest:
+
+<CodeEditor code={drumLoop} />
+
+## Better together
+
+All instruments function independently and can be used together — just make sure you `.push()` all of the instruments that you intend to hear playing in unison:
+
+<CodeEditor code={fullBeat} />
+
+## Eval and evolve
+
+Every time you evaluate your code, Drome clears the current instrument stack and rebuilds it based on the current state of your code. Instruments that aren't `.push()`ed in the new evaluation disappear on the next bar. This makes it easy to remove a part — just delete or comment out the line, or remove the call to `push` it into the queue.

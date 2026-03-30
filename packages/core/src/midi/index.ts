@@ -75,8 +75,6 @@ class MIDIController {
   }
 
   clearObservers(type?: MIDIObservableType) {
-    console.log("clearObservers", type, this._observables);
-
     if (type) {
       this._observables.forEach((obs) => {
         if (obs.type === type) obs.unsubscribeAll();
