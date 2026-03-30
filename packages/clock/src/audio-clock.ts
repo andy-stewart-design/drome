@@ -1,4 +1,4 @@
-import type { DromeEventCallback, DromeEventType, Metronome } from "@/types.js";
+import type { DromeEventCallback, DromeEventType, Metronome } from "./types.js";
 
 type ListenerMap = Map<DromeEventType, Set<DromeEventCallback>>;
 

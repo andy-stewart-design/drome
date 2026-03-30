@@ -1,4 +1,4 @@
-import AudioClock from "@/clock/audio-clock";
+import { AudioClock } from "@drome/clock";
 import LfoNode from "@/automation/lfo-node";
 import MIDIController, { MIDIObserver } from "@/midi";
 import Sample from "@/instruments/sample";
