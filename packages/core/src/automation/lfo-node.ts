@@ -6,7 +6,8 @@ import type {
   LfoProcessorOptions,
   LfoParameterData,
   LfoProcessorMessage,
-} from "@/worklets/worklet-lfo";
+  LfoNodeMessage,
+} from "@drome/audio-worklets";
 
 type LfoOptions = Partial<
   LfoProcessorOptions &
@@ -15,20 +16,6 @@ type LfoOptions = Partial<
     }
 >;
 type LfoParams = keyof LfoParameterData;
-type LfoNodeMessage =
-  | {
-      type: "start" | "stop" | "reset";
-      time?: number;
-      offset?: number;
-    }
-  | {
-      type: "oscillatorType";
-      oscillatorType: BasicWaveform;
-    }
-  | {
-      type: "normalize";
-      normalize: boolean;
-    };
 
 class LfoNode extends AudioWorkletNode {
   private _oscillatorType: BasicWaveform;

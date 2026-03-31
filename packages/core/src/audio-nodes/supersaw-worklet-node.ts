@@ -4,7 +4,7 @@ import type {
   AudioParamName,
   AudioParamData,
   SupersawProcessorMessage,
-} from "@/worklets/worklet-supersaw";
+} from "@drome/audio-worklets";
 
 type SupersawOptions = Partial<AudioParamData>;
 
