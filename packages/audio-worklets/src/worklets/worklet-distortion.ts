@@ -1,7 +1,9 @@
-import * as algos from "@/utils/distortion-algorithms.js";
-import { clamp } from "@/utils/math.js";
-import { DISTORTION_ID } from "@/constants.js";
-import type { DistortionAlgorithm, DistortionFunction } from "@/types.js";
+import * as algos from "../utils/distortion-algorithms";
+import { clamp } from "../utils/math";
+import { workletIds } from "../constants";
+
+type DistortionAlgorithm = keyof typeof algos;
+type DistortionFunction = (typeof algos)[DistortionAlgorithm];
 
 interface DistortionOptions extends AudioWorkletNodeOptions {
   processorOptions: {
@@ -71,6 +73,6 @@ class DistortionProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor(DISTORTION_ID, DistortionProcessor);
+registerProcessor(workletIds.distortion, DistortionProcessor);
 
-export { DistortionProcessor };
+export type { DistortionAlgorithm, DistortionFunction };

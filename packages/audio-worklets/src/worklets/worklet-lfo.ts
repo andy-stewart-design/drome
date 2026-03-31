@@ -1,5 +1,7 @@
-import { isNumber } from "@/utils/validators";
-import type { LfoNodeMessage } from "@/automation/lfo-node";
+import { isNumber } from "../utils/validators";
+import { workletIds } from "../constants";
+
+type BasicWaveform = "sawtooth" | "sine" | "square" | "triangle";
 
 interface LfoProcessorOptions {
   type: keyof typeof oscillators;
@@ -14,6 +16,20 @@ interface LfoOptions {
 type LfoParameter = (typeof parameterDescriptors)[number]["name"];
 type LfoParameterData = Record<LfoParameter, number>;
 type LfoProcessorMessage = { type: "ended"; time: number };
+type LfoNodeMessage =
+  | {
+      type: "start" | "stop" | "reset";
+      time?: number;
+      offset?: number;
+    }
+  | {
+      type: "oscillatorType";
+      oscillatorType: BasicWaveform;
+    }
+  | {
+      type: "normalize";
+      normalize: boolean;
+    };
 
 const parameterDescriptors = [
   { name: "frequency", defaultValue: 2, minValue: 0.01, maxValue: 100 },
@@ -158,9 +174,6 @@ class LFOProcessor extends AudioWorkletProcessor {
       }
 
       const phaseIncrement = frequency / sampleRate;
-      // {phaseIncrement: 0.000005208333333333333}
-      // {phaseIncrement: 0.000020833333333333333}
-      // console.log({ phaseIncrement });
 
       this.phase += phaseIncrement;
       if (this.phase >= 1.0) this.phase -= 1.0;
@@ -170,11 +183,12 @@ class LFOProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor("lfo-processor", LFOProcessor);
+registerProcessor(workletIds.lfo, LFOProcessor);
 
 export type {
   LfoParameter,
   LfoParameterData,
   LfoProcessorOptions,
   LfoProcessorMessage,
+  LfoNodeMessage,
 };

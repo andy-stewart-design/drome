@@ -1,4 +1,4 @@
-import type { SupersawOptions } from "@/worklets/worklet-supersaw";
+import type { SupersawOptions } from "@drome/audio-worklets";
 import CompositeAudioNode, {
   type CompositeAudioNodeOptions,
 } from "./composite-audio-node";

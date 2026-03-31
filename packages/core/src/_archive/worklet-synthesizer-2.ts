@@ -1,3 +1,5 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+/*
 import { isNumber } from "@/utils/validators";
 
 type Waveform = "sine" | "sawtooth" | "triangle" | "square";
@@ -100,3 +102,4 @@ class SynthProcessor extends AudioWorkletProcessor {
 }
 
 registerProcessor("synth-oscillator", SynthProcessor);
+*/

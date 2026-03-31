@@ -29,6 +29,7 @@
     "dist"
   ],
   "dependencies": {
+    "@drome/audio-worklets": "workspace:*",
     "@drome/clock": "workspace:*"
   },
   "devDependencies": {

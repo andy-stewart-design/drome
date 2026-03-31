@@ -1,3 +1,5 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+/*
 import { isNumber } from "@/utils/validators";
 
 type AudioParam = (typeof audioParams)[number]["name"];
@@ -122,3 +124,4 @@ class SampleProcessor extends AudioWorkletProcessor {
 registerProcessor("sample-processor", SampleProcessor);
 
 export type { AudioParams, ProcessorOptions, ProcessorMessage };
+*/

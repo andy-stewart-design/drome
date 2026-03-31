@@ -1,4 +1,4 @@
-import { BITCRUSH_ID } from "@/constants.js";
+import { workletIds } from "../constants";
 
 class BitcrushProcessor extends AudioWorkletProcessor {
   private phase: number;
@@ -68,6 +68,4 @@ class BitcrushProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor(BITCRUSH_ID, BitcrushProcessor);
-
-export { BitcrushProcessor };
+registerProcessor(workletIds.bitcrusher, BitcrushProcessor);

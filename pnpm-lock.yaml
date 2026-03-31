@@ -258,6 +258,18 @@ importers:
         specifier: ^19.2.3
         version: 19.2.3(react@19.2.3)
 
+  packages/audio-worklets:
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      esbuild:
+        specifier: ^0.27.0
+        version: 0.27.3
+      tsdown:
+        specifier: 0.17.0-beta.4
+        version: 0.17.0-beta.4(typescript@5.9.3)
+
   packages/clock:
     devDependencies:
       '@repo/typescript-config':
@@ -269,6 +281,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@drome/audio-worklets':
+        specifier: workspace:*
+        version: link:../audio-worklets
       '@drome/clock':
         specifier: workspace:*
         version: link:../clock

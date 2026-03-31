@@ -1,3 +1,7 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+// This node pairs with worklet-synthesizer.ts which is no longer registered.
+
+/*
 import AudioEndedEvent from "@/events/audio-ended";
 import type { FilterType } from "@/worklets/worklet-filter";
 import type { SynthesizerProcessorOptions, SynthesizerParameterData, SynthesizerProcessorMessage, } from "@/worklets/worklet-synthesizer";
@@ -29,33 +33,28 @@ class SynthesizerNode extends AudioWorkletNode {
   readonly frequency: AudioParam;
   readonly detune: AudioParam;
   readonly gain: AudioParam;
-  readonly begin: AudioParam;
-  readonly end: AudioParam;
-  //   readonly filterFrequency: AudioParam;
-  //   readonly filterQ: AudioParam;
+  readonly filterFrequency: AudioParam;
+  readonly filterQ: AudioParam;
   onended: ((e: AudioEndedEvent) => void) | null = null;
 
   constructor(
     ctx: AudioContext,
     { filterType = "none", type = "sine", ...params }: SynthesizerOptions = {},
   ) {
-    super(ctx, "synth-oscillator", {
+    super(ctx, "custom-oscillator-processor", {
       numberOfOutputs: 1,
       outputChannelCount: [2],
-      parameterData: params,
+      parameterData: { ...params, type: getOscillatorType(type) },
       processorOptions: { filterType, type },
     });
 
     this._oscillatorType = type;
     this._filterType = filterType;
-    this.begin = getParam(this, "begin");
-    this.end = getParam(this, "end");
     this.frequency = getParam(this, "frequency");
     this.detune = getParam(this, "detune");
     this.gain = getParam(this, "gain");
-
-    // this.filterFrequency = getParam(this, "filterFrequency");
-    // this.filterQ = getParam(this, "filterQ");
+    this.filterFrequency = getParam(this, "filterFrequency");
+    this.filterQ = getParam(this, "filterQ");
 
     // Listen for messages from the processor
     this.port.onmessage = (
@@ -76,14 +75,12 @@ class SynthesizerNode extends AudioWorkletNode {
   start(when: number = 0) {
     const startTime = when === 0 ? this.context.currentTime : when;
     this.postMessage({ type: "start", time: startTime });
-    this.begin.value = when;
   }
 
   stop(when: number = 0) {
     const stopTime = when === 0 ? this.context.currentTime : when;
     this._stopTime = stopTime;
     this.postMessage({ type: "stop", time: stopTime });
-    this.end.value = when;
   }
 
   setOscillatorType(oscillatorType: Waveform) {
@@ -135,3 +132,4 @@ function getOscillatorType(type: Waveform | number) {
     ? Math.min(Math.max(type, 0), 3)
     : typeMap[type];
 }
+*/

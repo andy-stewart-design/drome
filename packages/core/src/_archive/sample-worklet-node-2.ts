@@ -1,3 +1,7 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+// This node pairs with worklet-sample-2.ts which is no longer registered.
+
+/*
 import AudioEndedEvent from "@/events/audio-ended";
 import type { AudioParams, ProcessorOptions, ProcessorMessage, } from "@/worklets/worklet-sample-2";
 
@@ -130,3 +134,4 @@ function getParam(node: AudioWorkletNode, name: string) {
 
 export default SampleNode;
 export type { SampleNodeMessage };
+*/

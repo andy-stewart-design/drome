@@ -13,7 +13,7 @@ import PanEffect from "@/effects/effect-pan";
 import ReverbEffect from "./effects/effect-reverb";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import { isString } from "@/utils/validators";
-import { addWorklets } from "@/utils/worklets";
+import { addWorklets } from "@drome/audio-worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
 import type {
   DistortionAlgorithm,
