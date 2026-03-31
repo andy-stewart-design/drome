@@ -1,5 +1,8 @@
 import MIDIObservable, { type MIDIObservableType } from "./midi-observable";
-import MIDIObserver, { type MIDIObserverDataMap, type MIDIObserverType } from "./midi-observer";
+import MIDIObserver, {
+  type MIDIObserverDataMap,
+  type MIDIObserverType,
+} from "./midi-observer";
 import MIDIRouter from "./midi-router";
 import { getMIDIPort } from "./utils";
 
@@ -166,6 +169,12 @@ class MIDIController {
   }
 }
 
+function isMidiObserver<T extends MIDIObserverType>(
+  n: unknown,
+): n is MIDIObserver<T> {
+  return n instanceof MIDIObserver;
+}
+
 export default MIDIController;
-export { MIDIController, MIDIObserver, MIDIRouter };
-export type { MIDIObserverDataMap, MIDIObserverType };
+export { MIDIController, isMidiObserver };
+export type { MIDIObserver, MIDIRouter, MIDIObserverDataMap, MIDIObserverType };

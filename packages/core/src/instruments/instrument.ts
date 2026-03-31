@@ -4,7 +4,8 @@ import DromeArrayNullable from "@/array/drome-array-nullable";
 import LfoNode from "@/automation/lfo-node";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
-import { MIDIObserver } from "@drome/midi";
+import { isMidiObserver } from "@drome/midi";
+import type { MIDIObserver } from "@drome/midi";
 import { parsePatternString } from "../utils/parse-pattern";
 import { isArray, isNullish, isNumber, isString } from "../utils/validators";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
@@ -134,7 +135,7 @@ abstract class Instrument<T> {
     } else if (this._filter.frequency instanceof LfoNode) {
       filFreq.value = this._filter.frequency.baseValue;
       this._filter.frequency.connect(filFreq);
-    } else if (this._filter.frequency instanceof MIDIObserver) {
+    } else if (isMidiObserver(this._filter.frequency)) {
       const { currentValue } = this._filter.frequency;
       filFreq.setValueAtTime(currentValue, this.ctx.currentTime);
       this._filter.frequency.onUpdate(({ value }) => {
@@ -148,7 +149,7 @@ abstract class Instrument<T> {
       this._filter.q.apply(filQ, cycleIndex, chordIdx);
     } else if (this._filter.q instanceof Envelope) {
       this._filter.q.apply(filQ, start, dur, cycleIndex, chordIdx);
-    } else if (this._filter.q instanceof MIDIObserver) {
+    } else if (isMidiObserver(this._filter.q)) {
       const { currentValue } = this._filter.q;
       filQ.setValueAtTime(currentValue, this.ctx.currentTime);
       this._filter.q.onUpdate(({ value }) => {
@@ -170,7 +171,7 @@ abstract class Instrument<T> {
       this._detune.apply(node.detune, cycleIndex, chordIndex);
     } else if (this._detune instanceof Envelope) {
       this._detune.apply(node.detune, start, duration, cycleIndex, chordIndex);
-    } else if (this._detune instanceof MIDIObserver) {
+    } else if (isMidiObserver(this._detune)) {
       node.detune.setValueAtTime(
         this._detune.currentValue,
         this.ctx.currentTime,
@@ -324,7 +325,7 @@ abstract class Instrument<T> {
     if (
       input instanceof Envelope ||
       input instanceof LfoNode ||
-      input instanceof MIDIObserver
+      isMidiObserver(input)
     ) {
       this._detune = input;
     } else {
@@ -345,7 +346,7 @@ abstract class Instrument<T> {
     if (f instanceof Envelope) {
       this._filter.frequency = f;
       this._filter.frequency.endValue = 30;
-    } else if (f instanceof LfoNode || f instanceof MIDIObserver) {
+    } else if (f instanceof LfoNode || isMidiObserver(f)) {
       this._filter.frequency = f;
     } else if (isNumber(f) || isString(f)) {
       const pattern = isString(f) ? parsePatternString(f) : [f];
@@ -354,7 +355,7 @@ abstract class Instrument<T> {
       console.warn("Invalid type:", f satisfies never);
     }
 
-    if (q instanceof Envelope || q instanceof MIDIObserver) {
+    if (q instanceof Envelope || isMidiObserver(q)) {
       this._filter.q = q;
     } else if (isString(q) || isNumber(q)) {
       const pattern = isString(q) ? parsePatternString(q) : [q];
@@ -408,7 +409,7 @@ abstract class Instrument<T> {
   }
 
   protected beforePlay(barStart: number, barDuration: number) {
-    if (this._detune instanceof MIDIObserver) this._detune.clear();
+    if (isMidiObserver(this._detune)) this._detune.clear();
 
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
     const cycle = this._cycles.at(cycleIndex);

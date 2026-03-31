@@ -1,8 +1,5 @@
 import Envelope from "@/automation/envelope";
 import LfoNode from "@/automation/lfo-node";
-import { MIDIObserver } from "@drome/midi";
-import type { MIDIObserverType } from "@drome/midi";
-
 function isNullish(v: unknown) {
   return v === null || v === undefined;
 }
@@ -27,10 +24,4 @@ function isLfoNode(n: unknown): n is LfoNode {
   return n instanceof LfoNode;
 }
 
-function isObserver<T extends MIDIObserverType>(
-  n: unknown,
-): n is MIDIObserver<T> {
-  return n instanceof MIDIObserver;
-}
-
-export { isNullish, isNumber, isArray, isEnv, isLfoNode, isString, isObserver };
+export { isNullish, isNumber, isArray, isEnv, isLfoNode, isString };

@@ -1,9 +1,9 @@
+import { isMidiObserver } from "@drome/midi";
 import {
   isArray,
   isEnv,
   isLfoNode,
   isNumber,
-  isObserver,
   isString,
 } from "./validators";
 import type { SNELO, Pattern, PatternInput } from "../types";
@@ -26,7 +26,7 @@ function parsePatternInput(input: PatternInput): Pattern {
 }
 
 function parseParamInput(input: SNELO) {
-  if (isEnv(input) || isLfoNode(input) || isObserver<"controlchange">(input)) {
+  if (isEnv(input) || isLfoNode(input) || isMidiObserver<"controlchange">(input)) {
     return input;
   } else if (isString(input) || isNumber(input)) {
     return parsePatternInput(input);
