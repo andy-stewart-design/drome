@@ -1,3 +1,5 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+/*
 export type SupersawProcessorMessage = { type: "ended"; time: number };
 export type AudioParamName = (typeof audioParams)[number]["name"];
 export type AudioParamData = Record<AudioParamName, number>;
@@ -132,3 +134,4 @@ function polyBlep(phase: number, dt: number) {
 const sawblep = (phase: number, dt: number) => {
   return 2 * phase - 1 - polyBlep(phase, dt);
 };
+*/

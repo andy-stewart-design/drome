@@ -1,3 +1,5 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+/*
 import { isNumber } from "@/utils/validators";
 import type { LfoNodeMessage } from "@/automation/lfo-node";
 
@@ -178,3 +180,4 @@ export type {
   LfoProcessorOptions,
   LfoProcessorMessage,
 };
+*/

@@ -1,3 +1,5 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+/*
 import FilterProcessor, { type FilterType } from "./worklet-filter";
 import type { SampleNodeMessage } from "../audio-nodes/sample-worklet-node-1";
 
@@ -224,3 +226,4 @@ export type {
   SampleProcessorOptions,
   SampleProcessorMessage,
 };
+*/

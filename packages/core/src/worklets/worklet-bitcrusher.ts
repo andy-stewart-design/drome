@@ -1,3 +1,5 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+/*
 import { BITCRUSH_ID } from "@/constants.js";
 
 class BitcrushProcessor extends AudioWorkletProcessor {
@@ -71,3 +73,4 @@ class BitcrushProcessor extends AudioWorkletProcessor {
 registerProcessor(BITCRUSH_ID, BitcrushProcessor);
 
 export { BitcrushProcessor };
+*/

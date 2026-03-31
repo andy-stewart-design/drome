@@ -1,3 +1,5 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+/*
 import type { SynthesizerNodeMessage } from "@/audio-nodes/synth-worklet-node-1";
 import FilterProcessor, { type FilterType } from "./worklet-filter";
 import { isNumber } from "@/utils/validators";
@@ -183,3 +185,4 @@ export type {
   SynthesizerProcessorOptions,
   SynthesizerProcessorMessage,
 };
+*/

@@ -1,3 +1,5 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+/*
 type FilterType = "none" | "lowpass" | "highpass" | "bandpass";
 
 abstract class FilterProcessor extends AudioWorkletProcessor {
@@ -75,3 +77,4 @@ abstract class FilterProcessor extends AudioWorkletProcessor {
 
 export default FilterProcessor;
 export type { FilterType };
+*/

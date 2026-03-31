@@ -1,3 +1,5 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+/*
 import * as algos from "@/utils/distortion-algorithms.js";
 import { clamp } from "@/utils/math.js";
 import { DISTORTION_ID } from "@/constants.js";
@@ -74,3 +76,4 @@ class DistortionProcessor extends AudioWorkletProcessor {
 registerProcessor(DISTORTION_ID, DistortionProcessor);
 
 export { DistortionProcessor };
+*/

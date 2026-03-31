@@ -1,3 +1,7 @@
+// NOTE: Dead code — preserved for reference during audio-engine extraction.
+// This node pairs with worklet-synthesizer.ts which is no longer registered.
+
+/*
 import AudioEndedEvent from "@/events/audio-ended";
 import type { FilterType } from "@/worklets/worklet-filter";
 import type { SynthesizerProcessorOptions, SynthesizerParameterData, SynthesizerProcessorMessage, } from "@/worklets/worklet-synthesizer";
@@ -128,3 +132,4 @@ function getOscillatorType(type: Waveform | number) {
     ? Math.min(Math.max(type, 0), 3)
     : typeMap[type];
 }
+*/
