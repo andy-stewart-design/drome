@@ -8,7 +8,7 @@ import {
   isObserver,
 } from "@/utils/validators";
 import { applySteppedRamp } from "@/utils/stepped-ramp";
-import { MIDIObserver } from "@/midi";
+import { MIDIObserver } from "@drome/midi";
 import type Envelope from "@/automation/envelope";
 import type LfoNode from "@/automation/lfo-node";
 import type { Automation, Note } from "@/types";

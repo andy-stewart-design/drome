@@ -287,6 +287,9 @@ importers:
       '@drome/clock':
         specifier: workspace:*
         version: link:../clock
+      '@drome/midi':
+        specifier: workspace:*
+        version: link:../midi
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
@@ -297,6 +300,15 @@ importers:
       prettier-plugin-one-line-imports:
         specifier: ^1.0.1
         version: 1.0.1(prettier@3.8.1)
+      tsdown:
+        specifier: 0.17.0-beta.4
+        version: 0.17.0-beta.4(typescript@5.9.3)
+
+  packages/midi:
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       tsdown:
         specifier: 0.17.0-beta.4
         version: 0.17.0-beta.4(typescript@5.9.3)

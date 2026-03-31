@@ -1,7 +1,7 @@
 import Envelope from "@/automation/envelope";
 import LfoNode from "@/automation/lfo-node";
-import { MIDIObserver } from "@/midi";
-import type { MIDIObserverType } from "@/midi/midi-observer";
+import { MIDIObserver } from "@drome/midi";
+import type { MIDIObserverType } from "@drome/midi";
 
 function isNullish(v: unknown) {
   return v === null || v === undefined;

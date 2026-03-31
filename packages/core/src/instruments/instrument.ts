@@ -4,7 +4,7 @@ import DromeArrayNullable from "@/array/drome-array-nullable";
 import LfoNode from "@/automation/lfo-node";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
-import { MIDIObserver } from "@/midi";
+import { MIDIObserver } from "@drome/midi";
 import { parsePatternString } from "../utils/parse-pattern";
 import { isArray, isNullish, isNumber, isString } from "../utils/validators";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
@@ -20,7 +20,7 @@ import type {
   Nullable,
 } from "@/types";
 import type { FilterType } from "@/types";
-import type MIDIRouter from "@/midi/midi-router";
+import type { MIDIRouter } from "@drome/midi";
 
 type NonNullNote = NonNullable<Note<number | number[]>>;
 

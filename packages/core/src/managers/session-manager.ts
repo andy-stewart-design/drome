@@ -1,6 +1,6 @@
 import { AudioClock } from "@drome/clock";
 import LfoNode from "@/automation/lfo-node";
-import MIDIController, { MIDIObserver } from "@/midi";
+import MIDIController, { MIDIObserver } from "@drome/midi";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
 import type { DromeEventCallback, DromeEventType, SNELO } from "@/types";

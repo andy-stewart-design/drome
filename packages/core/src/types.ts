@@ -7,7 +7,7 @@ import type {
   waveformAliasMap,
 } from "./utils/synth-alias";
 import type { scaleAliasMap } from "./utils/get-scale";
-import type { MIDIObserver } from "./midi";
+import type { MIDIObserver } from "@drome/midi";
 
 // AUDIO CLOCK (types owned by @drome/clock)
 export type { DromeEventCallback, DromeEventType, Metronome } from "@drome/clock";

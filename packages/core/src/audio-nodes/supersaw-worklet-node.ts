@@ -1,6 +1,11 @@
 import AudioEndedEvent from "@/events/audio-ended";
 import { getParam } from "@/utils/audio-params";
-import { workletIds, type AudioParamName, type AudioParamData, type SupersawProcessorMessage } from "@drome/audio-worklets";
+import {
+  workletIds,
+  type AudioParamName,
+  type AudioParamData,
+  type SupersawProcessorMessage,
+} from "@drome/audio-worklets";
 
 type SupersawOptions = Partial<AudioParamData>;
 
