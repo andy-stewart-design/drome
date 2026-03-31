@@ -1,10 +1,6 @@
 import AudioEndedEvent from "@/events/audio-ended";
 import { getParam } from "@/utils/audio-params";
-import type {
-  AudioParamName,
-  AudioParamData,
-  SupersawProcessorMessage,
-} from "@drome/audio-worklets";
+import { workletIds, type AudioParamName, type AudioParamData, type SupersawProcessorMessage } from "@drome/audio-worklets";
 
 type SupersawOptions = Partial<AudioParamData>;
 
@@ -19,7 +15,7 @@ class SupersawNode extends AudioWorkletNode {
   onended: ((e: AudioEndedEvent) => void) | null = null;
 
   constructor(ctx: AudioContext, parameterData: SupersawOptions = {}) {
-    super(ctx, "supersaw-processor", {
+    super(ctx, workletIds.supersaw, {
       numberOfOutputs: 1,
       outputChannelCount: [2],
       parameterData,

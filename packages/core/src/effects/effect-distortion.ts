@@ -1,5 +1,6 @@
 import AutomatableEffect from "@/abstracts/effect-automatable.js";
 import type { Automation, DistortionAlgorithm } from "@/types.js";
+import { workletIds } from "@drome/audio-worklets";
 
 interface DistortionEffectOptions {
   distortion: Automation;
@@ -19,7 +20,7 @@ class DistortionEffect extends AutomatableEffect<AudioWorkletNode> {
     super(distortion);
 
     this._input = new GainNode(ctx);
-    this._effect = new AudioWorkletNode(ctx, "distortion-processor", {
+    this._effect = new AudioWorkletNode(ctx, workletIds.distortion, {
       processorOptions: { algorithm: type },
     } as AudioWorkletNodeOptions);
     this._target = this.distortionParam;

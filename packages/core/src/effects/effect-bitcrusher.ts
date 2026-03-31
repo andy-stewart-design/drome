@@ -1,5 +1,6 @@
 import AutomatableEffect from "@/abstracts/effect-automatable.js";
 import type { Automation } from "@/types.js";
+import { workletIds } from "@drome/audio-worklets";
 
 interface BitcrusherEffectOptions {
   bitDepth: Automation;
@@ -18,7 +19,7 @@ class BitcrusherEffect extends AutomatableEffect<AudioWorkletNode> {
     super(bitDepth);
 
     this._input = new GainNode(ctx);
-    this._effect = new AudioWorkletNode(ctx, "bitcrush-processor");
+    this._effect = new AudioWorkletNode(ctx, workletIds.bitcrusher);
     this._target = this.bitParam;
 
     this.bitDepth(this._defaultValue);

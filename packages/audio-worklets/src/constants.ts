@@ -1,2 +1,6 @@
-export const BITCRUSH_ID = "bitcrush-processor";
-export const DISTORTION_ID = "distortion-processor";
+export const workletIds = {
+  bitcrusher: "bitcrush-processor",
+  distortion: "distortion-processor",
+  lfo: "lfo-processor",
+  supersaw: "supersaw-processor",
+} as const;

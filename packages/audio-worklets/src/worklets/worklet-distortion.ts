@@ -1,6 +1,6 @@
 import * as algos from "../utils/distortion-algorithms";
 import { clamp } from "../utils/math";
-import { DISTORTION_ID } from "../constants";
+import { workletIds } from "../constants";
 
 type DistortionAlgorithm = keyof typeof algos;
 type DistortionFunction = (typeof algos)[DistortionAlgorithm];
@@ -73,6 +73,6 @@ class DistortionProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor(DISTORTION_ID, DistortionProcessor);
+registerProcessor(workletIds.distortion, DistortionProcessor);
 
 export type { DistortionAlgorithm, DistortionFunction };

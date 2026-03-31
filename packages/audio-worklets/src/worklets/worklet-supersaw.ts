@@ -1,3 +1,5 @@
+import { workletIds } from "../constants";
+
 export type SupersawProcessorMessage = { type: "ended"; time: number };
 export type AudioParamName = (typeof audioParams)[number]["name"];
 export type AudioParamData = Record<AudioParamName, number>;
@@ -90,7 +92,7 @@ class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor("supersaw-processor", SuperSawOscillatorProcessor);
+registerProcessor(workletIds.supersaw, SuperSawOscillatorProcessor);
 
 // Helper functions
 

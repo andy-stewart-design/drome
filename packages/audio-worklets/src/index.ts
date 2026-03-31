@@ -15,6 +15,7 @@ async function addWorklets(ctx: AudioContext) {
 }
 
 export { addWorklets };
+export { workletIds } from "./constants";
 
 export type {
   LfoParameter,

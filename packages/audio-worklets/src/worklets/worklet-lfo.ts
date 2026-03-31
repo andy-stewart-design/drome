@@ -1,4 +1,5 @@
 import { isNumber } from "../utils/validators";
+import { workletIds } from "../constants";
 
 type BasicWaveform = "sawtooth" | "sine" | "square" | "triangle";
 
@@ -182,7 +183,7 @@ class LFOProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor("lfo-processor", LFOProcessor);
+registerProcessor(workletIds.lfo, LFOProcessor);
 
 export type {
   LfoParameter,
