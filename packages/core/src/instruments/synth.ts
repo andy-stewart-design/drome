@@ -26,7 +26,7 @@ export default class Synth extends Instrument {
     super(drome, { ...opts, baseGain: 0.125 });
     this._types = opts.type?.length ? opts.type : ["sine"];
     this._voices = new DromeArray(7);
-    this._panspread = new DromeArray(0.5);
+    this._panspread = new DromeArray(0.4);
     this._freqspread = new DromeArray(0.2);
   }
 
@@ -57,7 +57,7 @@ export default class Synth extends Instrument {
     if (input instanceof Envelope || input instanceof LfoNode) {
       this._panspread = input;
     } else {
-      if (!(this._panspread instanceof DromeArray)) this._panspread = new DromeArray(0.5);
+      if (!(this._panspread instanceof DromeArray)) this._panspread = new DromeArray(0.4);
       this._panspread.note(input, ...rest);
     }
     return this;
