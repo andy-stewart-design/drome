@@ -145,7 +145,14 @@ export default class Synth extends Instrument {
         if (!note) return;
         [note?.value].flat().forEach((midiNote) => {
           // if (!midiNote) return;
-          const cycleIndex = this._drome.metronome.bar % this._voices.length;
+          const bar = this._drome.metronome.bar;
+          const cycleIndex = bar % this._voices.length;
+          const panspreadCycleIndex = this._panspread instanceof DromeArray
+            ? bar % this._panspread.length
+            : cycleIndex;
+          const freqspreadCycleIndex = this._freqspread instanceof DromeArray
+            ? bar % this._freqspread.length
+            : cycleIndex;
           const osc = new SynthNode(this.ctx, {
             frequency: this.getFrequency(midiNote),
             type: getWaveform(typeAlias),
@@ -154,11 +161,11 @@ export default class Synth extends Instrument {
             voices: this._voices.at(cycleIndex, chordIndex),
             panspread:
               this._panspread instanceof DromeArray
-                ? this._panspread.at(cycleIndex, chordIndex)
+                ? this._panspread.at(panspreadCycleIndex, chordIndex)
                 : undefined,
             freqspread:
               this._freqspread instanceof DromeArray
-                ? this._freqspread.at(cycleIndex, chordIndex)
+                ? this._freqspread.at(freqspreadCycleIndex, chordIndex)
                 : undefined,
           });
           this._audioNodes.add(osc);
