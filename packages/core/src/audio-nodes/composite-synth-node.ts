@@ -22,8 +22,8 @@ class SynthNode extends CompositeAudioNode<OscillatorNode | SupersawNode> {
       this._audioNode = new SupersawNode(ctx, {
         frequency: opts.frequency,
         voices,
-        panspread,
-        freqspread,
+        ...(panspread !== undefined && { panspread }),
+        ...(freqspread !== undefined && { freqspread }),
       });
     } else {
       this._audioNode = new OscillatorNode(ctx, { ...opts, type });
@@ -54,6 +54,18 @@ class SynthNode extends CompositeAudioNode<OscillatorNode | SupersawNode> {
     if (!this.isSupersaw(this.audioNode)) {
       this.audioNode.type = type;
     }
+  }
+
+  get panspread(): AudioParam | undefined {
+    return this._audioNode instanceof SupersawNode
+      ? this._audioNode.panspread
+      : undefined;
+  }
+
+  get freqspread(): AudioParam | undefined {
+    return this._audioNode instanceof SupersawNode
+      ? this._audioNode.freqspread
+      : undefined;
   }
 }
 
