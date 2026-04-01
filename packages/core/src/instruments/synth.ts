@@ -53,21 +53,29 @@ export default class Synth extends Instrument {
     return this;
   }
 
-  panspread(input: Envelope | LfoNode | number | number[], ...rest: (number | number[])[]): this {
+  panspread(
+    input: Envelope | LfoNode | number | number[],
+    ...rest: (number | number[])[]
+  ) {
     if (input instanceof Envelope || input instanceof LfoNode) {
       this._panspread = input;
     } else {
-      if (!(this._panspread instanceof DromeArray)) this._panspread = new DromeArray(0.4);
+      if (!(this._panspread instanceof DromeArray))
+        this._panspread = new DromeArray(0.4);
       this._panspread.note(input, ...rest);
     }
     return this;
   }
 
-  freqspread(input: Envelope | LfoNode | number | number[], ...rest: (number | number[])[]): this {
+  freqspread(
+    input: Envelope | LfoNode | number | number[],
+    ...rest: (number | number[])[]
+  ) {
     if (input instanceof Envelope || input instanceof LfoNode) {
       this._freqspread = input;
     } else {
-      if (!(this._freqspread instanceof DromeArray)) this._freqspread = new DromeArray(0.2);
+      if (!(this._freqspread instanceof DromeArray))
+        this._freqspread = new DromeArray(0.2);
       this._freqspread.note(input, ...rest);
     }
     return this;
@@ -83,7 +91,13 @@ export default class Synth extends Instrument {
 
     if (node.panspread) {
       if (this._panspread instanceof Envelope) {
-        this._panspread.apply(node.panspread, start, duration, cycleIndex, chordIndex);
+        this._panspread.apply(
+          node.panspread,
+          start,
+          duration,
+          cycleIndex,
+          chordIndex,
+        );
       } else if (this._panspread instanceof LfoNode) {
         node.panspread.value = this._panspread.baseValue;
         this._panspread.connect(node.panspread);
@@ -92,7 +106,13 @@ export default class Synth extends Instrument {
 
     if (node.freqspread) {
       if (this._freqspread instanceof Envelope) {
-        this._freqspread.apply(node.freqspread, start, duration, cycleIndex, chordIndex);
+        this._freqspread.apply(
+          node.freqspread,
+          start,
+          duration,
+          cycleIndex,
+          chordIndex,
+        );
       } else if (this._freqspread instanceof LfoNode) {
         node.freqspread.value = this._freqspread.baseValue;
         this._freqspread.connect(node.freqspread);
@@ -132,8 +152,14 @@ export default class Synth extends Instrument {
             filter: this._filter.type ? { type: this._filter.type } : undefined,
             gain: 0,
             voices: this._voices.at(cycleIndex, chordIndex),
-            panspread: this._panspread instanceof DromeArray ? this._panspread.at(cycleIndex, chordIndex) : undefined,
-            freqspread: this._freqspread instanceof DromeArray ? this._freqspread.at(cycleIndex, chordIndex) : undefined,
+            panspread:
+              this._panspread instanceof DromeArray
+                ? this._panspread.at(cycleIndex, chordIndex)
+                : undefined,
+            freqspread:
+              this._freqspread instanceof DromeArray
+                ? this._freqspread.at(cycleIndex, chordIndex)
+                : undefined,
           });
           this._audioNodes.add(osc);
 
