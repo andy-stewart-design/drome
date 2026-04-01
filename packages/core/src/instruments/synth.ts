@@ -15,6 +15,8 @@ interface SynthOptions extends InstrumentOptions {
 export default class Synth extends Instrument {
   private _types: WaveformAlias[];
   private _voices: DromeArray<number>;
+  private _panspread: DromeArray<number>;
+  private _freqspread: DromeArray<number>;
   private _root = 0;
   private _scale: number[] | null = null;
 
@@ -22,6 +24,8 @@ export default class Synth extends Instrument {
     super(drome, { ...opts, baseGain: 0.125 });
     this._types = opts.type?.length ? opts.type : ["sine"];
     this._voices = new DromeArray(7);
+    this._panspread = new DromeArray(0.4);
+    this._freqspread = new DromeArray(0.2);
   }
 
   private getMidiNote(note: number) {
@@ -44,6 +48,16 @@ export default class Synth extends Instrument {
 
   voices(...input: (number | number[])[]) {
     this._voices.note(...input);
+    return this;
+  }
+
+  panspread(...input: (number | number[])[]) {
+    this._panspread.note(...input);
+    return this;
+  }
+
+  freqspread(...input: (number | number[])[]) {
+    this._freqspread.note(...input);
     return this;
   }
 
@@ -79,6 +93,8 @@ export default class Synth extends Instrument {
             filter: this._filter.type ? { type: this._filter.type } : undefined,
             gain: 0,
             voices: this._voices.at(cycleIndex, chordIndex),
+            panspread: this._panspread.at(cycleIndex, chordIndex),
+            freqspread: this._freqspread.at(cycleIndex, chordIndex),
           });
           this._audioNodes.add(osc);
 
