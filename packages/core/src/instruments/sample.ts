@@ -6,14 +6,14 @@ import type Drome from "@/index";
 
 type Nullable<T> = T | null | undefined;
 
-interface SampleOptions extends InstrumentOptions<number> {
+interface SampleOptions extends InstrumentOptions {
   sampleIds?: string[];
   sampleBank?: string;
   playbackRate?: number;
   loop?: boolean;
 }
 
-export default class Sample extends Instrument<number> {
+export default class Sample extends Instrument {
   private _sampleIds: string[];
   private _sampleBank: string;
   private _playbackRate: number;
@@ -42,7 +42,7 @@ export default class Sample extends Instrument<number> {
     return this;
   }
 
-  begin(...input: (Nullable<number> | Nullable<number>[])[]) {
+  begin(...input: (Nullable<number | number[]> | Nullable<number | number[]>[])[]) {
     this._cycles.note(...input);
     return this;
   }
@@ -105,49 +105,49 @@ export default class Sample extends Instrument<number> {
       const { buffer } = await this._drome.loadSample(bank, name, index);
 
       notes.forEach((note, noteIndex) => {
-        if (
-          !buffer ||
-          !isNumber(note?.value) ||
-          note.start < this.ctx.currentTime - 0.0375
-        ) {
+        if (!buffer || !note || note.start < this.ctx.currentTime - 0.0375) {
           return;
         }
 
-        const playbackRate = this._fitValue
-          ? buffer.duration / barDuration / this._fitValue
-          : Math.abs(this._playbackRate);
+        [note.value].flat().forEach((offset) => {
+          if (!isNumber(offset)) return;
 
-        const src = new SamplerNode(
-          this.ctx,
-          this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
-          {
-            playbackRate,
-            loop: this._loop,
-            gain: 0,
-            filter: this._filter.type ? { type: this._filter.type } : undefined,
-          },
-        );
-        this._audioNodes.add(src);
+          const playbackRate = this._fitValue
+            ? buffer.duration / barDuration / this._fitValue
+            : Math.abs(this._playbackRate);
 
-        const _note = this._cut ? note : { ...note, duration: buffer.duration };
-        const duration = this.applyNodeEffects(src, _note, noteIndex);
+          const src = new SamplerNode(
+            this.ctx,
+            this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
+            {
+              playbackRate,
+              loop: this._loop,
+              gain: 0,
+              filter: this._filter.type ? { type: this._filter.type } : undefined,
+            },
+          );
+          this._audioNodes.add(src);
 
-        src.connect(this._connectorNode);
-        src.start(note.start, note.value);
-        src.stop(note.start + duration);
+          const _note = this._cut ? note : { ...note, duration: buffer.duration };
+          const duration = this.applyNodeEffects(src, _note, noteIndex);
 
-        const cleanup = () => {
-          src.disconnect();
-          src.removeEventListener("ended", cleanup);
-          this._audioNodes.delete(src);
-          src.destory();
+          src.connect(this._connectorNode);
+          src.start(note.start, offset);
+          src.stop(note.start + duration);
 
-          if (this._stopTime && this._audioNodes.size === 0) {
-            this.destroy();
-          }
-        };
+          const cleanup = () => {
+            src.disconnect();
+            src.removeEventListener("ended", cleanup);
+            this._audioNodes.delete(src);
+            src.destory();
 
-        src.addEventListener("ended", cleanup);
+            if (this._stopTime && this._audioNodes.size === 0) {
+              this.destroy();
+            }
+          };
+
+          src.addEventListener("ended", cleanup);
+        });
       });
     });
   }

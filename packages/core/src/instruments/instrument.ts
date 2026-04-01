@@ -25,10 +25,10 @@ import type { MIDIRouter } from "@drome/midi";
 
 type NonNullNote = NonNullable<Note<number | number[]>>;
 
-interface InstrumentOptions<T> {
+interface InstrumentOptions {
   destination: AudioNode;
-  defaultCycle: T;
-  nullValue: T;
+  defaultCycle: number | number[];
+  nullValue: number | number[];
   baseGain?: number;
   adsr?: AdsrEnvelope;
 }
@@ -39,9 +39,9 @@ interface FrequencyParams {
   q?: Pattern | Envelope | MIDIObserver<"controlchange">;
 }
 
-abstract class Instrument<T> {
+abstract class Instrument {
   protected _drome: Drome;
-  protected _cycles: DromeArrayNullable<T>;
+  protected _cycles: DromeArrayNullable<number | number[]>;
   protected _midiRouter: MIDIRouter | null;
   private _destination: AudioNode;
   protected _connectorNode: GainNode;
@@ -68,7 +68,7 @@ abstract class Instrument<T> {
   rev: () => this;
   seq: (steps: number, ...pulses: (number | number[])[]) => this;
 
-  constructor(drome: Drome, opts: InstrumentOptions<T>) {
+  constructor(drome: Drome, opts: InstrumentOptions) {
     this._drome = drome;
     this._cycles = new DromeArrayNullable(opts.defaultCycle);
     this._midiRouter = null;
@@ -187,7 +187,7 @@ abstract class Instrument<T> {
   }
 
   private connectChain(
-    notes: Note<T>[],
+    notes: Note<number | number[]>[],
     barStart: number,
     barDuration: number,
   ) {
@@ -212,12 +212,14 @@ abstract class Instrument<T> {
     this._connected = true;
   }
 
-  note(...input: (Nullable<T> | Nullable<T>[])[]) {
+  note(
+    ...input: (Nullable<number | number[]> | Nullable<number | number[]>[])[]
+  ) {
     this._cycles.note(...input);
     return this;
   }
 
-  arrange(...input: [number, Nullable<T>[]][]) {
+  arrange(...input: [number, Nullable<number | number[]>[]][]) {
     this._cycles.arrange(...input);
     return this;
   }
@@ -413,7 +415,7 @@ abstract class Instrument<T> {
 
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
     const cycle = this._cycles.at(cycleIndex);
-    const notes: Note<T>[] = cycle.map((value, i) => {
+    const notes: Note<number | number[]>[] = cycle.map((value, i) => {
       if (isNullish(value)) return null;
       const start = barStart + i * (barDuration / cycle.length);
       const baseDuration = barDuration / cycle.length;

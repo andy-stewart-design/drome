@@ -8,11 +8,11 @@ import type Drome from "@/index";
 import type { NoteName, NoteValue, ScaleAlias, WaveformAlias } from "@/types";
 import { getScale } from "@/utils/get-scale";
 
-interface SynthOptions extends InstrumentOptions<number | number[]> {
+interface SynthOptions extends InstrumentOptions {
   type?: WaveformAlias[];
 }
 
-export default class Synth extends Instrument<number | number[]> {
+export default class Synth extends Instrument {
   private _types: WaveformAlias[];
   private _voices: DromeArray<number>;
   private _root = 0;
