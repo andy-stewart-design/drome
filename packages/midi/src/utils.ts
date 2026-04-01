@@ -108,9 +108,22 @@ function parsePortChangeType(p: MIDIPort) {
   }
 }
 
+// ----------------------------------------------------------------
+// GENERIC HELPERS
+// ----------------------------------------------------------------
+function isArray(v: unknown) {
+  return Array.isArray(v);
+}
+
+function isNumber(v: unknown) {
+  return typeof v === "number";
+}
+
 export {
   encodeNoteCommand,
   parseMIDIMessage,
   getMIDIPort,
   parseMIDIPortChange,
+  isArray,
+  isNumber,
 };

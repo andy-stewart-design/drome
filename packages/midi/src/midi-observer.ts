@@ -1,5 +1,5 @@
-import { map } from "@/utils/math";
-import { isArray, isNumber } from "@/utils/validators";
+import { map } from "./math";
+import { isArray, isNumber } from "./utils";
 import type MIDIController from "./index";
 import type {
   MIDIControlMessage,
@@ -131,36 +131,6 @@ class MIDIOberserver<T extends MIDIObserverType> {
     return this._type;
   }
 }
-
-// const noteData: MIDINoteMessage = {
-//   type: "noteoff",
-//   source: {
-//     name: "iphone bluetooth",
-//     id: "1986674228",
-//   },
-//   channel: 1,
-//   note: 45,
-//   velocity: 0,
-// };
-
-// const ccData: MIDIControlMessage = {
-//   type: "controlchange",
-//   source: {
-//     name: "iphone bluetooth",
-//     id: "1986674228",
-//   },
-//   channel: 1,
-//   controlNumber: 1,
-//   value: 59,
-// };
-
-// const foo = new MIDIOberserver("note").onUpdate((data) => {});
-// foo.update(noteData);
-
-// const bar = new MIDIOberserver("controlchange").onUpdate((data) => {});
-// bar.update(ccData);
-
-// const baz = new MIDIOberserver("portchange").onUpdate((data) => {});
 
 export default MIDIOberserver;
 export type { MIDIOberserver, MIDIObserverDataMap, MIDIObserverType };

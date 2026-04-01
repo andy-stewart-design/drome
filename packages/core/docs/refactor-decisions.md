@@ -48,10 +48,10 @@ The original four objectives have been re-scoped:
 
 **Needs an audit before the audio engine is built against the schema.** Every effect parameter should be classified as one of:
 
-| Tier | Type | Example |
-|------|------|---------|
-| **Static** | Plain `number` or `string` — set once, never automated | `reverb.decay` |
-| **Patternable** | `ScheduledValue[][]` — steps through values per cycle/step | `delay.delayTime` |
+| Tier                  | Type                                                        | Example            |
+| --------------------- | ----------------------------------------------------------- | ------------------ |
+| **Static**            | Plain `number` or `string` — set once, never automated      | `reverb.decay`     |
+| **Patternable**       | `ScheduledValue[][]` — steps through values per cycle/step  | `delay.delayTime`  |
 | **Fully automatable** | `AutomationDescriptor` — pattern, envelope, LFO, or MIDI CC | `filter.frequency` |
 
 Current inconsistencies in `schema.ts` (e.g. `delay.delayTime: number[]`, `reverb.decay: number`) should be resolved during this audit, not left to accumulate.
@@ -103,9 +103,9 @@ onBar() {
 
 These packages change minimally and can be extracted and adopted without waiting for the schema work:
 
-- **`clock`** — self-contained timing engine, no schema dependency
-- **`midi`** — observable wrapper around Web MIDI API, no schema dependency
-- **`audio-worklets`** — already separate files, no runtime coupling
+[x] **`clock`** — self-contained timing engine, no schema dependency
+[x] **`midi`** — observable wrapper around Web MIDI API, no schema dependency
+[x] **`audio-worklets`** — already separate files, no runtime coupling
 
 ### Coordinated tranche (migrate together)
 
@@ -120,6 +120,7 @@ You cannot extract `language` without `audio-engine` ready to consume the schema
 ### `patterns` package
 
 Open question. `DromeArray` and pattern manipulation logic could be:
+
 - A **standalone `patterns` package** that `language` depends on (useful if the REPL or other consumers need pattern manipulation independently)
 - **Internalized into `language`** (simpler if it's never used outside of schema generation)
 
@@ -132,9 +133,9 @@ Decide when scoping the `language` package.
 Planned API:
 
 ```js
-d.synth().note(d.midi()).push()       // unquantized, play freely
-d.synth().note(d.midi(16)).push()     // quantized to 16th notes
-d.synth().note(d.midi(null)).push()   // explicit: play freely
+d.synth().note(d.midi()).push(); // unquantized, play freely
+d.synth().note(d.midi(16)).push(); // quantized to 16th notes
+d.synth().note(d.midi(null)).push(); // explicit: play freely
 ```
 
 - `d.midi(n)` is a drop-in replacement for a pattern argument

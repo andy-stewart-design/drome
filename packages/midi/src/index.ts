@@ -1,5 +1,8 @@
 import MIDIObservable, { type MIDIObservableType } from "./midi-observable";
-import MIDIObserver, { type MIDIObserverType } from "./midi-observer";
+import MIDIObserver, {
+  type MIDIObserverDataMap,
+  type MIDIObserverType,
+} from "./midi-observer";
 import MIDIRouter from "./midi-router";
 import { getMIDIPort } from "./utils";
 
@@ -166,30 +169,12 @@ class MIDIController {
   }
 }
 
+function isMidiObserver<T extends MIDIObserverType>(
+  n: unknown,
+): n is MIDIObserver<T> {
+  return n instanceof MIDIObserver;
+}
+
 export default MIDIController;
-export { MIDIController, MIDIObserver };
-
-// class TypedMap<T extends Record<PropertyKey, any>> {
-//   private map = new Map<keyof T, T[keyof T]>();
-
-//   get<K extends keyof T>(key: K): T[K] | undefined {
-//     return this.map.get(key) as T[K] | undefined;
-//   }
-
-//   set<K extends keyof T>(key: K, value: T[K]): void {
-//     this.map.set(key, value);
-//   }
-// }
-
-// interface MyMap {
-//   foo: string[];
-//   bar: number[];
-// }
-
-// const myMap = new TypedMap<MyMap>();
-
-// myMap.set("foo", ["a", "b"]);
-// myMap.set("bar", [1, 2, 3]);
-
-// const foo = myMap.get("bar"); // string[] | undefined
-// const bar = myMap.get("bar"); // number[] | undefined
+export { MIDIController, isMidiObserver };
+export type { MIDIObserver, MIDIRouter, MIDIObserverDataMap, MIDIObserverType };

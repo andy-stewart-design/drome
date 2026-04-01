@@ -1,6 +1,7 @@
 import { AudioClock } from "@drome/clock";
 import LfoNode from "@/automation/lfo-node";
-import MIDIController, { MIDIObserver } from "@/midi";
+import MIDIController, { isMidiObserver } from "@drome/midi";
+import type { MIDIObserver } from "@drome/midi";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
 import type { DromeEventCallback, DromeEventType, SNELO } from "@/types";
@@ -66,7 +67,7 @@ class SessionManager {
     if (input instanceof LfoNode) {
       if (!this._queue.lfos) this._queue.lfos = new Set();
       this._queue.lfos.add(input);
-    } else if (input instanceof MIDIObserver) {
+    } else if (isMidiObserver(input)) {
       if (!this._queue.observers) this._queue.observers = new Set();
       this._queue.observers.add(input);
     } else if (input instanceof Synth || input instanceof Sample) {

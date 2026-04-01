@@ -1,4 +1,4 @@
-import { isArray } from "@/utils/validators";
+import { isArray } from "./utils";
 import { encodeNoteCommand } from "./utils";
 
 class MIDIRouter {

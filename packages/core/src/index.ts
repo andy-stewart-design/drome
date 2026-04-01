@@ -24,7 +24,7 @@ import type {
   WaveformAlias,
 } from "@/types";
 import SampleManager from "./managers/sample-manager";
-import type MIDIController from "./midi";
+import type MIDIController from "@drome/midi";
 
 type LogCallback = (log: string, logs: string[]) => void;
 
