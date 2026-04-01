@@ -169,9 +169,7 @@ class MIDIController {
   }
 }
 
-function isMidiObserver<T extends MIDIObserverType>(
-  n: unknown,
-): n is MIDIObserver<T> {
+function isMidiObserver(n: unknown): n is MIDIObserver<any> {
   return n instanceof MIDIObserver;
 }
 

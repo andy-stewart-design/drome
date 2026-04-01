@@ -31,7 +31,7 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
     switch (true) {
       case isEnv(input):
       case isLfoNode(input):
-      case isMidiObserver<"controlchange">(input):
+      case isMidiObserver(input):
         this._defaultValue = input.defaultValue;
         this._cycles = new DromeArray(this._defaultValue);
         this._automation = input;
@@ -69,7 +69,7 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
           this._automation.apply(this._target, start, duration, cycleIdx, i);
         }
         break;
-      case isMidiObserver<"controlchange">(this._automation):
+      case isMidiObserver(this._automation):
         this._target.setValueAtTime(this._automation.currentValue, startTime);
         this._automation.onUpdate(({ value }) => {
           this._target?.setValueAtTime(value, 0);
