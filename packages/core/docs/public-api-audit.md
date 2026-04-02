@@ -6,6 +6,43 @@ A comprehensive reference of all public-facing methods across instruments, LFOs,
 
 ## Instruments
 
+### Instrument Base
+
+`src/instruments/instrument.ts` — inherited by `Synth` and `Sample`
+
+| Method        | Parameters                                                                     | Returns |
+| ------------- | ------------------------------------------------------------------------------ | ------- |
+| `note`        | `...input: (Nullable<number \| number[]> \| Nullable<number \| number[]>[])[]` | `this`  |
+| `arrange`     | `...input: [number, Nullable<number \| number[]>[]][]`                         | `this`  |
+| `euclid`      | `pulses: number \| number[], steps: number, rotation: number \| number[]`      | `this`  |
+| `hex`         | `...hexes: (string \| number)[]`                                               | `this`  |
+| `reverse`     | —                                                                              | `this`  |
+| `sequence`    | `steps: number, ...pulses: (number \| number[])[]`                             | `this`  |
+| `xox`         | `...input: (number \| number)[]`                                               | `this`  |
+| `fast`        | `multiplier: number`                                                           | `this`  |
+| `slow`        | `multiplier: number`                                                           | `this`  |
+| `stretch`     | `bars: number, steps?: number`                                                 | `this`  |
+| `legato`      | `v: boolean \| number \| number[]` (default `true`)                            | `this`  |
+| `gain`        | `input: number \| Envelope \| string`                                          | `this`  |
+| `adsr`        | `a: number, d?: number, s?: number, r?: number`                                | `this`  |
+| `att`         | `v: number`                                                                    | `this`  |
+| `dec`         | `v: number`                                                                    | `this`  |
+| `sus`         | `v: number`                                                                    | `this`  |
+| `rel`         | `v: number`                                                                    | `this`  |
+| `adsrMode`    | `mode: AdsrMode`                                                               | `this`  |
+| `detune`      | `input: SNELO \| MIDIObserver<"controlchange">`                                | `this`  |
+| `filter`      | `type: FilterTypeAlias, f: SNELO \| MIDIObserver<"controlchange">, q?: SNELO`  | `this`  |
+| `mute`        | `mute?: boolean` (default `false`)                                             | `this`  |
+| `effects`     | `...nodes: DromeAudioNode[]`                                                   | `this`  |
+| `midi`        | `identifier: string, velocity?: number`                                        | `this`  |
+| `midichannel` | `n: number \| number[]`                                                        | `this`  |
+| `stop`        | `when?: number, fadeTime?: number`                                             | `void`  |
+| `destroy`     | —                                                                              | `void`  |
+
+**Aliases:** `dt()`, `env()`, `envMode()`, `fil()`, `fx()`, `leg()`, `midichan()`, `rev()`, `seq()`
+
+---
+
 ### `Synth`
 
 `src/instruments/synth.ts`
@@ -64,43 +101,6 @@ Inherits all methods from `Instrument` — see [Instrument base methods](#instru
 | `destroy`  | —                                               | `void`  |
 
 **Aliases:** `dt()`, `env()`, `envMode()`, `fil()`, `fx()`
-
----
-
-### Instrument Base
-
-`src/instruments/instrument.ts` — inherited by `Synth` and `Sample`
-
-| Method        | Parameters                                                                     | Returns |
-| ------------- | ------------------------------------------------------------------------------ | ------- |
-| `note`        | `...input: (Nullable<number \| number[]> \| Nullable<number \| number[]>[])[]` | `this`  |
-| `arrange`     | `...input: [number, Nullable<number \| number[]>[]][]`                         | `this`  |
-| `euclid`      | `pulses: number \| number[], steps: number, rotation: number \| number[]`      | `this`  |
-| `hex`         | `...hexes: (string \| number)[]`                                               | `this`  |
-| `reverse`     | —                                                                              | `this`  |
-| `sequence`    | `steps: number, ...pulses: (number \| number[])[]`                             | `this`  |
-| `xox`         | `...input: (number \| number)[]`                                               | `this`  |
-| `fast`        | `multiplier: number`                                                           | `this`  |
-| `slow`        | `multiplier: number`                                                           | `this`  |
-| `stretch`     | `bars: number, steps?: number`                                                 | `this`  |
-| `legato`      | `v: boolean \| number \| number[]` (default `true`)                            | `this`  |
-| `gain`        | `input: number \| Envelope \| string`                                          | `this`  |
-| `adsr`        | `a: number, d?: number, s?: number, r?: number`                                | `this`  |
-| `att`         | `v: number`                                                                    | `this`  |
-| `dec`         | `v: number`                                                                    | `this`  |
-| `sus`         | `v: number`                                                                    | `this`  |
-| `rel`         | `v: number`                                                                    | `this`  |
-| `adsrMode`    | `mode: AdsrMode`                                                               | `this`  |
-| `detune`      | `input: SNELO \| MIDIObserver<"controlchange">`                                | `this`  |
-| `filter`      | `type: FilterTypeAlias, f: SNELO \| MIDIObserver<"controlchange">, q?: SNELO`  | `this`  |
-| `mute`        | `mute?: boolean` (default `false`)                                             | `this`  |
-| `effects`     | `...nodes: DromeAudioNode[]`                                                   | `this`  |
-| `midi`        | `identifier: string, velocity?: number`                                        | `this`  |
-| `midichannel` | `n: number \| number[]`                                                        | `this`  |
-| `stop`        | `when?: number, fadeTime?: number`                                             | `void`  |
-| `destroy`     | —                                                                              | `void`  |
-
-**Aliases:** `dt()`, `env()`, `envMode()`, `fil()`, `fx()`, `leg()`, `midichan()`, `rev()`, `seq()`
 
 ---
 

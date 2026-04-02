@@ -212,6 +212,11 @@ abstract class Instrument {
     this._connected = true;
   }
 
+  // .note(...input)
+  // .note([0, null, [2, 0]], null, 0)
+  // type Nullable<T> = T | null | undefined
+  // ...input: Nullable<number> | (Nullable<number> | ((Nullable<number>)[]))[]
+
   note(
     ...input: (Nullable<number | number[]> | Nullable<number | number[]>[])[]
   ) {
