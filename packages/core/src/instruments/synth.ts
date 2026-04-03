@@ -25,9 +25,9 @@ export default class Synth extends Instrument {
   constructor(drome: Drome, opts: SynthOptions) {
     super(drome, { ...opts, baseGain: 0.125 });
     this._types = opts.type?.length ? opts.type : ["sine"];
-    this._voices = new FlatCycle(7, 0);
-    this._panspread = new FlatCycle(0.4, 0);
-    this._freqspread = new FlatCycle(0.2, 0);
+    this._voices = new FlatCycle(7);
+    this._panspread = new FlatCycle(0.4);
+    this._freqspread = new FlatCycle(0.2);
   }
 
   private getMidiNote(note: number) {
@@ -61,7 +61,7 @@ export default class Synth extends Instrument {
       this._panspread = input;
     } else {
       if (!(this._panspread instanceof FlatCycle))
-        this._panspread = new FlatCycle(0.4, -1);
+        this._panspread = new FlatCycle(0.4);
       this._panspread.pattern(input, ...rest);
     }
     return this;
@@ -75,7 +75,7 @@ export default class Synth extends Instrument {
       this._freqspread = input;
     } else {
       if (!(this._freqspread instanceof FlatCycle))
-        this._freqspread = new FlatCycle(0.2, -1);
+        this._freqspread = new FlatCycle(0.2);
       this._freqspread.pattern(input, ...rest);
     }
     return this;

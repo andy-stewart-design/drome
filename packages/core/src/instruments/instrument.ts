@@ -200,8 +200,6 @@ abstract class Instrument {
     barStart: number,
     barDuration: number,
   ) {
-    console.log(notes);
-
     const chain = [
       this._connectorNode,
       ...this._signalChain,

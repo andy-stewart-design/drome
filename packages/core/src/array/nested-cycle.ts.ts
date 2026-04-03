@@ -1,30 +1,36 @@
 import { euclid } from "@/utils/euclid";
 import { hex } from "@/utils/hex";
 import {
-  type NoteInput,
-  type Cycle,
-  pattern,
   arrange,
+  fast,
+  pattern,
   stretch,
   reverse,
-  fast,
-  slow,
   sequence,
+  slow,
   xox,
+  type NoteInput,
+  type Cycle,
 } from "./cycle-utils";
-
-// type Nullable<T> = T | null | undefined;
 
 class NestedCycle<T> {
   private _cycle: Cycle<T | T[]>;
-  private _nullValue: T;
+  private _nullValue: T | undefined;
 
-  constructor(pattern: NoteInput<T | T[]>, nullValue: T) {
+  constructor(pattern: NoteInput<T | T[]>, nullValue?: T) {
     this._cycle = Array.isArray(pattern) ? [pattern] : [[pattern]];
     this._nullValue = nullValue;
   }
 
-  private applyPattern(modifier: number[][]) {
+  private applyPattern(type: string, modifier: number[][]) {
+    const nullValue = this._nullValue;
+
+    if (nullValue === undefined) {
+      const warning = `[NESTED CYCLE] A null value was not set at Cycle creation. Skipping call to ${type}.`;
+      console.warn(warning);
+      return this._cycle;
+    }
+
     const cycles = this._cycle;
     const loops = Math.max(cycles.length, modifier.length);
     const nextCycles: Cycle<T | T[]> = [];
@@ -34,7 +40,7 @@ class NestedCycle<T> {
       const cycle = cycles[i % cycles.length] ?? [];
 
       const nextCycle = modifier[i % modifier.length].map((p) =>
-        p === 0 ? this._nullValue : cycle[noteIndex++ % cycle.length],
+        p === 0 ? nullValue : cycle[noteIndex++ % cycle.length],
       );
 
       nextCycles.push(nextCycle);
@@ -88,22 +94,22 @@ class NestedCycle<T> {
   }
 
   euclid(pulses: number | number[], steps: number, rot?: number | number[]) {
-    this._cycle = this.applyPattern(euclid(pulses, steps, rot));
+    this._cycle = this.applyPattern("euclid", euclid(pulses, steps, rot));
     return this;
   }
 
   hex(...input: (string | number)[]) {
-    this._cycle = this.applyPattern(input.map(hex));
+    this._cycle = this.applyPattern("hex", input.map(hex));
     return this;
   }
 
   sequence(stepCount: number, ...steps: (number | number[])[]) {
-    this._cycle = this.applyPattern(sequence(stepCount, ...steps));
+    this._cycle = this.applyPattern("sequence", sequence(stepCount, ...steps));
     return this;
   }
 
   xox(...steps: (number | number[])[] | string[]) {
-    this._cycle = this.applyPattern(xox(...steps));
+    this._cycle = this.applyPattern("xox", xox(...steps));
     return this;
   }
 
@@ -134,9 +140,5 @@ class NestedCycle<T> {
     return this._cycle;
   }
 }
-
-// const myCycles = new NestedCycle<Nullable<number>>(60, null);
-// myCycles.pattern([0, 4, [2, 0]], 0);
-// console.log(myCycles.current);
 
 export default NestedCycle;

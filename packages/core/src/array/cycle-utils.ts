@@ -46,9 +46,11 @@ export function reverse<S>(cycle: Cycle<S>) {
 
 export function fast<S>(
   cycle: Cycle<S>,
-  nullVal: S,
+  nullVal: S | undefined,
   mult: number,
 ): Cycle<S> | null {
+  if (nullVal === undefined) return null;
+
   mult = Math.round(mult);
   if (mult === 1) return null;
   else if (mult < 1) return slow(cycle, nullVal, 1 / mult);
@@ -67,9 +69,11 @@ export function fast<S>(
 
 export function slow<S>(
   cycle: Cycle<S>,
-  nullVal: S,
+  nullVal: S | undefined,
   mult: number,
 ): Cycle<S> | null {
+  if (nullVal === undefined) return null;
+
   mult = Math.round(mult);
   if (mult === 1) return null;
   else if (mult < 1) return fast(cycle, nullVal, 1 / mult);

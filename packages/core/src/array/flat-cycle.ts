@@ -1,19 +1,17 @@
 import { euclid } from "@/utils/euclid";
 import { hex } from "@/utils/hex";
 import {
-  type NoteInput,
-  type Cycle,
-  pattern,
   arrange,
+  fast,
+  pattern,
   stretch,
   reverse,
-  fast,
-  slow,
   sequence,
+  slow,
   xox,
+  type NoteInput,
+  type Cycle,
 } from "./cycle-utils";
-
-// type Nullable<T> = T | null | undefined;
 
 class FlatCycle<T> {
   private _cycle: Cycle<T>;
@@ -24,9 +22,14 @@ class FlatCycle<T> {
     this._nullValue = nullValue;
   }
 
-  private applyPattern(modifier: number[][]) {
+  private applyPattern(type: string, modifier: number[][]) {
     const nullValue = this._nullValue;
-    if (nullValue === undefined) return this._cycle;
+
+    if (nullValue === undefined) {
+      const warning = `[FLAT CYCLE] A null value was not set at Cycle creation. Skipping call to ${type}.`;
+      console.warn(warning);
+      return this._cycle;
+    }
 
     const cycles = this._cycle;
     const loops = Math.max(cycles.length, modifier.length);
@@ -73,7 +76,6 @@ class FlatCycle<T> {
   }
 
   fast(mult: number) {
-    if (this._nullValue === undefined) return;
     const nextCycle = fast(this._cycle, this._nullValue, mult);
     if (!nextCycle) return this;
     this._cycle = nextCycle;
@@ -81,7 +83,6 @@ class FlatCycle<T> {
   }
 
   slow(mult: number) {
-    if (this._nullValue === undefined) return;
     const nextCycle = slow(this._cycle, this._nullValue, mult);
     if (!nextCycle) return this;
     this._cycle = nextCycle;
@@ -89,25 +90,22 @@ class FlatCycle<T> {
   }
 
   euclid(pulses: number | number[], steps: number, rot?: number | number[]) {
-    if (this._nullValue === undefined) return;
-    this._cycle = this.applyPattern(euclid(pulses, steps, rot));
+    this._cycle = this.applyPattern("euclid", euclid(pulses, steps, rot));
     return this;
   }
 
   hex(...input: (string | number)[]) {
-    if (this._nullValue === undefined) return;
-    this._cycle = this.applyPattern(input.map(hex));
+    this._cycle = this.applyPattern("hex", input.map(hex));
     return this;
   }
 
   sequence(stepCount: number, ...steps: (number | number[])[]) {
-    if (this._nullValue === undefined) return;
-    this._cycle = this.applyPattern(sequence(stepCount, ...steps));
+    this._cycle = this.applyPattern("sequence", sequence(stepCount, ...steps));
     return this;
   }
 
   xox(...steps: (number | number[])[] | string[]) {
-    this._cycle = this.applyPattern(xox(...steps));
+    this._cycle = this.applyPattern("xox", xox(...steps));
     return this;
   }
 
@@ -138,17 +136,5 @@ class FlatCycle<T> {
     return this._cycle;
   }
 }
-
-// const myCycles = new CycleArray<number>(60, 0);
-// myCycles.pattern([0, 4, 2, 0], 0);
-// const cycles = myCycles.current;
-// console.log(cycles);
-// const pat = myCycles.at(0);
-// console.log(pat);
-// const scheduledValue = myCycles.at(0, 0);
-// console.log(scheduledValue);
-
-// const myCycles2 = new CycleArray<Nullable<number>>([60, null], 0);
-// console.log(myCycles2);
 
 export default FlatCycle;

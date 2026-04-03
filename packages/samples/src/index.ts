@@ -5,7 +5,6 @@ import { fileURLToPath } from "url";
 const inDir = join(dirname(fileURLToPath(import.meta.url)), "samples");
 const outDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outFile = join(outDir, "drome.json");
-console.log(outDir);
 
 async function combineJSONFiles() {
   const result: Record<string, any> = {};

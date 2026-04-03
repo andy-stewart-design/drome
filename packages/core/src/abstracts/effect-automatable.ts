@@ -28,17 +28,17 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
       case isLfoNode(input):
       case isMidiObserver(input):
         this._defaultValue = input.defaultValue;
-        this._cycles = new FlatCycle(this._defaultValue, 0);
+        this._cycles = new FlatCycle(this._defaultValue);
         this._automation = input;
         break;
       case isArray(input):
-        this._cycles = new FlatCycle(0, 0).pattern(...input);
+        this._cycles = new FlatCycle(0).pattern(...input);
         this._defaultValue = this._cycles.at(0, 0) ?? defaultValue;
         break;
       default:
         console.warn("Invalid input", input satisfies never);
         this._defaultValue = defaultValue;
-        this._cycles = new FlatCycle(0, 0);
+        this._cycles = new FlatCycle(0);
     }
   }
 

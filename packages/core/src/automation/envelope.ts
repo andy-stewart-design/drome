@@ -13,7 +13,7 @@ class Envelope {
   constructor(start: number, max: number | string, end?: number) {
     this._startValue = start;
     const mv = typeof max === "number" ? [max] : parsePatternString(max);
-    this._maxValue = new FlatCycle(0, 0).pattern(...mv);
+    this._maxValue = new FlatCycle(0).pattern(...mv);
     this._endValue = end ?? start;
   }
 
