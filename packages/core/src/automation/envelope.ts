@@ -1,11 +1,11 @@
-import DromeArray from "@/array/drome-array";
+import FlatCycle from "@/array/flat-cycle";
 import { applyAdsr, getAdsrTimes } from "@/utils/adsr.js";
 import { parsePatternString } from "@/utils/parse-pattern";
 import type { AdsrEnvelope, AdsrMode } from "@/types.js";
 
 class Envelope {
   private _startValue: number;
-  private _maxValue: DromeArray<number>;
+  private _maxValue: FlatCycle<number>;
   private _endValue: number;
   private _adsr: AdsrEnvelope = { a: 0.01, d: 0, s: 1, r: 0.01 };
   private _mode: AdsrMode = "fit";
@@ -13,7 +13,7 @@ class Envelope {
   constructor(start: number, max: number | string, end?: number) {
     this._startValue = start;
     const mv = typeof max === "number" ? [max] : parsePatternString(max);
-    this._maxValue = new DromeArray(...mv);
+    this._maxValue = new FlatCycle(0, 0).pattern(...mv);
     this._endValue = end ?? start;
   }
 
@@ -51,7 +51,7 @@ class Envelope {
   }
 
   maxValue(...v: (number | number[])[]) {
-    return this._maxValue.note(...v);
+    return this._maxValue.pattern(...v);
   }
 
   apply(

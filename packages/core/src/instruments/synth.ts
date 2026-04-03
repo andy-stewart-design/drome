@@ -8,7 +8,7 @@ import { getWaveform } from "@/utils/synth-alias";
 import type Drome from "@/index";
 import type { NoteName, NoteValue, ScaleAlias, WaveformAlias } from "@/types";
 import { getScale } from "@/utils/get-scale";
-import FlatCycle from "@/array/test-flat";
+import FlatCycle from "@/array/flat-cycle";
 
 interface SynthOptions extends InstrumentOptions {
   type?: WaveformAlias[];

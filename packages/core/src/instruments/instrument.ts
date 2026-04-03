@@ -1,10 +1,10 @@
-import NestedCycle from "@/array/test-nested";
+import NestedCycle from "@/array/nested-cycle.ts";
 
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
 import LfoNode from "@/automation/lfo-node";
 import Envelope from "@/automation/envelope";
-import Pattern from "@/automation/pattern";
+import FlatCycle from "@/array/flat-cycle";
 import { isMidiObserver } from "@drome/midi";
 import type { MIDIObserver } from "@drome/midi";
 import { parsePatternString } from "../utils/parse-pattern";
@@ -36,8 +36,12 @@ interface InstrumentOptions {
 
 interface FrequencyParams {
   type?: FilterType;
-  frequency?: Pattern | Envelope | LfoNode | MIDIObserver<"controlchange">;
-  q?: Pattern | Envelope | MIDIObserver<"controlchange">;
+  frequency?:
+    | FlatCycle<number>
+    | Envelope
+    | LfoNode
+    | MIDIObserver<"controlchange">;
+  q?: FlatCycle<number> | Envelope | MIDIObserver<"controlchange">;
 }
 
 abstract class Instrument {
@@ -50,7 +54,11 @@ abstract class Instrument {
   private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
   protected _gain: Envelope;
-  private _detune: Pattern | Envelope | LfoNode | MIDIObserver<"controlchange">;
+  private _detune:
+    | FlatCycle<number>
+    | Envelope
+    | LfoNode
+    | MIDIObserver<"controlchange">;
   private _muted: boolean;
   protected _filter: FrequencyParams = {};
   private _connected = false;
@@ -81,7 +89,7 @@ abstract class Instrument {
 
     this._baseGain = opts.baseGain ?? 0.35;
     this._gain = new Envelope(0, this._baseGain);
-    this._detune = new Pattern(0);
+    this._detune = new FlatCycle(0);
     this._muted = false;
 
     this.dt = this.detune.bind(this);
@@ -129,8 +137,8 @@ abstract class Instrument {
     if (!filFreq || !filQ) return;
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
 
-    if (this._filter.frequency instanceof Pattern) {
-      this._filter.frequency.apply(filFreq, cycleIndex, chordIdx);
+    if (this._filter.frequency instanceof FlatCycle) {
+      filFreq.value = this._filter.frequency.at(cycleIndex, chordIdx);
     } else if (this._filter.frequency instanceof Envelope) {
       this._filter.frequency.apply(filFreq, start, dur, cycleIndex, chordIdx);
     } else if (this._filter.frequency instanceof LfoNode) {
@@ -146,8 +154,8 @@ abstract class Instrument {
       console.warn("Invalid type:", this._filter.frequency satisfies undefined);
     }
 
-    if (this._filter.q instanceof Pattern) {
-      this._filter.q.apply(filQ, cycleIndex, chordIdx);
+    if (this._filter.q instanceof FlatCycle) {
+      filQ.value = this._filter.q.at(cycleIndex, chordIdx);
     } else if (this._filter.q instanceof Envelope) {
       this._filter.q.apply(filQ, start, dur, cycleIndex, chordIdx);
     } else if (isMidiObserver(this._filter.q)) {
@@ -168,8 +176,8 @@ abstract class Instrument {
     if (!node.detune) return;
     const cycleIndex = this._drome.metronome.bar % this._cycles.length;
 
-    if (this._detune instanceof Pattern) {
-      this._detune.apply(node.detune, cycleIndex, chordIndex);
+    if (this._detune instanceof FlatCycle) {
+      node.detune.value = this._detune.at(cycleIndex, chordIndex);
     } else if (this._detune instanceof Envelope) {
       this._detune.apply(node.detune, start, duration, cycleIndex, chordIndex);
     } else if (isMidiObserver(this._detune)) {
@@ -335,7 +343,7 @@ abstract class Instrument {
       this._detune = input;
     } else {
       const pattern = isString(input) ? parsePatternString(input) : [input];
-      this._detune = new Pattern(...pattern);
+      this._detune = new FlatCycle(0).pattern(...pattern);
     }
 
     return this;
@@ -355,7 +363,7 @@ abstract class Instrument {
       this._filter.frequency = f;
     } else if (isNumber(f) || isString(f)) {
       const pattern = isString(f) ? parsePatternString(f) : [f];
-      this._filter.frequency = new Pattern(...pattern);
+      this._filter.frequency = new FlatCycle(0).pattern(...pattern);
     } else {
       console.warn("Invalid type:", f satisfies never);
     }
@@ -364,7 +372,7 @@ abstract class Instrument {
       this._filter.q = q;
     } else if (isString(q) || isNumber(q)) {
       const pattern = isString(q) ? parsePatternString(q) : [q];
-      this._filter.q = new Pattern(...pattern);
+      this._filter.q = new FlatCycle(0).pattern(...pattern);
     } else if (q instanceof LfoNode) {
       // TODO: Figure out what to do here
     } else {

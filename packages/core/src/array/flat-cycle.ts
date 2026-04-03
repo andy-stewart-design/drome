@@ -11,20 +11,23 @@ import {
   slow,
   sequence,
   xox,
-} from "./test-utils";
+} from "./cycle-utils";
 
 // type Nullable<T> = T | null | undefined;
 
 class FlatCycle<T> {
   private _cycle: Cycle<T>;
-  private _nullValue: T;
+  private _nullValue: T | undefined;
 
-  constructor(pattern: NoteInput<T>, nullValue: T) {
+  constructor(pattern: NoteInput<T>, nullValue?: T) {
     this._cycle = Array.isArray(pattern) ? [pattern] : [[pattern]];
     this._nullValue = nullValue;
   }
 
   private applyPattern(modifier: number[][]) {
+    const nullValue = this._nullValue;
+    if (nullValue === undefined) return this._cycle;
+
     const cycles = this._cycle;
     const loops = Math.max(cycles.length, modifier.length);
     const nextCycles: Cycle<T> = [];
@@ -34,7 +37,7 @@ class FlatCycle<T> {
       const cycle = cycles[i % cycles.length] ?? [];
 
       const nextCycle = modifier[i % modifier.length].map((p) =>
-        p === 0 ? this._nullValue : cycle[noteIndex++ % cycle.length],
+        p === 0 ? nullValue : cycle[noteIndex++ % cycle.length],
       );
 
       nextCycles.push(nextCycle);
@@ -70,6 +73,7 @@ class FlatCycle<T> {
   }
 
   fast(mult: number) {
+    if (this._nullValue === undefined) return;
     const nextCycle = fast(this._cycle, this._nullValue, mult);
     if (!nextCycle) return this;
     this._cycle = nextCycle;
@@ -77,6 +81,7 @@ class FlatCycle<T> {
   }
 
   slow(mult: number) {
+    if (this._nullValue === undefined) return;
     const nextCycle = slow(this._cycle, this._nullValue, mult);
     if (!nextCycle) return this;
     this._cycle = nextCycle;
@@ -84,16 +89,19 @@ class FlatCycle<T> {
   }
 
   euclid(pulses: number | number[], steps: number, rot?: number | number[]) {
+    if (this._nullValue === undefined) return;
     this._cycle = this.applyPattern(euclid(pulses, steps, rot));
     return this;
   }
 
   hex(...input: (string | number)[]) {
+    if (this._nullValue === undefined) return;
     this._cycle = this.applyPattern(input.map(hex));
     return this;
   }
 
   sequence(stepCount: number, ...steps: (number | number[])[]) {
+    if (this._nullValue === undefined) return;
     this._cycle = this.applyPattern(sequence(stepCount, ...steps));
     return this;
   }
@@ -101,6 +109,10 @@ class FlatCycle<T> {
   xox(...steps: (number | number[])[] | string[]) {
     this._cycle = this.applyPattern(xox(...steps));
     return this;
+  }
+
+  clear() {
+    this._cycle = [];
   }
 
   /* ----------------------------------------------------------------

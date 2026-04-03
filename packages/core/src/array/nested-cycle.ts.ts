@@ -11,7 +11,7 @@ import {
   slow,
   sequence,
   xox,
-} from "./test-utils";
+} from "./cycle-utils";
 
 // type Nullable<T> = T | null | undefined;
 
@@ -105,6 +105,10 @@ class NestedCycle<T> {
   xox(...steps: (number | number[])[] | string[]) {
     this._cycle = this.applyPattern(xox(...steps));
     return this;
+  }
+
+  clear() {
+    this._cycle = [];
   }
 
   /* ----------------------------------------------------------------

@@ -1,4 +1,4 @@
-import type DromeArray from "@/array/drome-array";
+import FlatCycle from "./array/flat-cycle";
 import type Envelope from "@/automation/envelope";
 import type LfoNode from "./automation/lfo-node";
 import type * as algos from "@/utils/distortion-algorithms";
@@ -10,7 +10,11 @@ import type { scaleAliasMap } from "./utils/get-scale";
 import type { MIDIObserver } from "@drome/midi";
 
 // AUDIO CLOCK (types owned by @drome/clock)
-export type { DromeEventCallback, DromeEventType, Metronome } from "@drome/clock";
+export type {
+  DromeEventCallback,
+  DromeEventType,
+  Metronome,
+} from "@drome/clock";
 
 // NOTES + SCALES
 type NaturalNote = "A" | "B" | "C" | "D" | "E" | "F" | "G";
@@ -46,7 +50,7 @@ type AdsrEnvelope = { a: number; d: number; s: number; r: number };
 type FilterType = "bandpass" | "highpass" | "lowpass";
 type FilterOptions = {
   node: BiquadFilterNode;
-  frequencies: DromeArray<number>;
+  frequencies: FlatCycle<number>;
 };
 
 // EFFECTS
