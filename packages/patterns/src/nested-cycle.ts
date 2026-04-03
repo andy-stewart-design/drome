@@ -1,5 +1,5 @@
-import { euclid } from "@/utils/euclid";
-import { hex } from "@/utils/hex";
+import { euclid } from "./utils/euclid";
+import { hex } from "./utils/hex";
 import {
   arrange,
   fast,
@@ -11,7 +11,7 @@ import {
   xox,
   type NoteInput,
   type Cycle,
-} from "./cycle-utils";
+} from "./utils";
 
 class NestedCycle<T> {
   private _cycle: Cycle<T | T[]>;

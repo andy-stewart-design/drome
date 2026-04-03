@@ -1,4 +1,4 @@
-import FlatCycle from "@/array/flat-cycle";
+import { FlatCycle } from "@drome/patterns";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
 import { isArray, isEnv, isLfoNode, isNullish } from "@/utils/validators";
 import { applySteppedRamp } from "@/utils/stepped-ramp";

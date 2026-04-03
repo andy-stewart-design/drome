@@ -1,4 +1,3 @@
-import FlatCycle from "./array/flat-cycle";
 import type Envelope from "@/automation/envelope";
 import type LfoNode from "./automation/lfo-node";
 import type * as algos from "@/utils/distortion-algorithms";
@@ -48,11 +47,6 @@ type SNELO = PatternInput | Envelope | LfoNode | MIDIObserver<"controlchange">;
 type AdsrMode = "fit" | "clip" | "free";
 type AdsrEnvelope = { a: number; d: number; s: number; r: number };
 type FilterType = "bandpass" | "highpass" | "lowpass";
-type FilterOptions = {
-  node: BiquadFilterNode;
-  frequencies: FlatCycle<number>;
-};
-
 // EFFECTS
 type DistortionAlgorithm = keyof typeof algos;
 type DistortionFunction = (typeof algos)[DistortionAlgorithm];
@@ -67,7 +61,6 @@ export type {
   DistortionFunction,
   DromeCycleValue,
   FilterType,
-  FilterOptions,
   InstrumentType,
   NoteName,
   NoteValue,

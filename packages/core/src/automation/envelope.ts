@@ -1,4 +1,4 @@
-import FlatCycle from "@/array/flat-cycle";
+import { FlatCycle } from "@drome/patterns";
 import { applyAdsr, getAdsrTimes } from "@/utils/adsr.js";
 import { parsePatternString } from "@/utils/parse-pattern";
 import type { AdsrEnvelope, AdsrMode } from "@/types.js";

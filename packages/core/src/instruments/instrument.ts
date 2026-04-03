@@ -1,10 +1,9 @@
-import NestedCycle from "@/array/nested-cycle.ts";
+import { FlatCycle, NestedCycle } from "@drome/patterns";
 
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
 import LfoNode from "@/automation/lfo-node";
 import Envelope from "@/automation/envelope";
-import FlatCycle from "@/array/flat-cycle";
 import { isMidiObserver } from "@drome/midi";
 import type { MIDIObserver } from "@drome/midi";
 import { parsePatternString } from "../utils/parse-pattern";
