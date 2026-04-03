@@ -13,9 +13,9 @@ import {
   xox,
 } from "./test-utils";
 
-type Nullable<T> = T | null | undefined;
+// type Nullable<T> = T | null | undefined;
 
-class CycleArray<T> {
+class FlatCycle<T> {
   private _cycle: Cycle<T>;
   private _nullValue: T;
 
@@ -111,9 +111,15 @@ class CycleArray<T> {
   at(i: number, j?: number) {
     const currentValue = this.current[i % this.current.length];
 
-    if (typeof j === "number") return currentValue[j];
+    if (typeof j === "number") {
+      return currentValue?.[j % currentValue.length] ?? this._nullValue;
+    }
 
-    return currentValue;
+    return currentValue ?? [this._nullValue];
+  }
+
+  get length() {
+    return this._cycle.length;
   }
 
   get current() {
@@ -121,14 +127,16 @@ class CycleArray<T> {
   }
 }
 
-const myCycles = new CycleArray<number>(60, 0);
-myCycles.pattern([0, 4, 2, 0], 0);
-const cycles = myCycles.current;
-console.log(cycles);
-const pat = myCycles.at(0);
-console.log(pat);
-const scheduledValue = myCycles.at(0, 0);
-console.log(scheduledValue);
+// const myCycles = new CycleArray<number>(60, 0);
+// myCycles.pattern([0, 4, 2, 0], 0);
+// const cycles = myCycles.current;
+// console.log(cycles);
+// const pat = myCycles.at(0);
+// console.log(pat);
+// const scheduledValue = myCycles.at(0, 0);
+// console.log(scheduledValue);
 
-const myCycles2 = new CycleArray<Nullable<number>>([60, null], 0);
-console.log(myCycles2);
+// const myCycles2 = new CycleArray<Nullable<number>>([60, null], 0);
+// console.log(myCycles2);
+
+export default FlatCycle;

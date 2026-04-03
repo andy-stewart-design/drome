@@ -1,6 +1,7 @@
+import NestedCycle from "@/array/test-nested";
+
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
-import DromeArrayNullable from "@/array/drome-array-nullable";
 import LfoNode from "@/automation/lfo-node";
 import Envelope from "@/automation/envelope";
 import Pattern from "@/automation/pattern";
@@ -41,7 +42,7 @@ interface FrequencyParams {
 
 abstract class Instrument {
   protected _drome: Drome;
-  protected _cycles: DromeArrayNullable<number | number[]>;
+  protected _cycles: NestedCycle<Nullable<number>>;
   protected _midiRouter: MIDIRouter | null;
   private _destination: AudioNode;
   protected _connectorNode: GainNode;
@@ -70,7 +71,7 @@ abstract class Instrument {
 
   constructor(drome: Drome, opts: InstrumentOptions) {
     this._drome = drome;
-    this._cycles = new DromeArrayNullable(opts.defaultCycle);
+    this._cycles = new NestedCycle(opts.defaultCycle, null);
     this._midiRouter = null;
 
     this._destination = opts.destination;
@@ -191,6 +192,8 @@ abstract class Instrument {
     barStart: number,
     barDuration: number,
   ) {
+    console.log(notes);
+
     const chain = [
       this._connectorNode,
       ...this._signalChain,
@@ -212,15 +215,10 @@ abstract class Instrument {
     this._connected = true;
   }
 
-  // .note(...input)
-  // .note([0, null, [2, 0]], null, 0)
-  // type Nullable<T> = T | null | undefined
-  // ...input: Nullable<number> | (Nullable<number> | ((Nullable<number>)[]))[]
-
   note(
     ...input: (Nullable<number | number[]> | Nullable<number | number[]>[])[]
   ) {
-    this._cycles.note(...input);
+    this._cycles.pattern(...input);
     return this;
   }
 
@@ -422,6 +420,11 @@ abstract class Instrument {
     const cycle = this._cycles.at(cycleIndex);
     const notes: Note<number | number[]>[] = cycle.map((value, i) => {
       if (isNullish(value)) return null;
+
+      const cleanValue: number | number[] = Array.isArray(value)
+        ? value.filter((v): v is number => v != null)
+        : value;
+
       const start = barStart + i * (barDuration / cycle.length);
       const baseDuration = barDuration / cycle.length;
 
@@ -430,12 +433,17 @@ abstract class Instrument {
         : this._legato;
 
       if (!isLegato) {
-        return { value, start, baseDuration, duration: baseDuration };
+        return {
+          value: cleanValue,
+          start,
+          baseDuration,
+          duration: baseDuration,
+        };
       } else {
         const nextNonNull = cycle.findIndex((v, j) => j > i && v !== null);
         const nullCount = (nextNonNull === -1 ? cycle.length : nextNonNull) - i;
         const duration = baseDuration * nullCount;
-        return { value, start, baseDuration, duration };
+        return { value: cleanValue, start, baseDuration, duration };
       }
     });
 

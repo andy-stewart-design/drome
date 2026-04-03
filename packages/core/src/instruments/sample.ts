@@ -42,8 +42,10 @@ export default class Sample extends Instrument {
     return this;
   }
 
-  begin(...input: (Nullable<number | number[]> | Nullable<number | number[]>[])[]) {
-    this._cycles.note(...input);
+  begin(
+    ...input: (Nullable<number | number[]> | Nullable<number | number[]>[])[]
+  ) {
+    this._cycles.pattern(...input);
     return this;
   }
 
@@ -56,19 +58,20 @@ export default class Sample extends Instrument {
       const chopsPerCycle = Math.floor(numChops / this._cycles.length) || 1;
       const step = 1 / (chopsPerCycle * this._cycles.length);
 
-      this._cycles.value = Array.from(
-        { length: this._cycles.length },
-        (_, i) => {
+      this._cycles.replace(
+        Array.from({ length: this._cycles.length }, (_, i) => {
           return Array.from({ length: chopsPerCycle }, (_, j) => {
             return step * j + chopsPerCycle * step * i;
           });
-        },
+        }),
       );
     } else {
-      this._cycles.value = input.map((cycle) =>
-        isArray(cycle)
-          ? cycle.map((chord) => convert(chord))
-          : [convert(cycle)],
+      this._cycles.replace(
+        input.map((cycle) =>
+          isArray(cycle)
+            ? cycle.map((chord) => convert(chord))
+            : [convert(cycle)],
+        ),
       );
     }
 
@@ -123,12 +126,16 @@ export default class Sample extends Instrument {
               playbackRate,
               loop: this._loop,
               gain: 0,
-              filter: this._filter.type ? { type: this._filter.type } : undefined,
+              filter: this._filter.type
+                ? { type: this._filter.type }
+                : undefined,
             },
           );
           this._audioNodes.add(src);
 
-          const _note = this._cut ? note : { ...note, duration: buffer.duration };
+          const _note = this._cut
+            ? note
+            : { ...note, duration: buffer.duration };
           const duration = this.applyNodeEffects(src, _note, noteIndex);
 
           src.connect(this._connectorNode);

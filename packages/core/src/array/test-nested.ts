@@ -13,9 +13,9 @@ import {
   xox,
 } from "./test-utils";
 
-type Nullable<T> = T | null | undefined;
+// type Nullable<T> = T | null | undefined;
 
-class CycleArrayNested<T> {
+class NestedCycle<T> {
   private _cycle: Cycle<T | T[]>;
   private _nullValue: T;
 
@@ -54,6 +54,10 @@ class CycleArrayNested<T> {
   arrange(...input: [number, NoteInput<T | T[]>][]) {
     this._cycle = arrange(...input);
     return this;
+  }
+
+  replace(cycle: Cycle<T | T[]>) {
+    this._cycle = cycle;
   }
 
   /* ----------------------------------------------------------------
@@ -111,9 +115,11 @@ class CycleArrayNested<T> {
   at(i: number, j?: number) {
     const currentValue = this.current[i % this.current.length];
 
-    if (typeof j === "number") return currentValue[j];
+    if (typeof j === "number") {
+      return currentValue?.[j % currentValue.length] ?? this._nullValue;
+    }
 
-    return currentValue;
+    return currentValue ?? [this._nullValue];
   }
 
   get length() {
@@ -125,6 +131,8 @@ class CycleArrayNested<T> {
   }
 }
 
-const myCycles = new CycleArrayNested<Nullable<number>>(60, null);
-myCycles.pattern([0, 4, [2, 0]], 0);
-console.log(myCycles.current);
+// const myCycles = new NestedCycle<Nullable<number>>(60, null);
+// myCycles.pattern([0, 4, [2, 0]], 0);
+// console.log(myCycles.current);
+
+export default NestedCycle;
