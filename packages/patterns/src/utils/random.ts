@@ -23,6 +23,14 @@ const intMapper: RandMapper = (r, start, end) =>
   Math.floor(r * (end - start) + start);
 const binaryMapper: RandMapper = (r) => Math.round(r);
 
+const quantizeMapper =
+  (step: number): RandMapper =>
+  (r, start, end) => {
+    const raw = r * (end - start) + start;
+    const quantized = Math.round(raw / step) * step;
+    return Math.min(end, Math.max(start, quantized));
+  };
+
 export {
   xorwise,
   getSeed,
@@ -30,5 +38,6 @@ export {
   floatMapper,
   intMapper,
   binaryMapper,
+  quantizeMapper,
   type RandMapper,
 };

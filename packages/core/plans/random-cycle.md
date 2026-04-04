@@ -165,3 +165,9 @@ Wire RandomCycle into `@drome/core`. This phase touches the instrument layer and
 - [ ] `note(d.rand())` auto-sets null value to null
 - [ ] `.null(value)` overrides the auto-set null value
 - [ ] End-to-end: `d.sample("hh").hex(0xff).gain(d.rand()).push()` produces audible output with varying gain
+
+---
+
+## Future work
+
+- **Sample `begin()` and `chop()` with RandomCycle**: These methods currently only accept static values, but randomizing sample start offsets (`begin`) and chop slicing (`chop`) could be musically interesting. Revisit whether these should accept RandomCycle as input.

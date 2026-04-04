@@ -7,6 +7,7 @@ import {
   floatMapper,
   intMapper,
   binaryMapper,
+  quantizeMapper,
   type RandMapper,
 } from "./utils/random";
 
@@ -92,6 +93,11 @@ class RandomCycle extends BaseCycle<number> {
 
   bin() {
     this._mapper = binaryMapper;
+    return this;
+  }
+
+  quant(step: number) {
+    this._mapper = quantizeMapper(step);
     return this;
   }
 

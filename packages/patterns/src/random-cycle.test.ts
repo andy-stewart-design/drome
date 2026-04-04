@@ -154,6 +154,49 @@ describe("RandomCycle", () => {
     });
   });
 
+  describe("quant", () => {
+    it("produces values that are multiples of the step", () => {
+      const rc = new RandomCycle({ seed: 1 }).steps(100).quant(0.25);
+      const values = rc.at(0);
+      for (const v of values) {
+        expect(Math.round(v / 0.25) * 0.25).toBeCloseTo(v, 10);
+      }
+    });
+
+    it("values stay within the default [0, 1] range", () => {
+      const rc = new RandomCycle({ seed: 1 }).steps(100).quant(0.25);
+      const values = rc.at(0);
+      for (const v of values) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it("only produces values from the expected set", () => {
+      const rc = new RandomCycle({ seed: 1 }).steps(200).quant(0.25);
+      const allowed = new Set([0, 0.25, 0.5, 0.75, 1]);
+      const values = rc.at(0);
+      for (const v of values) {
+        expect(allowed.has(Math.round(v * 100) / 100)).toBe(true);
+      }
+    });
+
+    it("works with a non-default range", () => {
+      const rc = new RandomCycle({ seed: 1 }).steps(100).range(200, 800).quant(100);
+      const values = rc.at(0);
+      for (const v of values) {
+        expect(v).toBeGreaterThanOrEqual(200);
+        expect(v).toBeLessThanOrEqual(800);
+        expect(Math.round(v / 100) * 100).toBeCloseTo(v, 10);
+      }
+    });
+
+    it("is chainable", () => {
+      const rc = new RandomCycle();
+      expect(rc.quant(0.25)).toBe(rc);
+    });
+  });
+
   describe("pattern modifier composition", () => {
     it("euclid applies mask to random values", () => {
       const rc = new RandomCycle({ seed: 1 }).steps(3).euclid(3, 8);
