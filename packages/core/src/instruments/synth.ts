@@ -8,7 +8,12 @@ import { getWaveform } from "@/utils/synth-alias";
 import type Drome from "@/index";
 import type { NoteName, NoteValue, ScaleAlias, WaveformAlias } from "@/types";
 import { getScale } from "@/utils/get-scale";
-import { FlatCycle, isCycle } from "@drome/patterns";
+import {
+  FlatCycle,
+  type RandomCycle,
+  isCycle,
+  isRandomCycle,
+} from "@drome/patterns";
 
 interface SynthOptions extends InstrumentOptions {
   type?: WaveformAlias[];
@@ -16,9 +21,9 @@ interface SynthOptions extends InstrumentOptions {
 
 export default class Synth extends Instrument {
   private _types: WaveformAlias[];
-  private _voices: FlatCycle<number>;
-  private _panspread: FlatCycle<number> | Envelope | LfoNode;
-  private _freqspread: FlatCycle<number> | Envelope | LfoNode;
+  private _voices: FlatCycle<number> | RandomCycle;
+  private _panspread: FlatCycle<number> | RandomCycle | Envelope | LfoNode;
+  private _freqspread: FlatCycle<number> | RandomCycle | Envelope | LfoNode;
   private _root = 0;
   private _scale: number[] | null = null;
 
@@ -48,19 +53,29 @@ export default class Synth extends Instrument {
     return midiToFrequency(this._root + octave + step);
   }
 
-  voices(...input: (number | number[])[]) {
-    this._voices.pattern(...input);
+  voices(input: RandomCycle | number | number[], ...rest: (number | number[])[]) {
+    if (isRandomCycle(input)) {
+      input.null(0);
+      this._voices = input;
+    } else {
+      if (!(this._voices instanceof FlatCycle))
+        this._voices = new FlatCycle(7);
+      this._voices.pattern(input, ...rest);
+    }
     return this;
   }
 
   panspread(
-    input: Envelope | LfoNode | number | number[],
+    input: Envelope | LfoNode | RandomCycle | number | number[],
     ...rest: (number | number[])[]
   ) {
-    if (input instanceof Envelope || input instanceof LfoNode) {
+    if (isRandomCycle(input)) {
+      input.null(0);
+      this._panspread = input;
+    } else if (input instanceof Envelope || input instanceof LfoNode) {
       this._panspread = input;
     } else {
-      if (!(isCycle(this._panspread)))
+      if (!(this._panspread instanceof FlatCycle))
         this._panspread = new FlatCycle(0.4);
       this._panspread.pattern(input, ...rest);
     }
@@ -68,13 +83,16 @@ export default class Synth extends Instrument {
   }
 
   freqspread(
-    input: Envelope | LfoNode | number | number[],
+    input: Envelope | LfoNode | RandomCycle | number | number[],
     ...rest: (number | number[])[]
   ) {
-    if (input instanceof Envelope || input instanceof LfoNode) {
+    if (isRandomCycle(input)) {
+      input.null(0);
+      this._freqspread = input;
+    } else if (input instanceof Envelope || input instanceof LfoNode) {
       this._freqspread = input;
     } else {
-      if (!(isCycle(this._freqspread)))
+      if (!(this._freqspread instanceof FlatCycle))
         this._freqspread = new FlatCycle(0.2);
       this._freqspread.pattern(input, ...rest);
     }
