@@ -62,6 +62,10 @@ class FlatCycle<T> {
     return this;
   }
 
+  replace(cycle: Cycle<T>) {
+    this._cycle = cycle;
+  }
+
   /* ----------------------------------------------------------------
   /* PATTERN MODIFIERS
   ---------------------------------------------------------------- */

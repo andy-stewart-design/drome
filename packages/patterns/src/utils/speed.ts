@@ -8,8 +8,7 @@ export function fast<S>(
   if (nullVal === undefined) return null;
 
   mult = Math.round(mult);
-  if (mult === 1) return null;
-  else if (mult < 1) return slow(cycle, nullVal, 1 / mult);
+  if (mult <= 1) return null;
 
   const length = Math.ceil(cycle.length / mult);
   const numLoops = mult * length;
@@ -31,8 +30,7 @@ export function slow<S>(
   if (nullVal === undefined) return null;
 
   mult = Math.round(mult);
-  if (mult === 1) return null;
-  else if (mult < 1) return fast(cycle, nullVal, 1 / mult);
+  if (mult <= 1) return null;
 
   const nextCycle: Cycle<S> = [];
 
