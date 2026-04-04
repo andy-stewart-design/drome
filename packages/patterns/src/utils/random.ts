@@ -7,6 +7,15 @@ function xorwise(x: number): number {
   return (b << 5) ^ b;
 }
 
+function mulberry32(a: number): number {
+  a = (a + 0x6d2b79f5) | 0;
+  let t = Math.imul(a ^ (a >>> 15), 1 | a);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 0x100000000;
+}
+
+type RandAlgo = "xor" | "mulberry";
+
 const frac = (n: number) => n - Math.trunc(n);
 
 function getSeed(n: number): number {
@@ -33,6 +42,7 @@ const quantizeMapper =
 
 export {
   xorwise,
+  mulberry32,
   getSeed,
   seedToRand,
   floatMapper,
@@ -40,4 +50,5 @@ export {
   binaryMapper,
   quantizeMapper,
   type RandMapper,
+  type RandAlgo,
 };

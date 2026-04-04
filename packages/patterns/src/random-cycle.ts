@@ -4,11 +4,13 @@ import {
   getSeed,
   seedToRand,
   xorwise,
+  mulberry32,
   floatMapper,
   intMapper,
   binaryMapper,
   quantizeMapper,
   type RandMapper,
+  type RandAlgo,
 } from "./utils/random";
 
 interface RandomCycleOptions {
@@ -23,6 +25,7 @@ class RandomCycle extends BaseCycle<number> {
   private _rangeStart = 0;
   private _rangeEnd = 1;
   private _mapper: RandMapper = floatMapper;
+  private _algo: RandAlgo = "xor";
 
   constructor(opts: RandomCycleOptions = {}) {
     super([[1]], 0);
@@ -63,9 +66,15 @@ class RandomCycle extends BaseCycle<number> {
       if (m === nullValue) {
         result.push(nullValue!);
       } else {
-        const rFloat = Math.abs(seedToRand(seed));
+        let rFloat: number;
+        if (this._algo === "mulberry") {
+          rFloat = mulberry32(seed);
+          seed = (seed + 1) | 0;
+        } else {
+          rFloat = Math.abs(seedToRand(seed));
+          seed = xorwise(seed);
+        }
         result.push(this._mapper(rFloat, this._rangeStart, this._rangeEnd));
-        seed = xorwise(seed);
       }
     }
 
@@ -98,6 +107,11 @@ class RandomCycle extends BaseCycle<number> {
 
   quant(step: number) {
     this._mapper = quantizeMapper(step);
+    return this;
+  }
+
+  algo(name: RandAlgo) {
+    this._algo = name;
     return this;
   }
 
