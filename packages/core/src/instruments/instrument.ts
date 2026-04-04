@@ -1,17 +1,16 @@
-import { FlatCycle, NestedCycle } from "@drome/patterns";
-
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
 import LfoNode from "@/automation/lfo-node";
 import Envelope from "@/automation/envelope";
 import { isMidiObserver } from "@drome/midi";
-import type { MIDIObserver } from "@drome/midi";
+import { FlatCycle, NestedCycle, RandomCycle, isCycle } from "@drome/patterns";
 import { parsePatternString } from "../utils/parse-pattern";
 import { isArray, isNullish, isNumber, isString } from "../utils/validators";
 import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
 import type Drome from "../index";
 import type SynthNode from "@/audio-nodes/composite-synth-node";
 import type SampleNode from "@/audio-nodes/composite-sample-node";
+import type { MIDIObserver } from "@drome/midi";
 import type {
   AdsrMode,
   AdsrEnvelope,
@@ -37,24 +36,30 @@ interface FrequencyParams {
   type?: FilterType;
   frequency?:
     | FlatCycle<number>
+    | RandomCycle
     | Envelope
     | LfoNode
     | MIDIObserver<"controlchange">;
-  q?: FlatCycle<number> | Envelope | MIDIObserver<"controlchange">;
+  q?:
+    | FlatCycle<number>
+    | RandomCycle
+    | Envelope
+    | MIDIObserver<"controlchange">;
 }
 
 abstract class Instrument {
   protected _drome: Drome;
-  protected _cycles: NestedCycle<Nullable<number>>;
+  protected _cycles: NestedCycle<Nullable<number>> | RandomCycle;
   protected _midiRouter: MIDIRouter | null;
   private _destination: AudioNode;
   protected _connectorNode: GainNode;
   protected readonly _audioNodes: Set<SynthNode | SampleNode>;
   private _signalChain: Set<DromeAudioNode>;
   private _baseGain: number;
-  protected _gain: Envelope;
+  protected _gain: Envelope | RandomCycle;
   private _detune:
     | FlatCycle<number>
+    | RandomCycle
     | Envelope
     | LfoNode
     | MIDIObserver<"controlchange">;
@@ -122,7 +127,15 @@ abstract class Instrument {
     chordIdx: number,
   ) {
     if (!node.gain) return 0;
-    const cycleIndex = this._drome.metronome.bar % this._cycles.length;
+    const bar = this._drome.metronome.bar;
+
+    if (this._gain instanceof RandomCycle) {
+      const value = this._gain.at(bar, chordIdx);
+      node.gain.setValueAtTime(value * this._baseGain, start);
+      return dur;
+    }
+
+    const cycleIndex = bar % this._cycles.length;
     return this._gain.apply(node.gain, start, dur, cycleIndex, chordIdx);
   }
 
@@ -134,10 +147,11 @@ abstract class Instrument {
   ) {
     const { filterFrequency: filFreq, filterQ: filQ } = node;
     if (!filFreq || !filQ) return;
-    const cycleIndex = this._drome.metronome.bar % this._cycles.length;
+    const bar = this._drome.metronome.bar;
+    const cycleIndex = bar % this._cycles.length;
 
-    if (this._filter.frequency instanceof FlatCycle) {
-      filFreq.value = this._filter.frequency.at(cycleIndex, chordIdx);
+    if (isCycle(this._filter.frequency)) {
+      filFreq.value = this._filter.frequency.at(bar, chordIdx);
     } else if (this._filter.frequency instanceof Envelope) {
       this._filter.frequency.apply(filFreq, start, dur, cycleIndex, chordIdx);
     } else if (this._filter.frequency instanceof LfoNode) {
@@ -153,8 +167,8 @@ abstract class Instrument {
       console.warn("Invalid type:", this._filter.frequency satisfies undefined);
     }
 
-    if (this._filter.q instanceof FlatCycle) {
-      filQ.value = this._filter.q.at(cycleIndex, chordIdx);
+    if (isCycle(this._filter.q)) {
+      filQ.value = this._filter.q.at(bar, chordIdx);
     } else if (this._filter.q instanceof Envelope) {
       this._filter.q.apply(filQ, start, dur, cycleIndex, chordIdx);
     } else if (isMidiObserver(this._filter.q)) {
@@ -173,11 +187,12 @@ abstract class Instrument {
     chordIndex: number,
   ) {
     if (!node.detune) return;
-    const cycleIndex = this._drome.metronome.bar % this._cycles.length;
+    const bar = this._drome.metronome.bar;
 
-    if (this._detune instanceof FlatCycle) {
-      node.detune.value = this._detune.at(cycleIndex, chordIndex);
+    if (isCycle(this._detune)) {
+      node.detune.value = this._detune.at(bar, chordIndex);
     } else if (this._detune instanceof Envelope) {
+      const cycleIndex = bar % this._cycles.length;
       this._detune.apply(node.detune, start, duration, cycleIndex, chordIndex);
     } else if (isMidiObserver(this._detune)) {
       node.detune.setValueAtTime(
@@ -221,14 +236,30 @@ abstract class Instrument {
   }
 
   note(
-    ...input: (Nullable<number | number[]> | Nullable<number | number[]>[])[]
+    ...input: (
+      | Nullable<number | number[]>
+      | Nullable<number | number[]>[]
+      | RandomCycle
+    )[]
   ) {
-    this._cycles.pattern(...input);
+    if (input.length === 1 && input[0] instanceof RandomCycle) {
+      input[0].null(null as any);
+      this._cycles = input[0];
+    } else if (this._cycles instanceof NestedCycle) {
+      this._cycles.pattern(
+        ...(input as (
+          | Nullable<number | number[]>
+          | Nullable<number | number[]>[]
+        )[]),
+      );
+    }
     return this;
   }
 
   arrange(...input: [number, Nullable<number | number[]>[]][]) {
-    this._cycles.arrange(...input);
+    if (this._cycles instanceof NestedCycle) {
+      this._cycles.arrange(...input);
+    }
     return this;
   }
 
@@ -281,12 +312,15 @@ abstract class Instrument {
     return this;
   }
 
-  gain(input: number | Envelope | string) {
+  gain(input: number | Envelope | RandomCycle | string) {
     if (this._muted) return this;
 
-    if (input instanceof Envelope) {
+    if (input instanceof RandomCycle) {
+      input.null(0);
       this._gain = input;
-    } else {
+    } else if (input instanceof Envelope) {
+      this._gain = input;
+    } else if (this._gain instanceof Envelope) {
       const pattern = isString(input) ? parsePatternString(input) : [input];
       const normalizedPattern = pattern.map((x) =>
         isArray(x) ? x.map((y) => y * this._baseGain) : x * this._baseGain,
@@ -297,6 +331,7 @@ abstract class Instrument {
   }
 
   adsr(a: number, d?: number, s?: number, r?: number) {
+    if (!(this._gain instanceof Envelope)) return this;
     this._gain.att(a);
     if (typeof d === "number") this._gain.dec(d);
     if (typeof s === "number") this._gain.sus(s);
@@ -306,33 +341,36 @@ abstract class Instrument {
   }
 
   att(v: number) {
-    this._gain.att(v);
+    if (this._gain instanceof Envelope) this._gain.att(v);
     return this;
   }
 
   dec(v: number) {
-    this._gain.dec(v);
+    if (this._gain instanceof Envelope) this._gain.dec(v);
     return this;
   }
 
   sus(v: number) {
-    this._gain.sus(v);
+    if (this._gain instanceof Envelope) this._gain.sus(v);
     return this;
   }
 
   rel(v: number) {
-    this._gain.rel(v);
+    if (this._gain instanceof Envelope) this._gain.rel(v);
     return this;
   }
 
   adsrMode(mode: AdsrMode) {
-    this._gain.mode(mode);
+    if (this._gain instanceof Envelope) this._gain.mode(mode);
     if (this._detune instanceof Envelope) this._detune.mode(mode);
     return this;
   }
 
-  detune(input: SNELO | MIDIObserver<"controlchange">) {
-    if (
+  detune(input: SNELO | RandomCycle | MIDIObserver<"controlchange">) {
+    if (input instanceof RandomCycle) {
+      input.null(0);
+      this._detune = input;
+    } else if (
       input instanceof Envelope ||
       input instanceof LfoNode ||
       isMidiObserver(input)
@@ -348,12 +386,15 @@ abstract class Instrument {
 
   filter(
     type: FilterTypeAlias,
-    f: SNELO | MIDIObserver<"controlchange">,
-    q?: SNELO,
+    f: SNELO | RandomCycle | MIDIObserver<"controlchange">,
+    q?: SNELO | RandomCycle,
   ) {
     this._filter.type = filterTypeMap[type];
 
-    if (f instanceof Envelope) {
+    if (f instanceof RandomCycle) {
+      f.null(0);
+      this._filter.frequency = f;
+    } else if (f instanceof Envelope) {
       this._filter.frequency = f;
       this._filter.frequency.endValue = 30;
     } else if (f instanceof LfoNode || isMidiObserver(f)) {
@@ -365,7 +406,10 @@ abstract class Instrument {
       console.warn("Invalid type:", f satisfies never);
     }
 
-    if (q instanceof Envelope || isMidiObserver(q)) {
+    if (q instanceof RandomCycle) {
+      q.null(0);
+      this._filter.q = q;
+    } else if (q instanceof Envelope || isMidiObserver(q)) {
       this._filter.q = q;
     } else if (isString(q) || isNumber(q)) {
       const pattern = isString(q) ? parsePatternString(q) : [q];
@@ -421,8 +465,9 @@ abstract class Instrument {
   protected beforePlay(barStart: number, barDuration: number) {
     if (isMidiObserver(this._detune)) this._detune.clear();
 
-    const cycleIndex = this._drome.metronome.bar % this._cycles.length;
-    const cycle = this._cycles.at(cycleIndex);
+    const bar = this._drome.metronome.bar;
+    const cycleIndex = bar % this._cycles.length;
+    const cycle = this._cycles.at(bar);
     const notes: Note<number | number[]>[] = cycle.map((value, i) => {
       if (isNullish(value)) return null;
 

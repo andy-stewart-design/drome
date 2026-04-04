@@ -8,7 +8,7 @@ import { getWaveform } from "@/utils/synth-alias";
 import type Drome from "@/index";
 import type { NoteName, NoteValue, ScaleAlias, WaveformAlias } from "@/types";
 import { getScale } from "@/utils/get-scale";
-import { FlatCycle } from "@drome/patterns";
+import { FlatCycle, isCycle } from "@drome/patterns";
 
 interface SynthOptions extends InstrumentOptions {
   type?: WaveformAlias[];
@@ -60,7 +60,7 @@ export default class Synth extends Instrument {
     if (input instanceof Envelope || input instanceof LfoNode) {
       this._panspread = input;
     } else {
-      if (!(this._panspread instanceof FlatCycle))
+      if (!(isCycle(this._panspread)))
         this._panspread = new FlatCycle(0.4);
       this._panspread.pattern(input, ...rest);
     }
@@ -74,7 +74,7 @@ export default class Synth extends Instrument {
     if (input instanceof Envelope || input instanceof LfoNode) {
       this._freqspread = input;
     } else {
-      if (!(this._freqspread instanceof FlatCycle))
+      if (!(isCycle(this._freqspread)))
         this._freqspread = new FlatCycle(0.2);
       this._freqspread.pattern(input, ...rest);
     }
@@ -148,11 +148,11 @@ export default class Synth extends Instrument {
           const bar = this._drome.metronome.bar;
           const cycleIndex = bar % this._voices.length;
           const panspreadCycleIndex =
-            this._panspread instanceof FlatCycle
+            isCycle(this._panspread)
               ? bar % this._panspread.length
               : cycleIndex;
           const freqspreadCycleIndex =
-            this._freqspread instanceof FlatCycle
+            isCycle(this._freqspread)
               ? bar % this._freqspread.length
               : cycleIndex;
           const osc = new SynthNode(this.ctx, {
@@ -162,11 +162,11 @@ export default class Synth extends Instrument {
             gain: 0,
             voices: this._voices.at(cycleIndex, chordIndex),
             panspread:
-              this._panspread instanceof FlatCycle
+              isCycle(this._panspread)
                 ? this._panspread.at(panspreadCycleIndex, chordIndex)
                 : undefined,
             freqspread:
-              this._freqspread instanceof FlatCycle
+              isCycle(this._freqspread)
                 ? this._freqspread.at(freqspreadCycleIndex, chordIndex)
                 : undefined,
           });

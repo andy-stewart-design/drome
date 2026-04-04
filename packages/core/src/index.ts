@@ -1,5 +1,6 @@
 import Envelope from "@/automation/envelope";
 import LfoNode from "@/automation/lfo-node";
+import { RandomCycle } from "@drome/patterns";
 import Sample from "@/instruments/sample";
 import Synth from "@/instruments/synth";
 import Stack from "@/instruments/stack";
@@ -132,7 +133,9 @@ class Drome {
     if (!this.clock.paused) return;
     if (this._suspendTimeoutId) clearTimeout(this._suspendTimeoutId);
     const queued = this._sessionManager.queue?.instruments ?? new Set();
-    await this._sampleManager.preloadSamples(new Set([...this.instruments, ...queued]));
+    await this._sampleManager.preloadSamples(
+      new Set([...this.instruments, ...queued]),
+    );
     this._sessionManager.start();
   }
 
@@ -210,6 +213,10 @@ class Drome {
 
   env(maxValue: number, startValue = 0, endValue?: number) {
     return new Envelope(maxValue, startValue, endValue);
+  }
+
+  rand(seed?: number, loop?: number | number[]) {
+    return new RandomCycle({ seed, loop });
   }
 
   lfo(baseValue: number, scale = 1, rate = 1) {

@@ -2,6 +2,7 @@ import Instrument, { type InstrumentOptions } from "./instrument";
 import SamplerNode from "@/audio-nodes/composite-sample-node";
 import { flipBuffer } from "@/utils/flip-buffer";
 import { isArray, isNumber } from "@/utils/validators";
+import { NestedCycle } from "@drome/patterns";
 import type Drome from "@/index";
 
 type Nullable<T> = T | null | undefined;
@@ -45,11 +46,15 @@ export default class Sample extends Instrument {
   begin(
     ...input: (Nullable<number | number[]> | Nullable<number | number[]>[])[]
   ) {
-    this._cycles.pattern(...input);
+    if (this._cycles instanceof NestedCycle) {
+      this._cycles.pattern(...input);
+    }
     return this;
   }
 
   chop(numChops: number, ...input: (number | number[])[]) {
+    if (!(this._cycles instanceof NestedCycle)) return this;
+
     const convert = (n: Nullable<number>) => {
       return typeof n === "number" ? (1 / numChops) * (n % numChops) : null;
     };
