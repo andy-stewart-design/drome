@@ -1,52 +1,15 @@
-import { euclid } from "./utils/euclid";
-import { hex } from "./utils/hex";
+import BaseCycle from "./base-cycle";
 import {
   arrange,
-  fast,
   pattern,
-  stretch,
-  reverse,
-  sequence,
-  slow,
-  xox,
   type NoteInput,
   type Cycle,
 } from "./utils";
 
-class NestedCycle<T> {
-  private _cycle: Cycle<T | T[]>;
-  private _nullValue: T | undefined;
-
-  constructor(pattern: NoteInput<T | T[]>, nullValue?: T) {
-    this._cycle = Array.isArray(pattern) ? [pattern] : [[pattern]];
-    this._nullValue = nullValue;
-  }
-
-  private applyPattern(type: string, modifier: number[][]) {
-    const nullValue = this._nullValue;
-
-    if (nullValue === undefined) {
-      const warning = `[NESTED CYCLE] A null value was not set at Cycle creation. Skipping call to ${type}.`;
-      console.warn(warning);
-      return this._cycle;
-    }
-
-    const cycles = this._cycle;
-    const loops = Math.max(cycles.length, modifier.length);
-    const nextCycles: Cycle<T | T[]> = [];
-
-    for (let i = 0; i < loops; i++) {
-      let noteIndex = 0;
-      const cycle = cycles[i % cycles.length] ?? [];
-
-      const nextCycle = modifier[i % modifier.length].map((p) =>
-        p === 0 ? nullValue : cycle[noteIndex++ % cycle.length],
-      );
-
-      nextCycles.push(nextCycle);
-    }
-
-    return nextCycles;
+class NestedCycle<T> extends BaseCycle<T | T[]> {
+  constructor(input: NoteInput<T | T[]>, nullValue?: T) {
+    const cycle = Array.isArray(input) ? [input] : [[input]];
+    super(cycle, nullValue);
   }
 
   /* ----------------------------------------------------------------
@@ -67,57 +30,6 @@ class NestedCycle<T> {
   }
 
   /* ----------------------------------------------------------------
-  /* PATTERN MODIFIERS
-  ---------------------------------------------------------------- */
-  stretch(bars: number, steps = 1) {
-    this._cycle = stretch(this._cycle, bars, steps);
-    return this;
-  }
-
-  reverse() {
-    this._cycle = reverse(this._cycle);
-    return this;
-  }
-
-  fast(mult: number) {
-    const nextCycle = fast(this._cycle, this._nullValue, mult);
-    if (!nextCycle) return this;
-    this._cycle = nextCycle;
-    return this;
-  }
-
-  slow(mult: number) {
-    const nextCycle = slow(this._cycle, this._nullValue, mult);
-    if (!nextCycle) return this;
-    this._cycle = nextCycle;
-    return this;
-  }
-
-  euclid(pulses: number | number[], steps: number, rot?: number | number[]) {
-    this._cycle = this.applyPattern("euclid", euclid(pulses, steps, rot));
-    return this;
-  }
-
-  hex(...input: (string | number)[]) {
-    this._cycle = this.applyPattern("hex", input.map(hex));
-    return this;
-  }
-
-  sequence(stepCount: number, ...steps: (number | number[])[]) {
-    this._cycle = this.applyPattern("sequence", sequence(stepCount, ...steps));
-    return this;
-  }
-
-  xox(...steps: (number | number[])[] | string[]) {
-    this._cycle = this.applyPattern("xox", xox(...steps));
-    return this;
-  }
-
-  clear() {
-    this._cycle = [];
-  }
-
-  /* ----------------------------------------------------------------
   /* GETTERS
   ---------------------------------------------------------------- */
   at(i: number): Cycle<T | T[]>[number];
@@ -130,14 +42,6 @@ class NestedCycle<T> {
     }
 
     return currentValue ?? [this._nullValue];
-  }
-
-  get length() {
-    return this._cycle.length;
-  }
-
-  get current() {
-    return this._cycle;
   }
 }
 
