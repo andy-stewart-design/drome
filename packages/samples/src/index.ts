@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile, mkdir } from "fs/promises";
+import { readdir, readFile, writeFile } from "fs/promises";
 import { dirname, join, basename } from "path";
 import { fileURLToPath } from "url";
 
