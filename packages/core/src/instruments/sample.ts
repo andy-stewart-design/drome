@@ -10,6 +10,10 @@ import {
 import type Drome from "@/index";
 
 type Nullable<T> = T | null | undefined;
+type Note = Nullable<number>;
+
+const isRCInput = (i: unknown[]): i is [RandomCycle] =>
+  i.length === 1 && isRandomCycle(i[0]);
 
 interface SampleOptions extends InstrumentOptions {
   sampleIds?: string[];
@@ -47,23 +51,12 @@ export default class Sample extends Instrument {
     return this;
   }
 
-  begin(
-    ...input: (
-      | Nullable<number | number[]>
-      | Nullable<number | number[]>[]
-      | RandomCycle
-    )[]
-  ) {
-    if (input.length === 1 && isRandomCycle(input[0])) {
+  begin(...input: (Note | Note[] | Note[][])[] | [RandomCycle]) {
+    if (isRCInput(input)) {
       input[0].null(null as any);
       this._cycles = input[0];
     } else if (isNestedCycle(this._cycles)) {
-      this._cycles.pattern(
-        ...(input as (
-          | Nullable<number | number[]>
-          | Nullable<number | number[]>[]
-        )[]),
-      );
+      this._cycles.pattern(...input);
     }
     return this;
   }
@@ -74,9 +67,6 @@ export default class Sample extends Instrument {
     const convert = (n: Nullable<number>) => {
       return typeof n === "number" ? (1 / numChops) * (n % numChops) : null;
     };
-
-    const isRCInput = (i: typeof input): i is [RandomCycle] =>
-      i.length === 1 && isRandomCycle(i[0]);
 
     if (!input.length) {
       const chopsPerCycle = Math.floor(numChops / this._cycles.length) || 1;
@@ -126,7 +116,6 @@ export default class Sample extends Instrument {
   }
 
   push() {
-    // this._drome.instruments.add(this);
     this._drome.queue(this);
   }
 

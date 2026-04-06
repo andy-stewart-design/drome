@@ -1,5 +1,3 @@
-// TODO: look at sample methods and determine if any should accept RandomCycle
-
 import AutomatableEffect from "@/abstracts/effect-automatable";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
 import LfoNode from "@/automation/lfo-node";
