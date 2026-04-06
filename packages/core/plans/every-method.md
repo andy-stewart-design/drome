@@ -20,32 +20,37 @@ cycle.every(4, otherCycle)   // swap in alternate pattern on last of 4
 ## Behavior
 
 ### Callback case (`apply` is a function)
-- Clone `this` into a fresh instance
-- Call `fn(clone)` — mutates clone, no bleed back to original
-- Return `clone.at(i, j)` — same global bar index, transformed data
+- Get the active bar via `this.at(i)` — a single `S[]`
+- Construct a temporary `new FlatCycle(currentPattern, this._nullValue)` — single-bar cycle
+- Call `fn(temp)` — mutates temp, no bleed back to original
+- Return `temp.at(0, j)` — query from bar 0 of the temp cycle
 
 ### Pattern case (`apply` is a `BaseCycle`)
 - Return `apply.at(0, j)` — always starts from bar 0 of the alternate pattern
 
 ## Implementation
 
-### `BaseCycle`
+### `packages/patterns` — `BaseCycle`
 - Add `_everyRules: Array<{ n: number, offset: number, apply: Function | BaseCycle }>`
 - Add `every()` method — pushes rule onto `_everyRules`, returns `this` (chainable)
 - Override `at(i, j?)` to check rules before normal lookup — **first match wins**
-- Add abstract `clone()` method
+- No `clone()` needed
 
-### `FlatCycle` / `NestedCycle`
-- Implement `clone()` — deep copy `_cycle` (2D array) and `_nullValue`
+### `packages/core` — `Drome` class (`index.ts`)
+- Add `d.note(...input)` factory — returns `new NestedCycle(input, null)`
+- Add `d.param(...input)` factory — returns `new FlatCycle(input, 0)`
+- Follows same pattern as existing `d.rand()`
 
-### `RandomCycle`
-- Stub `clone()` — throws, not supported for now
+### `packages/core` — `Instrument` class
+- Update `instrument.note()` to detect when a `NestedCycle` is passed — swap it in as `_cycles` wholesale (new `else if` branch)
+- Add `instrument.every()` delegating method — forwards to `_cycles.every()`, returns `this`
 
 ## Decisions Log
 
 - **Naming:** `every` preferred over `firstOf`/`lastOf` — more flexible, cleaner API
 - **Default offset:** `n - 1` (last of), override with explicit offset arg
 - **Multiple rules:** Allowed — stack via chaining, first match wins on conflict
-- **Clone behavior:** No mutation of original — callback receives and mutates a throwaway clone
+- **Callback scope:** Callback receives a single-bar `FlatCycle` constructed from `this.at(i)`, not a full clone — sufficient for transforms like `rev()`, rules out multi-bar operations like `stretch()`
+- **No `clone()` needed:** Scoping to the active bar eliminates the need for a full cycle clone; `FlatCycle` constructor handles wrapping `S[]` to `[[...]]` correctly
 - **Alternate pattern query index:** Always `0` — drum break mental model, always starts fresh
 - **Scope:** `FlatCycle` and `NestedCycle` only for now; `RandomCycle` deferred
