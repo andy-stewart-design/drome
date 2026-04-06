@@ -42,8 +42,13 @@ cycle.every(4, otherCycle)   // swap in alternate pattern on last of 4
 - Follows same pattern as existing `d.rand()`
 
 ### `packages/core` — `Instrument` class
-- Update `instrument.note()` to detect when a `NestedCycle` is passed — swap it in as `_cycles` wholesale (new `else if` branch)
 - Add `instrument.every()` delegating method — forwards to `_cycles.every()`, returns `this`
+
+### `packages/core` — `Synth` class
+- Update `synth.note()` to detect when a `NestedCycle` is passed — swap it in as `_cycles` wholesale (new `else if` branch)
+
+### `packages/core` — `Sample` class
+- Update `sample.begin()` to detect when a `NestedCycle` is passed — swap it in as `_cycles` wholesale (same pattern as `synth.note()`)
 
 ## Decisions Log
 
