@@ -6,13 +6,14 @@ import { midiToFrequency } from "@/utils/midi-to-frequency";
 import { noteToMidi } from "@/utils/note-string-to-frequency";
 import { getWaveform } from "@/utils/synth-alias";
 import type Drome from "@/index";
-import type { NoteName, NoteValue, ScaleAlias, WaveformAlias } from "@/types";
+import type { NoteName, NoteValue, Nullable, ScaleAlias, WaveformAlias } from "@/types";
 import { getScale } from "@/utils/get-scale";
 import {
   FlatCycle,
   type RandomCycle,
   isCycle,
   isRandomCycle,
+  isNestedCycle,
 } from "@drome/patterns";
 
 interface SynthOptions extends InstrumentOptions {
@@ -51,6 +52,27 @@ export default class Synth extends Instrument {
     const degree = ((note % 7) + 7) % 7;
     const step = this._scale[degree];
     return midiToFrequency(this._root + octave + step);
+  }
+
+  note(
+    ...input: (
+      | Nullable<number | number[]>
+      | Nullable<number | number[]>[]
+      | RandomCycle
+    )[]
+  ) {
+    if (input.length === 1 && isRandomCycle(input[0])) {
+      input[0].null(null as any);
+      this._cycles = input[0];
+    } else if (isNestedCycle(this._cycles)) {
+      this._cycles.pattern(
+        ...(input as (
+          | Nullable<number | number[]>
+          | Nullable<number | number[]>[]
+        )[]),
+      );
+    }
+    return this;
   }
 
   voices(input: RandomCycle | number | number[], ...rest: (number | number[])[]) {

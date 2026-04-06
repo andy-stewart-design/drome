@@ -2,7 +2,7 @@ import Instrument, { type InstrumentOptions } from "./instrument";
 import SamplerNode from "@/audio-nodes/composite-sample-node";
 import { flipBuffer } from "@/utils/flip-buffer";
 import { isArray, isNumber } from "@/utils/validators";
-import { isNestedCycle } from "@drome/patterns";
+import { isNestedCycle, isRandomCycle, type RandomCycle } from "@drome/patterns";
 import type Drome from "@/index";
 
 type Nullable<T> = T | null | undefined;
@@ -44,10 +44,22 @@ export default class Sample extends Instrument {
   }
 
   begin(
-    ...input: (Nullable<number | number[]> | Nullable<number | number[]>[])[]
+    ...input: (
+      | Nullable<number | number[]>
+      | Nullable<number | number[]>[]
+      | RandomCycle
+    )[]
   ) {
-    if (isNestedCycle(this._cycles)) {
-      this._cycles.pattern(...input);
+    if (input.length === 1 && isRandomCycle(input[0])) {
+      input[0].null(null as any);
+      this._cycles = input[0];
+    } else if (isNestedCycle(this._cycles)) {
+      this._cycles.pattern(
+        ...(input as (
+          | Nullable<number | number[]>
+          | Nullable<number | number[]>[]
+        )[]),
+      );
     }
     return this;
   }
@@ -90,7 +102,7 @@ export default class Sample extends Instrument {
 
   fit(numBars = 1) {
     this._fitValue = numBars;
-    this.note(...Array.from({ length: numBars }, (_, i) => i / numBars));
+    this.begin(...Array.from({ length: numBars }, (_, i) => i / numBars));
     return this;
   }
 

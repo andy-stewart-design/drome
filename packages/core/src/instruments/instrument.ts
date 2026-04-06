@@ -242,27 +242,6 @@ abstract class Instrument {
     this._connected = true;
   }
 
-  note(
-    ...input: (
-      | Nullable<number | number[]>
-      | Nullable<number | number[]>[]
-      | RandomCycle
-    )[]
-  ) {
-    if (input.length === 1 && isRandomCycle(input[0])) {
-      input[0].null(null as any);
-      this._cycles = input[0];
-    } else if (isNestedCycle(this._cycles)) {
-      this._cycles.pattern(
-        ...(input as (
-          | Nullable<number | number[]>
-          | Nullable<number | number[]>[]
-        )[]),
-      );
-    }
-    return this;
-  }
-
   arrange(...input: [number, Nullable<number | number[]>[]][]) {
     if (isNestedCycle(this._cycles)) {
       this._cycles.arrange(...input);
