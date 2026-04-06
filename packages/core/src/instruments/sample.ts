@@ -2,7 +2,11 @@ import Instrument, { type InstrumentOptions } from "./instrument";
 import SamplerNode from "@/audio-nodes/composite-sample-node";
 import { flipBuffer } from "@/utils/flip-buffer";
 import { isArray, isNumber } from "@/utils/validators";
-import { isNestedCycle, isRandomCycle, type RandomCycle } from "@drome/patterns";
+import {
+  isNestedCycle,
+  isRandomCycle,
+  type RandomCycle,
+} from "@drome/patterns";
 import type Drome from "@/index";
 
 type Nullable<T> = T | null | undefined;
@@ -64,12 +68,15 @@ export default class Sample extends Instrument {
     return this;
   }
 
-  chop(numChops: number, ...input: (number | number[])[]) {
-    if (!(isNestedCycle(this._cycles))) return this;
+  chop(numChops: number, ...input: (number | number[])[] | [RandomCycle]) {
+    if (!isNestedCycle(this._cycles)) return this;
 
     const convert = (n: Nullable<number>) => {
       return typeof n === "number" ? (1 / numChops) * (n % numChops) : null;
     };
+
+    const isRCInput = (i: typeof input): i is [RandomCycle] =>
+      i.length === 1 && isRandomCycle(i[0]);
 
     if (!input.length) {
       const chopsPerCycle = Math.floor(numChops / this._cycles.length) || 1;
@@ -81,6 +88,13 @@ export default class Sample extends Instrument {
             return step * j + chopsPerCycle * step * i;
           });
         }),
+      );
+    } else if (isRCInput(input)) {
+      const rc = input[0];
+      this._cycles.replace(
+        Array.from({ length: this._cycles.length }, (_, i) =>
+          rc.at(i).map(convert),
+        ),
       );
     } else {
       this._cycles.replace(
