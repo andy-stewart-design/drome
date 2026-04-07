@@ -21,7 +21,7 @@ interface RandomCycleOptions {
 class RandomCycle extends BaseCycle<number> {
   private _seed: number;
   private _loopLengths: number[] | undefined;
-  private _totalPeriod: number | undefined;
+  private _loopPeriod: number | undefined;
   private _rangeStart = 0;
   private _rangeEnd = 1;
   private _mapper: RandMapper = floatMapper;
@@ -33,31 +33,29 @@ class RandomCycle extends BaseCycle<number> {
 
     if (opts.loop !== undefined) {
       this._loopLengths = Array.isArray(opts.loop) ? opts.loop : [opts.loop];
-      this._totalPeriod = this._loopLengths.reduce((a, b) => a + b, 0);
+      this._loopPeriod = this._loopLengths.reduce((a, b) => a + b, 0);
     }
   }
 
-  private getLocalIndex(i: number): number {
-    if (!this._loopLengths || !this._totalPeriod) return i;
+  private getSeedOffset(barIndex: number): number {
+    if (!this._loopLengths || !this._loopPeriod) return barIndex;
 
-    const position = i % this._totalPeriod;
+    const position = barIndex % this._loopPeriod;
     let accumulated = 0;
 
     for (const len of this._loopLengths) {
-      if (position < accumulated + len) {
-        return position - accumulated;
-      }
-      accumulated += len;
+      if (position < accumulated + len) return position - accumulated;
+      else accumulated += len;
     }
 
     return 0;
   }
 
-  private generate(i: number): number[] {
-    const localIndex = this.getLocalIndex(i);
-    const mask = this.current[i % this.current.length];
+  private generate(barIndex: number) {
+    const seedOffset = this.getSeedOffset(barIndex);
+    const mask = this._cycle[barIndex % this._cycle.length];
 
-    let seed = getSeed(this._seed + localIndex);
+    let seed = getSeed(this._seed + seedOffset);
     const result: number[] = [];
 
     const nullValue = this._nullValue;
