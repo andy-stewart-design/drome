@@ -14,12 +14,13 @@ import {
 } from "./utils/random";
 
 interface RandomCycleOptions {
-  seed?: number;
+  seed?: number | number[];
   loop?: number | number[];
 }
 
 class RandomCycle extends BaseCycle<number> {
-  private _seed: number;
+  private _seed: number[];
+  private _seedPeriod: number | undefined;
   private _loopLengths: number[] | undefined;
   private _loopPeriod: number | undefined;
   private _rangeStart = 0;
@@ -29,12 +30,18 @@ class RandomCycle extends BaseCycle<number> {
 
   constructor(opts: RandomCycleOptions = {}) {
     super([[1]], 0);
-    this._seed = opts.seed ?? 0;
+    this._seed = Array.isArray(opts.seed) ? opts.seed : [opts.seed ?? 0];
+    if (this._seed.length > 1)
+      this._seedPeriod = this._seed.reduce((a, b) => a + b, 0);
 
     if (opts.loop !== undefined) {
       this._loopLengths = Array.isArray(opts.loop) ? opts.loop : [opts.loop];
       this._loopPeriod = this._loopLengths.reduce((a, b) => a + b, 0);
     }
+  }
+
+  private getCurrentSeed(barIndex: number): number {
+    return this._seed[0];
   }
 
   private getSeedOffset(barIndex: number): number {
@@ -52,17 +59,16 @@ class RandomCycle extends BaseCycle<number> {
   }
 
   private generate(barIndex: number) {
+    const currentSeed = this.getCurrentSeed(barIndex);
     const seedOffset = this.getSeedOffset(barIndex);
+    let seed = getSeed(currentSeed + seedOffset);
+
+    const result: number[] = [];
     const mask = this._cycle[barIndex % this._cycle.length];
 
-    let seed = getSeed(this._seed + seedOffset);
-    const result: number[] = [];
-
-    const nullValue = this._nullValue;
-
     for (const m of mask) {
-      if (m === nullValue) {
-        result.push(nullValue!);
+      if (m === this._nullValue) {
+        result.push(this._nullValue!);
       } else {
         let rFloat: number;
         if (this._algo === "mulberry") {
