@@ -32,7 +32,7 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
         this._automation = input;
         break;
       case isArray(input):
-        this._cycles = new FlatCycle(0).pattern(...input);
+        this._cycles = new FlatCycle<number>(0).pattern(...input);
         this._defaultValue = this._cycles.at(0, 0) ?? defaultValue;
         break;
       default:

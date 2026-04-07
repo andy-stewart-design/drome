@@ -1,12 +1,10 @@
 import BaseCycle from "./base-cycle";
-import {
-  arrange,
-  pattern,
-  type NoteInput,
-  type Cycle,
-} from "./utils";
+import { arrange, pattern, type NoteInput, type Cycle } from "./utils";
 
-class NestedCycle<T> extends BaseCycle<T | T[]> {
+type Nullable<T> = T | null | undefined;
+type SheduledValue = number | Nullable<number>;
+
+class NestedCycle<T extends SheduledValue = number> extends BaseCycle<T | T[]> {
   constructor(input: NoteInput<T | T[]>, nullValue?: T) {
     const cycle = Array.isArray(input) ? [input] : [[input]];
     super(cycle, nullValue);

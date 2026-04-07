@@ -16,14 +16,17 @@ describe("FlatCycle", () => {
 
   describe("pattern", () => {
     it("sets the cycle and returns this for chaining", () => {
-      const cycle = new FlatCycle(0);
+      const cycle = new FlatCycle<number>(0);
       const result = cycle.pattern([1, 2], [3, 4]);
       expect(result).toBe(cycle);
-      expect(cycle.current).toEqual([[1, 2], [3, 4]]);
+      expect(cycle.current).toEqual([
+        [1, 2],
+        [3, 4],
+      ]);
     });
 
     it("wraps single values in arrays", () => {
-      const cycle = new FlatCycle(0);
+      const cycle = new FlatCycle<number>(0);
       cycle.pattern(1, 2);
       expect(cycle.current).toEqual([[1], [2]]);
     });
@@ -31,7 +34,7 @@ describe("FlatCycle", () => {
 
   describe("arrange", () => {
     it("sets the cycle from [count, pattern] pairs", () => {
-      const cycle = new FlatCycle(0);
+      const cycle = new FlatCycle<number>(0);
       const result = cycle.arrange([2, [1, 2]], [1, [3]]);
       expect(result).toBe(cycle);
       expect(cycle.current).toEqual([[1, 2], [1, 2], [3]]);
@@ -40,7 +43,7 @@ describe("FlatCycle", () => {
 
   describe("replace", () => {
     it("directly sets the cycle", () => {
-      const cycle = new FlatCycle(0);
+      const cycle = new FlatCycle<number>(0);
       cycle.replace([[10, 20], [30]]);
       expect(cycle.current).toEqual([[10, 20], [30]]);
     });
@@ -51,27 +54,36 @@ describe("FlatCycle", () => {
       const cycle = new FlatCycle([1, 2]);
       const result = cycle.stretch(2);
       expect(result).toBe(cycle);
-      expect(cycle.current).toEqual([[1, 2], [1, 2]]);
+      expect(cycle.current).toEqual([
+        [1, 2],
+        [1, 2],
+      ]);
     });
   });
 
   describe("reverse", () => {
     it("reverses the cycle", () => {
-      const cycle = new FlatCycle(0);
+      const cycle = new FlatCycle<number>(0);
       cycle.pattern([1, 2], [3, 4]);
       const result = cycle.reverse();
       expect(result).toBe(cycle);
-      expect(cycle.current).toEqual([[4, 3], [2, 1]]);
+      expect(cycle.current).toEqual([
+        [4, 3],
+        [2, 1],
+      ]);
     });
   });
 
   describe("fast", () => {
     it("compresses the cycle and returns this", () => {
-      const cycle = new FlatCycle(0, 0);
+      const cycle = new FlatCycle<number>(0, 0);
       cycle.pattern([1], [2], [3], [4]);
       const result = cycle.fast(2);
       expect(result).toBe(cycle);
-      expect(cycle.current).toEqual([[1, 2], [3, 4]]);
+      expect(cycle.current).toEqual([
+        [1, 2],
+        [3, 4],
+      ]);
     });
 
     it("returns this unchanged when nullValue is undefined", () => {
@@ -92,7 +104,10 @@ describe("FlatCycle", () => {
       const cycle = new FlatCycle([1, 2], 0);
       const result = cycle.slow(2);
       expect(result).toBe(cycle);
-      expect(cycle.current).toEqual([[1, 0], [2, 0]]);
+      expect(cycle.current).toEqual([
+        [1, 0],
+        [2, 0],
+      ]);
     });
 
     it("returns this unchanged when nullValue is undefined", () => {
@@ -153,26 +168,26 @@ describe("FlatCycle", () => {
 
   describe("at", () => {
     it("returns the pattern at the given index", () => {
-      const cycle = new FlatCycle(0);
+      const cycle = new FlatCycle<number>(0);
       cycle.pattern([1, 2], [3, 4]);
       expect(cycle.at(0)).toEqual([1, 2]);
       expect(cycle.at(1)).toEqual([3, 4]);
     });
 
     it("wraps around with modulo", () => {
-      const cycle = new FlatCycle(0);
+      const cycle = new FlatCycle<number>(0);
       cycle.pattern([1, 2], [3, 4]);
       expect(cycle.at(2)).toEqual([1, 2]);
     });
 
     it("returns element at (i, j) with two arguments", () => {
-      const cycle = new FlatCycle(0);
+      const cycle = new FlatCycle<number>(0);
       cycle.pattern([10, 20, 30]);
       expect(cycle.at(0, 1)).toBe(20);
     });
 
     it("wraps j index with modulo", () => {
-      const cycle = new FlatCycle(0);
+      const cycle = new FlatCycle<number>(0);
       cycle.pattern([10, 20]);
       expect(cycle.at(0, 2)).toBe(10);
     });
@@ -186,7 +201,7 @@ describe("FlatCycle", () => {
 
   describe("length", () => {
     it("returns the number of patterns in the cycle", () => {
-      const cycle = new FlatCycle(0);
+      const cycle = new FlatCycle<number>(0);
       cycle.pattern([1], [2], [3]);
       expect(cycle.length).toBe(3);
     });
@@ -194,7 +209,7 @@ describe("FlatCycle", () => {
 
   describe("chaining", () => {
     it("supports method chaining", () => {
-      const cycle = new FlatCycle(0, 0);
+      const cycle = new FlatCycle<number>(0, 0);
       cycle.pattern([1, 2], [3, 4]).stretch(2).reverse();
       expect(cycle.length).toBe(4);
     });

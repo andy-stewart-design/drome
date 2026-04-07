@@ -1,12 +1,10 @@
 import BaseCycle from "./base-cycle";
-import {
-  arrange,
-  pattern,
-  type NoteInput,
-  type Cycle,
-} from "./utils";
+import { arrange, pattern, type NoteInput, type Cycle } from "./utils";
 
-class FlatCycle<T> extends BaseCycle<T> {
+type Nullable<T> = T | null | undefined;
+type SheduledValue = number | Nullable<number>;
+
+class FlatCycle<T extends SheduledValue = number> extends BaseCycle<T> {
   constructor(input: NoteInput<T>, nullValue?: T) {
     const cycle = Array.isArray(input) ? [input] : [[input]];
     super(cycle, nullValue);

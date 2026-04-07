@@ -69,7 +69,7 @@ class RandomCycle extends BaseCycle<number> {
     const mask = this._cycle[barIndex % this._cycle.length];
 
     for (const m of mask) {
-      if (m === this._nullValue) {
+      if (m === 0) {
         result.push(this._nullValue!);
       } else {
         let rFloat: number;

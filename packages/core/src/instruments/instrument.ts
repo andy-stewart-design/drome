@@ -364,7 +364,7 @@ abstract class Instrument {
       this._detune = input;
     } else {
       const pattern = isString(input) ? parsePatternString(input) : [input];
-      this._detune = new FlatCycle(0).pattern(...pattern);
+      this._detune = new FlatCycle<number>(0).pattern(...pattern);
     }
 
     return this;
@@ -387,7 +387,7 @@ abstract class Instrument {
       this._filter.frequency = f;
     } else if (isNumber(f) || isString(f)) {
       const pattern = isString(f) ? parsePatternString(f) : [f];
-      this._filter.frequency = new FlatCycle(0).pattern(...pattern);
+      this._filter.frequency = new FlatCycle<number>(0).pattern(...pattern);
     } else {
       console.warn("Invalid type:", f satisfies never);
     }
@@ -399,7 +399,7 @@ abstract class Instrument {
       this._filter.q = q;
     } else if (isString(q) || isNumber(q)) {
       const pattern = isString(q) ? parsePatternString(q) : [q];
-      this._filter.q = new FlatCycle(0).pattern(...pattern);
+      this._filter.q = new FlatCycle<number>(0).pattern(...pattern);
     } else if (q instanceof LfoNode) {
       // TODO: Figure out what to do here
     } else {
