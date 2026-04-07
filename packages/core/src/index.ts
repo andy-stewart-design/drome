@@ -215,7 +215,7 @@ class Drome {
     return new Envelope(maxValue, startValue, endValue);
   }
 
-  rand(seed?: number, loop?: number | number[]) {
+  rand(seed?: number | number[], loop?: number | number[]) {
     return new RandomCycle({ seed, loop });
   }
 

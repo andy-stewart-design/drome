@@ -6,7 +6,13 @@ import { midiToFrequency } from "@/utils/midi-to-frequency";
 import { noteToMidi } from "@/utils/note-string-to-frequency";
 import { getWaveform } from "@/utils/synth-alias";
 import type Drome from "@/index";
-import type { NoteName, NoteValue, Nullable, ScaleAlias, WaveformAlias } from "@/types";
+import type {
+  NoteName,
+  NoteValue,
+  Nullable,
+  ScaleAlias,
+  WaveformAlias,
+} from "@/types";
 import { getScale } from "@/utils/get-scale";
 import {
   FlatCycle,
@@ -62,7 +68,7 @@ export default class Synth extends Instrument {
     )[]
   ) {
     if (input.length === 1 && isRandomCycle(input[0])) {
-      input[0].null(null as any);
+      input[0].null(null);
       this._cycles = input[0];
     } else if (isNestedCycle(this._cycles)) {
       this._cycles.pattern(
@@ -75,13 +81,15 @@ export default class Synth extends Instrument {
     return this;
   }
 
-  voices(input: RandomCycle | number | number[], ...rest: (number | number[])[]) {
+  voices(
+    input: RandomCycle | number | number[],
+    ...rest: (number | number[])[]
+  ) {
     if (isRandomCycle(input)) {
       input.null(0);
       this._voices = input;
     } else {
-      if (!(this._voices instanceof FlatCycle))
-        this._voices = new FlatCycle(7);
+      if (!(this._voices instanceof FlatCycle)) this._voices = new FlatCycle(7);
       this._voices.pattern(input, ...rest);
     }
     return this;
@@ -187,28 +195,24 @@ export default class Synth extends Instrument {
           if (midiNote == null) return;
           const bar = this._drome.metronome.bar;
           const cycleIndex = bar % this._voices.length;
-          const panspreadCycleIndex =
-            isCycle(this._panspread)
-              ? bar % this._panspread.length
-              : cycleIndex;
-          const freqspreadCycleIndex =
-            isCycle(this._freqspread)
-              ? bar % this._freqspread.length
-              : cycleIndex;
+          const panspreadCycleIndex = isCycle(this._panspread)
+            ? bar % this._panspread.length
+            : cycleIndex;
+          const freqspreadCycleIndex = isCycle(this._freqspread)
+            ? bar % this._freqspread.length
+            : cycleIndex;
           const osc = new SynthNode(this.ctx, {
             frequency: this.getFrequency(midiNote),
             type: getWaveform(typeAlias),
             filter: this._filter.type ? { type: this._filter.type } : undefined,
             gain: 0,
             voices: this._voices.at(cycleIndex, chordIndex),
-            panspread:
-              isCycle(this._panspread)
-                ? this._panspread.at(panspreadCycleIndex, chordIndex)
-                : undefined,
-            freqspread:
-              isCycle(this._freqspread)
-                ? this._freqspread.at(freqspreadCycleIndex, chordIndex)
-                : undefined,
+            panspread: isCycle(this._panspread)
+              ? this._panspread.at(panspreadCycleIndex, chordIndex)
+              : undefined,
+            freqspread: isCycle(this._freqspread)
+              ? this._freqspread.at(freqspreadCycleIndex, chordIndex)
+              : undefined,
           });
           this._audioNodes.add(osc);
 

@@ -154,6 +154,50 @@ describe("RandomCycle", () => {
     });
   });
 
+  describe("multi-seed", () => {
+    it("rand([3,6], 2): different seeds produce different values at the same local offset", () => {
+      const rc = new RandomCycle({ seed: [3, 6], loop: 2 });
+      // bar 0 = segment 0 (seed 3, offset 0), bar 2 = segment 1 (seed 6, offset 0)
+      expect(rc.at(0)).not.toEqual(rc.at(2));
+    });
+
+    it("rand([3,6], 2): period = 4, sequence repeats", () => {
+      const rc = new RandomCycle({ seed: [3, 6], loop: 2 });
+      expect(rc.at(0)).toEqual(rc.at(4));
+      expect(rc.at(1)).toEqual(rc.at(5));
+      expect(rc.at(2)).toEqual(rc.at(6));
+      expect(rc.at(3)).toEqual(rc.at(7));
+    });
+
+    it("rand([3,6], [2,4]): period = 6, sequence repeats", () => {
+      const rc = new RandomCycle({ seed: [3, 6], loop: [2, 4] });
+      expect(rc.at(0)).toEqual(rc.at(6));
+      expect(rc.at(1)).toEqual(rc.at(7));
+      expect(rc.at(2)).toEqual(rc.at(8));
+      expect(rc.at(5)).toEqual(rc.at(11));
+    });
+
+    it("rand([3,6], [2,4]): different seeds at same local offset produce different values", () => {
+      const rc = new RandomCycle({ seed: [3, 6], loop: [2, 4] });
+      // bar 0 = segment 0 (seed 3, offset 0), bar 2 = segment 1 (seed 6, offset 0)
+      expect(rc.at(0)).not.toEqual(rc.at(2));
+    });
+
+    it("rand(3, [2,4]): same seed resets at each segment boundary", () => {
+      const rc = new RandomCycle({ seed: 3, loop: [2, 4] });
+      // bar 0 = segment 0 (seed 3, offset 0), bar 2 = segment 1 (seed 3, offset 0) — same
+      expect(rc.at(0)).toEqual(rc.at(2));
+      // bar 1 = segment 0 (seed 3, offset 1), bar 3 = segment 1 (seed 3, offset 1) — same
+      expect(rc.at(1)).toEqual(rc.at(3));
+    });
+
+    it("rand(3, [2,4]): period = 6, sequence repeats", () => {
+      const rc = new RandomCycle({ seed: 3, loop: [2, 4] });
+      expect(rc.at(0)).toEqual(rc.at(6));
+      expect(rc.at(5)).toEqual(rc.at(11));
+    });
+  });
+
   describe("quant", () => {
     it("produces values that are multiples of the step", () => {
       const rc = new RandomCycle({ seed: 1 }).steps(100).quant(0.25);

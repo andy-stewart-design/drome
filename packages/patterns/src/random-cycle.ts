@@ -19,10 +19,9 @@ interface RandomCycleOptions {
 }
 
 class RandomCycle extends BaseCycle<number> {
-  private _seed: number[];
-  private _seedPeriod: number | undefined;
-  private _loopLengths: number[] | undefined;
-  private _loopPeriod: number | undefined;
+  private _baseSeed: number;
+  private _segments: Array<{ seed: number; len: number }> | undefined;
+  private _totalPeriod: number | undefined;
   private _rangeStart = 0;
   private _rangeEnd = 1;
   private _mapper: RandMapper = floatMapper;
@@ -30,37 +29,40 @@ class RandomCycle extends BaseCycle<number> {
 
   constructor(opts: RandomCycleOptions = {}) {
     super([[1]], 0);
-    this._seed = Array.isArray(opts.seed) ? opts.seed : [opts.seed ?? 0];
-    if (this._seed.length > 1)
-      this._seedPeriod = this._seed.reduce((a, b) => a + b, 0);
+    const seeds = Array.isArray(opts.seed) ? opts.seed : [opts.seed ?? 0];
+    this._baseSeed = seeds[0];
 
     if (opts.loop !== undefined) {
-      this._loopLengths = Array.isArray(opts.loop) ? opts.loop : [opts.loop];
-      this._loopPeriod = this._loopLengths.reduce((a, b) => a + b, 0);
+      const lengths = Array.isArray(opts.loop) ? opts.loop : [opts.loop];
+      const count = Math.max(seeds.length, lengths.length);
+      this._segments = Array.from({ length: count }, (_, i) => ({
+        seed: seeds[i % seeds.length],
+        len: lengths[i % lengths.length],
+      }));
+      this._totalPeriod = this._segments.reduce((a, s) => a + s.len, 0);
     }
   }
 
-  private getCurrentSeed(barIndex: number): number {
-    return this._seed[0];
-  }
+  private getSegmentInfo(barIndex: number) {
+    if (!this._segments || !this._totalPeriod) {
+      return [this._baseSeed, barIndex] as const;
+    }
 
-  private getSeedOffset(barIndex: number): number {
-    if (!this._loopLengths || !this._loopPeriod) return barIndex;
-
-    const position = barIndex % this._loopPeriod;
+    const position = barIndex % this._totalPeriod;
     let accumulated = 0;
 
-    for (const len of this._loopLengths) {
-      if (position < accumulated + len) return position - accumulated;
-      else accumulated += len;
+    for (const seg of this._segments) {
+      if (position < accumulated + seg.len) {
+        return [seg.seed, position - accumulated] as const;
+      }
+      accumulated += seg.len;
     }
 
-    return 0;
+    return [this._segments[0].seed, 0] as const;
   }
 
   private generate(barIndex: number) {
-    const currentSeed = this.getCurrentSeed(barIndex);
-    const seedOffset = this.getSeedOffset(barIndex);
+    const [currentSeed, seedOffset] = this.getSegmentInfo(barIndex);
     let seed = getSeed(currentSeed + seedOffset);
 
     const result: number[] = [];
