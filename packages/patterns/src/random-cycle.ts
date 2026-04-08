@@ -12,10 +12,12 @@ import {
   type RandMapper,
   type RandAlgo,
 } from "./utils/random";
+import type { nullableNumber } from "./types";
 
-class RandomCycle<
-  N extends number | null | undefined = number,
-> extends BaseCycle<number, number | N> {
+class RandomCycle<N extends nullableNumber = number> extends BaseCycle<
+  number,
+  number | N
+> {
   private _outputNullValue: N | undefined;
   private _baseSeed: number = 0;
   private _segments: Array<{ seed: number; len: number }> | undefined;
@@ -140,7 +142,7 @@ class RandomCycle<
     return this;
   }
 
-  private _clone<N extends number | null | undefined>(cloned: RandomCycle<N>) {
+  private _clone<N extends nullableNumber>(cloned: RandomCycle<N>) {
     cloned._baseSeed = this._baseSeed;
     cloned._segments = this._segments?.map((s) => ({ ...s }));
     cloned._totalPeriod = this._totalPeriod;
@@ -152,7 +154,7 @@ class RandomCycle<
     return cloned;
   }
 
-  clone(nullable: true): RandomCycle<number | null | undefined>;
+  clone(nullable: true): RandomCycle<nullableNumber>;
   clone(nullable?: false): RandomCycle<N>;
   clone(nullable?: boolean) {
     if (nullable) {
