@@ -27,6 +27,8 @@ class RandomCycle<N extends nullableNumber = number> extends BaseCycle<
   private _mapper: RandMapper = floatMapper;
   private _algo: RandAlgo = "xor";
   private _transform: ((v: number | N) => number | N) | null = null;
+  private _cachedBar: number | null = null;
+  private _cachedResult: (number | N)[] | null = null;
 
   public rib: (seed: number | number[], loop?: number | number[]) => this;
 
@@ -55,6 +57,10 @@ class RandomCycle<N extends nullableNumber = number> extends BaseCycle<
   }
 
   private generate(barIndex: number) {
+    if (barIndex === this._cachedBar && this._cachedResult !== null) {
+      return this._cachedResult;
+    }
+
     const [currentSeed, seedOffset] = this.getSegmentInfo(barIndex);
     let seed = getSeed(currentSeed + seedOffset);
 
@@ -79,8 +85,10 @@ class RandomCycle<N extends nullableNumber = number> extends BaseCycle<
       }
     }
 
-    if (this._transform) return result.map(this._transform);
-    return result;
+    const out = this._transform ? result.map(this._transform) : result;
+    this._cachedBar = barIndex;
+    this._cachedResult = out;
+    return out;
   }
 
   /* ----------------------------------------------------------------
