@@ -53,8 +53,8 @@ export default class Sample extends Instrument {
 
   begin(...input: (Note | Note[] | Note[][])[] | [RandomCycle]) {
     if (isRCInput(input)) {
-      input[0].null(null);
-      this._cycles = input[0];
+      // input[0].null(null);
+      this._cycles = input[0].clone(true);
     } else if (isNestedCycle(this._cycles)) {
       this._cycles.pattern(...input);
     }
@@ -62,11 +62,16 @@ export default class Sample extends Instrument {
   }
 
   chop(numChops: number, ...input: (number | number[])[] | [RandomCycle]) {
-    if (!isNestedCycle(this._cycles)) return this;
-
     const convert = (n: Nullable<number>) => {
       return typeof n === "number" ? (1 / numChops) * (n % numChops) : null;
     };
+
+    if (isRCInput(input)) {
+      this._cycles = input[0].clone(true).transform(convert);
+      return this;
+    }
+
+    if (!isNestedCycle(this._cycles)) return this;
 
     if (!input.length) {
       const chopsPerCycle = Math.floor(numChops / this._cycles.length) || 1;
@@ -78,13 +83,6 @@ export default class Sample extends Instrument {
             return step * j + chopsPerCycle * step * i;
           });
         }),
-      );
-    } else if (isRCInput(input)) {
-      const rc = input[0];
-      this._cycles.replace(
-        Array.from({ length: this._cycles.length }, (_, i) =>
-          rc.at(i).map(convert),
-        ),
       );
     } else {
       this._cycles.replace(

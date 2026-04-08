@@ -215,8 +215,8 @@ class Drome {
     return new Envelope(maxValue, startValue, endValue);
   }
 
-  rand(seed?: number | number[], loop?: number | number[]) {
-    return new RandomCycle({ seed, loop });
+  get rand() {
+    return new RandomCycle();
   }
 
   lfo(baseValue: number, scale = 1, rate = 1) {

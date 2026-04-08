@@ -68,8 +68,8 @@ export default class Synth extends Instrument {
     )[]
   ) {
     if (input.length === 1 && isRandomCycle(input[0])) {
-      input[0].null(null);
-      this._cycles = input[0];
+      // input[0].null(null);
+      this._cycles = input[0].clone(true);
     } else if (isNestedCycle(this._cycles)) {
       this._cycles.pattern(
         ...(input as (
@@ -86,7 +86,7 @@ export default class Synth extends Instrument {
     ...rest: (number | number[])[]
   ) {
     if (isRandomCycle(input)) {
-      input.null(0);
+      // input.null(0);
       this._voices = input;
     } else {
       if (!(this._voices instanceof FlatCycle)) this._voices = new FlatCycle(7);
@@ -100,7 +100,7 @@ export default class Synth extends Instrument {
     ...rest: (number | number[])[]
   ) {
     if (isRandomCycle(input)) {
-      input.null(0);
+      // input.null(0);
       this._panspread = input;
     } else if (input instanceof Envelope || input instanceof LfoNode) {
       this._panspread = input;
@@ -117,7 +117,7 @@ export default class Synth extends Instrument {
     ...rest: (number | number[])[]
   ) {
     if (isRandomCycle(input)) {
-      input.null(0);
+      // input.null(0);
       this._freqspread = input;
     } else if (input instanceof Envelope || input instanceof LfoNode) {
       this._freqspread = input;
