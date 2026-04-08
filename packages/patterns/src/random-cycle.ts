@@ -1,3 +1,5 @@
+// TODO: FIX Sample.chop random issue
+
 import BaseCycle from "./base-cycle";
 import type { Cycle } from "./utils/types";
 import {
@@ -13,6 +15,8 @@ import {
   type RandAlgo,
 } from "./utils/random";
 
+type Nullable<T> = T | null | undefined;
+
 class RandomCycle<
   N extends number | null | undefined = number,
 > extends BaseCycle<number, number | N> {
@@ -25,9 +29,12 @@ class RandomCycle<
   private _mapper: RandMapper = floatMapper;
   private _algo: RandAlgo = "xor";
 
+  public rib: (seed: number | number[], loop?: number | number[]) => this;
+
   constructor(nullValue?: N) {
     super([[1]], 0);
     this._outputNullValue = nullValue;
+    this.rib = this.ribbon.bind(this);
   }
 
   private getSegmentInfo(barIndex: number) {
@@ -130,9 +137,26 @@ class RandomCycle<
     return this;
   }
 
-  null(value: N) {
-    this._outputNullValue = value;
-    return this;
+  private _clone<N extends number | Nullable<number>>(cloned: RandomCycle<N>) {
+    cloned._baseSeed = this._baseSeed;
+    cloned._segments = this._segments?.map((s) => ({ ...s }));
+    cloned._totalPeriod = this._totalPeriod;
+    cloned._rangeStart = this._rangeStart;
+    cloned._rangeEnd = this._rangeEnd;
+    cloned._mapper = this._mapper;
+    cloned._algo = this._algo;
+    cloned._cycle = this._cycle.map((row) => [...row]);
+    return cloned;
+  }
+
+  clone(nullable: true): RandomCycle<Nullable<N>>;
+  clone(nullable?: false): RandomCycle<N>;
+  clone(nullable?: boolean) {
+    if (nullable) {
+      return this._clone(new RandomCycle<Nullable<number>>(null));
+    } else {
+      return this._clone(new RandomCycle(this._outputNullValue));
+    }
   }
 
   /* ----------------------------------------------------------------

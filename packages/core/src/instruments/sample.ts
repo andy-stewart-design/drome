@@ -54,7 +54,7 @@ export default class Sample extends Instrument {
   begin(...input: (Note | Note[] | Note[][])[] | [RandomCycle]) {
     if (isRCInput(input)) {
       // input[0].null(null);
-      this._cycles = input[0];
+      this._cycles = input[0].clone(true);
     } else if (isNestedCycle(this._cycles)) {
       this._cycles.pattern(...input);
     }

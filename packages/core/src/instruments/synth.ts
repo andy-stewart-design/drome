@@ -69,7 +69,7 @@ export default class Synth extends Instrument {
   ) {
     if (input.length === 1 && isRandomCycle(input[0])) {
       // input[0].null(null);
-      this._cycles = input[0];
+      this._cycles = input[0].clone(true);
     } else if (isNestedCycle(this._cycles)) {
       this._cycles.pattern(
         ...(input as (

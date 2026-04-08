@@ -56,7 +56,9 @@ interface FrequencyParams {
 
 abstract class Instrument {
   protected _drome: Drome;
-  protected _cycles: NestedCycle<Nullable<number>> | RandomCycle;
+  protected _cycles:
+    | NestedCycle<Nullable<number>>
+    | RandomCycle<Nullable<number>>;
   protected _midiRouter: MIDIRouter | null;
   private _destination: AudioNode;
   protected _connectorNode: GainNode;

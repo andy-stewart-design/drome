@@ -241,6 +241,45 @@ describe("RandomCycle", () => {
     });
   });
 
+  describe("clone", () => {
+    it("produces identical output to the original", () => {
+      const rc = new RandomCycle().ribbon(42, 4).steps(4).range(0, 100).int();
+      const cloned = rc.clone();
+      for (let i = 0; i < 8; i++) {
+        expect(cloned.at(i)).toEqual(rc.at(i));
+      }
+    });
+
+    it("mutating the clone does not affect the original", () => {
+      const rc = new RandomCycle().ribbon(1).steps(4).range(0, 10);
+      const cloned = rc.clone();
+      cloned.range(100, 200);
+      expect(rc.at(0)[0]).toBeLessThanOrEqual(10);
+      expect(cloned.at(0)[0]).toBeGreaterThanOrEqual(100);
+    });
+
+    it("_cycle is a deep copy — modifying clone mask does not affect original", () => {
+      const rc = new RandomCycle().ribbon(1).steps(4).euclid(3, 8);
+      const cloned = rc.clone();
+      cloned.reverse(); // mutates cloned._cycle in place
+      expect(rc.at(0)).not.toEqual(cloned.at(0));
+    });
+
+    it("clone preserves null value", () => {
+      const rc = new RandomCycle(-1).ribbon(1).steps(2).euclid(2, 4);
+      const cloned = rc.clone();
+      expect(cloned.at(0).filter((v) => v === -1)).toHaveLength(2);
+    });
+
+    it("clone(true) makes null positions return null", () => {
+      const rc = new RandomCycle().ribbon(1).steps(2).euclid(2, 4);
+      const cloned = rc.clone(true);
+      expect(cloned.at(0).filter((v) => v === null)).toHaveLength(2);
+      // original unchanged
+      expect(rc.at(0).filter((v) => v === 0)).toHaveLength(2);
+    });
+  });
+
   describe("pattern modifier composition", () => {
     it("euclid applies mask to random values", () => {
       const rc = new RandomCycle().ribbon(1).steps(3).euclid(3, 8);
