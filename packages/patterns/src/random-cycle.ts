@@ -1,5 +1,3 @@
-// TODO: FIX Sample.chop random issue
-
 import BaseCycle from "./base-cycle";
 import type { Cycle } from "./utils/types";
 import {
@@ -15,8 +13,6 @@ import {
   type RandAlgo,
 } from "./utils/random";
 
-type Nullable<T> = T | null | undefined;
-
 class RandomCycle<
   N extends number | null | undefined = number,
 > extends BaseCycle<number, number | N> {
@@ -28,6 +24,7 @@ class RandomCycle<
   private _rangeEnd = 1;
   private _mapper: RandMapper = floatMapper;
   private _algo: RandAlgo = "xor";
+  private _transform: ((v: number | N) => number | N) | null = null;
 
   public rib: (seed: number | number[], loop?: number | number[]) => this;
 
@@ -66,7 +63,7 @@ class RandomCycle<
 
     for (const m of mask) {
       if (m === 0) {
-        result.push(nullOut as N);
+        result.push(nullOut);
       } else {
         let rFloat: number;
         if (this._algo === "mulberry") {
@@ -80,6 +77,7 @@ class RandomCycle<
       }
     }
 
+    if (this._transform) return result.map(this._transform);
     return result;
   }
 
@@ -137,7 +135,12 @@ class RandomCycle<
     return this;
   }
 
-  private _clone<N extends number | Nullable<number>>(cloned: RandomCycle<N>) {
+  transform(fn: (v: number | N) => number | N) {
+    this._transform = fn;
+    return this;
+  }
+
+  private _clone<N extends number | null | undefined>(cloned: RandomCycle<N>) {
     cloned._baseSeed = this._baseSeed;
     cloned._segments = this._segments?.map((s) => ({ ...s }));
     cloned._totalPeriod = this._totalPeriod;
@@ -149,11 +152,11 @@ class RandomCycle<
     return cloned;
   }
 
-  clone(nullable: true): RandomCycle<Nullable<N>>;
+  clone(nullable: true): RandomCycle<number | null | undefined>;
   clone(nullable?: false): RandomCycle<N>;
   clone(nullable?: boolean) {
     if (nullable) {
-      return this._clone(new RandomCycle<Nullable<number>>(null));
+      return this._clone(new RandomCycle<number | null | undefined>(null));
     } else {
       return this._clone(new RandomCycle(this._outputNullValue));
     }
