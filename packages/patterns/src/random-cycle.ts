@@ -13,13 +13,11 @@ import {
   type RandAlgo,
 } from "./utils/random";
 
-interface RandomCycleOptions {
-  seed?: number | number[];
-  loop?: number | number[];
-}
-
-class RandomCycle extends BaseCycle<number> {
-  private _baseSeed: number;
+class RandomCycle<
+  N extends number | null | undefined = number,
+> extends BaseCycle<number, number | N> {
+  private _outputNullValue: N | undefined;
+  private _baseSeed: number = 0;
   private _segments: Array<{ seed: number; len: number }> | undefined;
   private _totalPeriod: number | undefined;
   private _rangeStart = 0;
@@ -27,20 +25,9 @@ class RandomCycle extends BaseCycle<number> {
   private _mapper: RandMapper = floatMapper;
   private _algo: RandAlgo = "xor";
 
-  constructor(opts: RandomCycleOptions = {}) {
+  constructor(nullValue?: N) {
     super([[1]], 0);
-    const seeds = Array.isArray(opts.seed) ? opts.seed : [opts.seed ?? 0];
-    this._baseSeed = seeds[0];
-
-    if (opts.loop !== undefined) {
-      const lengths = Array.isArray(opts.loop) ? opts.loop : [opts.loop];
-      const count = Math.max(seeds.length, lengths.length);
-      this._segments = Array.from({ length: count }, (_, i) => ({
-        seed: seeds[i % seeds.length],
-        len: lengths[i % lengths.length],
-      }));
-      this._totalPeriod = this._segments.reduce((a, s) => a + s.len, 0);
-    }
+    this._outputNullValue = nullValue;
   }
 
   private getSegmentInfo(barIndex: number) {
@@ -65,12 +52,14 @@ class RandomCycle extends BaseCycle<number> {
     const [currentSeed, seedOffset] = this.getSegmentInfo(barIndex);
     let seed = getSeed(currentSeed + seedOffset);
 
-    const result: number[] = [];
+    const result: (number | N)[] = [];
     const mask = this._cycle[barIndex % this._cycle.length];
+    const nullOut =
+      this._outputNullValue === undefined ? 0 : this._outputNullValue;
 
     for (const m of mask) {
       if (m === 0) {
-        result.push(this._nullValue!);
+        result.push(nullOut as N);
       } else {
         let rFloat: number;
         if (this._algo === "mulberry") {
@@ -90,6 +79,26 @@ class RandomCycle extends BaseCycle<number> {
   /* ----------------------------------------------------------------
   /* RANDOM-SPECIFIC METHODS
   ---------------------------------------------------------------- */
+  ribbon(seed: number | number[], loop?: number | number[]) {
+    const seeds = Array.isArray(seed) ? seed : [seed];
+    this._baseSeed = seeds[0];
+
+    if (loop !== undefined) {
+      const lengths = Array.isArray(loop) ? loop : [loop];
+      const count = Math.max(seeds.length, lengths.length);
+      this._segments = Array.from({ length: count }, (_, i) => ({
+        seed: seeds[i % seeds.length],
+        len: lengths[i % lengths.length],
+      }));
+      this._totalPeriod = this._segments.reduce((a, s) => a + s.len, 0);
+    } else {
+      this._segments = undefined;
+      this._totalPeriod = undefined;
+    }
+
+    return this;
+  }
+
   steps(n: number) {
     this._cycle = [Array.from({ length: n }, () => 1)];
     return this;
@@ -121,21 +130,21 @@ class RandomCycle extends BaseCycle<number> {
     return this;
   }
 
-  null(value: number | null) {
-    this._nullValue = value as number;
+  null(value: N) {
+    this._outputNullValue = value;
     return this;
   }
 
   /* ----------------------------------------------------------------
   /* GETTERS
   ---------------------------------------------------------------- */
-  at(i: number): Cycle<number>[number];
-  at(i: number, j: number): number;
-  at(i: number, j?: number) {
+  at(i: number): Cycle<number | N>[number];
+  at(i: number, j: number): number | N;
+  at(i: number, j?: number): Cycle<number | N>[number] | (number | N) {
     const values = this.generate(i);
 
     if (typeof j === "number") {
-      return values[j % values.length] ?? this._nullValue;
+      return values[j % values.length];
     }
 
     return values;

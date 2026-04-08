@@ -216,7 +216,7 @@ class Drome {
   }
 
   rand(seed?: number | number[], loop?: number | number[]) {
-    return new RandomCycle({ seed, loop });
+    return new RandomCycle().ribbon(seed ?? 0, loop);
   }
 
   lfo(baseValue: number, scale = 1, rate = 1) {

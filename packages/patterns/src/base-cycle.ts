@@ -10,7 +10,7 @@ import {
   type Cycle,
 } from "./utils";
 
-abstract class BaseCycle<S> {
+abstract class BaseCycle<S, R = S> {
   protected _cycle: Cycle<S>;
   protected _nullValue: S | undefined;
 
@@ -100,9 +100,9 @@ abstract class BaseCycle<S> {
   /* ----------------------------------------------------------------
   /* ABSTRACT
   ---------------------------------------------------------------- */
-  abstract at(i: number): Cycle<S>[number];
-  abstract at(i: number, j: number): S;
-  abstract at(i: number, j?: number): Cycle<S>[number] | S;
+  abstract at(i: number): Cycle<R>[number];
+  abstract at(i: number, j: number): R;
+  abstract at(i: number, j?: number): Cycle<R>[number] | R;
 
   /* ----------------------------------------------------------------
   /* GETTERS

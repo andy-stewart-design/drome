@@ -28,18 +28,18 @@ describe("RandomCycle", () => {
     });
   });
 
-  describe("seed", () => {
+  describe("ribbon (seed only)", () => {
     it("same seed produces same sequence", () => {
-      const a = new RandomCycle({ seed: 42 });
-      const b = new RandomCycle({ seed: 42 });
+      const a = new RandomCycle().ribbon(42);
+      const b = new RandomCycle().ribbon(42);
       for (let i = 0; i < 10; i++) {
         expect(a.at(i)).toEqual(b.at(i));
       }
     });
 
     it("different seeds produce different sequences", () => {
-      const a = new RandomCycle({ seed: 1 });
-      const b = new RandomCycle({ seed: 2 });
+      const a = new RandomCycle().ribbon(1);
+      const b = new RandomCycle().ribbon(2);
       expect(a.at(0)).not.toEqual(b.at(0));
     });
   });
@@ -74,7 +74,7 @@ describe("RandomCycle", () => {
 
   describe("range", () => {
     it("maps values to the specified range", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(100).range(200, 800);
+      const rc = new RandomCycle().ribbon(1).steps(100).range(200, 800);
       const values = rc.at(0);
       for (const v of values) {
         expect(v).toBeGreaterThanOrEqual(200);
@@ -90,7 +90,7 @@ describe("RandomCycle", () => {
 
   describe("int", () => {
     it("produces integer values", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(50).range(0, 100).int();
+      const rc = new RandomCycle().ribbon(1).steps(50).range(0, 100).int();
       const values = rc.at(0);
       for (const v of values) {
         expect(Number.isInteger(v)).toBe(true);
@@ -98,7 +98,7 @@ describe("RandomCycle", () => {
     });
 
     it("values are within range", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(50).range(60, 72).int();
+      const rc = new RandomCycle().ribbon(1).steps(50).range(60, 72).int();
       const values = rc.at(0);
       for (const v of values) {
         expect(v).toBeGreaterThanOrEqual(60);
@@ -109,7 +109,7 @@ describe("RandomCycle", () => {
 
   describe("bin", () => {
     it("produces only 0 or 1", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(50).bin();
+      const rc = new RandomCycle().ribbon(1).steps(50).bin();
       const values = rc.at(0);
       for (const v of values) {
         expect(v === 0 || v === 1).toBe(true);
@@ -117,9 +117,9 @@ describe("RandomCycle", () => {
     });
   });
 
-  describe("loop", () => {
+  describe("ribbon (seed + loop)", () => {
     it("single loop length repeats", () => {
-      const rc = new RandomCycle({ seed: 1, loop: 4 }).steps(4);
+      const rc = new RandomCycle().ribbon(1, 4).steps(4);
       expect(rc.at(0)).toEqual(rc.at(4));
       expect(rc.at(1)).toEqual(rc.at(5));
       expect(rc.at(2)).toEqual(rc.at(6));
@@ -127,7 +127,7 @@ describe("RandomCycle", () => {
     });
 
     it("no loop means unique values", () => {
-      const rc = new RandomCycle({ seed: 1 });
+      const rc = new RandomCycle().ribbon(1);
       const seen = new Set<string>();
       for (let i = 0; i < 100; i++) {
         seen.add(JSON.stringify(rc.at(i)));
@@ -136,7 +136,7 @@ describe("RandomCycle", () => {
     });
 
     it("alternating loop lengths repeat at total period", () => {
-      const rc = new RandomCycle({ seed: 1, loop: [2, 4] }).steps(4);
+      const rc = new RandomCycle().ribbon(1, [2, 4]).steps(4);
       // total period = 6
       expect(rc.at(0)).toEqual(rc.at(6));
       expect(rc.at(1)).toEqual(rc.at(7));
@@ -145,7 +145,7 @@ describe("RandomCycle", () => {
     });
 
     it("alternating loops have correct segment boundaries", () => {
-      const rc = new RandomCycle({ seed: 1, loop: [2, 4] }).steps(4);
+      const rc = new RandomCycle().ribbon(1, [2, 4]).steps(4);
       // bar 0 and bar 2 are both local index 0, but in different segments
       // bar 0 = segment 0, local 0
       // bar 2 = segment 1, local 0
@@ -154,15 +154,15 @@ describe("RandomCycle", () => {
     });
   });
 
-  describe("multi-seed", () => {
+  describe("ribbon (multi-seed)", () => {
     it("rand([3,6], 2): different seeds produce different values at the same local offset", () => {
-      const rc = new RandomCycle({ seed: [3, 6], loop: 2 });
+      const rc = new RandomCycle().ribbon([3, 6], 2);
       // bar 0 = segment 0 (seed 3, offset 0), bar 2 = segment 1 (seed 6, offset 0)
       expect(rc.at(0)).not.toEqual(rc.at(2));
     });
 
     it("rand([3,6], 2): period = 4, sequence repeats", () => {
-      const rc = new RandomCycle({ seed: [3, 6], loop: 2 });
+      const rc = new RandomCycle().ribbon([3, 6], 2);
       expect(rc.at(0)).toEqual(rc.at(4));
       expect(rc.at(1)).toEqual(rc.at(5));
       expect(rc.at(2)).toEqual(rc.at(6));
@@ -170,7 +170,7 @@ describe("RandomCycle", () => {
     });
 
     it("rand([3,6], [2,4]): period = 6, sequence repeats", () => {
-      const rc = new RandomCycle({ seed: [3, 6], loop: [2, 4] });
+      const rc = new RandomCycle().ribbon([3, 6], [2, 4]);
       expect(rc.at(0)).toEqual(rc.at(6));
       expect(rc.at(1)).toEqual(rc.at(7));
       expect(rc.at(2)).toEqual(rc.at(8));
@@ -178,13 +178,13 @@ describe("RandomCycle", () => {
     });
 
     it("rand([3,6], [2,4]): different seeds at same local offset produce different values", () => {
-      const rc = new RandomCycle({ seed: [3, 6], loop: [2, 4] });
+      const rc = new RandomCycle().ribbon([3, 6], [2, 4]);
       // bar 0 = segment 0 (seed 3, offset 0), bar 2 = segment 1 (seed 6, offset 0)
       expect(rc.at(0)).not.toEqual(rc.at(2));
     });
 
     it("rand(3, [2,4]): same seed resets at each segment boundary", () => {
-      const rc = new RandomCycle({ seed: 3, loop: [2, 4] });
+      const rc = new RandomCycle().ribbon(3, [2, 4]);
       // bar 0 = segment 0 (seed 3, offset 0), bar 2 = segment 1 (seed 3, offset 0) — same
       expect(rc.at(0)).toEqual(rc.at(2));
       // bar 1 = segment 0 (seed 3, offset 1), bar 3 = segment 1 (seed 3, offset 1) — same
@@ -192,7 +192,7 @@ describe("RandomCycle", () => {
     });
 
     it("rand(3, [2,4]): period = 6, sequence repeats", () => {
-      const rc = new RandomCycle({ seed: 3, loop: [2, 4] });
+      const rc = new RandomCycle().ribbon(3, [2, 4]);
       expect(rc.at(0)).toEqual(rc.at(6));
       expect(rc.at(5)).toEqual(rc.at(11));
     });
@@ -200,7 +200,7 @@ describe("RandomCycle", () => {
 
   describe("quant", () => {
     it("produces values that are multiples of the step", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(100).quant(0.25);
+      const rc = new RandomCycle().ribbon(1).steps(100).quant(0.25);
       const values = rc.at(0);
       for (const v of values) {
         expect(Math.round(v / 0.25) * 0.25).toBeCloseTo(v, 10);
@@ -208,7 +208,7 @@ describe("RandomCycle", () => {
     });
 
     it("values stay within the default [0, 1] range", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(100).quant(0.25);
+      const rc = new RandomCycle().ribbon(1).steps(100).quant(0.25);
       const values = rc.at(0);
       for (const v of values) {
         expect(v).toBeGreaterThanOrEqual(0);
@@ -217,7 +217,7 @@ describe("RandomCycle", () => {
     });
 
     it("only produces values from the expected set", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(200).quant(0.25);
+      const rc = new RandomCycle().ribbon(1).steps(200).quant(0.25);
       const allowed = new Set([0, 0.25, 0.5, 0.75, 1]);
       const values = rc.at(0);
       for (const v of values) {
@@ -226,7 +226,7 @@ describe("RandomCycle", () => {
     });
 
     it("works with a non-default range", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(100).range(200, 800).quant(100);
+      const rc = new RandomCycle().ribbon(1).steps(100).range(200, 800).quant(100);
       const values = rc.at(0);
       for (const v of values) {
         expect(v).toBeGreaterThanOrEqual(200);
@@ -243,7 +243,7 @@ describe("RandomCycle", () => {
 
   describe("pattern modifier composition", () => {
     it("euclid applies mask to random values", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(3).euclid(3, 8);
+      const rc = new RandomCycle().ribbon(1).steps(3).euclid(3, 8);
       const values = rc.at(0);
       expect(values).toHaveLength(8);
       const nonZero = values.filter((v) => v !== 0);
@@ -252,7 +252,7 @@ describe("RandomCycle", () => {
 
     it("hex applies mask to random values", () => {
       // hex "9" = [1,0,0,1] — 2 active positions
-      const rc = new RandomCycle({ seed: 1 }).steps(2).hex("9");
+      const rc = new RandomCycle().ribbon(1).steps(2).hex("9");
       const values = rc.at(0);
       expect(values).toHaveLength(4);
       expect(values[1]).toBe(0);
@@ -262,8 +262,8 @@ describe("RandomCycle", () => {
     });
 
     it("reverse changes mask positions", () => {
-      const rc1 = new RandomCycle({ seed: 1 }).steps(3).euclid(3, 8);
-      const rc2 = new RandomCycle({ seed: 1 }).steps(3).euclid(3, 8).reverse();
+      const rc1 = new RandomCycle().ribbon(1).steps(3).euclid(3, 8);
+      const rc2 = new RandomCycle().ribbon(1).steps(3).euclid(3, 8).reverse();
       const v1 = rc1.at(0);
       const v2 = rc2.at(0);
       // mask is reversed, so null positions flip
@@ -276,7 +276,7 @@ describe("RandomCycle", () => {
     });
 
     it("default null value (0) is used for masked positions", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(2).euclid(2, 4);
+      const rc = new RandomCycle().ribbon(1).steps(2).euclid(2, 4);
       const values = rc.at(0);
       expect(values).toHaveLength(4);
       const zeroCount = values.filter((v) => v === 0).length;
@@ -284,7 +284,7 @@ describe("RandomCycle", () => {
     });
 
     it("custom null value is used for masked positions", () => {
-      const rc = new RandomCycle({ seed: 1 }).steps(2).null(-1).euclid(2, 4);
+      const rc = new RandomCycle(-1).ribbon(1).steps(2).euclid(2, 4);
       const values = rc.at(0);
       const negOneCount = values.filter((v) => v === -1).length;
       expect(negOneCount).toBe(2);

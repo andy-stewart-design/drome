@@ -302,7 +302,7 @@ abstract class Instrument {
     if (this._muted) return this;
 
     if (isRandomCycle(input)) {
-      input.null(0);
+      // input.null(0);
       this._gain = input;
     } else if (input instanceof Envelope) {
       this._gain = input;
@@ -354,7 +354,7 @@ abstract class Instrument {
 
   detune(input: SNELO | RandomCycle | MIDIObserver<"controlchange">) {
     if (isRandomCycle(input)) {
-      input.null(0);
+      // input.null(0);
       this._detune = input;
     } else if (
       input instanceof Envelope ||
@@ -378,7 +378,7 @@ abstract class Instrument {
     this._filter.type = filterTypeMap[type];
 
     if (isRandomCycle(f)) {
-      f.null(0);
+      // f.null(0);
       this._filter.frequency = f;
     } else if (f instanceof Envelope) {
       this._filter.frequency = f;
@@ -393,7 +393,7 @@ abstract class Instrument {
     }
 
     if (isRandomCycle(q)) {
-      q.null(0);
+      // q.null(0);
       this._filter.q = q;
     } else if (q instanceof Envelope || isMidiObserver(q)) {
       this._filter.q = q;
