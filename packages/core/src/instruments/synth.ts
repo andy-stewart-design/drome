@@ -1,27 +1,45 @@
 import Instrument, { type InstrumentOptions } from "./instrument";
-import DromeArray from "@/array/drome-array";
+import LfoNode from "@/automation/lfo-node";
+import Envelope from "@/automation/envelope";
 import SynthNode from "@/audio-nodes/composite-synth-node";
 import { midiToFrequency } from "@/utils/midi-to-frequency";
 import { noteToMidi } from "@/utils/note-string-to-frequency";
 import { getWaveform } from "@/utils/synth-alias";
 import type Drome from "@/index";
-import type { NoteName, NoteValue, ScaleAlias, WaveformAlias } from "@/types";
+import type {
+  NoteName,
+  NoteValue,
+  Nullable,
+  ScaleAlias,
+  WaveformAlias,
+} from "@/types";
 import { getScale } from "@/utils/get-scale";
+import {
+  FlatCycle,
+  type RandomCycle,
+  isCycle,
+  isRandomCycle,
+  isNestedCycle,
+} from "@drome/patterns";
 
-interface SynthOptions extends InstrumentOptions<number | number[]> {
+interface SynthOptions extends InstrumentOptions {
   type?: WaveformAlias[];
 }
 
-export default class Synth extends Instrument<number | number[]> {
+export default class Synth extends Instrument {
   private _types: WaveformAlias[];
-  private _voices: DromeArray<number>;
+  private _voices: FlatCycle<number> | RandomCycle;
+  private _panspread: FlatCycle<number> | RandomCycle | Envelope | LfoNode;
+  private _freqspread: FlatCycle<number> | RandomCycle | Envelope | LfoNode;
   private _root = 0;
   private _scale: number[] | null = null;
 
   constructor(drome: Drome, opts: SynthOptions) {
     super(drome, { ...opts, baseGain: 0.125 });
     this._types = opts.type?.length ? opts.type : ["sine"];
-    this._voices = new DromeArray(7);
+    this._voices = new FlatCycle(7);
+    this._panspread = new FlatCycle(0.4);
+    this._freqspread = new FlatCycle(0.2);
   }
 
   private getMidiNote(note: number) {
@@ -42,15 +60,118 @@ export default class Synth extends Instrument<number | number[]> {
     return midiToFrequency(this._root + octave + step);
   }
 
-  voices(...input: (number | number[])[]) {
-    this._voices.note(...input);
+  note(
+    ...input: (
+      | Nullable<number | number[]>
+      | Nullable<number | number[]>[]
+      | RandomCycle
+    )[]
+  ) {
+    if (input.length === 1 && isRandomCycle(input[0])) {
+      // input[0].null(null);
+      this._cycles = input[0].clone(true);
+    } else if (isNestedCycle(this._cycles)) {
+      this._cycles.pattern(
+        ...(input as (
+          | Nullable<number | number[]>
+          | Nullable<number | number[]>[]
+        )[]),
+      );
+    }
     return this;
+  }
+
+  voices(
+    input: RandomCycle | number | number[],
+    ...rest: (number | number[])[]
+  ) {
+    if (isRandomCycle(input)) {
+      // input.null(0);
+      this._voices = input;
+    } else {
+      if (!(this._voices instanceof FlatCycle)) this._voices = new FlatCycle(7);
+      this._voices.pattern(input, ...rest);
+    }
+    return this;
+  }
+
+  panspread(
+    input: Envelope | LfoNode | RandomCycle | number | number[],
+    ...rest: (number | number[])[]
+  ) {
+    if (isRandomCycle(input)) {
+      // input.null(0);
+      this._panspread = input;
+    } else if (input instanceof Envelope || input instanceof LfoNode) {
+      this._panspread = input;
+    } else {
+      if (!(this._panspread instanceof FlatCycle))
+        this._panspread = new FlatCycle(0.4);
+      this._panspread.pattern(input, ...rest);
+    }
+    return this;
+  }
+
+  freqspread(
+    input: Envelope | LfoNode | RandomCycle | number | number[],
+    ...rest: (number | number[])[]
+  ) {
+    if (isRandomCycle(input)) {
+      // input.null(0);
+      this._freqspread = input;
+    } else if (input instanceof Envelope || input instanceof LfoNode) {
+      this._freqspread = input;
+    } else {
+      if (!(this._freqspread instanceof FlatCycle))
+        this._freqspread = new FlatCycle(0.2);
+      this._freqspread.pattern(input, ...rest);
+    }
+    return this;
+  }
+
+  private applySupersawParams(
+    node: SynthNode,
+    start: number,
+    duration: number,
+    chordIndex: number,
+  ) {
+    const cycleIndex = this._drome.metronome.bar % this._voices.length;
+
+    if (node.panspread) {
+      if (this._panspread instanceof Envelope) {
+        this._panspread.apply(
+          node.panspread,
+          start,
+          duration,
+          cycleIndex,
+          chordIndex,
+        );
+      } else if (this._panspread instanceof LfoNode) {
+        node.panspread.value = this._panspread.baseValue;
+        this._panspread.connect(node.panspread);
+      }
+    }
+
+    if (node.freqspread) {
+      if (this._freqspread instanceof Envelope) {
+        this._freqspread.apply(
+          node.freqspread,
+          start,
+          duration,
+          cycleIndex,
+          chordIndex,
+        );
+      } else if (this._freqspread instanceof LfoNode) {
+        node.freqspread.value = this._freqspread.baseValue;
+        this._freqspread.connect(node.freqspread);
+      }
+    }
   }
 
   root(n: NoteName | NoteValue | number) {
     if (typeof n === "number") this._root = n;
     else this._root = noteToMidi(n) || 0;
-    this._cycles.defaultValue = [[0]];
+    // this._cycles.defaultValue = [[0]];
     return this;
   }
 
@@ -70,19 +191,33 @@ export default class Synth extends Instrument<number | number[]> {
     this._types.forEach((typeAlias) => {
       notes.forEach((note, chordIndex) => {
         if (!note) return;
-        [note?.value].flat().forEach((midiNote) => {
-          // if (!midiNote) return;
-          const cycleIndex = this._drome.metronome.bar % this._voices.length;
+        [note.value].flat().forEach((midiNote) => {
+          if (midiNote == null) return;
+          const bar = this._drome.metronome.bar;
+          const cycleIndex = bar % this._voices.length;
+          const panspreadCycleIndex = isCycle(this._panspread)
+            ? bar % this._panspread.length
+            : cycleIndex;
+          const freqspreadCycleIndex = isCycle(this._freqspread)
+            ? bar % this._freqspread.length
+            : cycleIndex;
           const osc = new SynthNode(this.ctx, {
             frequency: this.getFrequency(midiNote),
             type: getWaveform(typeAlias),
             filter: this._filter.type ? { type: this._filter.type } : undefined,
             gain: 0,
             voices: this._voices.at(cycleIndex, chordIndex),
+            panspread: isCycle(this._panspread)
+              ? this._panspread.at(panspreadCycleIndex, chordIndex)
+              : undefined,
+            freqspread: isCycle(this._freqspread)
+              ? this._freqspread.at(freqspreadCycleIndex, chordIndex)
+              : undefined,
           });
           this._audioNodes.add(osc);
 
           const duration = this.applyNodeEffects(osc, note, chordIndex);
+          this.applySupersawParams(osc, note.start, duration, chordIndex);
 
           osc.connect(this._connectorNode);
           osc.start(note.start);

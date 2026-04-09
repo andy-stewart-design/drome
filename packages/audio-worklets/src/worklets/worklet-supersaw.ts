@@ -12,7 +12,7 @@ const audioParams = [
   { name: "stop", defaultValue: 0, max: Number.POSITIVE_INFINITY, min: 0 },
   { name: "frequency", defaultValue: 440, minValue: 20, maxValue: 20000 },
   { name: "panspread", defaultValue: 0.4, min: 0, max: 1 },
-  { name: "freqspread", defaultValue: 0.2, min: 0, max: 1 },
+  { name: "freqspread", defaultValue: 0.2, min: 0 },
   { name: "detune", defaultValue: 0, minValue: -153600.0, maxValue: 153600.0 },
   { name: "voices", defaultValue: 7, min: 1, max: 8, automationRate: "k-rate" },
 ] as const;
@@ -73,8 +73,8 @@ class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
       freq = freq * Math.pow(2, detune / 100 / 12);
       const detuner = getDetuner(voices, freqspread);
 
-      let gainL = Math.sqrt(1 - panspread);
-      let gainR = Math.sqrt(panspread);
+      let gainL = Math.sqrt(1 - (panspread * 0.5 + 0.5));
+      let gainR = Math.sqrt(panspread * 0.5 + 0.5);
 
       for (let v = 0; v < voices; v++) {
         const phase = this.phase[v];
@@ -85,7 +85,7 @@ class SuperSawOscillatorProcessor extends AudioWorkletProcessor {
         outL[i] += sample * gainL;
         outR[i] += sample * gainR;
         this.phase[v] = (phase + dt) % 1;
-        [gainL, gainR] = [gainR, gainL]; // Swap pan for next voice
+        [gainL, gainR] = [gainR, gainL];
       }
     }
     return true;

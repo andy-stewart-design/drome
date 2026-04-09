@@ -1,4 +1,3 @@
-import type DromeArray from "@/array/drome-array";
 import type Envelope from "@/automation/envelope";
 import type LfoNode from "./automation/lfo-node";
 import type * as algos from "@/utils/distortion-algorithms";
@@ -10,7 +9,11 @@ import type { scaleAliasMap } from "./utils/get-scale";
 import type { MIDIObserver } from "@drome/midi";
 
 // AUDIO CLOCK (types owned by @drome/clock)
-export type { DromeEventCallback, DromeEventType, Metronome } from "@drome/clock";
+export type {
+  DromeEventCallback,
+  DromeEventType,
+  Metronome,
+} from "@drome/clock";
 
 // NOTES + SCALES
 type NaturalNote = "A" | "B" | "C" | "D" | "E" | "F" | "G";
@@ -44,11 +47,6 @@ type SNELO = PatternInput | Envelope | LfoNode | MIDIObserver<"controlchange">;
 type AdsrMode = "fit" | "clip" | "free";
 type AdsrEnvelope = { a: number; d: number; s: number; r: number };
 type FilterType = "bandpass" | "highpass" | "lowpass";
-type FilterOptions = {
-  node: BiquadFilterNode;
-  frequencies: DromeArray<number>;
-};
-
 // EFFECTS
 type DistortionAlgorithm = keyof typeof algos;
 type DistortionFunction = (typeof algos)[DistortionAlgorithm];
@@ -63,7 +61,6 @@ export type {
   DistortionFunction,
   DromeCycleValue,
   FilterType,
-  FilterOptions,
   InstrumentType,
   NoteName,
   NoteValue,

@@ -21,7 +21,6 @@ class MIDIOberserver<T extends MIDIObserverType> {
 
   constructor(type: T, ident?: string, defaultValue?: number) {
     if ((type === "note" || type === "controlchange") && !ident) {
-      console.log(type);
       console.error("[MIDI Observer]: must provide a port id or name.");
     }
 

@@ -26,7 +26,7 @@ function parsePatternInput(input: PatternInput): Pattern {
 }
 
 function parseParamInput(input: SNELO) {
-  if (isEnv(input) || isLfoNode(input) || isMidiObserver<"controlchange">(input)) {
+  if (isEnv(input) || isLfoNode(input) || isMidiObserver(input)) {
     return input;
   } else if (isString(input) || isNumber(input)) {
     return parsePatternInput(input);
