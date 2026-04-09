@@ -2,18 +2,27 @@ import Instrument, { type InstrumentOptions } from "./instrument";
 import SamplerNode from "@/audio-nodes/composite-sample-node";
 import { flipBuffer } from "@/utils/flip-buffer";
 import { isArray, isNumber } from "@/utils/validators";
+import {
+  isNestedCycle,
+  isRandomCycle,
+  type RandomCycle,
+} from "@drome/patterns";
 import type Drome from "@/index";
 
 type Nullable<T> = T | null | undefined;
+type Note = Nullable<number>;
 
-interface SampleOptions extends InstrumentOptions<number> {
+const isRCInput = (i: unknown[]): i is [RandomCycle] =>
+  i.length === 1 && isRandomCycle(i[0]);
+
+interface SampleOptions extends InstrumentOptions {
   sampleIds?: string[];
   sampleBank?: string;
   playbackRate?: number;
   loop?: boolean;
 }
 
-export default class Sample extends Instrument<number> {
+export default class Sample extends Instrument {
   private _sampleIds: string[];
   private _sampleBank: string;
   private _playbackRate: number;
@@ -42,33 +51,46 @@ export default class Sample extends Instrument<number> {
     return this;
   }
 
-  begin(...input: (Nullable<number> | Nullable<number>[])[]) {
-    this._cycles.note(...input);
+  begin(...input: (Note | Note[] | Note[][])[] | [RandomCycle]) {
+    if (isRCInput(input)) {
+      // input[0].null(null);
+      this._cycles = input[0].clone(true);
+    } else if (isNestedCycle(this._cycles)) {
+      this._cycles.pattern(...input);
+    }
     return this;
   }
 
-  chop(numChops: number, ...input: (number | number[])[]) {
+  chop(numChops: number, ...input: (number | number[])[] | [RandomCycle]) {
     const convert = (n: Nullable<number>) => {
       return typeof n === "number" ? (1 / numChops) * (n % numChops) : null;
     };
+
+    if (isRCInput(input)) {
+      this._cycles = input[0].clone(true).transform(convert);
+      return this;
+    }
+
+    if (!isNestedCycle(this._cycles)) return this;
 
     if (!input.length) {
       const chopsPerCycle = Math.floor(numChops / this._cycles.length) || 1;
       const step = 1 / (chopsPerCycle * this._cycles.length);
 
-      this._cycles.value = Array.from(
-        { length: this._cycles.length },
-        (_, i) => {
+      this._cycles.replace(
+        Array.from({ length: this._cycles.length }, (_, i) => {
           return Array.from({ length: chopsPerCycle }, (_, j) => {
             return step * j + chopsPerCycle * step * i;
           });
-        },
+        }),
       );
     } else {
-      this._cycles.value = input.map((cycle) =>
-        isArray(cycle)
-          ? cycle.map((chord) => convert(chord))
-          : [convert(cycle)],
+      this._cycles.replace(
+        input.map((cycle) =>
+          isArray(cycle)
+            ? cycle.map((chord) => convert(chord))
+            : [convert(cycle)],
+        ),
       );
     }
 
@@ -82,7 +104,7 @@ export default class Sample extends Instrument<number> {
 
   fit(numBars = 1) {
     this._fitValue = numBars;
-    this.note(...Array.from({ length: numBars }, (_, i) => i / numBars));
+    this.begin(...Array.from({ length: numBars }, (_, i) => i / numBars));
     return this;
   }
 
@@ -92,7 +114,6 @@ export default class Sample extends Instrument<number> {
   }
 
   push() {
-    // this._drome.instruments.add(this);
     this._drome.queue(this);
   }
 
@@ -105,49 +126,53 @@ export default class Sample extends Instrument<number> {
       const { buffer } = await this._drome.loadSample(bank, name, index);
 
       notes.forEach((note, noteIndex) => {
-        if (
-          !buffer ||
-          !isNumber(note?.value) ||
-          note.start < this.ctx.currentTime - 0.0375
-        ) {
+        if (!buffer || !note || note.start < this.ctx.currentTime - 0.0375) {
           return;
         }
 
-        const playbackRate = this._fitValue
-          ? buffer.duration / barDuration / this._fitValue
-          : Math.abs(this._playbackRate);
+        [note.value].flat().forEach((offset) => {
+          if (!isNumber(offset)) return;
 
-        const src = new SamplerNode(
-          this.ctx,
-          this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
-          {
-            playbackRate,
-            loop: this._loop,
-            gain: 0,
-            filter: this._filter.type ? { type: this._filter.type } : undefined,
-          },
-        );
-        this._audioNodes.add(src);
+          const playbackRate = this._fitValue
+            ? buffer.duration / barDuration / this._fitValue
+            : Math.abs(this._playbackRate);
 
-        const _note = this._cut ? note : { ...note, duration: buffer.duration };
-        const duration = this.applyNodeEffects(src, _note, noteIndex);
+          const src = new SamplerNode(
+            this.ctx,
+            this._playbackRate < 0 ? flipBuffer(this.ctx, buffer) : buffer,
+            {
+              playbackRate,
+              loop: this._loop,
+              gain: 0,
+              filter: this._filter.type
+                ? { type: this._filter.type }
+                : undefined,
+            },
+          );
+          this._audioNodes.add(src);
 
-        src.connect(this._connectorNode);
-        src.start(note.start, note.value);
-        src.stop(note.start + duration);
+          const _note = this._cut
+            ? note
+            : { ...note, duration: buffer.duration };
+          const duration = this.applyNodeEffects(src, _note, noteIndex);
 
-        const cleanup = () => {
-          src.disconnect();
-          src.removeEventListener("ended", cleanup);
-          this._audioNodes.delete(src);
-          src.destory();
+          src.connect(this._connectorNode);
+          src.start(note.start, offset);
+          src.stop(note.start + duration);
 
-          if (this._stopTime && this._audioNodes.size === 0) {
-            this.destroy();
-          }
-        };
+          const cleanup = () => {
+            src.disconnect();
+            src.removeEventListener("ended", cleanup);
+            this._audioNodes.delete(src);
+            src.destory();
 
-        src.addEventListener("ended", cleanup);
+            if (this._stopTime && this._audioNodes.size === 0) {
+              this.destroy();
+            }
+          };
+
+          src.addEventListener("ended", cleanup);
+        });
       });
     });
   }

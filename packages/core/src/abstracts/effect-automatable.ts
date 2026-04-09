@@ -1,11 +1,6 @@
-import DromeArray from "@/array/drome-array";
+import { FlatCycle } from "@drome/patterns";
 import DromeAudioNode from "@/abstracts/drome-audio-node";
-import {
-  isArray,
-  isEnv,
-  isLfoNode,
-  isNullish,
-} from "@/utils/validators";
+import { isArray, isEnv, isLfoNode, isNullish } from "@/utils/validators";
 import { applySteppedRamp } from "@/utils/stepped-ramp";
 import { isMidiObserver } from "@drome/midi";
 import type { MIDIObserver } from "@drome/midi";
@@ -18,7 +13,7 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
   protected abstract _effect: T;
   protected abstract _target: AudioParam | undefined;
   protected _defaultValue: number;
-  protected _cycles: DromeArray<number>;
+  protected _cycles: FlatCycle<number>;
   protected _automation:
     | LfoNode
     | Envelope
@@ -31,19 +26,19 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
     switch (true) {
       case isEnv(input):
       case isLfoNode(input):
-      case isMidiObserver<"controlchange">(input):
+      case isMidiObserver(input):
         this._defaultValue = input.defaultValue;
-        this._cycles = new DromeArray(this._defaultValue);
+        this._cycles = new FlatCycle(this._defaultValue);
         this._automation = input;
         break;
       case isArray(input):
-        this._cycles = new DromeArray(0).note(...input);
+        this._cycles = new FlatCycle<number>(0).pattern(...input);
         this._defaultValue = this._cycles.at(0, 0) ?? defaultValue;
         break;
       default:
         console.warn("Invalid input", input satisfies never);
         this._defaultValue = defaultValue;
-        this._cycles = new DromeArray(0);
+        this._cycles = new FlatCycle(0);
     }
   }
 
@@ -69,7 +64,7 @@ abstract class AutomatableEffect<T extends AudioNode> extends DromeAudioNode {
           this._automation.apply(this._target, start, duration, cycleIdx, i);
         }
         break;
-      case isMidiObserver<"controlchange">(this._automation):
+      case isMidiObserver(this._automation):
         this._target.setValueAtTime(this._automation.currentValue, startTime);
         this._automation.onUpdate(({ value }) => {
           this._target?.setValueAtTime(value, 0);

@@ -31,7 +31,8 @@
   "dependencies": {
     "@drome/audio-worklets": "workspace:*",
     "@drome/clock": "workspace:*",
-    "@drome/midi": "workspace:*"
+    "@drome/midi": "workspace:*",
+    "@drome/patterns": "workspace:*"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",

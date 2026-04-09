@@ -29,7 +29,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    "baseUrl": ".", // This is important for path mapping to work
     "paths": {
       "@/*": ["./src/*"],
       // You can add other aliases here, e.g., "@/*": ["./src/*"]

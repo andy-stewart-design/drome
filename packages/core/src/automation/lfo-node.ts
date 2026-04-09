@@ -1,8 +1,14 @@
-import AudioEndedEvent from "@/events/audio-ended";
+import AudioEndedEvent from "@/utils/audio-ended";
 import type { BasicWaveform, BasicWaveformAlias } from "@/types";
 import { getParam } from "@/utils/audio-params";
 import { getBasicWaveform } from "@/utils/synth-alias";
-import { workletIds, type LfoProcessorOptions, type LfoParameterData, type LfoProcessorMessage, type LfoNodeMessage } from "@drome/audio-worklets";
+import {
+  workletIds,
+  type LfoProcessorOptions,
+  type LfoParameterData,
+  type LfoProcessorMessage,
+  type LfoNodeMessage,
+} from "@drome/audio-worklets";
 
 type LfoOptions = Partial<
   LfoProcessorOptions &

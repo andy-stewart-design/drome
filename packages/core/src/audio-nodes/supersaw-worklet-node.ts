@@ -1,4 +1,4 @@
-import AudioEndedEvent from "@/events/audio-ended";
+import AudioEndedEvent from "@/utils/audio-ended";
 import { getParam } from "@/utils/audio-params";
 import {
   workletIds,
