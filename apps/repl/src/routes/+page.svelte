@@ -9,5 +9,5 @@
 	});
 </script>
 
-<h1>REPL</h1>
+<h1 class="sr-only">REPL</h1>
 <div bind:this={editorEl}></div>
