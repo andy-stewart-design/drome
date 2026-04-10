@@ -4,6 +4,15 @@ import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
 	plugins: [sveltekit()],
+	resolve: {
+		dedupe: [
+			'@codemirror/state',
+			'@codemirror/view',
+			'@codemirror/commands',
+			'@codemirror/language',
+			'@codemirror/lang-javascript'
+		]
+	},
 	test: {
 		expect: { requireAssertions: true },
 		projects: [

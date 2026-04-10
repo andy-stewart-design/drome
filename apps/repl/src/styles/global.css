@@ -15,6 +15,20 @@ html {
 	tab-size: 2;
 	hanging-punctuation: first allow-end last;
 	word-break: break-word;
+
+	--cm-editor-color-foreground: inherit;
+	--cm-editor-color-background: none;
+	--cm-editor-font-family: 'Courier New', monospace;
+	--cm-editor-font-size: 14px;
+	--cm-cursor-width: 1.5px;
+	--cm-cursor-color: white;
+	--cm-gutter-border-width: 0px;
+	--cm-gutter-border-color: transparent;
+	--cm-selection-color-background: rgb(255 255 255 / 0.25);
+	--cm-gutter-color-foreground: rgb(255 255 255 / 0.5);
+	--cm-gutter-font-size: 14px;
+	--cm-active-line-color-background: rgb(255 255 255 / 0.05);
+	--cm-active-gutter-color-background: rgb(255 255 255 / 0.05);
 }
 
 body {
