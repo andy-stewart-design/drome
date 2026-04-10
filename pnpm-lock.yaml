@@ -150,6 +150,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.41.0
         version: 6.41.0
+      '@drome/audio-visualizer':
+        specifier: workspace:*
+        version: link:../../packages/audio-visualizer
       '@drome/editor':
         specifier: workspace:*
         version: link:../../packages/editor

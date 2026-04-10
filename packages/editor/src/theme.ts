@@ -51,6 +51,9 @@ export const theme = EditorView.theme(
       backgroundColor:
         "var(--cm-active-gutter-color-background, rgb(255 255 255 / 0.1))",
     },
+    "& .cm-matchingBracket, &.cm-focused .cm-matchingBracket": {
+      backgroundColor: "var(--cm-matching-bracket-color-background, blue)",
+    },
   },
   { dark: true },
 );

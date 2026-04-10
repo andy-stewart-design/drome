@@ -46,6 +46,7 @@ html {
 	--cm-gutter-font-size: 14px;
 	--cm-active-line-color-background: rgb(255 255 255 / 0.05);
 	--cm-active-gutter-color-background: rgb(255 255 255 / 0.05);
+	--cm-matching-bracket-color-background: rgb(255 255 255 / 0.25);
 }
 
 body {
