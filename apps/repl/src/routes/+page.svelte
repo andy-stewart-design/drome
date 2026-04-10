@@ -48,17 +48,23 @@
 <h1 class="sr-only">Drome REPL</h1>
 <div class="grid">
 	<div bind:this={container} class="container"></div>
+	<aside></aside>
 </div>
 
 <style>
 	.grid {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr);
+		/*grid-template-columns: minmax(0, 1fr);*/
+		grid-template-columns: minmax(0, 1fr) 320px;
 		height: 100dvh;
 	}
 
 	.container {
 		height: 100%;
 		overflow: hidden;
+	}
+
+	aside {
+		border-inline-start: 1px solid rgb(255 255 255 / 0.1);
 	}
 </style>
