@@ -12,6 +12,7 @@ import { indentOnInput, bracketMatching } from "@codemirror/language";
 import { javascript } from "@codemirror/lang-javascript";
 
 import { theme } from "./theme";
+import { insertLineAbove } from "./utiils";
 
 const DEFAULT_DOC =
   "// JavaScript support without colors\nfunction init() {\n  const message = 'Hello World';\n  console.log(message);\n}";
@@ -29,7 +30,11 @@ const startState = (doc?: string) =>
       bracketMatching(),
       javascript(),
       theme,
-      keymap.of([...defaultKeymap, ...historyKeymap]),
+      keymap.of([
+        { key: "Mod-Shift-Enter", run: insertLineAbove },
+        ...defaultKeymap,
+        ...historyKeymap,
+      ]),
     ],
   });
 
