@@ -21,11 +21,12 @@ If you're using Vite, add a `resolve.dedupe` config to ensure a single instance 
 export default defineConfig({
   resolve: {
     dedupe: [
-      '@codemirror/state',
-      '@codemirror/view',
-      '@codemirror/commands',
-      '@codemirror/language',
-      '@codemirror/lang-javascript',
+      "@codemirror/state",
+      "@codemirror/view",
+      "@codemirror/commands",
+      "@codemirror/language",
+      "@codemirror/lang-javascript",
+      "@codemirror/autocomplete",
     ],
   },
 });
@@ -34,9 +35,12 @@ export default defineConfig({
 ### API
 
 ```ts
-import { createCodeMirror } from '@drome/editor';
+import { createCodeMirror } from "@drome/editor";
 
-const view = createCodeMirror(document.getElementById('editor'), 'initial content');
+const view = createCodeMirror(
+  document.getElementById("editor"),
+  "initial content",
+);
 ```
 
 `createCodeMirror(parent: HTMLElement, doc?: string): EditorView`

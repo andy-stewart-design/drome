@@ -9,6 +9,7 @@ import {
 import { EditorState } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { indentOnInput, bracketMatching } from "@codemirror/language";
+import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
 
 import { theme } from "./theme";
@@ -28,12 +29,14 @@ const startState = (doc?: string) =>
       highlightActiveLineGutter(),
       indentOnInput(),
       bracketMatching(),
+      closeBrackets(),
       javascript(),
       theme,
       EditorState.allowMultipleSelections.of(true),
       EditorView.clickAddsSelectionRange.of((event) => event.altKey),
       keymap.of([
         { key: "Mod-Shift-Enter", run: insertLineAbove },
+        ...closeBracketsKeymap,
         ...defaultKeymap,
         ...historyKeymap,
       ]),

@@ -10,7 +10,8 @@ export default defineConfig({
 			'@codemirror/view',
 			'@codemirror/commands',
 			'@codemirror/language',
-			'@codemirror/lang-javascript'
+			'@codemirror/lang-javascript',
+			'@codemirror/autocomplete'
 		]
 	},
 	test: {
