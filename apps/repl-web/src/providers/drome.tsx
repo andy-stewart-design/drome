@@ -9,7 +9,7 @@ import {
   type ParentProps,
   type Setter,
 } from 'solid-js'
-import AudioVisualizer from '@/utils/audio-visualizer'
+import AudioVisualizer from '@drome/audio-visualizer'
 import { parseColorCssVars } from '@/utils/parse-color-css-var'
 import { usePlayState } from '@/providers/playstate'
 import { useSession } from '@/providers/session'
