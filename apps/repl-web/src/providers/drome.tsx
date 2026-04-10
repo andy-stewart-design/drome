@@ -84,15 +84,16 @@ function DromeProvider(props: ParentProps) {
       '--app-color-neutral-950-lch',
     )
 
+    const analyzer = d.getAnalyzer()
+
     const visualizer = new AudioVisualizer({
-      audioContext: d.context,
+      analyzer,
       canvas: c,
       type: 'curve',
       fgLCH,
       bgLCH,
     })
 
-    d.analyzer = visualizer.node
     setVisualizer(visualizer)
   })
 
