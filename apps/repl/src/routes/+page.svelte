@@ -17,21 +17,38 @@
 			drome = await Drome.init(120);
 
 			const analyser = drome.getAnalyzer();
-			visualizer = new AudioVisualizer({ analyzer: analyser, canvas, type: 'curve' });
+			visualizer = new AudioVisualizer({
+				analyzer: analyser,
+				canvas,
+				type: 'curve',
+				bgLCH: [0.1822, 0, 0]
+			});
 		}
 
-		function togglePlaystate(e: KeyboardEvent) {
-			if (!(e.altKey && e.key === 'Enter')) return;
-			if (drome && !drome.paused) {
+		function togglePlaystate(pause?: boolean) {
+			if (!drome || !editor) return;
+			const shouldPause = pause ?? !drome.paused;
+
+			if (shouldPause) {
 				console.log('stopping');
 				drome.stop();
 				visualizer?.stop();
-			} else if (drome && editor) {
+			} else {
 				console.log('starting');
 				const code = editor.state.doc.toString();
 				drome.evaluate(code);
 				if (drome.paused) drome.start();
 				visualizer?.start();
+			}
+		}
+
+		function handleKeyDown(e: KeyboardEvent) {
+			if (e.altKey && e.key === 'Enter') {
+				e.preventDefault();
+				togglePlaystate(false);
+			} else if (e.altKey && e.key === '÷') {
+				e.preventDefault();
+				togglePlaystate(true);
 			}
 		}
 
@@ -41,9 +58,9 @@
 		);
 		init();
 
-		window.addEventListener('keydown', togglePlaystate);
+		window.addEventListener('keydown', handleKeyDown);
 		return () => {
-			window.removeEventListener('keydown', togglePlaystate);
+			window.removeEventListener('keydown', handleKeyDown);
 			visualizer?.destroy();
 		};
 	});
@@ -58,7 +75,7 @@
 <div class="grid">
 	<div bind:this={container} class="container"></div>
 	<aside>
-		<canvas bind:this={canvas}></canvas>
+		<div class="visualizer"><canvas bind:this={canvas}></canvas></div>
 	</aside>
 </div>
 
@@ -79,7 +96,18 @@
 		border-inline-start: 1px solid rgb(255 255 255 / 0.1);
 	}
 
+	.visualizer {
+		display: grid;
+
+		&::after {
+			grid-area: 1/-1;
+			content: '';
+			display: block;
+			border-block-end: 1px solid rgb(255 255 255 / 0.1);
+		}
+	}
 	canvas {
+		grid-area: 1/-1;
 		width: 100%;
 		display: block;
 		aspect-ratio: 4/3;
