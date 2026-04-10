@@ -1,3 +1,19 @@
+@font-face {
+	font-family: 'Geist Mono';
+	src: url('/fonts/GeistMono[wght].woff2') format('woff2-variations');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Geist Mono';
+	src: url('/fonts/GeistMono-Italic[wght].woff2') format('woff2-variations');
+	font-weight: 100 900;
+	font-style: italic;
+	font-display: swap;
+}
+
 html {
 	color-scheme: light dark;
 	font-family:
@@ -19,7 +35,7 @@ html {
 	--cm-editor-color-foreground: inherit;
 	--cm-editor-color-background: none;
 	--cm-editor-block-size: 100%;
-	--cm-editor-font-family: 'DM Mono', monospace;
+	--cm-editor-font-family: 'Geist Mono', monospace;
 	--cm-editor-font-size: 14px;
 	--cm-cursor-width: 1.5px;
 	--cm-cursor-color: white;
