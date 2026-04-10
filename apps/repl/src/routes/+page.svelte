@@ -9,5 +9,20 @@
 	});
 </script>
 
-<h1 class="sr-only">REPL</h1>
-<div bind:this={editorEl}></div>
+<h1 class="sr-only">Drome REPL</h1>
+<div class="grid">
+	<div bind:this={editorEl} class="container"></div>
+</div>
+
+<style>
+	.grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		height: 100dvh;
+	}
+
+	.container {
+		height: 100%;
+		overflow: hidden;
+	}
+</style>

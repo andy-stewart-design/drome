@@ -6,6 +6,7 @@ export const theme = EditorView.theme(
       color: "var(--cm-editor-color-foreground, inherit)",
       background: "var(--cm-editor-color-background, none)",
       fontSize: "var(--cm-editor-font-size, 14px)",
+      height: "var(--cm-editor-block-size, auto)",
     },
     "&.cm-focused": {
       outline: "none",
@@ -34,6 +35,7 @@ export const theme = EditorView.theme(
     },
     "& .cm-lineNumbers .cm-gutterElement": {
       paddingInline: "0.75rem 0.625rem",
+      minWidth: "calc(1.375rem + 2ch)",
     },
     ".cm-activeLine": {
       backgroundColor: "transparent",

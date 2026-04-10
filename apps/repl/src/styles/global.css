@@ -18,7 +18,8 @@ html {
 
 	--cm-editor-color-foreground: inherit;
 	--cm-editor-color-background: none;
-	--cm-editor-font-family: 'Courier New', monospace;
+	--cm-editor-block-size: 100%;
+	--cm-editor-font-family: 'DM Mono', monospace;
 	--cm-editor-font-size: 14px;
 	--cm-cursor-width: 1.5px;
 	--cm-cursor-color: white;
@@ -39,6 +40,8 @@ body {
 *::before,
 *::after {
 	box-sizing: border-box;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 :where(h1, h2) {

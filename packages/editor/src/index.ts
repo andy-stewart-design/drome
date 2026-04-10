@@ -30,6 +30,8 @@ const startState = (doc?: string) =>
       bracketMatching(),
       javascript(),
       theme,
+      EditorState.allowMultipleSelections.of(true),
+      EditorView.clickAddsSelectionRange.of((event) => event.altKey),
       keymap.of([
         { key: "Mod-Shift-Enter", run: insertLineAbove },
         ...defaultKeymap,
