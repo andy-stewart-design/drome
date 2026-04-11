@@ -1,6 +1,6 @@
 <script lang="ts">
 	import AudioVisualizer from '@drome/audio-visualizer';
-	import { getDromeContext } from '$lib/drome-context.svelte';
+	import { getDromeContext } from '$lib/context/drome.svelte';
 	import { parseLCH } from '@/utils/parse-lch';
 
 	const ctx = getDromeContext();

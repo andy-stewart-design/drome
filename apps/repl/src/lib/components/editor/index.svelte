@@ -1,15 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
 	import { createCodeMirror } from '@drome/editor';
 	import { EditorView } from '@codemirror/view';
 	import { StateEffect } from '@codemirror/state';
-	import { getDromeContext } from '$lib/drome-context.svelte';
+	import { getDromeContext } from '$lib/context/drome.svelte';
+	import { getSketchContext } from '$lib/context/sketch.svelte';
 	import { createSketch, updateSketch } from '$lib/db';
 	import SaveSketchDialog from '@/components/save-sketch-dialog/index.svelte';
 
 	let { initialCode = '', tid = null }: { initialCode?: string; tid?: string | null } = $props();
 
 	const ctx = getDromeContext();
+	const sketchCtx = getSketchContext();
 
 	let container: HTMLDivElement;
 	let editor: EditorView | null = $state(null);
@@ -46,6 +49,7 @@
 		if (currentTid) {
 			await updateSketch(currentTid, { code });
 			savedCode = code;
+			sketchCtx.refresh();
 		} else {
 			saveDialogOpen = true;
 		}
@@ -58,6 +62,8 @@
 		const sketch = await createSketch({ title, code });
 		currentTid = sketch.tid;
 		savedCode = code;
+		sketchCtx.currentTid = sketch.tid;
+		sketchCtx.refresh();
 		history.replaceState(null, '', `/${sketch.tid}`);
 	}
 
@@ -85,10 +91,19 @@
 		}
 	}
 
+	beforeNavigate((navigation) => {
+		if (isDirty) {
+			if (!confirm('You have unsaved changes. Discard and leave?')) {
+				navigation.cancel();
+			}
+		}
+	});
+
 	onMount(() => {
 		savedCode = initialCode;
 		currentCode = initialCode;
 		currentTid = tid ?? null;
+		sketchCtx.currentTid = currentTid;
 
 		const view = createCodeMirror(container, initialCode);
 		editor = view;

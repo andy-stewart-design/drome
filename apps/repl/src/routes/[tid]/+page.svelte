@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { getSketch, type Sketch } from '@/db';
@@ -7,21 +6,25 @@
 
 	let sketch: Sketch | null = $state(null);
 
-	onMount(async () => {
+	$effect(() => {
 		const tid = page.params.tid;
 		if (!tid) {
 			goto('/new', { replaceState: true });
 			return;
 		}
-		const result = await getSketch(tid);
-		if (!result) {
-			goto('/new', { replaceState: true });
-			return;
-		}
-		sketch = result;
+
+		getSketch(tid).then((result) => {
+			if (!result) {
+				goto('/new', { replaceState: true });
+				return;
+			}
+			sketch = result;
+		});
 	});
 </script>
 
 {#if sketch}
-	<Editor initialCode={sketch.code} tid={sketch.tid} />
+	{#key sketch.tid}
+		<Editor initialCode={sketch.code} tid={sketch.tid} />
+	{/key}
 {/if}

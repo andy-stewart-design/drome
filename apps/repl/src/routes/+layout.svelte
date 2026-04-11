@@ -5,11 +5,15 @@
 	import '@/styles/global.css';
 	import AppLayout from '@/components/app-layout/index.svelte';
 	import Visualizer from '@/components/visualizer/index.svelte';
-	import { setDromeContext } from '$lib/drome-context.svelte';
+	import SketchList from '@/components/sketch-list/index.svelte';
+	import { setDromeContext } from '$lib/context/drome.svelte';
+	import { setSketchContext } from '$lib/context/sketch.svelte';
+	import { cleanupDeletedSketches } from '$lib/db';
 
 	let { children } = $props();
 
 	const ctx = setDromeContext();
+	setSketchContext();
 
 	onMount(() => {
 		async function init() {
@@ -18,6 +22,7 @@
 		}
 
 		init();
+		cleanupDeletedSketches();
 	});
 </script>
 
@@ -28,6 +33,27 @@
 <AppLayout>
 	{@render children()}
 	{#snippet sidebar()}
-		<Visualizer />
+		<div class="sidebar-stack">
+			<Visualizer />
+			<div class="sketch-list-pane">
+				<SketchList />
+			</div>
+		</div>
 	{/snippet}
 </AppLayout>
+
+<style>
+	.sidebar-stack {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.sketch-list-pane {
+		flex: 1;
+		min-height: 0;
+		overflow: hidden;
+		border-block-start: 1px solid rgb(255 255 255 / 0.1);
+	}
+</style>
