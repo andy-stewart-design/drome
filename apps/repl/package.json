@@ -16,6 +16,7 @@
 		"test": "npm run test:unit -- --run"
 	},
 	"dependencies": {
+		"@atproto/common-web": "^0.4.20",
 		"@codemirror/autocomplete": "^6.20.1",
 		"@codemirror/commands": "^6.10.3",
 		"@codemirror/lang-javascript": "^6.2.4",
@@ -24,7 +25,8 @@
 		"@codemirror/view": "^6.41.0",
 		"@drome/audio-visualizer": "workspace:*",
 		"@drome/editor": "workspace:*",
-		"drome-live": "workspace:*"
+		"drome-live": "workspace:*",
+		"idb": "^8.0.3"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.4",
