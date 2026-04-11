@@ -10,48 +10,45 @@
 	let evaluating = $state(false);
 	let timeoutId: ReturnType<typeof setTimeout>;
 
+	function togglePlaystate(pause?: boolean) {
+		if (!ctx.drome || !editor) return;
+		const shouldPause = pause ?? !ctx.drome.paused;
+
+		if (shouldPause) {
+			ctx.drome.stop();
+			ctx.visualizer?.stop();
+		} else {
+			const code = editor.state.doc.toString();
+			ctx.drome.evaluate(code);
+			if (ctx.drome.paused) ctx.drome.start();
+			ctx.visualizer?.start();
+		}
+	}
+
+	function handleKeyDown(e: KeyboardEvent) {
+		if (e.altKey && e.key === 'Enter') {
+			if (timeoutId) clearTimeout(timeoutId);
+			e.preventDefault();
+			togglePlaystate(false);
+			evaluating = true;
+			timeoutId = setTimeout(() => {
+				evaluating = false;
+			}, 300);
+		} else if (e.altKey && e.key === '÷') {
+			e.preventDefault();
+			togglePlaystate(true);
+		}
+	}
+
 	onMount(() => {
-		function togglePlaystate(pause?: boolean) {
-			if (!ctx.drome || !editor) return;
-			const shouldPause = pause ?? !ctx.drome.paused;
-
-			if (shouldPause) {
-				ctx.drome.stop();
-				ctx.visualizer?.stop();
-			} else {
-				const code = editor.state.doc.toString();
-				ctx.drome.evaluate(code);
-				if (ctx.drome.paused) ctx.drome.start();
-				ctx.visualizer?.start();
-			}
-		}
-
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.altKey && e.key === 'Enter') {
-				if (timeoutId) clearTimeout(timeoutId);
-				e.preventDefault();
-				togglePlaystate(false);
-				evaluating = true;
-				timeoutId = setTimeout(() => {
-					evaluating = false;
-				}, 300);
-			} else if (e.altKey && e.key === '÷') {
-				e.preventDefault();
-				togglePlaystate(true);
-			}
-		}
-
 		editor = createCodeMirror(
 			container,
 			'd.synth("tri").root("a3").scale("min").note([0,2,4,6]).push()'
 		);
-
-		window.addEventListener('keydown', handleKeyDown);
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown);
-		};
 	});
 </script>
+
+<svelte:window onkeydown={handleKeyDown} />
 
 <h1 class="sr-only">Drome REPL</h1>
 <div bind:this={container} class="container" data-evaluating={evaluating}></div>

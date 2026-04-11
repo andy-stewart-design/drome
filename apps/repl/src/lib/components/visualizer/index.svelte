@@ -1,6 +1,7 @@
 <script lang="ts">
 	import AudioVisualizer from '@drome/audio-visualizer';
 	import { getDromeContext } from '$lib/drome-context.svelte';
+	import { parseLCH } from '@/utils/parse-lch';
 
 	const ctx = getDromeContext();
 
@@ -9,13 +10,17 @@
 	$effect(() => {
 		if (!ctx.drome) return;
 
+		const styles = getComputedStyle(canvas);
+		const bgLCH = parseLCH(styles.getPropertyValue('--app-color-neutral-950-lch'));
+		const fgLCH = parseLCH(styles.getPropertyValue('--app-color-neutral-50-lch'));
+
 		const analyser = ctx.drome.getAnalyzer();
 		ctx.visualizer = new AudioVisualizer({
 			analyzer: analyser,
 			canvas,
 			type: 'curve',
-			bgLCH: [0.1822, 0, 0],
-			fgLCH: [0.6, 0, 0]
+			bgLCH,
+			fgLCH
 		});
 
 		return () => {
@@ -35,7 +40,7 @@
 			grid-area: 1/-1;
 			content: '';
 			display: block;
-			border-block-end: 1px solid oklch(var(--app-color-neutral-950-lch) / 0.1);
+			border-block-end: 1px solid oklch(var(--app-color-neutral-50-lch) / 0.1);
 		}
 	}
 	canvas {

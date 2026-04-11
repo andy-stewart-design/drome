@@ -3,7 +3,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import '@/styles/tokens.css';
 	import '@/styles/global.css';
-	import AppLayout from '@/components/app-layout.svelte';
+	import AppLayout from '@/components/app-layout/index.svelte';
 	import Visualizer from '@/components/visualizer/index.svelte';
 	import { setDromeContext } from '$lib/drome-context.svelte';
 
