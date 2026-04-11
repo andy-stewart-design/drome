@@ -39,8 +39,13 @@
 					class:active={sketch.tid === ctx.currentTid}
 					href="/{sketch.tid}"
 				>
-					<span class="title">{sketch.title}</span>
-					<span class="date">{formatDate(sketch.updatedAt)}</span>
+					<span class="item-header">
+						<span class="title">{sketch.title}</span>
+						<span class="date">{formatDate(sketch.updatedAt)}</span>
+					</span>
+					{#if sketch.origin}
+						<span class="provenance">forked from {sketch.originDisplayName ?? 'unknown'}</span>
+					{/if}
 				</a>
 			</li>
 		{:else}
@@ -102,14 +107,26 @@
 
 	.sketch-item {
 		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
+		flex-direction: column;
 		width: 100%;
 		padding: 0.5rem 0.75rem;
 		background: transparent;
 		color: inherit;
 		text-decoration: none;
 		font-size: 0.8125rem;
+	}
+
+	.item-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+	}
+
+	.provenance {
+		font-size: 0.6875rem;
+		opacity: 0.4;
+		font-style: italic;
+		margin-block-start: 0.125rem;
 	}
 
 	.sketch-item:hover {
