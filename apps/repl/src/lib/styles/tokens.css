@@ -1,0 +1,15 @@
+:where(html) {
+	--app-color-neutral-50-lch: 0.985 0.002 247.84;
+	--app-color-neutral-50: oklch(var(--app-color-neutral-50-lch));
+	--app-color-neutral-100: oklch(0.967 0.003 264.54);
+	--app-color-neutral-200: oklch(0.928 0.006 264.53);
+	--app-color-neutral-300: oklch(0.872 0.01 258.34);
+	--app-color-neutral-400: oklch(0.707 0.022 261.32);
+	--app-color-neutral-500: oklch(0.551 0.027 264.36);
+	--app-color-neutral-600: oklch(0.446 0.03 256.8);
+	--app-color-neutral-700: oklch(0.373 0.034 259.73);
+	--app-color-neutral-800: oklch(0.278 0.033 256.85);
+	--app-color-neutral-900: oklch(0.21 0.034 264.67);
+	--app-color-neutral-950-lch: 0.1 0.028 261.69;
+	--app-color-neutral-950: oklch(var(--app-color-neutral-950-lch));
+}

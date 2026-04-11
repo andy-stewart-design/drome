@@ -9,7 +9,7 @@ import {
   type ParentProps,
   type Setter,
 } from 'solid-js'
-import AudioVisualizer from '@/utils/audio-visualizer'
+import AudioVisualizer from '@drome/audio-visualizer'
 import { parseColorCssVars } from '@/utils/parse-color-css-var'
 import { usePlayState } from '@/providers/playstate'
 import { useSession } from '@/providers/session'
@@ -84,15 +84,16 @@ function DromeProvider(props: ParentProps) {
       '--app-color-neutral-950-lch',
     )
 
+    const analyzer = d.getAnalyzer()
+
     const visualizer = new AudioVisualizer({
-      audioContext: d.context,
+      analyzer,
       canvas: c,
       type: 'curve',
       fgLCH,
       bgLCH,
     })
 
-    d.analyzer = visualizer.node
     setVisualizer(visualizer)
   })
 

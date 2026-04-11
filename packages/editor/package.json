@@ -28,16 +28,19 @@
     "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
     "@repo/typescript-config": "workspace:*",
+    "@types/node": "^25.5.0",
     "@typescript/native-preview": "7.0.0-dev.20260328.1",
     "tsdown": "^0.21.7",
     "typescript": "^6.0.2",
     "vitest": "^4.1.2"
   },
   "dependencies": {
+    "@codemirror/autocomplete": "^6.20.1",
+    "@codemirror/commands": "^6.10.3",
+    "@codemirror/lang-javascript": "^6.2.4",
     "@codemirror/language": "^6.12.1",
-    "@lezer/javascript": "^1.5.4",
-    "codemirror": "^6.0.2"
+    "@codemirror/state": "^6.6.0",
+    "@codemirror/view": "^6.41.0"
   }
 }

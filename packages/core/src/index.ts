@@ -12,7 +12,11 @@ import DromeFilter from "@/effects/effect-filter";
 import GainEffect from "@/effects/effect-gain";
 import PanEffect from "@/effects/effect-pan";
 import ReverbEffect from "./effects/effect-reverb";
-import { filterTypeMap, type FilterTypeAlias } from "@/constants/index";
+import {
+  filterTypeMap,
+  type FftSize,
+  type FilterTypeAlias,
+} from "@/constants/index";
 import { isString } from "@/utils/validators";
 import { addWorklets } from "@drome/audio-worklets";
 import { parseParamInput, parsePatternInput } from "@/utils/parse-pattern";
@@ -286,6 +290,16 @@ class Drome {
     return effect;
   }
 
+  getAnalyzer(fftSize: FftSize = 512, smoothingTimeConstant = 0.8) {
+    if (!this._analyser) {
+      this._analyser = new AnalyserNode(this.context, {
+        fftSize,
+        smoothingTimeConstant,
+      });
+    }
+    return this._analyser;
+  }
+
   destroy() {
     this.context.close();
     this.audioChannels.length = 0;
@@ -369,10 +383,6 @@ class Drome {
 
   get loadSample() {
     return this._sampleManager.loadSample.bind(this._sampleManager);
-  }
-
-  set analyzer(node: AnalyserNode) {
-    this._analyser = node;
   }
 }
 

@@ -1,6 +1,4 @@
 type VisualizerType = 'bars' | 'curve' | 'waveform' | 'circular'
-// prettier-ignore
-type FftSize = 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 | 32768
 type LCH = [number, number, number]
 
 const defaultAvData = new Uint8Array([
@@ -20,10 +18,8 @@ const defaultAvData = new Uint8Array([
 ])
 
 interface AudioVisualizerConfig {
-  audioContext: AudioContext
+  analyzer: AnalyserNode
   canvas: HTMLCanvasElement
-  fftSize?: FftSize
-  smoothingTimeConstant?: number
   type?: VisualizerType
   bgLCH?: LCH
   fgLCH?: LCH
@@ -45,8 +41,6 @@ class AudioVisualizer {
   private _type: VisualizerType
 
   private _dataArray: Uint8Array<ArrayBuffer>
-  private _fftSize: FftSize
-  private _smoothingTimeConstant: number
 
   constructor(config: AudioVisualizerConfig) {
     this._canvas = config.canvas
@@ -61,16 +55,11 @@ class AudioVisualizer {
     if (!context) throw new Error('Could not get 2D context from canvas')
 
     this._ctx = context
-    this._fftSize = config.fftSize ?? 512
-    this._smoothingTimeConstant = config.smoothingTimeConstant ?? 0.8
     this._type = config.type ?? 'bars'
     this._dataArray = defaultAvData
 
-    this._analyser = new AnalyserNode(config.audioContext, {
-      fftSize: this._fftSize,
-      smoothingTimeConstant: this._smoothingTimeConstant,
-    })
-    this._analyser.connect(config.audioContext.destination)
+    this._analyser = config.analyzer
+    // this._analyser.connect(config.audioContext.destination)
 
     const { signal } = this._controller
     window.addEventListener('resize', () => this.resize(), { signal })

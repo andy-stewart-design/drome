@@ -25,6 +25,7 @@
     "@tanstack/solid-router-ssr-query": "^1.132.25",
     "@tanstack/solid-start": "^1.132.25",
     "codemirror": "^6.0.2",
+    "@drome/audio-visualizer": "workspace:*",
     "drome-live": "workspace:*",
     "nitro": "npm:nitro-nightly@latest",
     "solid-js": "^1.9.9",
