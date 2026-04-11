@@ -1,19 +1,16 @@
 <script lang="ts">
-	import type Drome from 'drome-live';
 	import AudioVisualizer from '@drome/audio-visualizer';
+	import { getDromeContext } from '$lib/drome-context.svelte';
 
-	let {
-		drome,
-		visualizer = $bindable<AudioVisualizer | null>(null)
-	}: { drome: Drome | null; visualizer?: AudioVisualizer | null } = $props();
+	const ctx = getDromeContext();
 
 	let canvas: HTMLCanvasElement;
 
 	$effect(() => {
-		if (!drome) return;
+		if (!ctx.drome) return;
 
-		const analyser = drome.getAnalyzer();
-		visualizer = new AudioVisualizer({
+		const analyser = ctx.drome.getAnalyzer();
+		ctx.visualizer = new AudioVisualizer({
 			analyzer: analyser,
 			canvas,
 			type: 'curve',
@@ -22,8 +19,8 @@
 		});
 
 		return () => {
-			visualizer?.destroy();
-			visualizer = null;
+			ctx.visualizer?.destroy();
+			ctx.visualizer = null;
 		};
 	});
 </script>
