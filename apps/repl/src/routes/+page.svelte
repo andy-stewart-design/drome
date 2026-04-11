@@ -8,6 +8,8 @@
 	let canvas: HTMLCanvasElement;
 	let editor: ReturnType<typeof createCodeMirror> | null = $state(null);
 	let drome: Drome | null = $state(null);
+	let evaluating = $state(false);
+	let timeoutId: ReturnType<typeof setTimeout>;
 
 	onMount(() => {
 		let visualizer: AudioVisualizer | null = null;
@@ -21,7 +23,8 @@
 				analyzer: analyser,
 				canvas,
 				type: 'curve',
-				bgLCH: [0.1822, 0, 0]
+				bgLCH: [0.1822, 0, 0],
+				fgLCH: [0.6, 0, 0]
 			});
 		}
 
@@ -44,8 +47,13 @@
 
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.altKey && e.key === 'Enter') {
+				if (timeoutId) clearTimeout(timeoutId);
 				e.preventDefault();
 				togglePlaystate(false);
+				evaluating = true;
+				timeoutId = setTimeout(() => {
+					evaluating = false;
+				}, 300);
 			} else if (e.altKey && e.key === '÷') {
 				e.preventDefault();
 				togglePlaystate(true);
@@ -64,16 +72,11 @@
 			visualizer?.destroy();
 		};
 	});
-
-	$effect(() => {
-		console.log(editor?.state.doc.toString());
-		console.log(drome);
-	});
 </script>
 
 <h1 class="sr-only">Drome REPL</h1>
 <div class="grid">
-	<div bind:this={container} class="container"></div>
+	<div bind:this={container} class="container" data-evaluating={evaluating}></div>
 	<aside>
 		<div class="visualizer"><canvas bind:this={canvas}></canvas></div>
 	</aside>

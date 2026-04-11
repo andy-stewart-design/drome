@@ -14,8 +14,13 @@
 	font-display: swap;
 }
 
-html {
-	color-scheme: light dark;
+:where(html) {
+	--app-color-fg-primary: var(--app-color-neutral-200, white);
+	--app-color-bg-primary: var(--app-color-neutral-950, black);
+
+	color-scheme: dark;
+	background: var(--app-color-bg-primary);
+	color: var(--app-color-fg-primary);
 	font-family:
 		system-ui,
 		-apple-system,
@@ -38,15 +43,27 @@ html {
 	--cm-editor-font-family: 'Geist Mono', monospace;
 	--cm-editor-font-size: 14px;
 	--cm-cursor-width: 1.5px;
-	--cm-cursor-color: white;
+	--cm-cursor-color: var(--app-color-fg-primary);
 	--cm-gutter-border-width: 0px;
 	--cm-gutter-border-color: transparent;
-	--cm-selection-color-background: rgb(255 255 255 / 0.25);
-	--cm-gutter-color-foreground: rgb(255 255 255 / 0.5);
+	--cm-selection-color-background: var(--app-color-neutral-800);
+	--cm-gutter-color-foreground: var(--app-color-neutral-500);
 	--cm-gutter-font-size: 14px;
-	--cm-active-line-color-background: rgb(255 255 255 / 0.05);
-	--cm-active-gutter-color-background: rgb(255 255 255 / 0.05);
-	--cm-matching-bracket-color-background: rgb(255 255 255 / 0.25);
+	--cm-line-color-background: transparent;
+	--cm-line-inline-size: auto;
+	--cm-active-line-color-background: oklch(var(--app-color-neutral-50-lch) / 0.075);
+	--cm-active-line-blurred-color-background: transparent;
+	--cm-active-gutter-color-background: oklch(var(--app-color-neutral-50-lch) / 0.075);
+	--cm-matching-bracket-color-background: var(--app-color-neutral-700);
+
+	[data-evaluating='true'] {
+		--cm-line-color-background: var(--app-color-neutral-400);
+		--cm-active-line-blurred-color-background: var(--app-color-neutral-400);
+		--cm-active-line-color-background: var(--app-color-neutral-400);
+		--cm-line-inline-size: fit-content;
+		--cm-matching-bracket-color-background: transparent;
+		color: var(--app-color-neutral-800);
+	}
 }
 
 body {

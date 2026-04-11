@@ -46,7 +46,6 @@ Break the PRD into **tracer bullet** phases. Each phase is a thin vertical slice
 Present the proposed breakdown as a numbered list. For each phase show:
 
 - **Title**: short descriptive name
-- **User stories covered**: which user stories from the PRD this addresses
 
 Ask the user:
 
@@ -77,8 +76,6 @@ Durable decisions that apply across all phases:
 
 ## Phase 1: <Title>
 
-**User stories**: <list from PRD>
-
 ### What to build
 
 A concise description of this vertical slice. Describe the end-to-end behavior, not layer-by-layer implementation.
@@ -92,8 +89,6 @@ A concise description of this vertical slice. Describe the end-to-end behavior, 
 ---
 
 ## Phase 2: <Title>
-
-**User stories**: <list from PRD>
 
 ### What to build
 

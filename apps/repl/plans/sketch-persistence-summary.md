@@ -2,20 +2,20 @@
 
 ## Schema (IndexedDB)
 
-| Field | Type | Notes |
-|-------|------|-------|
-| `tid` | `string` | TID (primary key), AT Proto rkey-compatible |
-| `title` | `string` | Display name, not unique |
-| `code` | `string` | The sketch source code |
-| `origin` | `string \| null` | AT URI this was forked from |
-| `originDid` | `string \| null` | DID of original author |
-| `originDisplayName` | `string \| null` | Cached handle, refreshed opportunistically |
-| `description` | `string \| null` | Optional description |
-| `tags` | `string[] \| null` | Optional tags |
-| `publishedUri` | `string \| null` | AT URI of latest publication |
-| `createdAt` | `string` | ISO 8601 |
-| `updatedAt` | `string` | ISO 8601 |
-| `deletedAt` | `string \| null` | ISO 8601, soft delete |
+| Field               | Type               | Notes                                       |
+| ------------------- | ------------------ | ------------------------------------------- |
+| `tid`               | `string`           | TID (primary key), AT Proto rkey-compatible |
+| `title`             | `string`           | Display name, not unique                    |
+| `code`              | `string`           | The sketch source code                      |
+| `origin`            | `string \| null`   | AT URI this was forked from                 |
+| `originDid`         | `string \| null`   | DID of original author                      |
+| `originDisplayName` | `string \| null`   | Cached handle, refreshed opportunistically  |
+| `description`       | `string \| null`   | Optional description                        |
+| `tags`              | `string[] \| null` | Optional tags                               |
+| `publishedUri`      | `string \| null`   | AT URI of latest publication                |
+| `createdAt`         | `string`           | ISO 8601                                    |
+| `updatedAt`         | `string`           | ISO 8601                                    |
+| `deletedAt`         | `string \| null`   | ISO 8601, soft delete                       |
 
 **Indexes:** `updatedAt`, `title`, `publishedUri`, `deletedAt`
 
@@ -73,3 +73,12 @@
 - Just the code string — no BPM, channel state, visualizer config, or MIDI mappings
 - Title and authorship metadata for display and provenance
 - Optional description and tags for discoverability
+
+## Compression — Deferred
+
+Considered using the Compression Streams API to gzip + base64-encode sketch code in IndexedDB. **Decision: skip for now.**
+
+- Sketches are small (typically a few hundred bytes). Gzip headers (~20 bytes) plus base64's 33% inflation can make compressed output larger than the original for small payloads.
+- IndexedDB stores strings natively — no encoding needed. Quotas are generous (50%+ of disk).
+- Compression may become relevant at the AT Protocol publishing layer if PDS blob limits are a concern, but it can be added there without affecting the local storage format.
+- Keeping `code` as a plain string simplifies debugging, export, and avoids save/load overhead.

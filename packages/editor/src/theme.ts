@@ -37,8 +37,13 @@ export const theme = EditorView.theme(
       paddingInline: "0.75rem 0.625rem",
       minWidth: "calc(1.375rem + 2ch)",
     },
+    ".cm-line": {
+      backgroundColor: "var(--cm-line-color-background, transparent)",
+      inlineSize: "var(--cm-line-inline-size, auto)",
+    },
     ".cm-activeLine": {
-      backgroundColor: "transparent",
+      backgroundColor:
+        "var(--cm-active-line-blurred-color-background, transparent)",
     },
     "&.cm-focused .cm-activeLine": {
       backgroundColor:
