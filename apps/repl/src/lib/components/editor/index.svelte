@@ -6,8 +6,9 @@
 	import { StateEffect } from '@codemirror/state';
 	import { getDromeContext } from '$lib/context/drome.svelte';
 	import { getSketchContext } from '$lib/context/sketch.svelte';
-	import { createSketch, updateSketch } from '$lib/db';
+	import { createSketch, updateSketch, softDeleteSketch } from '$lib/db';
 	import SaveSketchDialog from '@/components/save-sketch-dialog/index.svelte';
+	import ConfirmDialog from '@/components/base-confirm-dialog/index.svelte';
 
 	let { initialCode = '', tid = null }: { initialCode?: string; tid?: string | null } = $props();
 
@@ -25,6 +26,7 @@
 	let isDirty = $derived(currentCode !== savedCode);
 
 	let saveDialogOpen = $state(false);
+	let deleteDialogOpen = $state(false);
 
 	function togglePlaystate(pause?: boolean) {
 		if (!ctx.drome || !editor) return;
@@ -67,10 +69,29 @@
 		history.replaceState(null, '', `/${sketch.tid}`);
 	}
 
+	async function handleDelete() {
+		if (!currentTid || !editor) return;
+		await softDeleteSketch(currentTid);
+		currentTid = null;
+		sketchCtx.currentTid = null;
+		sketchCtx.refresh();
+
+		const defaultCode = 'd.synth("tri").root("a3").scale("min").note([0,2,4,6]).push()';
+		editor.dispatch({
+			changes: { from: 0, to: editor.state.doc.length, insert: defaultCode }
+		});
+		savedCode = defaultCode;
+		currentCode = defaultCode;
+		history.replaceState(null, '', '/new');
+	}
+
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.altKey && e.key === 'ß') {
 			e.preventDefault();
 			save();
+		} else if (e.altKey && e.key === 'Backspace') {
+			e.preventDefault();
+			if (currentTid) deleteDialogOpen = true;
 		} else if (e.altKey && e.key === 'Enter') {
 			if (timeoutId) clearTimeout(timeoutId);
 			e.preventDefault();
@@ -123,6 +144,13 @@
 <div bind:this={container} class="container" data-evaluating={evaluating}></div>
 
 <SaveSketchDialog bind:open={saveDialogOpen} onsave={handleSave} />
+<ConfirmDialog
+	bind:open={deleteDialogOpen}
+	message="Delete this sketch? It can be recovered for 30 days."
+	confirmLabel="Delete"
+	cancelLabel="Cancel"
+	onconfirm={handleDelete}
+/>
 
 <style>
 	.container {
