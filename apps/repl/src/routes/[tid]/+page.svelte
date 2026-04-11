@@ -2,10 +2,10 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { getSketch } from '$lib/db';
+	import { getSketch, type Sketch } from '@/db';
 	import Editor from '@/components/editor/index.svelte';
 
-	let code: string | null = $state(null);
+	let sketch: Sketch | null = $state(null);
 
 	onMount(async () => {
 		const tid = page.params.tid;
@@ -13,15 +13,15 @@
 			goto('/new', { replaceState: true });
 			return;
 		}
-		const sketch = await getSketch(tid);
-		if (!sketch) {
+		const result = await getSketch(tid);
+		if (!result) {
 			goto('/new', { replaceState: true });
 			return;
 		}
-		code = sketch.code;
+		sketch = result;
 	});
 </script>
 
-{#if code !== null}
-	<Editor initialCode={code} />
+{#if sketch}
+	<Editor initialCode={sketch.code} tid={sketch.tid} />
 {/if}

@@ -1,16 +1,27 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { createCodeMirror } from '@drome/editor';
+	import { EditorView } from '@codemirror/view';
+	import { StateEffect } from '@codemirror/state';
 	import { getDromeContext } from '$lib/drome-context.svelte';
+	import { createSketch, updateSketch } from '$lib/db';
+	import SaveSketchDialog from '@/components/save-sketch-dialog/index.svelte';
 
-	let { initialCode = '' }: { initialCode?: string } = $props();
+	let { initialCode = '', tid = null }: { initialCode?: string; tid?: string | null } = $props();
 
 	const ctx = getDromeContext();
 
 	let container: HTMLDivElement;
-	let editor: ReturnType<typeof createCodeMirror> | null = $state(null);
+	let editor: EditorView | null = $state(null);
 	let evaluating = $state(false);
 	let timeoutId: ReturnType<typeof setTimeout>;
+
+	let savedCode = $state('');
+	let currentCode = $state('');
+	let currentTid: string | null = $state(null);
+	let isDirty = $derived(currentCode !== savedCode);
+
+	let saveDialogOpen = $state(false);
 
 	function togglePlaystate(pause?: boolean) {
 		if (!ctx.drome || !editor) return;
@@ -27,8 +38,34 @@
 		}
 	}
 
+	async function save() {
+		if (!editor) return;
+
+		const code = editor.state.doc.toString();
+
+		if (currentTid) {
+			await updateSketch(currentTid, { code });
+			savedCode = code;
+		} else {
+			saveDialogOpen = true;
+		}
+	}
+
+	async function handleSave(title: string) {
+		if (!editor) return;
+
+		const code = editor.state.doc.toString();
+		const sketch = await createSketch({ title, code });
+		currentTid = sketch.tid;
+		savedCode = code;
+		history.replaceState(null, '', `/${sketch.tid}`);
+	}
+
 	function handleKeyDown(e: KeyboardEvent) {
-		if (e.altKey && e.key === 'Enter') {
+		if (e.altKey && e.key === 'ß') {
+			e.preventDefault();
+			save();
+		} else if (e.altKey && e.key === 'Enter') {
 			if (timeoutId) clearTimeout(timeoutId);
 			e.preventDefault();
 			togglePlaystate(false);
@@ -42,15 +79,35 @@
 		}
 	}
 
+	function handleBeforeUnload(e: BeforeUnloadEvent) {
+		if (isDirty) {
+			e.preventDefault();
+		}
+	}
+
 	onMount(() => {
-		editor = createCodeMirror(container, initialCode);
+		savedCode = initialCode;
+		currentCode = initialCode;
+		currentTid = tid ?? null;
+
+		const view = createCodeMirror(container, initialCode);
+		editor = view;
+
+		const onUpdate = EditorView.updateListener.of((update) => {
+			if (update.docChanged) {
+				currentCode = update.state.doc.toString();
+			}
+		});
+		view.dispatch({ effects: StateEffect.appendConfig.of(onUpdate) });
 	});
 </script>
 
-<svelte:window onkeydown={handleKeyDown} />
+<svelte:window onkeydown={handleKeyDown} onbeforeunload={handleBeforeUnload} />
 
 <h1 class="sr-only">Drome REPL</h1>
 <div bind:this={container} class="container" data-evaluating={evaluating}></div>
+
+<SaveSketchDialog bind:open={saveDialogOpen} onsave={handleSave} />
 
 <style>
 	.container {
