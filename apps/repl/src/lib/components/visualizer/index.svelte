@@ -47,6 +47,7 @@
 		grid-area: 1/-1;
 		width: 100%;
 		display: block;
-		aspect-ratio: 4/3;
+		aspect-ratio: 3/2;
+		max-block-size: 560px;
 	}
 </style>

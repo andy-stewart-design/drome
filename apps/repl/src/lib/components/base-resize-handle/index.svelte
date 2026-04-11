@@ -22,27 +22,36 @@
 	}
 </script>
 
-<div
-	class="handle"
-	class:dragging
-	role="separator"
-	aria-orientation="vertical"
-	onpointerdown={handlePointerDown}
-	onpointermove={handlePointerMove}
-	onpointerup={handlePointerUp}
-></div>
+<div class="container">
+	<div
+		class="handle"
+		class:dragging
+		role="separator"
+		aria-orientation="vertical"
+		onpointerdown={handlePointerDown}
+		onpointermove={handlePointerMove}
+		onpointerup={handlePointerUp}
+	></div>
+</div>
 
 <style>
-	.handle {
-		width: 6px;
-		cursor: col-resize;
-		background: transparent;
-		border-inline: 1px solid rgb(255 255 255 / 0.1);
-		flex-shrink: 0;
+	.container {
+		display: flex;
+		justify-content: flex-end;
+		width: 1px;
+		z-index: 2;
 	}
 
-	.handle:hover,
-	.handle.dragging {
-		background: rgb(255 255 255 / 0.1);
+	.handle {
+		height: 100%;
+		width: 8px;
+		cursor: col-resize;
+		background: transparent;
+		border-inline-end: 1px solid rgb(255 255 255 / 0.1);
+		flex-shrink: 0;
+
+		&:is(:hover, .dragging) {
+			background: oklch(var(--app-color-neutral-50-lch) / 0.1);
+		}
 	}
 </style>

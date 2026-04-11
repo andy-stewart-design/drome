@@ -30,7 +30,8 @@
 
 <style>
 	dialog {
-		border: 1px solid rgb(255 255 255 / 0.2);
+		border: none;
+		outline: 1px solid rgb(255 255 255 / 0.2);
 		border-radius: 8px;
 		background: var(--app-color-bg-primary);
 		color: var(--app-color-fg-primary);
@@ -40,5 +41,6 @@
 
 	dialog::backdrop {
 		background: rgb(0 0 0 / 0.5);
+		backdrop-filter: blur(4px);
 	}
 </style>
